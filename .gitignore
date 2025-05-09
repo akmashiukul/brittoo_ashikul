@@ -1,0 +1,57 @@
+# ----------------------
+# Global dependencies
+# ----------------------
+node_modules/
+**/node_modules/
+
+# ----------------------
+# Build outputs
+# ----------------------
+build/
+dist/
+**/build/
+**/dist/
+
+# ----------------------
+# Environment variables
+# ----------------------
+.env
+.env.*
+**/.env
+**/.env.*
+
+# ----------------------
+# Logs
+# ----------------------
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+*.log
+
+# ----------------------
+# Prisma
+# ----------------------
+prisma/dev.db
+prisma/dev.db-journal
+prisma/migrations/
+**/prisma/dev.db
+**/prisma/migrations/
+
+# ----------------------
+# OS-specific
+# ----------------------
+.DS_Store
+Thumbs.db
+
+# ----------------------
+# Editor/IDE
+# ----------------------
+.vscode/
+.idea/
+*.swp
+
+# ----------------------
+# Misc
+# ----------------------
+coverage/

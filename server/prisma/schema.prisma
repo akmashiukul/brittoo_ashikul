@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String  @id @default(cuid())
+  name          String
+  email         String  @unique
+  roll          String  @unique
+  password      String
+  selfie        String
+  id_card_photo String
+  ip_address    String?
+  latitude      Float?
+  longitude     Float?
+
+  safety_score Int   @default(0)
+  blue_credit  Float @default(0.00)
+  red_credit   Float @default(0.00)
+
+  rented_products   Product[] @relation("RentedProducts")
+  borrowed_products Product[] @relation("BorrowedProducts")
+
+  createdAt DateTime
+  updatedAt DateTime @updatedAt
+
+  @@index([latitude, longitude])
+}
+
+model Product {
+  id            String @id @default(cuid())
+  name          String
+  price_per_day Float
+  product_image String
+
+  //FKs
+  ownerId    String
+  borrowerId String?
+
+  owner    User  @relation("RentedProducts", fields: [ownerId], references: [id])
+  borrower User? @relation("BorrowedProducts", fields: [borrowerId], references: [id])
+
+  createdAt DateTime
+  updatedAt DateTime @updatedAt
+}
