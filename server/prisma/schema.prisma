@@ -18,6 +18,7 @@ model User {
   ip_address    String?
   latitude      Float?
   longitude     Float?
+  role          Role    @default(USER)
 
   safety_score Int   @default(0)
   blue_credit  Float @default(0.00)
@@ -32,11 +33,18 @@ model User {
   @@index([latitude, longitude])
 }
 
+enum Role {
+  USER
+  ADMIN
+  MODERATOR
+}
+
 model Product {
-  id            String @id @default(cuid())
+  id            String      @id @default(cuid())
   name          String
   price_per_day Float
   product_image String
+  product_type  ProductType
 
   //FKs
   ownerId    String
@@ -47,4 +55,12 @@ model Product {
 
   createdAt DateTime
   updatedAt DateTime @updatedAt
+}
+
+enum ProductType {
+  GADGET
+  FURNITURE
+  VEHICLE
+  STATIONARY
+  MUSICAL_INSTRUMENT
 }

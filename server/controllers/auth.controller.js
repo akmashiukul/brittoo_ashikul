@@ -12,10 +12,8 @@ export const register = async (req, res, next) => {
     longitude,
     selfie,
     id_card_photo,
+    ip_address
   } = req.body;
-
-  const ip_address =
-    req.headers["x-forwarded-for"] || req.connection.remoteAddress;
   try {
     let user = await prisma.user.findFirst({
       where: {
