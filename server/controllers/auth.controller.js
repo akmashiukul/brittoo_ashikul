@@ -10,8 +10,6 @@ export const register = async (req, res, next) => {
     roll,
     latitude,
     longitude,
-    selfie,
-    id_card_photo,
     ip_address
   } = req.body;
   try {
@@ -24,6 +22,7 @@ export const register = async (req, res, next) => {
       throw new CustomError("User already exists!", 401);
     }
     const hashedPassword = await bcrypt.hash(password, 10);
+
     user = await prisma.user.create({
       data: {
         name,
@@ -32,8 +31,6 @@ export const register = async (req, res, next) => {
         roll,
         latitude,
         longitude,
-        selfie,
-        id_card_photo,
         ip_address,
       },
     });
@@ -50,3 +47,8 @@ export const register = async (req, res, next) => {
     next(error);
   }
 };
+
+
+export const verifyUser = async (req, res) => {
+
+}

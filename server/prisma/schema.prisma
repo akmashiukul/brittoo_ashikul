@@ -14,8 +14,10 @@ model User {
   roll          String  @unique
   password      String
   selfie        String
-  id_card_photo String
+  id_card_front String
+  id_card_back  String
   ip_address    String?
+  is_verified   Boolean @default(false)
   latitude      Float?
   longitude     Float?
   role          Role    @default(USER)
@@ -43,10 +45,9 @@ model Product {
   id            String      @id @default(cuid())
   name          String
   price_per_day Float
-  product_image String
+  product_image String[]
   product_type  ProductType
 
-  //FKs
   ownerId    String
   borrowerId String?
 
@@ -63,4 +64,8 @@ enum ProductType {
   VEHICLE
   STATIONARY
   MUSICAL_INSTRUMENT
+  CLOTHING
+  BOOK
+  SHOE
+  ELECTRONICS
 }

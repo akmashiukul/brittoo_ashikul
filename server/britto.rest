@@ -1,0 +1,29 @@
+## ⚠️IMPORTANT: Install (REST Client) extension first to get started with.
+
+
+##  REGISTER 
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+# Body:
+{
+  "name": "User 1",
+  "email": "2010033@student.ruet.ac.bd",
+  "password": "1234", // for now(dev) no pass format restriction needed
+  "roll": "2010033",
+  "latitude": "24.363588",
+  "longitude": "88.624138",
+  "ip_address": "103.231.163.237",
+}
+
+
+
+## LOGIN 
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+# Body:
+{
+  "email": "2010033@student.ruet.ac.bd",
+  "password": "1234"
+}
