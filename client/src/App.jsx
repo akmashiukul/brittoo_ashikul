@@ -6,7 +6,7 @@ const App = () => {
   return (
     <BrowserRouter>
       <Navbar />
-      <div className="mx-auto lg:max-w-7xl overflow-x-hidden">
+      <div className="overflow-x-hidden">
         <Routes>
           <Route path="/" element={<Home />} />
         </Routes>
