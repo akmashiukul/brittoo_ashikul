@@ -3,7 +3,7 @@ import brittoLogo from "../../assets/britto-logo.png";
 import { IoLogOut } from "react-icons/io5";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { useState } from "react";
-const user = true;
+const user = false;
 const profileImg =
   "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
 
@@ -135,12 +135,6 @@ const Navbar = () => {
                     Contact
                   </NavLink>
                 </div>
-                {user && (
-                  <button className="flex w-full items-center gap-2 rounded-lg px-4 py-2 text-sm text-red-700 hover:bg-red-50 cursor-pointer mb-2 mx-2">
-                    <IoLogOut size={20} />
-                    Logout
-                  </button>
-                )}
               </div>
             )}
           </div>
