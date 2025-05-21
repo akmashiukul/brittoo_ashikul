@@ -1,6 +1,7 @@
 import useRegModalStore from "../../stores/useRegModalStore";
 import brittoLogo from "../../assets/britto-logo.png";
 import useLoginModalStore from "../../stores/useLoginModalStore";
+import { Link } from "react-router-dom";
 
 const RegisterModal = () => {
   const { isRegModalOpen, closeRegModal } = useRegModalStore();
@@ -22,16 +23,16 @@ const RegisterModal = () => {
             <div className="flex flex-col items-center text-center w-full">
               <img
                 src={brittoLogo}
-                className="h-12 object-contain"
+                className="h-8 md:h-12 object-contain"
                 alt="Britto"
               />
-              <h3 className="text-lg font-semibold text-gray-700 mt-4">
+              <h3 className="text-xs md:text-lg font-semibold text-gray-700 mt-1 md:mt-4">
                 Create Your Brittoo Account
               </h3>
             </div>
             <button
               type="button"
-              className="absolute top-1 cursor-pointer right-1  text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
+              className="absolute top-1 cursor-pointer right-1  text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-xs md:text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
               data-modal-hide="authentication-modal"
               onClick={closeRegModal}
             >
@@ -59,7 +60,7 @@ const RegisterModal = () => {
               <div>
                 <label
                   htmlFor="email"
-                  className="block mb-2 text-sm font-medium text-gray-900"
+                  className="block mb-2 text-xs md:text-sm font-medium text-gray-900"
                 >
                   Your email
                 </label>
@@ -67,7 +68,7 @@ const RegisterModal = () => {
                   type="email"
                   name="email"
                   id="email"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-xs md:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2 md:p-2.5"
                   placeholder="name@company.com"
                   required
                 />
@@ -75,7 +76,7 @@ const RegisterModal = () => {
               <div>
                 <label
                   htmlFor="password"
-                  className="block mb-2 text-sm font-medium text-gray-900"
+                  className="block mb-2 text-xs md:text-sm font-medium text-gray-900"
                 >
                   Your password
                 </label>
@@ -84,7 +85,7 @@ const RegisterModal = () => {
                   name="password"
                   id="password"
                   placeholder="••••••••"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-xs md:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2 md:p-2.5"
                   required
                 />
               </div>
@@ -103,17 +104,17 @@ const RegisterModal = () => {
                     htmlFor="remember"
                     className="ms-2 text-xs font-medium text-gray-900"
                   >
-                    Accept Terms & Conditions
+                    I have read and agree to the <Link to='/terms&conditions' className="text-green-600 underline dark:text-green-500">terms and conditions.</Link>
                   </label>
                 </div>
               </div>
               <button
                 type="submit"
-                className="w-full text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                className="w-full text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-xs md:text-sm px-5 py-2.5 text-center"
               >
                 Create Account
               </button>
-              <div className="text-sm font-medium text-gray-500">
+              <div className="text-xs md:text-sm font-medium text-gray-500">
                 Have an account?{" "}
                 <a onClick={() => {
                   closeRegModal();

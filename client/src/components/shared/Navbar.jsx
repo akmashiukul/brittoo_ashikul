@@ -4,6 +4,7 @@ import { IoLogOut } from "react-icons/io5";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { useState } from "react";
 import useRegModalStore from "../../stores/useRegModalStore";
+import useLoginModalStore from "../../stores/useLoginModalStore";
 const user = false;
 const profileImg =
   "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
@@ -13,7 +14,8 @@ const Navbar = () => {
     "block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700";
   const [isUserDropDownOpen, setIsUserDropDownOpen] = useState(false);
   const [isHamMenuOpen, setIsHamMenuOpen] = useState(false);
-  const openRegModal = useRegModalStore((state) => state.openRegModal);
+  const { openRegModal } = useRegModalStore();
+  const { openLoginModal } = useLoginModalStore();
 
   return (
     <header className="bg-white shadow-md z-10 relative">
@@ -74,12 +76,16 @@ const Navbar = () => {
               />
             ) : (
               <div className="flex gap-4">
-                <button className="text-xs md:text-base mr-3 lg:mr-0 px-3 py-2 border border-gray-300 text-gray-700 hover:border-green-600 hover:bg-green-600 rounded-lg hover:text-white cursor-pointer bg-transparent">
+                <button
+                  onClick={openLoginModal}
+                  className="text-xs md:text-base mr-3 lg:mr-0 px-3 py-2 border border-gray-300 text-gray-700 hover:border-green-600 hover:bg-green-600 rounded-lg hover:text-white cursor-pointer bg-transparent"
+                >
                   Log In
                 </button>
                 <button
-                onClick={openRegModal}
-                className="px-3 py-2 border border-green-600 bg-green-600 rounded-lg text-white cursor-pointer hover:bg-green-700 hover:border-green-700 hidden md:block">
+                  onClick={openRegModal}
+                  className="px-3 py-2 border border-green-600 bg-green-600 rounded-lg text-white cursor-pointer hover:bg-green-700 hover:border-green-700 hidden md:block"
+                >
                   Sign Up
                 </button>
               </div>
@@ -108,34 +114,19 @@ const Navbar = () => {
             {isHamMenuOpen && (
               <div className="absolute end-0 z-10 mt-0.5 w-56 divide-gray-100 rounded-md border border-gray-100 bg-white shadow-lg top-14 overflow-x-hidden">
                 <div className="p-2">
-                  <NavLink
-                    to="/"
-                    className={menuClassname}
-                  >
+                  <NavLink to="/" className={menuClassname}>
                     Home
                   </NavLink>
-                  <NavLink
-                    to="/browse"
-                    className={menuClassname}
-                  >
+                  <NavLink to="/browse" className={menuClassname}>
                     Browse Items
                   </NavLink>
-                  <NavLink
-                    to="/how-it-works"
-                    className={menuClassname}
-                  >
+                  <NavLink to="/how-it-works" className={menuClassname}>
                     How Brittoo Works
                   </NavLink>
-                  <NavLink
-                    to="/faq"
-                    className={menuClassname}
-                  >
+                  <NavLink to="/faq" className={menuClassname}>
                     FAQ
                   </NavLink>
-                  <NavLink
-                    to="/contact"
-                    className={menuClassname}
-                  >
+                  <NavLink to="/contact" className={menuClassname}>
                     Contact
                   </NavLink>
                 </div>
