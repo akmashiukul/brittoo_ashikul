@@ -3,6 +3,7 @@ import brittoLogo from "../../assets/britto-logo.png";
 import { IoLogOut } from "react-icons/io5";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { useState } from "react";
+import useRegModalStore from "../../stores/useRegModalStore";
 const user = false;
 const profileImg =
   "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
@@ -12,6 +13,7 @@ const Navbar = () => {
     "block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700";
   const [isUserDropDownOpen, setIsUserDropDownOpen] = useState(false);
   const [isHamMenuOpen, setIsHamMenuOpen] = useState(false);
+  const openRegModal = useRegModalStore((state) => state.openRegModal);
 
   return (
     <header className="bg-white shadow-md z-10 relative">
@@ -32,31 +34,31 @@ const Navbar = () => {
               <div className="flex items-center gap-6 text-sm">
                 <NavLink
                   to="/"
-                  className="text-gray-600 text-[16px] cursor-pointer hover:text-green-600"
+                  className="text-gray-600 text-[16px] cursor-pointer hover:text-green-500"
                 >
                   Home
                 </NavLink>
                 <NavLink
                   to="/browse"
-                  className="text-gray-600 text-[16px] cursor-pointer hover:text-green-600"
+                  className="text-gray-600 text-[16px] cursor-pointer hover:text-green-500"
                 >
                   Browse Items
                 </NavLink>
                 <NavLink
                   to="/how-it-works"
-                  className="text-gray-600 text-[16px] cursor-pointer hover:text-green-600"
+                  className="text-gray-600 text-[16px] cursor-pointer hover:text-green-500"
                 >
                   How Brittoo Works
                 </NavLink>
                 <NavLink
                   to="/faq"
-                  className="text-gray-600 text-[16px] cursor-pointer hover:text-green-600"
+                  className="text-gray-600 text-[16px] cursor-pointer hover:text-green-500"
                 >
                   FAQ
                 </NavLink>
                 <NavLink
                   to="/contact"
-                  className="text-gray-600 text-[16px] cursor-pointer hover:text-green-600"
+                  className="text-gray-600 text-[16px] cursor-pointer hover:text-green-500"
                 >
                   Contact
                 </NavLink>
@@ -75,7 +77,9 @@ const Navbar = () => {
                 <button className="text-xs md:text-base mr-3 lg:mr-0 px-3 py-2 border border-gray-300 text-gray-700 hover:border-green-600 hover:bg-green-600 rounded-lg hover:text-white cursor-pointer bg-transparent">
                   Log In
                 </button>
-                <button className="px-3 py-2 border border-green-600 bg-green-600 rounded-lg text-white cursor-pointer hover:bg-green-700 hover:border-green-700 hidden md:block">
+                <button
+                onClick={openRegModal}
+                className="px-3 py-2 border border-green-600 bg-green-600 rounded-lg text-white cursor-pointer hover:bg-green-700 hover:border-green-700 hidden md:block">
                   Sign Up
                 </button>
               </div>

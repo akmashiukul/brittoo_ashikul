@@ -9,7 +9,7 @@ const Banner = () => {
     <div className="bg-gradient-to-b from-green-100 to-transparent">
       <div className="flex flex-col items-center mx-auto lg:max-w-7xl">
         <h1 className="text-2xl md:text-7xl font-bold mt-14 sm:mt-24">
-          <span className="text-green-600">Own Less,</span> Access More
+          <span className="text-green-500">Own Less,</span> Access More
         </h1>
         <p className="text-gray-500  text-xs md:text-xl mt-4 sm:mt-8 text-center mx-2 md:mx-0">
           Rent, Barter, and Share items in your community. Earn credits by{" "}
@@ -33,7 +33,7 @@ const Banner = () => {
           />
 
           <span className="absolute inset-y-0 right-0 md:right-2 grid w-8 place-content-center">
-            <IoSearchCircle className="text-green-600 cursor-pointer size-6 md:size-12" />
+            <IoSearchCircle className="text-green-500 cursor-pointer size-6 md:size-12" />
           </span>
         </div>
         <div className="w-full overflow-x-auto scrollbar-hide relative mt-8">
