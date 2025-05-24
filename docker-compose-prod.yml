@@ -2,7 +2,16 @@ name: "Brittoo"
 
 services:
 
-  britto-backend:
+  britto-client-prod:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.prod
+    ports:
+      - "8080:80"
+
+
+
+  britto-server-prod:
     build:
       context: ./server
       args:
@@ -14,9 +23,22 @@ services:
     command: npm run start
     restart: always
 
-    
 
-  britto-frontend:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=galib
+      - POSTGRES_PASS=galib2010033
+      - POSTGRES_DB=brittoodb
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  pgdata:
+    
     
 
 

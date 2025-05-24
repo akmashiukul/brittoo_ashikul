@@ -1,13 +1,11 @@
-FROM node:alpine3.20
+FROM node:22-alpine
 WORKDIR /app
 
 COPY package*.json ./
 
 ARG NODE_ENV
-RUN if [ "$NODE_ENV" = "Development" ] \
-        then npm install; \
-        else npm install --only=production; \
-        fi
+RUN if [ "$NODE_ENV" = "development" ]; then npm install; else npm install --only=production; fi
+
 
 COPY . .
 
@@ -25,23 +23,23 @@ CMD [ "node", "index.js" ]
 #   docker ps
    
 # 3. Build Image:
-#   docker build -t britto-backend .
+#   docker build -t britto-server .
   
 # 4. Run a container:
-#   docker run -p 5000:5000 -d --name britto-backend-cnt1 britto-backend
+#   docker run -p 5000:5000 -d --name britto-server-cnt1 britto-server
 
 # 5. Delete a running container or container and all associated volumes:
-#   docker rm britto-backend-cnt1 -f
-#   docker rm britto-backend-cnt1 -fv 
+#   docker rm britto-server-cnt1 -f
+#   docker rm britto-server-cnt1 -fv 
 
 # 6. Run by Mounting Volume: host:container
-#   docker run -v $(pwd):/app -p 5000:5000 -d --name britto-backend-cnt1 britto-backend
+#   docker run -v $(pwd):/app -p 5000:5000 -d --name britto-server-cnt1 britto-server
 
 # 7. Mount volume but ignore node_modules - if we dlt node_modules in host.
-#   docker run -v $(pwd):/app -v /app/node_modules -p 5000:5000 -d --name britto-backend-cnt1 britto-backend
+#   docker run -v $(pwd):/app -v /app/node_modules -p 5000:5000 -d --name britto-server-cnt1 britto-server
 
 # 7. Read Only BindMount - we can't create files in dockerbash and sync with host
-#   docker run -v $(pwd):/app:ro -v /app/node_modules -p 5000:5000 -d --name britto-backend-cnt1 britto-backend
+#   docker run -v $(pwd):/app:ro -v /app/node_modules -p 5000:5000 -d --name britto-server-cnt1 britto-server
 
 # 8. Go inside Docker /app dir in Bash:
-#   docker exec -it britto-backend bash 
+#   docker exec -it britto-server bash 
