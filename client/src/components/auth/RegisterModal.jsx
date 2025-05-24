@@ -2,17 +2,41 @@ import useRegModalStore from "../../stores/useRegModalStore";
 import brittoLogo from "../../assets/britto-logo.png";
 import useLoginModalStore from "../../stores/useLoginModalStore";
 import { Link } from "react-router-dom";
+import { useState } from "react";
 
 const RegisterModal = () => {
   const { isRegModalOpen, closeRegModal } = useRegModalStore();
   const { openLoginModal } = useLoginModalStore();
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    repassword: "",
+  });
+
+  const handleChange = (e) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    try {
+      //
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Something went wrong");
+    }
+  };
 
   if (!isRegModalOpen) return null;
 
   return (
     <div
       id="authentication-modal"
-      className="fixed inset-0 z-50 flex justify-center items-center bg-black/70"
+      className="fixed inset-0 z-50 flex justify-center items-center bg-black/70 overflow-y-scroll"
       onClick={(e) => {
         if (e.target === e.currentTarget) closeRegModal();
       }}
@@ -24,7 +48,7 @@ const RegisterModal = () => {
               <img
                 src={brittoLogo}
                 className="h-8 md:h-12 object-contain"
-                alt="Britto"
+                alt="Brittoo"
               />
               <h3 className="text-xs md:text-lg font-semibold text-gray-700 mt-1 md:mt-4">
                 Create Your Brittoo Account
@@ -56,20 +80,40 @@ const RegisterModal = () => {
           </div>
 
           <div className="p-4 md:p-5">
-            <form className="space-y-4" action="#">
+            <form onSubmit={handleRegister} className="space-y-3 md:space-y-4">
+              <div>
+                <label
+                  htmlFor="name"
+                  className="block mb-2 text-xs md:text-sm font-medium text-gray-900"
+                >
+                  Your Name
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  id="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-xs md:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-1.5 md:p-2.5"
+                  placeholder="Mr. Sanda"
+                  required
+                />
+              </div>
               <div>
                 <label
                   htmlFor="email"
                   className="block mb-2 text-xs md:text-sm font-medium text-gray-900"
                 >
-                  Your email
+                  Your Student Email
                 </label>
                 <input
                   type="email"
                   name="email"
                   id="email"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-xs md:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2 md:p-2.5"
-                  placeholder="name@company.com"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-xs md:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-1.5 md:p-2.5"
+                  placeholder="2010033@student.ruet.ac.bd"
                   required
                 />
               </div>
@@ -78,18 +122,38 @@ const RegisterModal = () => {
                   htmlFor="password"
                   className="block mb-2 text-xs md:text-sm font-medium text-gray-900"
                 >
-                  Your password
+                  Set password
                 </label>
                 <input
                   type="password"
                   name="password"
                   id="password"
+                  value={formData.password}
+                  onChange={handleChange}
                   placeholder="••••••••"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-xs md:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2 md:p-2.5"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-xs md:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-1.5 md:p-2.5"
                   required
                 />
               </div>
-              <div className="flex justify-between mt-8">
+              <div>
+                <label
+                  htmlFor="repassword"
+                  className="block mb-2 text-xs md:text-sm font-medium text-gray-900"
+                >
+                  Re-enter password
+                </label>
+                <input
+                  type="password"
+                  name="repassword"
+                  id="repassword"
+                  value={formData.repassword}
+                  onChange={handleChange}
+                  placeholder="••••••••"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-xs md:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-1.5 md:p-2.5"
+                  required
+                />
+              </div>
+              <div className="flex justify-between mt-4 md:mt-8">
                 <div className="flex items-center">
                   <div className="flex items-center h-5">
                     <input
@@ -104,7 +168,13 @@ const RegisterModal = () => {
                     htmlFor="remember"
                     className="ms-2 text-xs font-medium text-gray-900"
                   >
-                    I have read and agree to the <Link to='/terms&conditions' className="text-green-600 underline dark:text-green-500">terms and conditions.</Link>
+                    I have read and agree to the{" "}
+                    <Link
+                      to="/terms&conditions"
+                      className="text-green-600 underline dark:text-green-500"
+                    >
+                      terms and conditions.
+                    </Link>
                   </label>
                 </div>
               </div>
@@ -116,10 +186,13 @@ const RegisterModal = () => {
               </button>
               <div className="text-xs md:text-sm font-medium text-gray-500">
                 Have an account?{" "}
-                <a onClick={() => {
-                  closeRegModal();
-                  openLoginModal();
-                }} className="text-green-700 hover:underline cursor-pointer">
+                <a
+                  onClick={() => {
+                    closeRegModal();
+                    openLoginModal();
+                  }}
+                  className="text-green-700 hover:underline cursor-pointer"
+                >
                   Login
                 </a>
               </div>

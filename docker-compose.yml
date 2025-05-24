@@ -1,0 +1,30 @@
+name: "Brittoo"
+
+services:
+
+  britto-backend:
+    build:
+      context: ./server
+      args:
+        - NODE_ENV=production
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./server/.env
+    command: npm run start
+    restart: always
+
+    
+
+  britto-frontend:
+    
+
+
+# Commands:
+#   --Up:
+#       $ docker-compose up -d
+#       $ docker image ls
+#   --Down & Delete unnecessary vols. also
+#       $ docker-compose down -v
+#   --Force rebuild - no cache
+#       $ docker-compose up -d --build

@@ -23,7 +23,7 @@ const LoginModal = () => {
               <img
                 src={brittoLogo}
                 className="h-8 md:h-12 object-contain"
-                alt="Britto"
+                alt="Brittoo"
               />
               <h3 className="text-xs md:text-lg font-semibold text-gray-700 mt-1 md:mt-4">
                 Login Now & Get Started

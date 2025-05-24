@@ -17,10 +17,14 @@ model User {
   id_card_front String
   id_card_back  String
   ip_address    String?
-  is_verified   Boolean @default(false)
   latitude      Float?
   longitude     Float?
   role          Role    @default(USER)
+
+  email_verified Boolean   @default(false)
+  is_verified    Boolean   @default(false)
+  otp            String
+  otpExpiry      DateTime?
 
   safety_score Int   @default(0)
   blue_credit  Float @default(0.00)
@@ -66,6 +70,6 @@ enum ProductType {
   MUSICAL_INSTRUMENT
   CLOTHING
   BOOK
-  SHOE
   ELECTRONICS
+  APARTMENTS
 }
