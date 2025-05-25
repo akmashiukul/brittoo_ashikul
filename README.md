@@ -44,8 +44,55 @@ Brittoo is a modern full-stack rental platform that allows users to list, discov
 - **Nginx for serving frontend (production)**
 - **ENV files for secure config**
 
+<br>
 
+## 🚀 Setup
+```bash
+./setup.sh
+```
 
+## 💻 Development Commands
+
+### Build
+```bash
+## build all
+./dev.sh build all
+
+## build client
+./dev.sh build client
+
+## build server
+./dev.sh build server
+```
+
+<br>
+
+### Run
+```bash
+## run all
+./dev.sh run all
+
+## run client
+./dev.sh run client
+
+## run server
+./dev.sh run server
+```
+<br>
+
+### Stop
+```bash
+## stop all
+./dev.sh stop all
+
+## stop client
+./dev.sh stop client
+
+## stop server
+./dev.sh stop server
+```
+
+<br>
 
 
 ## 📌 Status
@@ -54,6 +101,13 @@ Brittoo is a modern full-stack rental platform that allows users to list, discov
 🧪 Targeting a stable MVP release soon.
 
 ---
+
+<br>
+<br>
+
+📧 Contact
+Maintainer: Asadullah Al Galib
+Email: aagalib2323@gmail.com
 
 ## 📎 License
 
