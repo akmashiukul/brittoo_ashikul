@@ -105,9 +105,10 @@ Brittoo is a modern full-stack rental platform that allows users to list, discov
 <br>
 <br>
 
-📧 Contact
-Maintainer: Asadullah Al Galib
-Email: aagalib2323@gmail.com
+### 📧 Contact
+__Maintainer:__ Asadullah Al Galib 
+
+__Email:__ aagalib2323@gmail.com
 
 ## 📎 License
 
