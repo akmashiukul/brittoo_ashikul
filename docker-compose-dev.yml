@@ -1,28 +1,25 @@
-name: "Brittoo"
+name: "brittoo-dev"
 
 services:
-
-  britto-client:
+  client:
     build:
       context: ./client
       dockerfile: Dockerfile.dev
     ports:
       - "5173:5173"
     volumes:
-      - ./client/src:/app/src:ro
-      - /app/node_modules
+      - ./client/src:/app/src
+      - client-node-modules:/app/node_modules
 
-
-  britto-server:
+  server:
     build:
       context: ./server
-      args:
-        - NODE_ENV=development
+      dockerfile: Dockerfile.dev
     ports:
       - "5000:5000"
     volumes:
-      - ./server:/app:ro
-      - /app/node_modules
+      - ./server:/app
+      - server-node-modules:/app/node_modules
     env_file:
       - ./server/.env
     command: npm run dev
@@ -37,14 +34,14 @@ services:
       - pgdata:/var/lib/postgresql/data
     ports:
       - "5433:5432"
-    
-    ## VISIT DB Locally: psql -h localhost -p 5433 -U galib -d brittoodb
-
-
 
 volumes:
   pgdata:
+  client-node-modules:
+  server-node-modules:
 
+
+## VISIT DB Locally: psql -h localhost -p 5433 -U galib -d brittoodb
 
 # ===========================================
 # DEV COMMANDS (using docker-compose-dev.yml)

@@ -1,0 +1,39 @@
+Config ✅:
+  1. Client Dockerized
+  2. Nginx Config added
+  3. Nginx.prod added
+  4. Server Dockerized
+  5. Docker DB installed(pg)
+  6. Docker Compose for dev
+  7. Docker Compose for prod
+
+Functions ✅:
+  1. Reg
+
+TODO: 
+  1. OTP
+  2. Selfie
+  3. Login
+
+  Get SSL:
+    1. Stop the Nginx at docker:
+      $ sudo docker compose -f docker-compose-prod.yml down -v
+
+    2. Install certbot in standalone mode
+      $ sudo apt install certbot
+      $ sudo certbot certonly --standalone -d brittoo.xyz -d www.brittoo.xyz
+
+    3. After confirmation SSL certs at:
+      $ /etc/letsencrypt/live/brittoo.xyz/
+
+    4. Rebuild:
+      $ sudo docker compose -f docker-compose.prod.yml up -d --build
+
+    5. Auto-Renew SSL:
+      $ sudo crontab -e
+    
+    6. Add this: 0 3 * * * certbot renew --pre-hook "docker compose -f /path/to/docker-compose.prod.yml down" --post-hook "docker compose -f /path/to/docker-compose.prod.yml up -d"
+
+
+
+Vallagena  😭😭

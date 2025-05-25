@@ -1,21 +1,22 @@
-name: "Brittoo"
+name: "brittoo"
 
 services:
 
-  britto-client-prod:
+  client-prod:
     build:
       context: ./client
       dockerfile: Dockerfile.prod
     ports:
       - "8080:80"
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
 
 
 
-  britto-server-prod:
+  server-prod:
     build:
       context: ./server
-      args:
-        - NODE_ENV=production
+      dockerfile: Dockerfile.prod
     ports:
       - "5000:5000"
     env_file:
