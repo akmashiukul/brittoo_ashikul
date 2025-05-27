@@ -7,9 +7,6 @@ COMPOSE_FILE=docker-compose-dev.yml
 run_all() {
   echo "Starting all containers using Docker Compose..."
   docker compose -f $COMPOSE_FILE up -d
-  echo "Running npm install inside server and client containers..."
-  docker exec $SERVER_CONTAINER npm install
-  docker exec $CLIENT_CONTAINER npm install
 }
 
 run_client() {

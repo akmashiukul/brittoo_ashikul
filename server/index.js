@@ -22,3 +22,5 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is dancing on http://localhost:${PORT} \n${new Date(Date.now()).toLocaleTimeString()}
     `);
 });
+
+// ngrok http --url=evolving-champion-bullfrog.ngrok-free.app 80

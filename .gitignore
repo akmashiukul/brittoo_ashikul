@@ -56,4 +56,5 @@ Thumbs.db
 # ----------------------
 coverage/
 .flowbite-react/
-test.js
+
+temp.js
