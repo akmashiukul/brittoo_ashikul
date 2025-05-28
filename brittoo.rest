@@ -2,15 +2,13 @@
 
 
 ##  REGISTER 
-POST http://localhost:5000/api/auth/register
-Content-Type: application/json
+POST http://localhost:5000/api/v1/auth/register
+Content-Type: "application/json"
 
-# Body:
 {
-  "name": "User 1",
   "email": "2010033@student.ruet.ac.bd",
-  "password": "1234", // for now(dev) no pass format restriction needed
-  "roll": "2010033",
+  "name": "User 1",
+  "password": "1234",
   "latitude": "24.363588",
   "longitude": "88.624138",
   "ip_address": "103.231.163.237",

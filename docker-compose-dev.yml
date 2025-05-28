@@ -7,9 +7,6 @@ services:
       dockerfile: Dockerfile.dev
     ports:
       - "5173:5173"
-    volumes:
-      - ./client/src:/app/src
-      - client-node-modules:/app/node_modules
 
   server:
     build:
@@ -17,9 +14,7 @@ services:
       dockerfile: Dockerfile.dev
     ports:
       - "5000:5000"
-    volumes:
-      - ./server:/app
-      - server-node-modules:/app/node_modules
+      - "5555:5555"
     env_file:
       - ./server/.env
     command: npm run dev
@@ -28,17 +23,15 @@ services:
     image: postgres
     environment:
       - POSTGRES_USER=galib
-      - POSTGRES_PASSWORD=galib2010033
+      - POSTGRES_PASSWORD=galib2723
       - POSTGRES_DB=brittoodb
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
-      - "5433:5432"
+      - "5432:5432"
 
 volumes:
   pgdata:
-  client-node-modules:
-  server-node-modules:
 
 
 ## VISIT DB Locally: psql -h localhost -p 5433 -U galib -d brittoodb

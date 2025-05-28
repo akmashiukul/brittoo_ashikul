@@ -13,9 +13,9 @@ model User {
   email         String  @unique
   roll          String  @unique
   password      String
-  selfie        String
-  id_card_front String
-  id_card_back  String
+  selfie        String  @default("absent")
+  id_card_front String  @default("absent")
+  id_card_back  String  @default("absent")
   ip_address    String?
   latitude      Float?
   longitude     Float?
@@ -33,10 +33,11 @@ model User {
   rented_products   Product[] @relation("RentedProducts")
   borrowed_products Product[] @relation("BorrowedProducts")
 
-  createdAt DateTime
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([latitude, longitude])
+  @@map("users")
 }
 
 enum Role {
@@ -58,8 +59,10 @@ model Product {
   owner    User  @relation("RentedProducts", fields: [ownerId], references: [id])
   borrower User? @relation("BorrowedProducts", fields: [borrowerId], references: [id])
 
-  createdAt DateTime
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@map("products")
 }
 
 enum ProductType {

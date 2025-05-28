@@ -44,7 +44,7 @@ run_server() {
 
 stop_all() {
   echo "Stopping all services and removing volumes..."
-  docker compose -f $COMPOSE_FILE down -v
+  docker compose -f $COMPOSE_FILE down
 }
 
 stop_client() {
