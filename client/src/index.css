@@ -13,6 +13,16 @@
   }
 }
 
+
+.centered-otp-input {
+  width: 100px !important;
+  margin: 0 auto !important;
+  text-align: center;
+  font-size: 1rem;
+  display: block;
+  border-radius: 8px;
+}
+
 @theme {
   --color-green-50: #f0fdf4;
   --color-green-100: #dcfce7;

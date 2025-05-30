@@ -1,12 +1,23 @@
 import useRegModalStore from "../../stores/useRegModalStore";
 import brittoLogo from "../../assets/britto-logo.png";
 import useLoginModalStore from "../../stores/useLoginModalStore";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import api from "../../lib/api";
+import Swal from "sweetalert2";
+import useUserStore from "../../stores/useUserStore";
+import { useGeoLocation } from "../../hooks/useGeoLocation";
+import { PacmanLoader } from "react-spinners";
+import Loader from "../shared/Loader";
 
 const RegisterModal = () => {
   const { isRegModalOpen, closeRegModal } = useRegModalStore();
   const { openLoginModal } = useLoginModalStore();
+  const { setLoading, loading, setTempUser } = useUserStore();
+
+  const navigate = useNavigate();
+
+  const { getGeoLocation } = useGeoLocation();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -23,26 +34,89 @@ const RegisterModal = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+
+    if (formData.password !== formData.repassword) {
+      Swal.fire({
+        icon: "warning",
+        title: "Password Mismatch",
+        text: "Passwords do not match. Please re-enter them.",
+      });
+      return;
+    }
+
     try {
-      //
+      setLoading(true);
+      const coords = await getGeoLocation();
+      if (!coords) {
+        Swal.fire({
+          icon: "warning",
+          title: "Location Access Blocked",
+          html: `
+    Please allow location access from your browser settings to continue registration.<br><br>
+    <small>
+      Click the <b>🔒 lock icon</b> next to the address bar → <b>Site settings</b> → <b>Location</b> → "Allow"
+    </small>
+  `,
+        });
+
+        return;
+      }
+
+      const ipResponse = await fetch("https://api.ipify.org?format=json");
+      const { ip } = await ipResponse.json();
+
+      const res = await api.post("/api/v1/auth/register", {
+        ...formData,
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+        ip_address: ip,
+      });
+
+      console.log(res);
+
+      if (!res.data.success) {
+        closeRegModal();
+        Swal.fire({
+          icon: "error",
+          title: "Registration Failed",
+          text: res.message || "An error occurred while registering.",
+        });
+        return;
+      }
+      closeRegModal();
+      await setTempUser(res.data.user);
+      navigate('/verify-otp');
+      
     } catch (error) {
-      console.error("Error:", error);
-      alert("Something went wrong");
+      console.error("Registration Error:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Something went wrong",
+        text: error.response?.data?.message || error.message,
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
   if (!isRegModalOpen) return null;
 
+  if (loading) {
+    return (
+      <Loader />
+    );
+  }
+
   return (
     <div
       id="authentication-modal"
-      className="fixed inset-0 z-50 flex justify-center items-center bg-black/70 overflow-y-scroll"
+      className={`fixed inset-0 z-30 flex justify-center items-center bg-black/70 overflow-y-scroll`}
       onClick={(e) => {
         if (e.target === e.currentTarget) closeRegModal();
       }}
     >
       <div className="relative p-4 w-full max-w-md max-h-full">
-        <div className="relative bg-white rounded-lg shadow-sm">
+        <div className={`relative bg-white rounded-lg shadow-sm`}>
           <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t border-gray-200">
             <div className="flex flex-col items-center text-center w-full">
               <img

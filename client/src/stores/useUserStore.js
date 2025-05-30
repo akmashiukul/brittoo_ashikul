@@ -8,10 +8,12 @@ const useUserStore = create(
       currentUser: null,
       error: null,
       loading: false,
+      tempUser: null,
 
-      // Actions
+
       setLoading: (isLoading) => set({ loading: isLoading }),
       setCurrentUser: (user) => set({ currentUser: user, error: null }),
+      setTempUser: (user) => set({ tempUser: user, error: null}),
       setError: (errorMessage) => set({ error: errorMessage }),
       clearState: () => set({ currentUser: null, error: null, loading: false }),
     }),
