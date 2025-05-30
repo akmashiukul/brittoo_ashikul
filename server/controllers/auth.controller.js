@@ -65,7 +65,7 @@ export const register = async (req, res, next) => {
     return res.status(201).json({
       success: true,
       message: "User created successfully. OTP sent to your email.",
-      user: safeUser
+      user: safeUser,
     });
   } catch (error) {
     console.error(error);
@@ -190,7 +190,7 @@ export const resendOTP = async (req, res, next) => {
 
 export const verifyOTP = async (req, res, next) => {
   const { email, otp } = req.body;
-  console.log(req.body)
+  console.log(req.body);
 
   try {
     if (!email || !otp) {
@@ -232,6 +232,83 @@ export const verifyOTP = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: "Email verified successfully",
+      user: safeUser,
+      token,
+    });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+
+export const login = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      throw new CustomError("Email and password are required", 400);
+    }
+    if (!isValidRuetEmail(email)) {
+      throw new CustomError("The email is not a valid student email", 401);
+    }
+    const user = await prisma.user.findFirst({
+      where: {
+        email: email,
+      },
+    });
+    if (!user) {
+      throw new CustomError("User not found", 401);
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      throw new CustomError("Invalid password", 401);
+    }
+
+    // If two factor enabled (TODO):
+    /*
+      const otp = Math.floor(10000 + Math.random() * 90000).toString();
+      const otp_expiry = new Date(Date.now() + 5 * 60 * 1000);
+      await prisma.user.update({
+      where: { id: user.id },
+        data: {
+          otp,
+          otp_expiry,
+          otp_sent_count: user.otp_sent_count + 1,
+          last_otp_sent_date: new Date(),
+        },
+      });
+
+      await resend.emails.send({
+      from: "Brittoo <verify@brittoo.xyz>",
+      to: email,
+      subject: "Your Brittoo Login OTP Code",
+      html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2>Brittoo Login Verification</h2>
+            <p>Your OTP verification code for login is:</p>
+            <div style="font-size: 24px; font-weight: bold; color: #007bff; padding: 20px; background-color: #f8f9fa; border-radius: 5px; text-align: center; margin: 20px 0;">
+              ${otp}
+            </div>
+            <p><strong>Important:</strong> This code expires in 5 minutes.</p>
+            <p>If you didn't attempt to log in, please secure your account.</p>
+          </div>
+        `,
+      });
+      const { password: _, otp: __, otp_expiry: ___, ...safeUser } = user;
+    */
+
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "2d" },
+    );
+
+    const { password: _, otp: __, otp_expiry: ___, ...safeUser } = user;
+
+    return res.status(200).json({
+      success: true,
+      message: "Login successful.",
       user: safeUser,
       token
     });
