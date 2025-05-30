@@ -4,7 +4,6 @@ import bcrypt from "bcryptjs";
 import { Resend } from "resend";
 import { isValidRuetEmail } from "../lib/emailValidator.js";
 import jwt from "jsonwebtoken";
-
 const resend = new Resend(`${process.env.RESEND_API_KEY}`);
 
 export const register = async (req, res, next) => {
@@ -310,7 +309,7 @@ export const login = async (req, res, next) => {
       success: true,
       message: "Login successful.",
       user: safeUser,
-      token
+      token,
     });
   } catch (error) {
     console.error(error);

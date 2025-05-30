@@ -24,7 +24,7 @@ const Navbar = () => {
     text: "Your first year study group lasted longer than this session",
     icon: "warning",
     showCancelButton: true,
-    confirmButtonColor: "#22c55e",
+    confirmButtonColor: "#dc2626",
     cancelButtonColor: "#6b7280",
     confirmButtonText: "Yes! Take me outta this shit",
     cancelButtonText: "Let me rot a little longer",

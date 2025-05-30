@@ -6,6 +6,7 @@ import LoginModal from "./components/auth/LoginModal";
 import Test from "./pages/Test";
 import VerifyOTP from "./pages/VerifyOTP";
 import useUserStore from "./stores/useUserStore";
+import VerifyUser from "./pages/VerifyUser";
 
 const App = () => {
   const { loading } = useUserStore();
@@ -21,6 +22,7 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/test" element={<Test />} />
           <Route path="/verify-otp" element={<VerifyOTP />} />
+          <Route path="/verify-user" element={<VerifyUser />} />
         </Routes>
       </div>
     </BrowserRouter>

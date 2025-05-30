@@ -53,7 +53,7 @@ export default function VerifyOTP() {
       localStorage.setItem('token', res.data.token);
       setTimeout(() => {
         setTempUser(null);
-        navigate('/');
+        navigate('/verify-user');
       }, 500);
     } catch (err) {
       setMessage("❌ Invalid OTP. Please try again.");

@@ -21,11 +21,11 @@ model User {
   longitude     Float?
   role          Role    @default(USER)
 
-  email_verified     Boolean   @default(false)
-  is_verified        Boolean   @default(false)
+  email_verified     Boolean      @default(false)
+  is_verified        VerifyStatus @default(UNVERIFIED)
   otp                String?
   otp_expiry         DateTime?
-  otp_sent_count     Int       @default(0)
+  otp_sent_count     Int          @default(0)
   last_otp_sent_date DateTime?
 
   safety_score Int   @default(0)
@@ -40,6 +40,12 @@ model User {
 
   @@index([latitude, longitude])
   @@map("users")
+}
+
+enum VerifyStatus {
+  UNVERIFIED
+  VERIFIED
+  PENDING
 }
 
 enum Role {

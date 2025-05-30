@@ -16,7 +16,7 @@ Functions ✅:
   1. Reg
 
 TODO: 
-  1. Selfie
+  1. after verification redirect
   2. 
 
 
