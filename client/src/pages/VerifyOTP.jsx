@@ -50,7 +50,7 @@ export default function VerifyOTP() {
 
       setMessage("✅ OTP verified successfully!");
       await setCurrentUser(res.data.user);
-
+      localStorage.setItem('token', res.data.token);
       setTimeout(() => {
         setTempUser(null);
         navigate('/');

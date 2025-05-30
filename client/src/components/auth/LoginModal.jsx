@@ -1,12 +1,69 @@
 import useLoginModalStore from "../../stores/useLoginModalStore";
 import brittoLogo from "../../assets/britto-logo.png";
 import useRegModalStore from "../../stores/useRegModalStore";
+import useUserStore from "../../stores/useUserStore";
+import { useState } from "react";
+import api from "../../lib/api";
+import Swal from "sweetalert2";
+import Loader from "../shared/Loader";
 
 const LoginModal = () => {
   const { isLoginModalOpen, closeLoginModal } = useLoginModalStore();
   const { openRegModal } = useRegModalStore();
+  const { setCurrentUser, loading, setLoading } = useUserStore();
+
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const handleChange = (e) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      const res = await api.post("/api/v1/auth/login", formData);
+      console.log(res);
+
+      if (!res.data.success) {
+        closeLoginModal();
+        Swal.fire({
+          icon: "error",
+          title: "Login Failed",
+          text: res.message || "An error occurred while Logging in.",
+        });
+        return;
+      }
+      Swal.fire({
+        icon: "success",
+        title: "Login Successfull",
+      });
+      await setCurrentUser(res.data.user);
+      localStorage.setItem("token", res.data.token);
+    } catch (error) {
+      console.error("Registration Error:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Something went wrong",
+        text: error.response?.data?.message || error.message,
+      });
+    } finally {
+      setLoading(false);
+      closeLoginModal();
+    }
+  };
 
   if (!isLoginModalOpen) return null;
+
+  if (loading) {
+    return <Loader />;
+  }
 
   return (
     <div
@@ -55,7 +112,7 @@ const LoginModal = () => {
           </div>
 
           <div className="p-4 md:p-5">
-            <form className="space-y-4" action="#">
+            <form onSubmit={handleLogin} className="space-y-4" action='#'>
               <div>
                 <label
                   htmlFor="email"
@@ -67,6 +124,8 @@ const LoginModal = () => {
                   type="email"
                   name="email"
                   id="email"
+                  onChange={handleChange}
+                  value={formData.email}
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-xs md:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2 md:p-2.5"
                   placeholder="name@company.com"
                   required
@@ -83,6 +142,8 @@ const LoginModal = () => {
                   type="password"
                   name="password"
                   id="password"
+                  onChange={handleChange}
+                  value={formData.password}
                   placeholder="••••••••"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-xs md:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2 md:p-2.5"
                   required
