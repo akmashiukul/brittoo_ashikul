@@ -5,9 +5,9 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { useState } from "react";
 import useRegModalStore from "../../stores/useRegModalStore";
 import useLoginModalStore from "../../stores/useLoginModalStore";
-const user = false;
-const profileImg =
-  "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+import useUserStore from "../../stores/useUserStore";
+import Avatar from "boring-avatars";
+import Swal from "sweetalert2";
 
 const Navbar = () => {
   const menuClassname =
@@ -16,6 +16,34 @@ const Navbar = () => {
   const [isHamMenuOpen, setIsHamMenuOpen] = useState(false);
   const { openRegModal } = useRegModalStore();
   const { openLoginModal } = useLoginModalStore();
+  const { currentUser, setCurrentUser } = useUserStore();
+
+  const handleLogOut = () => {
+  Swal.fire({
+    title: "Logging Out?",
+    text: "Your first year study group lasted longer than this session",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#22c55e",
+    cancelButtonColor: "#6b7280",
+    confirmButtonText: "Yes! Take me outta this shit",
+    cancelButtonText: "Let me rot a little longer",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      setCurrentUser(null);
+      localStorage.removeItem("token");
+      setIsUserDropDownOpen(false);
+      Swal.fire({
+        title: "Session Terminated",
+        text: "Unlike your CG, this completed successfully.",
+        icon: "success",
+      });
+    } else {
+      setIsUserDropDownOpen(false);
+    }
+  });
+};
+
 
   return (
     <header className="bg-white shadow-md z-10 relative">
@@ -67,11 +95,13 @@ const Navbar = () => {
               </div>
             </nav>
 
-            {user ? (
-              <img
-                src={profileImg}
-                alt=""
-                className="size-8 md:size-10 object-cover rounded-full mr-3 md:relative cursor-pointer"
+            {currentUser ? (
+              <Avatar
+                name={currentUser.name}
+                colors={["#482344", "#2b5166", "#429867", "#fab243", "#e02130"]}
+                variant="beam"
+                size={35}
+                className="cursor-pointer mr-2 md:mr-0"
                 onClick={() => setIsUserDropDownOpen((prevState) => !prevState)}
               />
             ) : (
@@ -91,7 +121,10 @@ const Navbar = () => {
               </div>
             )}
             {isUserDropDownOpen && (
-              <div className="absolute end-0 z-10 mt-0.5 w-56 divide-gray-100 rounded-md border border-gray-100 bg-white shadow-lg top-14 overflow-x-hidden">
+              <div
+                className="absolute end-0 z-10 mt-0.5 w-48 divide-gray-100 rounded-md border border-gray-100 bg-white shadow-lg top-14 right-1.5
+               overflow-x-hidden"
+              >
                 <div className="p-2">
                   <Link to="" className={menuClassname}>
                     My profile
@@ -103,8 +136,11 @@ const Navbar = () => {
                     Team settings
                   </Link>
                 </div>
-                {user && (
-                  <button className="flex w-full items-center gap-2 rounded-lg px-4 py-2 text-sm text-red-700 hover:bg-red-50 cursor-pointer mb-2 mx-2">
+                {currentUser && (
+                  <button
+                    className="flex w-full items-center gap-2 rounded-lg px-4 py-2 text-sm text-red-700 hover:bg-red-50 cursor-pointer mb-2 mx-2"
+                    onClick={handleLogOut}
+                  >
                     <IoLogOut size={20} />
                     Logout
                   </button>

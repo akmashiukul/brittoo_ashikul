@@ -7,13 +7,18 @@ Config ✅:
   6. Docker Compose for dev
   7. Docker Compose for prod
 
+Prod: 
+  1. fix OTP request limit to 3
+  2. Rate LImit of 5 in login
+
+
 Functions ✅:
   1. Reg
 
 TODO: 
-  1. OTP
-  2. Selfie
-  3. Login
+  1. Selfie
+  2. 
+
 
   Get SSL:
     1. Stop the Nginx at docker:
