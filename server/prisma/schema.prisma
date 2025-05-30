@@ -55,14 +55,14 @@ enum Role {
 }
 
 model Product {
-  id            String      @id @default(cuid())
-  name          String
-  price_per_day Float
-  product_image String[]
-  product_type  ProductType
-
-  ownerId    String
-  borrowerId String?
+  id                  String      @id @default(cuid())
+  name                String
+  price_per_day       Float?
+  product_image       String[]
+  product_type        ProductType
+  approax_buying_date String
+  ownerId             String
+  borrowerId          String?
 
   owner    User  @relation("RentedProducts", fields: [ownerId], references: [id])
   borrower User? @relation("BorrowedProducts", fields: [borrowerId], references: [id])
@@ -84,3 +84,21 @@ enum ProductType {
   ELECTRONICS
   APARTMENTS
 }
+
+// 1. original market value
+// 2. item condition = (
+// New => 100%
+// Like New => 90%
+// Good => 75%
+// Fair => 50%
+// Poor => 30%
+// )
+// 3. Usage Duration
+// 4. Duration of Rental
+// 5. Security Score (
+// very low
+// low
+// mid
+// high
+// very high
+// )
