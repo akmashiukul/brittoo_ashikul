@@ -11,13 +11,13 @@ export default function VerifyOTP() {
   const [verifying, setVerifying] = useState(false);
   const navigate = useNavigate();
 
-  const { setCurrentUser, tempUser, setTempUser } = useUserStore();
+  const { setCurrentUser, tempUser, setTempUser, currentUser } = useUserStore();
 
   useEffect(() => {
-    if (!tempUser || !tempUser.email) {
-      navigate("/");
+    if (currentUser && currentUser.email) {
+      navigate("/verify-user", { replace: true });
     }
-  }, [tempUser, navigate]);
+  }, [currentUser, navigate]);
 
   useEffect(() => {
     if (timer > 0) {
@@ -50,11 +50,8 @@ export default function VerifyOTP() {
 
       setMessage("✅ OTP verified successfully!");
       await setCurrentUser(res.data.user);
-      localStorage.setItem('token', res.data.token);
-      setTimeout(() => {
-        setTempUser(null);
-        navigate('/verify-user');
-      }, 500);
+      localStorage.setItem("token", res.data.token);
+      setTempUser(null);
     } catch (err) {
       setMessage("❌ Invalid OTP. Please try again.");
       console.error("OTP verification error:", err);
@@ -90,6 +87,16 @@ export default function VerifyOTP() {
     }
   };
 
+  if (!tempUser || !tempUser.email) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="text-center text-gray-700 text-lg">
+          What are you looking for?
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-white px-4 py-12">
       <div className="w-full max-w-md bg-green-50 p-8 rounded-2xl shadow-xl">
@@ -98,7 +105,8 @@ export default function VerifyOTP() {
         </h2>
 
         <p className="text-sm text-gray-600 text-center mb-4">
-          We've sent a verification code to <span className="font-semibold italic"> {tempUser?.email} </span>
+          We've sent a verification code to{" "}
+          <span className="font-semibold italic"> {tempUser?.email} </span>
         </p>
 
         <input

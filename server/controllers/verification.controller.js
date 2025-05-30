@@ -31,6 +31,12 @@ export const verifyUser = async (req, res) => {
       return res.status(400).json({ success: false, message: "User is already verified" });
     }
 
+    if (user.is_verified === "PENDING") {
+      fs.unlinkSync(idCardFile.path);
+      fs.unlinkSync(selfieFile.path);
+      return res.status(400).json({ success: false, message: "You have already requested for verification" });
+    }
+
     if (user.id_card_front && user.id_card_front !== "absent") {
       const oldIdCardPath = path.join(uploadsDirPath, user.id_card_front);
       if (fs.existsSync(oldIdCardPath)) fs.unlinkSync(oldIdCardPath);
