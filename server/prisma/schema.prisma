@@ -28,9 +28,8 @@ model User {
   otp_sent_count     Int          @default(0)
   last_otp_sent_date DateTime?
 
-  safety_score Int   @default(0)
-  blue_credit  Float @default(0.00)
-  red_credit   Float @default(0.00)
+  safety_score        Int                 @default(0)
+  credit_transactions CreditTransaction[] // Tracks all credit transactions for the user
 
   rented_products   Product[] @relation("RentedProducts")
   borrowed_products Product[] @relation("BorrowedProducts")
@@ -54,6 +53,39 @@ enum Role {
   MODERATOR
 }
 
+model CreditTransaction {
+  id              String       @id @default(cuid())
+  userId          String
+  amount          Float
+  creditType      CreditType
+  sourceType      CreditSource // PRODUCT, MONEY, INSTANT
+  sourceProductId String?
+  renterId        String?
+  instantFee      Float? // Fee charged by Brittoo for instant credit
+  validityStart   DateTime
+  validityEnd     DateTime
+  isActive        Boolean      @default(true)
+
+  user          User     @relation(fields: [userId], references: [id])
+  sourceProduct Product? @relation(fields: [sourceProductId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("credit_transactions")
+}
+
+enum CreditType {
+  BLUE
+  RED
+}
+
+enum CreditSource {
+  PRODUCT
+  MONEY
+  INSTANT
+}
+
 model Product {
   id                  String      @id @default(cuid())
   name                String
@@ -63,9 +95,12 @@ model Product {
   approax_buying_date String
   ownerId             String
   borrowerId          String?
+  isOnHold            Boolean     @default(false)
+  holdCreditValidity  Int?
 
-  owner    User  @relation("RentedProducts", fields: [ownerId], references: [id])
-  borrower User? @relation("BorrowedProducts", fields: [borrowerId], references: [id])
+  owner              User                @relation("RentedProducts", fields: [ownerId], references: [id])
+  borrower           User?               @relation("BorrowedProducts", fields: [borrowerId], references: [id])
+  creditTransactions CreditTransaction[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -84,21 +119,3 @@ enum ProductType {
   ELECTRONICS
   APARTMENTS
 }
-
-// 1. original market value
-// 2. item condition = (
-// New => 100%
-// Like New => 90%
-// Good => 75%
-// Fair => 50%
-// Poor => 30%
-// )
-// 3. Usage Duration
-// 4. Duration of Rental
-// 5. Security Score (
-// very low
-// low
-// mid
-// high
-// very high
-// )
