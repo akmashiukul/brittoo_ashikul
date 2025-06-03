@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import Home from "./pages/Home";
 import Navbar from "./components/shared/Navbar";
 import RegisterModal from "./components/auth/RegisterModal";
@@ -7,14 +7,30 @@ import Test from "./pages/Test";
 import VerifyOTP from "./pages/VerifyOTP";
 import useUserStore from "./stores/useUserStore";
 import VerifyUser from "./pages/VerifyUser";
+import AdminRoute from "./routes/AdminRoute";
+import PrivateRoute from "./routes/PrivateRoute";
+import Dashboard from "./pages/private/DashboardLayout";
+import ListItems from "./pages/private/pages/ListItems";
+import Overview from "./pages/private/pages/Overview";
+import ManageItems from "./pages/private/pages/ManageItems";
+import MyOrders from "./pages/private/pages/MyOrders";
+import UserAnalytics from "./pages/private/pages/UserAnalytics";
 
-const App = () => {
+
+const AppContent = () => {
+  const location = useLocation();
   const { loading } = useUserStore();
+
+  const noNavbarRoutes = ["/dashboard", "/verify-otp", "/verify-user", "/dashboard/admin"];
+
+  const hideNavbar = noNavbarRoutes.some((path) =>
+    location.pathname.startsWith(path)
+  );
+
+
   return (
-    <BrowserRouter>
-      {
-        !loading && <Navbar />
-      }
+    <>
+      {!loading && !hideNavbar && <Navbar />}
       <RegisterModal />
       <LoginModal />
       <div className="overflow-x-hidden">
@@ -23,10 +39,28 @@ const App = () => {
           <Route path="/test" element={<Test />} />
           <Route path="/verify-otp" element={<VerifyOTP />} />
           <Route path="/verify-user" element={<VerifyUser />} />
+          <Route element={<AdminRoute />}>
+            <Route path="/dashboard/admin" element={<div>Admin Panel</div>} />
+          </Route>
+          <Route element={<PrivateRoute />}>
+            <Route path="/dashboard" element={<Dashboard />}>
+              <Route path="overview" element={<Overview />} />
+              <Route path="list-items" element={<ListItems />} />
+              <Route path="manage-items" element={<ManageItems />} />
+              <Route path="orders" element={<MyOrders />} />
+              <Route path="user-analytics" element={<UserAnalytics />} />
+            </Route>
+          </Route>
         </Routes>
       </div>
-    </BrowserRouter>
+    </>
   );
 };
+
+const App = () => (
+  <BrowserRouter>
+    <AppContent />
+  </BrowserRouter>
+);
 
 export default App;
