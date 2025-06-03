@@ -8,34 +8,30 @@ datasource db {
 }
 
 model User {
-  id            String  @id @default(cuid())
-  name          String
-  email         String  @unique
-  roll          String  @unique
-  password      String
-  selfie        String  @default("absent")
-  id_card_front String  @default("absent")
-  id_card_back  String  @default("absent")
-  ip_address    String?
-  latitude      Float?
-  longitude     Float?
-  role          Role    @default(USER)
-
-  email_verified     Boolean      @default(false)
-  is_verified        VerifyStatus @default(UNVERIFIED)
-  otp                String?
-  otp_expiry         DateTime?
-  otp_sent_count     Int          @default(0)
-  last_otp_sent_date DateTime?
-
-  safety_score        Int                 @default(0)
-  credit_transactions CreditTransaction[] // Tracks all credit transactions for the user
-
-  rented_products   Product[] @relation("RentedProducts")
-  borrowed_products Product[] @relation("BorrowedProducts")
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                 String              @id @default(cuid()) @map("id")
+  name               String              @map("name")
+  email              String              @unique @map("email")
+  roll               String              @unique @map("roll")
+  password           String              @map("password")
+  selfie             String              @default("absent") @map("selfie")
+  idCardFront        String              @default("absent") @map("id_card_front")
+  idCardBack         String              @default("absent") @map("id_card_back")
+  ipAddress          String?             @map("ip_address")
+  latitude           Float?              @map("latitude")
+  longitude          Float?              @map("longitude")
+  role               Role                @default(USER) @map("role")
+  emailVerified      Boolean             @default(false) @map("email_verified")
+  isVerified         VerifyStatus        @default(UNVERIFIED) @map("is_verified")
+  otp                String?             @map("otp")
+  otpExpiry          DateTime?           @map("otp_expiry")
+  otpSentCount       Int                 @default(0) @map("otp_sent_count")
+  lastOtpSentDate    DateTime?           @map("last_otp_sent_date")
+  safetyScore        Int                 @default(0) @map("safety_score")
+  creditTransactions CreditTransaction[]
+  rentedProducts     Product[]           @relation("RentedProducts")
+  borrowedProducts   Product[]           @relation("BorrowedProducts")
+  createdAt          DateTime            @default(now()) @map("created_at")
+  updatedAt          DateTime            @updatedAt @map("updated_at")
 
   @@index([latitude, longitude])
   @@map("users")
@@ -54,23 +50,21 @@ enum Role {
 }
 
 model CreditTransaction {
-  id              String       @id @default(cuid())
-  userId          String
-  amount          Float
-  creditType      CreditType
-  sourceType      CreditSource // PRODUCT, MONEY, INSTANT
-  sourceProductId String?
-  renterId        String?
-  instantFee      Float? // Fee charged by Brittoo for instant credit
-  validityStart   DateTime
-  validityEnd     DateTime
-  isActive        Boolean      @default(true)
-
-  user          User     @relation(fields: [userId], references: [id])
-  sourceProduct Product? @relation(fields: [sourceProductId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String       @id @default(cuid()) @map("id")
+  userId          String       @map("user_id")
+  amount          Float        @map("amount")
+  creditType      CreditType   @map("credit_type")
+  sourceType      CreditSource @map("source_type")
+  sourceProductId String?      @map("source_product_id")
+  renterId        String?      @map("renter_id")
+  instantFee      Float?       @map("instant_fee")
+  validityStart   DateTime     @map("validity_start")
+  validityEnd     DateTime     @map("validity_end")
+  isActive        Boolean      @default(true) @map("is_active")
+  user            User         @relation(fields: [userId], references: [id])
+  sourceProduct   Product?     @relation(fields: [sourceProductId], references: [id])
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
 
   @@map("credit_transactions")
 }
@@ -87,23 +81,21 @@ enum CreditSource {
 }
 
 model Product {
-  id                  String      @id @default(cuid())
-  name                String
-  price_per_day       Float?
-  product_image       String[]
-  product_type        ProductType
-  approax_buying_date String
-  ownerId             String
-  borrowerId          String?
-  isOnHold            Boolean     @default(false)
-  holdCreditValidity  Int?
-
+  id                 String              @id @default(cuid()) @map("id")
+  name               String              @map("name")
+  pricePerDay        Float?              @map("price_per_day")
+  productImage       String[]            @map("product_image")
+  productType        ProductType         @map("product_type")
+  approxBuyingDate   String              @map("approx_buying_date")
+  ownerId            String              @map("owner_id")
+  borrowerId         String?             @map("borrower_id")
+  isOnHold           Boolean             @default(false) @map("is_on_hold")
+  holdCreditValidity Int?                @map("hold_credit_validity")
   owner              User                @relation("RentedProducts", fields: [ownerId], references: [id])
   borrower           User?               @relation("BorrowedProducts", fields: [borrowerId], references: [id])
   creditTransactions CreditTransaction[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt          DateTime            @default(now()) @map("created_at")
+  updatedAt          DateTime            @updatedAt @map("updated_at")
 
   @@map("products")
 }

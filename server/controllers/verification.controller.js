@@ -3,7 +3,6 @@ import path from "path";
 import prisma from "../config/prisma.js";
 import { uploadsDirPath } from "../middlewares/uploadMiddleware.js";
 
-
 export const verifyUser = async (req, res) => {
   try {
     const { email } = req.body;
@@ -25,20 +24,20 @@ export const verifyUser = async (req, res) => {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    if (user.is_verified === "VERIFIED") {
+    if (user.isVerified === "VERIFIED") {
       fs.unlinkSync(idCardFile.path);
       fs.unlinkSync(selfieFile.path);
       return res.status(400).json({ success: false, message: "User is already verified" });
     }
 
-    if (user.is_verified === "PENDING") {
+    if (user.isVerified === "PENDING") {
       fs.unlinkSync(idCardFile.path);
       fs.unlinkSync(selfieFile.path);
       return res.status(400).json({ success: false, message: "You have already requested for verification" });
     }
 
-    if (user.id_card_front && user.id_card_front !== "absent") {
-      const oldIdCardPath = path.join(uploadsDirPath, user.id_card_front);
+    if (user.idCardFront && user.idCardFront !== "absent") {
+      const oldIdCardPath = path.join(uploadsDirPath, user.idCardFront);
       if (fs.existsSync(oldIdCardPath)) fs.unlinkSync(oldIdCardPath);
     }
 
@@ -50,9 +49,9 @@ export const verifyUser = async (req, res) => {
     await prisma.user.update({
       where: { email },
       data: {
-        id_card_front: idCardFile.filename,
+        idCardFront: idCardFile.filename,
         selfie: selfieFile.filename,
-        is_verified: "PENDING",
+        isVerified: "PENDING",
       },
     });
 

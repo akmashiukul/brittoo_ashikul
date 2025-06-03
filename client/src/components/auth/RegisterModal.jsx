@@ -69,7 +69,7 @@ const RegisterModal = () => {
         ...formData,
         latitude: coords.latitude,
         longitude: coords.longitude,
-        ip_address: ip,
+        ipAddress: ip,
       });
 
       console.log(res);

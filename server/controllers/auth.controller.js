@@ -7,7 +7,7 @@ import jwt from "jsonwebtoken";
 const resend = new Resend(`${process.env.RESEND_API_KEY}`);
 
 export const register = async (req, res, next) => {
-  const { name, email, password, latitude, longitude, ip_address } = req.body;
+  const { name, email, password, latitude, longitude, ipAddress } = req.body;
 
   try {
     if (!isValidRuetEmail(email)) {
@@ -25,7 +25,7 @@ export const register = async (req, res, next) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const otp = Math.floor(10000 + Math.random() * 90000).toString();
-    const otp_expiry = new Date(Date.now() + 5 * 60 * 1000);
+    const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
     const roll = email.split("@")[0];
 
     user = await prisma.user.create({
@@ -36,11 +36,11 @@ export const register = async (req, res, next) => {
         roll,
         latitude,
         longitude,
-        ip_address,
-        otp_expiry,
+        ipAddress,
+        otpExpiry,
         otp,
-        otp_sent_count: 1,
-        last_otp_sent_date: new Date(),
+        otpSentCount: 1,
+        lastOtpSentDate: new Date(),
       },
     });
 
@@ -60,7 +60,7 @@ export const register = async (req, res, next) => {
         </div>
       `,
     });
-    const { password: _, otp: __, otp_expiry: ___, ...safeUser } = user;
+    const { password: _, otp: __, otpExpiry: ___, ...safeUser } = user;
     return res.status(201).json({
       success: true,
       message: "User created successfully. OTP sent to your email.",
@@ -92,7 +92,7 @@ export const resendOTP = async (req, res, next) => {
       throw new CustomError("User not found", 404);
     }
 
-    if (user.email_verified) {
+    if (user.emailVerified) {
       throw new CustomError("Email is already verified", 400);
     }
 
@@ -102,10 +102,10 @@ export const resendOTP = async (req, res, next) => {
     let currentOtpCount = 0;
 
     if (
-      user.last_otp_sent_date &&
-      new Date(user.last_otp_sent_date) > twentyFourHoursAgo
+      user.lastOtpSentDate &&
+      new Date(user.lastOtpSentDate) > twentyFourHoursAgo
     ) {
-      currentOtpCount = user.otp_sent_count;
+      currentOtpCount = user.otpSentCount;
     } else {
       // More than 24 hours ago
       currentOtpCount = 2;
@@ -113,9 +113,9 @@ export const resendOTP = async (req, res, next) => {
 
     // Check 24-hour limit (max 3 OTPs in 24 hours)
     if (currentOtpCount >= 30) {
-      const timeUntilReset = user.last_otp_sent_date
+      const timeUntilReset = user.lastOtpSentDate
         ? new Date(
-            new Date(user.last_otp_sent_date).getTime() + 24 * 60 * 60 * 1000,
+            new Date(user.lastOtpSentDate).getTime() + 24 * 60 * 60 * 1000,
           )
         : new Date();
 
@@ -127,8 +127,8 @@ export const resendOTP = async (req, res, next) => {
       );
     }
 
-    const lastOtpTime = user.otp_expiry
-      ? new Date(user.otp_expiry).getTime() - 5 * 60 * 1000
+    const lastOtpTime = user.otpExpiry
+      ? new Date(user.otpExpiry).getTime() - 5 * 60 * 1000
       : 0;
     const timeSinceLastOtp = Date.now() - lastOtpTime;
     const minWaitTime = 60 * 1000;
@@ -142,15 +142,15 @@ export const resendOTP = async (req, res, next) => {
     }
 
     const newOtp = Math.floor(10000 + Math.random() * 90000).toString();
-    const newOtp_expiry = new Date(Date.now() + 5 * 60 * 1000);
+    const newOtpExpiry = new Date(Date.now() + 5 * 60 * 1000);
 
     const updatedUser = await prisma.user.update({
       where: { email },
       data: {
         otp: newOtp,
-        otp_expiry: newOtp_expiry,
-        otp_sent_count: currentOtpCount + 1,
-        last_otp_sent_date: now,
+        otpExpiry: newOtpExpiry,
+        otpSentCount: currentOtpCount + 1,
+        lastOtpSentDate: now,
       },
     });
 
@@ -166,7 +166,7 @@ export const resendOTP = async (req, res, next) => {
             ${newOtp}
           </div>
           <p><strong>Important:</strong> This code expires in 5 minutes.</p>
-          <p>Remaining OTP requests in 24 hours: ${3 - updatedUser.otp_sent_count}</p>
+          <p>Remaining OTP requests in 24 hours: ${3 - updatedUser.otpSentCount}</p>
           <p>If you didn't request this code, please secure your account immediately.</p>
         </div>
       `,
@@ -177,8 +177,8 @@ export const resendOTP = async (req, res, next) => {
       message: "OTP resent successfully",
       data: {
         email,
-        otp_sent_count: updatedUser.otp_sent_count,
-        remainingAttempts: 3 - updatedUser.otp_sent_count,
+        otpSentCount: updatedUser.otpSentCount,
+        remainingAttempts: 3 - updatedUser.otpSentCount,
       },
     });
   } catch (error) {
@@ -201,13 +201,13 @@ export const verifyOTP = async (req, res, next) => {
     if (!user) {
       throw new CustomError("User not found", 404);
     }
-    if (user.email_verified) {
+    if (user.emailVerified) {
       throw new CustomError("Email is already verified", 400);
     }
     if (user.otp !== otp) {
       throw new CustomError("Invalid OTP", 401);
     }
-    if (user.otp_expiry < new Date()) {
+    if (user.otpExpiry < new Date()) {
       throw new CustomError("OTP has expired", 401);
     }
 
@@ -215,9 +215,9 @@ export const verifyOTP = async (req, res, next) => {
       where: { email },
       data: {
         otp: null,
-        otp_expiry: null,
-        email_verified: true,
-        otp_sent_count: 0,
+        otpExpiry: null,
+        emailVerified: true,
+        otpSentCount: 0,
       },
     });
 
@@ -227,7 +227,7 @@ export const verifyOTP = async (req, res, next) => {
       { expiresIn: "2d" },
     );
 
-    const { password: _, otp: __, otp_expiry: ___, ...safeUser } = updatedUser;
+    const { password: _, otp: __, otpExpiry: ___, ...safeUser } = updatedUser;
     return res.status(200).json({
       success: true,
       message: "Email verified successfully",
@@ -267,22 +267,22 @@ export const login = async (req, res, next) => {
     // If two factor enabled (TODO):
     /*
       const otp = Math.floor(10000 + Math.random() * 90000).toString();
-      const otp_expiry = new Date(Date.now() + 5 * 60 * 1000);
+      const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
       await prisma.user.update({
-      where: { id: user.id },
+        where: { id: user.id },
         data: {
           otp,
-          otp_expiry,
-          otp_sent_count: user.otp_sent_count + 1,
-          last_otp_sent_date: new Date(),
+          otpExpiry,
+          otpSentCount: user.otpSentCount + 1,
+          lastOtpSentDate: new Date(),
         },
       });
 
       await resend.emails.send({
-      from: "Brittoo <verify@brittoo.xyz>",
-      to: email,
-      subject: "Your Brittoo Login OTP Code",
-      html: `
+        from: "Brittoo <verify@brittoo.xyz>",
+        to: email,
+        subject: "Your Brittoo Login OTP Code",
+        html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h2>Brittoo Login Verification</h2>
             <p>Your OTP verification code for login is:</p>
@@ -294,7 +294,7 @@ export const login = async (req, res, next) => {
           </div>
         `,
       });
-      const { password: _, otp: __, otp_expiry: ___, ...safeUser } = user;
+      const { password: _, otp: __, otpExpiry: ___, ...safeUser } = user;
     */
 
     const token = jwt.sign(
@@ -303,7 +303,7 @@ export const login = async (req, res, next) => {
       { expiresIn: "2d" },
     );
 
-    const { password: _, otp: __, otp_expiry: ___, ...safeUser } = user;
+    const { password: _, otp: __, otpExpiry: ___, ...safeUser } = user;
 
     return res.status(200).json({
       success: true,
