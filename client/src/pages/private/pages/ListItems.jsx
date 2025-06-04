@@ -1,8 +1,11 @@
 import { Plus, Upload, X } from "lucide-react";
 import { useState } from "react";
+import Swal from "sweetalert2";
+import Loader from "../../../components/shared/Loader";
 
 const ListItems = () => {
   const [selectedImages, setSelectedImages] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     productType: "",
@@ -10,7 +13,7 @@ const ListItems = () => {
     productAge: "",
     tags: "",
     omv: "",
-    description: "",
+    productDescription: "",
   });
 
   const handleInputChange = (e) => {
@@ -40,6 +43,27 @@ const ListItems = () => {
     });
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+
+    } catch (error) {
+      console.error("Error in Listing Item:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Something went wrong",
+        text: error.response?.data?.message || error.message,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return <Loader />
+  }
+
   return (
     <div className="p-4 md:p-10">
       <div>
@@ -50,7 +74,7 @@ const ListItems = () => {
           So you don&apos;t have to survive on only shingara from the tong.
         </p>
       </div>
-      <form className="mt-8 flex flex-col gap-4">
+      <form className="mt-8 flex flex-col gap-4" onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-2 w-full gap-4">
           <div>
             {selectedImages.length > 0 ? (
@@ -99,8 +123,8 @@ const ListItems = () => {
                 >
                   <Upload />
                   <span className="mt-4 font-medium gap-2">
-                    Upload Product Images
-                    <span className="text-[11px]">(max 4)</span>
+                    Upload Item Images
+                    <span className="text-[11px] ml-1">(max 4)</span>
                   </span>
                   <span className="mt-2 inline-block rounded border border-gray-200 bg-gray-50 px-3 py-1.5 text-center text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-200">
                     Browse files
@@ -127,6 +151,7 @@ const ListItems = () => {
                 id="name"
                 className="border bg-white border-gray-300 rounded-md w-full px-2 py-2 md:py-3 p md:px-4 focus:border-gray-400 focus:outline-none text-xs md:text-sm"
                 placeholder="Name of your product.."
+                onChange={handleInputChange}
               />
             </label>
             <label
@@ -140,6 +165,7 @@ const ListItems = () => {
                 name="productType"
                 id="productType"
                 className="border bg-white border-gray-300 rounded-md w-full px-2 py-2 md:py-3 p md:px-4 focus:border-gray-400 focus:outline-none text-xs md:text-sm"
+                onChange={handleInputChange}
               >
                 <option value="">Please select</option>
                 <option value="GADGET">Gadget</option>
@@ -162,6 +188,7 @@ const ListItems = () => {
                 id="omv"
                 className="border bg-white border-gray-300 rounded-md w-full px-2 py-2 md:py-3 p md:px-4 focus:border-gray-400 focus:outline-none text-xs md:text-sm"
                 placeholder="At what price was this product bought?"
+                onChange={handleInputChange}
               />
             </label>
             <label
@@ -175,13 +202,14 @@ const ListItems = () => {
                 name="productCondition"
                 id="productCondition"
                 className="border bg-white border-gray-300 rounded-md w-full px-2 py-2 md:py-3 p md:px-4 focus:border-gray-400 focus:outline-none text-xs md:text-sm"
+                onChange={handleInputChange}
               >
                 <option value="">Please select</option>
-                <option value="new">✨ New</option>
-                <option value="like-new">🌟 Like New</option>
-                <option value="good">👍 Good</option>
-                <option value="fair">👌 Fair</option>
-                <option value="poor">😔 Poor</option>
+                <option value="NEW">✨ New</option>
+                <option value="LIKE_NEW">🌟 Like New</option>
+                <option value="GOOD">👍 Good</option>
+                <option value="FAIR">👌 Fair</option>
+                <option value="POOR">😔 Poor</option>
               </select>
             </label>
           </div>
@@ -195,6 +223,7 @@ const ListItems = () => {
               name="productAge"
               id="productAge"
               className="border bg-white border-gray-300 rounded-md w-full px-2 py-2 md:py-3 p md:px-4 focus:border-gray-400 focus:outline-none text-xs md:text-sm"
+              onChange={handleInputChange}
             >
               <option value="">Please select</option>
               <option value="1"> Less than 1 year</option>
@@ -215,17 +244,25 @@ const ListItems = () => {
             id="tags"
             className="border bg-white border-gray-300 rounded-md w-full px-2 py-2 md:py-3 p md:px-4 focus:border-gray-400 focus:outline-none text-xs md:text-sm"
             placeholder="e.g.  gadget,electronics,arduino,uno,project"
+            onChange={handleInputChange}
           />
         </label>
-        <label htmlFor="description" className="flex flex-col gap-1.5 w-full">
-          <span className="text-sm font-medium text-gray-700">Description</span>
+        <label htmlFor="productDescription" className="flex flex-col gap-1.5 w-full">
+          <span className="text-sm font-medium text-gray-700">Product Description</span>
           <textarea
             type="text"
-            id="description"
+            id="productDescription"
             className="border h-24 bg-white border-gray-300 rounded-md w-full px-2 py-2 md:py-3 p md:px-4 focus:border-gray-400 focus:outline-none text-xs md:text-sm"
             placeholder="Say something about the product..."
+            onChange={handleInputChange}
           />
         </label>
+        <button
+          type="submit"
+          className="py-2 px-4 bg-green-600 text-white rounded-md border border-green-600 hover:bg-green-500 hover:text-white/90 cursor-pointer shadow-md text-center"
+        >
+          List Item
+        </button>
       </form>
     </div>
   );

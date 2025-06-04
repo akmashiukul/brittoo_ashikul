@@ -86,7 +86,8 @@ model Product {
   pricePerDay        Float?              @map("price_per_day")
   productImages      String[]            @map("product_images")
   productType        ProductType         @map("product_type")
-  productAge         String              @map("product_age")
+  productCondition   ProductCondition    @map("product_condition")
+  productAge         Int                 @map("product_age")
   omv                Int                 @map("omv")
   tags               String              @map("tags")
   productDescription String              @map("product_description")
@@ -113,4 +114,12 @@ enum ProductType {
   BOOK
   ELECTRONICS
   APARTMENTS
+}
+
+enum ProductCondition {
+  NEW
+  LIKE_NEW
+  GOOD
+  FAIR
+  POOR
 }

@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import { errorHandler } from "./lib/errorHandler.js";
 import authRoutes from "./routes/auth.routes.js";
+import productRoutes from "./routes/product.routes.js";
 import cors from 'cors';
 
 dotenv.config();
@@ -15,6 +16,7 @@ app.get("/", (req, res) => {
   res.send("Britto Server is Running....");
 });
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/products", productRoutes);
 
 app.use(errorHandler);
 
