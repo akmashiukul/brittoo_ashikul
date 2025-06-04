@@ -14,7 +14,7 @@ const VerifyUser = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState('');
   const [cameraReady, setCameraReady] = useState(false);
-  const [captureType, setCaptureType] = useState(null); // 'selfie' or 'idCard'
+  const [captureType, setCaptureType] = useState(null);
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -260,7 +260,7 @@ const VerifyUser = () => {
         'Something went wrong. Please try again.';
       setMessage(`❌ ${errorMessage}`);
       if (error.response?.status === 401) {
-        navigate('/login'); // Redirect to login if unauthorized
+        navigate('/login');
       }
     } finally {
       setIsSubmitting(false);

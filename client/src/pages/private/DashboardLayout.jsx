@@ -51,7 +51,7 @@ const Dashboard = () => {
               />
             </Link>
             <button
-              className="group cursor-pointer p-2 sm:hidden"
+              className="group cursor-pointer p-2 lg:hidden"
               onClick={closeDrawer}
               aria-label="Close drawer"
             >
@@ -185,20 +185,23 @@ const Dashboard = () => {
       </div>
 
       <button
-        className={`fixed top-4 left-4 z-50 p-2 md:p-2.5 rounded-full backdrop-blur-md shadow-md hover:shadow-2xl transition-all duration-300 group cursor-pointer bg-gray-100 border border-gray-200 ${
+        className={`fixed bottom-4 left-4 z-50 p-3 md:p-3 rounded-full shadow-md hover:shadow-2xl transition-all duration-300 group cursor-pointer bg-gray-100 border border-gray-200 ${
           isDrawerOpen ? "opacity-0 pointer-events-none" : "opacity-100"
         }`}
         aria-label="Open drawer"
         onClick={openDrawer}
       >
-        <Menu className="w-4 h-4 md:w-5 md:h-5 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-180 text-green-600" />
+        <Menu className="w-6 h-6 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-180 text-green-600" />
       </button>
 
       <div
         className={`flex-1 transition-all duration-300 ${
-          isDrawerOpen ? "ml-64 md:ml-80" : "ml-0"
+          isDrawerOpen ? "ml-0 md:ml-80 relative" : "ml-0"
         }`}
       >
+        {
+          (isDrawerOpen && window.innerWidth < 500) &&<div className="absolute bg-black/50 opacity-80 h-full w-full"></div>
+        }
         <Outlet />
       </div>
     </div>

@@ -126,8 +126,8 @@ const Navbar = () => {
                overflow-x-hidden"
               >
                 <div className="p-2">
-                  <Link to="" className={menuClassname}>
-                    My profile
+                  <Link to="/dashboard/overview" className={menuClassname}>
+                    My Dashboard
                   </Link>
                   <Link to="" className={menuClassname}>
                     Billing summary

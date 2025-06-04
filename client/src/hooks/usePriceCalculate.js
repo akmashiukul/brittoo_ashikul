@@ -21,22 +21,22 @@ export const usePriceCalculate = () => {
       5: 0.016,
       6: 0.014,
       7: 0.012,
-      8: 0.01,
-      9: 0.009,
-      10: 0.008,
+      8: 0.011,
+      9: 0.01,
+      10: 0.009,
     };
     const conditionMap = {
-      "New": 1.0,
+      New: 1.0,
       "Like New": 0.9,
-      "Good": 0.75,
-      "Fair": 0.5,
-      "Poor": 0.3,
+      Good: 0.75,
+      Fair: 0.5,
+      Poor: 0.3,
     };
     const securityMap = {
       "Very Low": 1.2,
-      "Low": 1.1,
-      "Mid": 1.0,
-      "High": 0.95,
+      Low: 1.1,
+      Mid: 1.0,
+      High: 0.95,
       "Very High": 0.9,
     };
     const usageMultiplier =
@@ -48,8 +48,10 @@ export const usePriceCalculate = () => {
         ? 0.7
         : usageYears < 5
         ? 0.55
-        : 0.4;
-    const baseRate = baseRates[day] ?? 0.012;
+        : usageYears < 8
+        ? 0.4
+        : 0.3;
+    const baseRate = baseRates[day] || 0.009 - (day - 10) * 0.0001;
     const basePrice = omv * baseRate;
     const scaleFactor = getScaleFactor(omv);
     const finalPrice =
@@ -61,6 +63,6 @@ export const usePriceCalculate = () => {
 
     return parseFloat(finalPrice.toFixed(2));
   }
-  
+
   return { calculatePricePerDay };
 };

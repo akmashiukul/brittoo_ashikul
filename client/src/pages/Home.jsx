@@ -1,4 +1,4 @@
-import Banner from "../components/HomePageComponents/Banner"
+import Banner from "../components/HomePage/Banner"
 import useUserStore from "../stores/useUserStore"
 
 const Home = () => {
