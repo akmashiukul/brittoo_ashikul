@@ -1,4 +1,3 @@
-// middleware/productImageUpload.js
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -30,10 +29,21 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-export const productImageUpload = multer({
+const upload = multer({
   storage,
   fileFilter,
   limits: { fileSize: 5 * 1024 * 1024 },
-}).array("images", 4);
+}).array("productImages", 4);
+
+export const productImageUpload = (req, res, next) => {
+  upload(req, res, function (err) {
+    if (err) {
+      console.error("💥 Multer Error:", err);
+      return res.status(400).json({ message: err.message });
+    }
+    console.log("✅ Multer succeeded. Uploaded files:", req.files);
+    next();
+  });
+};
 
 export const productUploadsPath = productUploadsDir;

@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { CustomError } from '../lib/customError.js';
 
 export const verifyToken = (req, res, next) => {
   let token;
@@ -9,7 +10,7 @@ export const verifyToken = (req, res, next) => {
   }
 
   if(!token) {
-    return res.status(401).json({ message: "No Token Provided"});
+    throw new CustomError("BAD REQUEST", 401);
   }
 
   try {
@@ -17,6 +18,7 @@ export const verifyToken = (req, res, next) => {
     req.user = decoded;
     next();
   } catch (error) {
+    console.log("error in token verfication: ", error)
     next(error);
   }
 }

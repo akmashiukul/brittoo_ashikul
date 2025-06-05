@@ -12,24 +12,39 @@ export const createProduct = async (req, res, next) => {
       omv,
       tags,
       productDescription,
-      ownerId,
     } = req.body;
+
+    if (!req.user || !req.user.id) {
+      throw new CustomError("Unauthorized: No user authenticated", 401);
+    }
+
+    const owner = await prisma.user.findUniqueOrThrow({
+      where: {
+        id: req.user.id
+      }
+    });
+    console.log(owner.email);
+
+    if (!owner) {
+      throw new CustomError("Unauthorized", 401);
+    }
+
+    if (!req.files || req.files.length === 0) {
+      throw new CustomError("At least one product image is required", 400);
+    }
+
 
     const imagePaths = req.files.map(
       (file) => `/uploads/products/${file.filename}`,
     );
 
-    const owner = await prisma.user.findUnique({
-      where: {
-        id: ownerId,
-      },
-    });
-
-    if (!owner) {
-      throw new CustomError("Unauthorized", 403);
-    }
-
-    pricePerDay = calculatePricePerDay(omv, productCondition, productAge, owner.safetyScore, 3);
+    const pricePerDay = calculatePricePerDay(
+      omv,
+      productCondition,
+      productAge,
+      owner.safetyScore,
+      3,
+    );
 
     const product = await prisma.product.create({
       data: {
@@ -41,7 +56,7 @@ export const createProduct = async (req, res, next) => {
         omv: parseInt(omv),
         tags,
         productDescription,
-        ownerId,
+        ownerId: req.user.id,
         productImages: imagePaths,
       },
     });
@@ -56,7 +71,6 @@ export const createProduct = async (req, res, next) => {
     next(error);
   }
 };
-
 
 export const getProducts = async (req, res, next) => {
   try {

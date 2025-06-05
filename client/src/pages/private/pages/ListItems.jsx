@@ -2,10 +2,13 @@ import { Plus, Upload, X } from "lucide-react";
 import { useState } from "react";
 import Swal from "sweetalert2";
 import Loader from "../../../components/shared/Loader";
+import api from "../../../lib/api";
+import { useNavigate } from "react-router-dom";
 
 const ListItems = () => {
   const [selectedImages, setSelectedImages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     productType: "",
@@ -47,7 +50,32 @@ const ListItems = () => {
     e.preventDefault();
     try {
       setLoading(true);
+      const token = localStorage.getItem("token");
+      const formDataToSend = new FormData();
+      Object.entries(formData).forEach(([key, value]) => {
+        formDataToSend.append(key, value);
+      });
 
+      selectedImages.forEach((image) => {
+        formDataToSend.append("productImages", image.file);
+      });
+
+      const res = await api.post("/api/v1/products", formDataToSend, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.data.success) {
+        Swal.fire({
+          icon: "error",
+          title: "Listing Failed",
+          text: res.message || "An error occurred while adding the item.",
+        });
+        return;
+      }
+
+      navigate("/dashboard/manage-items");
     } catch (error) {
       console.error("Error in Listing Item:", error);
       Swal.fire({
@@ -56,12 +84,22 @@ const ListItems = () => {
         text: error.response?.data?.message || error.message,
       });
     } finally {
+      setFormData({
+        name: "",
+        productType: "",
+        productCondition: "",
+        productAge: "",
+        tags: "",
+        omv: "",
+        productDescription: "",
+      });
+      setSelectedImages([]);
       setLoading(false);
     }
   };
 
   if (loading) {
-    return <Loader />
+    return <Loader />;
   }
 
   return (
@@ -89,6 +127,7 @@ const ListItems = () => {
                       />
                       <button
                         type="button"
+                        required
                         onClick={() => deleteImage(idx)}
                         className="absolute -top-1 -right-1 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors cursor-pointer"
                       >
@@ -148,6 +187,7 @@ const ListItems = () => {
               </span>
               <input
                 type="name"
+                required
                 id="name"
                 className="border bg-white border-gray-300 rounded-md w-full px-2 py-2 md:py-3 p md:px-4 focus:border-gray-400 focus:outline-none text-xs md:text-sm"
                 placeholder="Name of your product.."
@@ -164,6 +204,7 @@ const ListItems = () => {
               <select
                 name="productType"
                 id="productType"
+                required
                 className="border bg-white border-gray-300 rounded-md w-full px-2 py-2 md:py-3 p md:px-4 focus:border-gray-400 focus:outline-none text-xs md:text-sm"
                 onChange={handleInputChange}
               >
@@ -185,6 +226,7 @@ const ListItems = () => {
               </span>
               <input
                 type="number"
+                required
                 id="omv"
                 className="border bg-white border-gray-300 rounded-md w-full px-2 py-2 md:py-3 p md:px-4 focus:border-gray-400 focus:outline-none text-xs md:text-sm"
                 placeholder="At what price was this product bought?"
@@ -201,6 +243,7 @@ const ListItems = () => {
               <select
                 name="productCondition"
                 id="productCondition"
+                required
                 className="border bg-white border-gray-300 rounded-md w-full px-2 py-2 md:py-3 p md:px-4 focus:border-gray-400 focus:outline-none text-xs md:text-sm"
                 onChange={handleInputChange}
               >
@@ -222,6 +265,7 @@ const ListItems = () => {
             <select
               name="productAge"
               id="productAge"
+              required
               className="border bg-white border-gray-300 rounded-md w-full px-2 py-2 md:py-3 p md:px-4 focus:border-gray-400 focus:outline-none text-xs md:text-sm"
               onChange={handleInputChange}
             >
@@ -241,16 +285,23 @@ const ListItems = () => {
           </span>
           <input
             type="text"
+            required
             id="tags"
             className="border bg-white border-gray-300 rounded-md w-full px-2 py-2 md:py-3 p md:px-4 focus:border-gray-400 focus:outline-none text-xs md:text-sm"
             placeholder="e.g.  gadget,electronics,arduino,uno,project"
             onChange={handleInputChange}
           />
         </label>
-        <label htmlFor="productDescription" className="flex flex-col gap-1.5 w-full">
-          <span className="text-sm font-medium text-gray-700">Product Description</span>
+        <label
+          htmlFor="productDescription"
+          className="flex flex-col gap-1.5 w-full"
+        >
+          <span className="text-sm font-medium text-gray-700">
+            Product Description
+          </span>
           <textarea
             type="text"
+            required
             id="productDescription"
             className="border h-24 bg-white border-gray-300 rounded-md w-full px-2 py-2 md:py-3 p md:px-4 focus:border-gray-400 focus:outline-none text-xs md:text-sm"
             placeholder="Say something about the product..."

@@ -4,6 +4,7 @@ import { errorHandler } from "./lib/errorHandler.js";
 import authRoutes from "./routes/auth.routes.js";
 import productRoutes from "./routes/product.routes.js";
 import cors from 'cors';
+import { multerErrorHandler } from "./lib/multerErrorHandler.js";
 
 dotenv.config();
 const app = express();
@@ -19,6 +20,8 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/products", productRoutes);
 
 app.use(errorHandler);
+app.use(multerErrorHandler);
+
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is dancing on http://localhost:${PORT} \n${new Date(Date.now()).toLocaleTimeString()}
