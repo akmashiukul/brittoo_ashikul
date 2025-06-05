@@ -42,7 +42,7 @@ export const createProduct = async (req, res, next) => {
       omv,
       productCondition,
       productAge,
-      owner.safetyScore,
+      owner.securityScore,
       3,
     );
 

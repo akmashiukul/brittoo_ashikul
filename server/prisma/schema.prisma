@@ -26,7 +26,7 @@ model User {
   otpExpiry          DateTime?           @map("otp_expiry")
   otpSentCount       Int                 @default(0) @map("otp_sent_count")
   lastOtpSentDate    DateTime?           @map("last_otp_sent_date")
-  safetyScore        Int                 @default(0) @map("safety_score")
+  securityScore      SecurityScore       @default(MID) @map("security_score")
   creditTransactions CreditTransaction[]
   rentedProducts     Product[]           @relation("RentedProducts")
   borrowedProducts   Product[]           @relation("BorrowedProducts")
@@ -47,6 +47,14 @@ enum Role {
   USER
   ADMIN
   MODERATOR
+}
+
+enum SecurityScore {
+  VERY_LOW
+  LOW
+  MID
+  HIGH
+  VERY_HIGH
 }
 
 model CreditTransaction {

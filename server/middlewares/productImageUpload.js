@@ -41,7 +41,6 @@ export const productImageUpload = (req, res, next) => {
       console.error("💥 Multer Error:", err);
       return res.status(400).json({ message: err.message });
     }
-    console.log("✅ Multer succeeded. Uploaded files:", req.files);
     next();
   });
 };
