@@ -3,6 +3,7 @@ import Swal from "sweetalert2";
 import useUserStore from "../../../stores/useUserStore";
 import ManageItemCard from "../../../components/ManageItemCard";
 import api from "../../../lib/api";
+import Loader from "../../../components/shared/Loader";
 
 const ManageItems = () => {
   const [products, setProducts] = useState([]);
@@ -47,9 +48,7 @@ const ManageItems = () => {
           Manage Your Products
         </h1>
         {loading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-indigo-600"></div>
-          </div>
+          <Loader />
         ) : error ? (
           <div className="text-center text-red-600">
             {error}
@@ -64,6 +63,8 @@ const ManageItems = () => {
               <ManageItemCard
                 key={product.id}
                 product={product}
+                setProducts={setProducts}
+                products={products}
               />
             ))}
           </div>

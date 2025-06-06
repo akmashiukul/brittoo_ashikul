@@ -288,3 +288,51 @@ export const updateProduct = async (req, res, next) => {
     next(error);
   }
 };
+
+
+export const deleteProduct = async (req, res, next) => {
+  try {
+    const { id } = req.params; 
+    if (!req.user || !req.user.id) {
+      throw new CustomError("Unauthorized: No user authenticated", 401);
+    }
+    const product = await prisma.product.findUniqueOrThrow({
+      where: { id },
+    });
+
+    if (product.ownerId !== req.user.id && req.user.role !== "ADMIN") {
+      throw new CustomError("Unauthorized: You can only delete your own products", 403);
+    }
+
+    if (product.productImages && product.productImages.length > 0) {
+      for (const imagePath of product.productImages) {
+        const fullPath = path.join(productUploadsDir, path.basename(imagePath));
+        try {
+          if (fs.existsSync(fullPath)) {
+            fs.unlinkSync(fullPath);
+            console.log(`Deleted image: ${fullPath}`);
+          }
+        } catch (err) {
+          console.error(`Error deleting image ${fullPath}:`, err);
+        }
+      }
+    }
+
+    await prisma.product.delete({
+      where: { id },
+    });
+
+    const keys = await redisClient.keys("products:*");
+    if (keys.length > 0) {
+      await redisClient.del(keys);
+      console.log("Cache invalidated:", keys);
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Product deleted successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};

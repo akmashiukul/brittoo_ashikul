@@ -1,7 +1,9 @@
 import { Trash2, Edit3, TagIcon } from "lucide-react";
 import { Link } from "react-router-dom";
+import Swal from "sweetalert2";
+import api from "../lib/api";
 
-const ManageItemCard = ({ product, onDelete }) => {
+const ManageItemCard = ({ product, products, setProducts }) => {
   const {
     id,
     name,
@@ -12,31 +14,60 @@ const ManageItemCard = ({ product, onDelete }) => {
     productImages,
   } = product;
 
-  // Mock base URL for demo
   const base_url = import.meta.env.VITE_BASE_URL;
 
   const handleDelete = async () => {
-    if (window.confirm(`Delete "${name}"?`)) {
-      onDelete(id);
-    }
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const token = localStorage.getItem("token");
+          const res = await api.delete(`/api/v1/products/${id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (!res.data.success) {
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: res.data.message || "Something Went Wrong!",
+            });
+          }
+          setProducts(products.filter((product) => product.id !== id));
+          Swal.fire({
+            title: "Deleted Successfully",
+            icon: "success",
+          });
+        } catch (error) {
+          console.error("Error deleting product:", error);
+        }
+      }
+    });
   };
 
+  const conditionColor =
+    {
+      NEW: "bg-gray-100 text-gray-800",
+      LIKE_NEW: "bg-gray-100 text-gray-800",
+      GOOD: "bg-gray-100 text-gray-800",
+      FAIR: "bg-gray-200 text-gray-800",
+      POOR: "bg-gray-200 text-gray-800",
+    }[productCondition] || "bg-gray-100 text-gray-800";
 
-  const conditionColor = {
-    NEW: "bg-gray-100 text-gray-800",
-    LIKE_NEW: "bg-gray-100 text-gray-800",
-    GOOD: "bg-gray-100 text-gray-800",
-    FAIR: "bg-gray-200 text-gray-800",
-    POOR: "bg-gray-200 text-gray-800",
-  }[productCondition] || "bg-gray-100 text-gray-800";
-
-  const conditionLabel = {
-    NEW: "New",
-    LIKE_NEW: "Like New",
-    GOOD: "Good",
-    FAIR: "Fair",
-    POOR: "Poor",
-  }[productCondition] || productCondition;
+  const conditionLabel =
+    {
+      NEW: "New",
+      LIKE_NEW: "Like New",
+      GOOD: "Good",
+      FAIR: "Fair",
+      POOR: "Poor",
+    }[productCondition] || productCondition;
 
   return (
     <div className="w-full max-w-sm mx-auto">
@@ -90,7 +121,7 @@ const ManageItemCard = ({ product, onDelete }) => {
 
         <div className="px-4 pb-4 flex space-x-2">
           <Link
-            to={`/dashboard/update-item/${product.id}`}
+            to={`/dashboard/update-item/${id}`}
             className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 py-1.5 text-xs rounded font-medium border border-gray-300 flex items-center cursor-pointer justify-center space-x-1"
           >
             <Edit3 className="w-4 h-4" />
