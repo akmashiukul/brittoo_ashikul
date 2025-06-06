@@ -49,9 +49,9 @@ const ManageItems = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">
+        <h1 className="text-3xl font-bold text-gray-900 mb-6">
           Manage Your Products
         </h1>
         {loading ? (
@@ -59,11 +59,11 @@ const ManageItems = () => {
             <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-indigo-600"></div>
           </div>
         ) : error ? (
-          <div className="text-center text-red-600 dark:text-red-400">
+          <div className="text-center text-red-600">
             {error}
           </div>
         ) : products.length === 0 ? (
-          <div className="text-center text-gray-600 dark:text-gray-400">
+          <div className="text-center text-gray-600">
             You haven't listed any products yet.
           </div>
         ) : (

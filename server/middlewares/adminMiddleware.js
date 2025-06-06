@@ -1,4 +1,3 @@
-import prisma from "../config/prisma.js";
 import { CustomError } from "../lib/customError.js";
 
 export const adminMiddleware = (req, res, next) => {

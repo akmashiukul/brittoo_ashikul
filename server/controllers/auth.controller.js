@@ -222,7 +222,7 @@ export const verifyOTP = async (req, res, next) => {
     });
 
     const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
+      { id: user.id, email: user.email, role: user.role, isVerified: user.isVerified, isSuspended: user.isSuspended },
       process.env.JWT_SECRET,
       { expiresIn: "2d" },
     );
@@ -298,7 +298,7 @@ export const login = async (req, res, next) => {
     */
 
     const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
+      { id: user.id, email: user.email, role: user.role, isVerified: user.isVerified, isSuspended: user.isSuspended },
       process.env.JWT_SECRET,
       { expiresIn: "2d" },
     );

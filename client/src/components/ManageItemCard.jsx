@@ -1,8 +1,8 @@
-import React from "react";
-import Swal from "sweetalert2";
-import axios from "axios";
+import { Trash2, Edit3, TagIcon } from "lucide-react";
 
 const ManageItemCard = ({ product, onDelete, onUpdate }) => {
+
+
   const {
     id,
     name,
@@ -13,94 +13,124 @@ const ManageItemCard = ({ product, onDelete, onUpdate }) => {
     productImages,
   } = product;
 
+  // Mock base URL for demo
   const base_url = import.meta.env.VITE_BASE_URL;
-  console.log(base_url)
-  console.log(`${base_url}${productImages[0]}`);
 
   const handleDelete = async () => {
-    const result = await Swal.fire({
-      title: "Are you sure?",
-      text: `You won't be able to revert this deletion for "${name}"!`,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, delete it!",
-    });
-
-    if (result.isConfirmed) {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) throw new Error("Authentication token not found");
-
-        await axios.delete(`/api/v1/products/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        Swal.fire({
-          icon: "success",
-          title: "Deleted!",
-          text: "Your product has been deleted.",
-          timer: 1500,
-        });
-
-        onDelete(id);
-      } catch (error) {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: error.response?.data?.message || "Failed to delete product",
-        });
-      }
+    // Simplified for demo - replace with your SweetAlert logic
+    if (window.confirm(`Delete "${name}"?`)) {
+      onDelete(id);
     }
   };
 
   const handleUpdate = () => {
     onUpdate(product);
-    Swal.fire({
-      icon: "info",
-      title: "Update",
-      text: "Update functionality to be implemented!",
-      timer: 1500,
-    });
   };
 
+  const conditionColor =
+    {
+      NEW: "from-green-400 to-green-500",
+      LIKE_NEW: "from-emerald-400 to-emerald-500",
+      GOOD: "from-teal-400 to-teal-500",
+      FAIR: "from-yellow-400 to-yellow-500",
+      POOR: "from-red-400 to-red-500",
+    }[productCondition] || "from-gray-400 to-gray-500";
+
+  const conditionLabel =
+    {
+      NEW: "New",
+      LIKE_NEW: "Like New",
+      GOOD: "Good",
+      FAIR: "Fair",
+      POOR: "Poor",
+    }[productCondition] || productCondition;
+
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden transform transition-all hover:shadow-2xl hover:-translate-y-1">
-      <div className="h-48 w-full overflow-hidden">
-        <img
-          src={`${base_url}${productImages[0]}`}
-          alt={name}
-          className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-        />
-      </div>
-      <div className="p-4">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 truncate">
-          {name}
-        </h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          {productType} • {productCondition}
-        </p>
-        <p className="text-lg font-bold text-indigo-600 dark:text-indigo-400 mt-1">
-          ${pricePerDay.toFixed(2)}/day
-        </p>
-        <p className="text-sm text-gray-500 dark:text-gray-600 mt-2 truncate">
-          Tags: {tags}
-        </p>
-      </div>
-      <div className="flex justify-between p-4 bg-gray-50 dark:bg-gray-700">
-        <button
-          onClick={handleUpdate}
-          className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200 text-sm font-medium"
-        >
-          Edit
-        </button>
-        <button
-          onClick={handleDelete}
-          className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors duration-200 text-sm font-medium"
-        >
-          Delete
-        </button>
+    <div
+      className="group relative w-full max-w-sm mx-auto"
+    >
+      <div className="relative bg-white rounded-xl shadow-lg overflow-hidden transform transition-all duration-300 hover:shadow-xl group-hover:scale-[1.01]">
+        <div className="absolute top-3 left-3 z-20">
+          <div
+            className={`px-2 py-1 rounded-md text-xs font-medium text-white bg-gradient-to-r ${conditionColor} shadow-sm`}
+          >
+            {conditionLabel}
+          </div>
+        </div>
+
+        <div className="relative h-40 overflow-hidden">
+          <img
+            src={`${base_url}${productImages[0]}`}
+            alt={name}
+            className="w-full h-full object-cover transition-all duration-500 group-hover:scale-110"
+          />
+
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
+
+          <div className="absolute bottom-3 right-3">
+            <div className="bg-green-600 text-white px-3 py-[2px] rounded-lg shadow-md">
+              <span className="text-sm font-semibold">
+                ${pricePerDay.toFixed(2)}
+              </span>
+              <span className="text-xs opacity-90">/day</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-4 space-y-3">
+          <div className="relative">
+            <h3 className="text-lg font-semibold text-gray-900 group-hover:text-green-700 transition-colors duration-300 truncate">
+              {name}
+            </h3>
+          </div>
+
+          <div className="flex items-center space-x-2 text-gray-600">
+            <span className="text-sm">{productType.replace("_", " ")}</span>
+          </div>
+
+          {tags && (
+            <div className="flex items-center gap-2">
+              <TagIcon size={18} color="#4b5563" />
+              <div className="flex flex-wrap gap-1">
+                {tags
+                  .split(",")
+                  .slice(0, 3)
+                  .map((tag, index) => (
+                    <span
+                      key={index}
+                      className="px-2 py-1 text-xs bg-green-50 text-green-700 rounded-md border border-green-100"
+                    >
+                      {tag.trim()}
+                    </span>
+                  ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Action buttons with green theme */}
+        <div className="px-4 pb-4">
+          <div className="flex space-x-2">
+            <button
+              onClick={handleUpdate}
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 text-xs px-2 rounded-lg font-medium shadow-sm hover:shadow-md transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center space-x-1 cursor-pointer"
+            >
+              <Edit3 className="w-4 h-4" />
+              <span>Edit</span>
+            </button>
+
+            <button
+              onClick={handleDelete}
+              className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 text-xs px-2 rounded-lg font-medium shadow-sm hover:shadow-md transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center space-x-1 cursor-pointer"
+            >
+              <Trash2 className="w-4 h-4" />
+              <span>Delete</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Bottom accent line */}
+        <div className="h-1 bg-green-500"></div>
       </div>
     </div>
   );
