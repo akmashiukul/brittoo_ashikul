@@ -7,6 +7,6 @@ import flowbiteReact from "flowbite-react/plugin/vite";
 export default defineConfig({
   plugins: [react(), tailwindcss(), flowbiteReact()],
   server: {
-    allowedHosts: ["evolving-champion-bullfrog.ngrok-free.app"]
+    allowedHosts: ["evolving-champion-bullfrog.ngrok-free.app"],
   }
 })

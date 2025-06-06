@@ -21,8 +21,8 @@ export const createProduct = async (req, res, next) => {
 
     const owner = await prisma.user.findUniqueOrThrow({
       where: {
-        id: req.user.id
-      }
+        id: req.user.id,
+      },
     });
     console.log(owner.email);
 
@@ -33,7 +33,6 @@ export const createProduct = async (req, res, next) => {
     if (!req.files || req.files.length === 0) {
       throw new CustomError("At least one product image is required", 400);
     }
-
 
     const imagePaths = req.files.map(
       (file) => `/uploads/products/${file.filename}`,
@@ -62,6 +61,12 @@ export const createProduct = async (req, res, next) => {
       },
     });
 
+    const keys = await redisClient.keys("products:*");
+    if (keys.length > 0) {
+      await redisClient.del(keys);
+      console.log("Cache invalidated:", keys);
+    }
+
     return res.status(201).json({
       success: true,
       message: "Product Listed Successfully",
@@ -89,8 +94,11 @@ export const getProducts = async (req, res, next) => {
     const cacheKey = `products:${JSON.stringify(req.query)}`;
     const cached = await redisClient.get(cacheKey);
     if (cached) {
-      res.status(200).json(cached);
+      console.log("Cache hit");
+      return res.status(200).json(JSON.parse(cached));
     }
+
+    console.log("Cache Miss");
 
     const filters = {};
 
@@ -149,7 +157,9 @@ export const getProducts = async (req, res, next) => {
       limit: parseInt(limit),
       total,
       totalPages: Math.ceil(total / limit),
-    }
+    };
+
+    await redisClient.setEx(cacheKey, 20, JSON.stringify(response));
 
     res.status(200).json(response);
   } catch (error) {

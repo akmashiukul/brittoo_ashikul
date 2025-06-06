@@ -5,12 +5,19 @@ import authRoutes from "./routes/auth.routes.js";
 import productRoutes from "./routes/product.routes.js";
 import cors from 'cors';
 import { multerErrorHandler } from "./lib/multerErrorHandler.js";
+import path from "path";
+import { fileURLToPath } from "url";
 
 dotenv.config();
 const app = express();
 app.use(express.json());
 app.use(cors())
 const PORT = process.env.PORT || 5000;
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 //routes
 app.get("/", (req, res) => {
