@@ -15,6 +15,7 @@ import Overview from "./pages/private/pages/Overview";
 import ManageItems from "./pages/private/pages/ManageItems";
 import MyOrders from "./pages/private/pages/MyOrders";
 import UserAnalytics from "./pages/private/pages/UserAnalytics";
+import UpdateItem from "./pages/private/pages/UpdateItem";
 
 
 const AppContent = () => {
@@ -49,6 +50,7 @@ const AppContent = () => {
               <Route path="manage-items" element={<ManageItems />} />
               <Route path="orders" element={<MyOrders />} />
               <Route path="user-analytics" element={<UserAnalytics />} />
+              <Route path="update-item/:id" element={<UpdateItem />} />
             </Route>
           </Route>
         </Routes>

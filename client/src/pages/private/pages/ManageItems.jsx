@@ -40,14 +40,6 @@ const ManageItems = () => {
     fetchProducts();
   }, [currentUser.id]);
 
-  const handleDelete = (productId) => {
-    setProducts(products.filter((product) => product.id !== productId));
-  };
-
-  const handleUpdate = (product) => {
-    console.log("Update product:", product);
-  };
-
   return (
     <div className="min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -72,8 +64,6 @@ const ManageItems = () => {
               <ManageItemCard
                 key={product.id}
                 product={product}
-                onDelete={handleDelete}
-                onUpdate={handleUpdate}
               />
             ))}
           </div>

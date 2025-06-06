@@ -21,8 +21,9 @@ model User {
   longitude   Float?  @map("longitude")
   role        Role    @default(USER) @map("role")
 
-  emailVerified Boolean      @default(false) @map("email_verified")
-  isVerified    VerifyStatus @default(UNVERIFIED) @map("is_verified")
+  emailVerified   Boolean      @default(false) @map("email_verified")
+  isVerified      VerifyStatus @default(UNVERIFIED) @map("is_verified")
+  brittooVerified Boolean      @default(false) @map("brittoo_verified")
 
   otp             String?   @map("otp")
   otpExpiry       DateTime? @map("otp_expiry")
@@ -74,8 +75,8 @@ model CreditTransaction {
   validityStart   DateTime     @map("validity_start")
   validityEnd     DateTime     @map("validity_end")
   isActive        Boolean      @default(true) @map("is_active")
-  user            User         @relation(fields: [userId], references: [id])
-  sourceProduct   Product?     @relation(fields: [sourceProductId], references: [id])
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sourceProduct   Product?     @relation(fields: [sourceProductId], references: [id], onDelete: Cascade)
   createdAt       DateTime     @default(now()) @map("created_at")
   updatedAt       DateTime     @updatedAt @map("updated_at")
 
@@ -105,11 +106,10 @@ model Product {
   tags               String              @map("tags")
   productDescription String              @map("product_description")
   ownerId            String              @map("owner_id")
-  borrowerId         String?             @map("borrower_id")
   isOnHold           Boolean             @default(false) @map("is_on_hold")
   holdCreditValidity Int?                @map("hold_credit_validity")
-  owner              User                @relation("RentedProducts", fields: [ownerId], references: [id])
-  borrower           User?               @relation("BorrowedProducts", fields: [borrowerId], references: [id])
+  owner              User                @relation("RentedProducts", fields: [ownerId], references: [id], onDelete: Cascade)
+  borrowers          User[]              @relation("BorrowedProducts")
   creditTransactions CreditTransaction[]
   createdAt          DateTime            @default(now()) @map("created_at")
   updatedAt          DateTime            @updatedAt @map("updated_at")
