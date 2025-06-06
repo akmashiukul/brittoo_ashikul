@@ -105,10 +105,10 @@ const ListItems = () => {
   return (
     <div className="p-4 md:p-10">
       <div>
-        <h1 className="text-lg sm:text-2xl font-semibold text-gray-800">
+        <h1 className="text-lg text-center md:text-left sm:text-2xl font-semibold text-gray-800">
           List Your Items & Start Earning 🤑
         </h1>
-        <p className="text-xs sm:text-sm text-gray-600 mt-1">
+        <p className="text-xs text-center md:text-left sm:text-sm text-gray-600 mt-1">
           So you don&apos;t have to survive on only shingara from the tong.
         </p>
       </div>

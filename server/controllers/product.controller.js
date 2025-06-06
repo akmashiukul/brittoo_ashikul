@@ -1,4 +1,5 @@
 import prisma from "../config/prisma.js";
+import redisClient from "../config/redis.js";
 import { calculatePricePerDay } from "../lib/calculatePrice.js";
 import { CustomError } from "../lib/customError.js";
 
@@ -82,12 +83,17 @@ export const getProducts = async (req, res, next) => {
       maxAge,
       ownerId,
       page = 1,
-      limit = 10,
+      limit = 20,
     } = req.query;
+
+    const cacheKey = `products:${JSON.stringify(req.query)}`;
+    const cached = await redisClient.get(cacheKey);
+    if (cached) {
+      res.status(200).json(cached);
+    }
 
     const filters = {};
 
-    // Apply filters if present
     if (productType) {
       filters.productType = productType;
     }
@@ -106,7 +112,6 @@ export const getProducts = async (req, res, next) => {
       if (maxAge) filters.productAge.lte = parseInt(maxAge);
     }
 
-    // Build OR search clause for name, tags, description
     const searchClause = search
       ? {
           OR: [
@@ -136,13 +141,17 @@ export const getProducts = async (req, res, next) => {
       },
     });
 
-    res.json({
-      data: products,
+    const response = {
+      success: true,
+      message: "Data fetched successfully",
+      products,
       page: parseInt(page),
       limit: parseInt(limit),
       total,
       totalPages: Math.ceil(total / limit),
-    });
+    }
+
+    res.status(200).json(response);
   } catch (error) {
     console.error("Error getting products:", error);
     next(error);
