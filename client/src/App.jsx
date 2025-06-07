@@ -16,6 +16,7 @@ import ManageItems from "./pages/private/pages/ManageItems";
 import MyOrders from "./pages/private/pages/MyOrders";
 import UserAnalytics from "./pages/private/pages/UserAnalytics";
 import UpdateItem from "./pages/private/pages/UpdateItem";
+import ProductDetails from "./components/ProductDetails";
 
 
 const AppContent = () => {
@@ -36,13 +37,19 @@ const AppContent = () => {
       <LoginModal />
       <div className="overflow-x-hidden">
         <Routes>
+
           <Route path="/" element={<Home />} />
           <Route path="/test" element={<Test />} />
           <Route path="/verify-otp" element={<VerifyOTP />} />
           <Route path="/verify-user" element={<VerifyUser />} />
+          <Route path="/product-details/:id" element={<ProductDetails />} />
+
+          {/* Admin Routes */}
           <Route element={<AdminRoute />}>
             <Route path="/dashboard/admin" element={<div>Admin Panel</div>} />
           </Route>
+
+          {/* Private Routes (User) */}
           <Route element={<PrivateRoute />}>
             <Route path="/dashboard" element={<Dashboard />}>
               <Route path="overview" element={<Overview />} />
@@ -53,6 +60,7 @@ const AppContent = () => {
               <Route path="update-item/:id" element={<UpdateItem />} />
             </Route>
           </Route>
+
         </Routes>
       </div>
     </>

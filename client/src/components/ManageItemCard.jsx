@@ -70,13 +70,13 @@ const ManageItemCard = ({ product, products, setProducts }) => {
     }[productCondition] || productCondition;
 
   return (
-    <div className="w-full max-w-sm mx-auto">
+    <Link to={`/product-details/${id}`} className="w-full max-w-sm mx-auto group hover:scale-105 transition duration-300">
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="relative h-40 overflow-hidden">
           <img
             src={`${base_url}${productImages[0]}`}
             alt={name}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover group-hover:scale-110 transition duration-400 group-hover:translate-x-2"
           />
           <div className="absolute top-2 left-2">
             <div
@@ -105,6 +105,8 @@ const ManageItemCard = ({ product, products, setProducts }) => {
               <div className="flex flex-wrap gap-1">
                 {tags
                   .split(",")
+                  .map(tag => tag.trim())
+                  .filter(tag => tag.length > 0)
                   .slice(0, 3)
                   .map((tag, index) => (
                     <span
@@ -136,7 +138,7 @@ const ManageItemCard = ({ product, products, setProducts }) => {
           </button>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 
