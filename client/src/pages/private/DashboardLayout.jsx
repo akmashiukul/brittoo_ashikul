@@ -3,7 +3,7 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 import useUserStore from "../../stores/useUserStore";
 import brittoLogo from "../../assets/britto-logo.png";
 import { IoAnalytics, IoExit, IoHomeSharp } from "react-icons/io5";
-import { MdOutlineManageHistory, MdOutlineSpaceDashboard } from "react-icons/md";
+import { MdOutlineManageHistory, MdOutlineSpaceDashboard, MdRequestPage } from "react-icons/md";
 import useDashDrawertore from "../../stores/useDashDrawerStore";
 import { Menu, X } from "lucide-react";
 import { AiOutlineProduct } from "react-icons/ai";
@@ -114,9 +114,9 @@ const Dashboard = () => {
             </li>
             <li>
               <Link
-                to="/dashboard/orders"
+                to="/dashboard/rental-requests"
                 className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${
-                  path.includes("/orders") ? "bg-green-600 text-white" : "text-gray-700"
+                  path.includes("/rental-requests") ? "bg-green-600 text-white" : "text-gray-700"
                 } flex items-center gap-2`}
                 onClick={() => {
                   if (window.innerWidth <= 425) {
@@ -124,7 +124,7 @@ const Dashboard = () => {
                   }
                 }}
               >
-                <FaShoppingCart /> My Orders
+                <FaShoppingCart /> Rental Requests
               </Link>
             </li>
             <li>

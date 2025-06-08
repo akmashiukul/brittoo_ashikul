@@ -13,10 +13,10 @@ import Dashboard from "./pages/private/DashboardLayout";
 import ListItems from "./pages/private/pages/ListItems";
 import Overview from "./pages/private/pages/Overview";
 import ManageItems from "./pages/private/pages/ManageItems";
-import MyOrders from "./pages/private/pages/MyOrders";
 import UserAnalytics from "./pages/private/pages/UserAnalytics";
 import UpdateItem from "./pages/private/pages/UpdateItem";
 import ProductDetails from "./components/ProductDetails";
+import RentalRequests from "./pages/private/pages/RentalRequests";
 
 
 const AppContent = () => {
@@ -55,7 +55,7 @@ const AppContent = () => {
               <Route path="overview" element={<Overview />} />
               <Route path="list-items" element={<ListItems />} />
               <Route path="manage-items" element={<ManageItems />} />
-              <Route path="orders" element={<MyOrders />} />
+              <Route path="rental-requests" element={<RentalRequests />} />
               <Route path="user-analytics" element={<UserAnalytics />} />
               <Route path="update-item/:id" element={<UpdateItem />} />
             </Route>

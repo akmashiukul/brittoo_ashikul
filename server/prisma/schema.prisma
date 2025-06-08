@@ -37,9 +37,13 @@ model User {
   creditTransactions CreditTransaction[]
   rentedProducts     Product[]           @relation("ProductsRentedOut")
   borrowedProducts   Product[]           @relation("ProductsBorrowed")
-  createdAt          DateTime            @default(now()) @map("created_at")
-  updatedAt          DateTime            @updatedAt @map("updated_at")
-  deletedAt          DateTime?           @map("deleted_at")
+
+  rentalRequestsMade     RentalRequest[] @relation("RentalRequestsMade")
+  rentalRequestsReceived RentalRequest[] @relation("RentalRequestsReceived")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   @@index([latitude, longitude])
   @@map("users")
@@ -110,14 +114,17 @@ model Product {
   productDescription String           @map("product_description")
   ownerId            String           @map("owner_id")
   isOnHold           Boolean          @default(false) @map("is_on_hold")
+  isBrittooVerified  Boolean          @default(false) @map("is_brittoo_verified")
   holdCreditValidity Int?             @map("hold_credit_validity")
   owner              User             @relation("ProductsRentedOut", fields: [ownerId], references: [id], onDelete: Cascade)
 
   borrowers          User[]              @relation("ProductsBorrowed")
   creditTransactions CreditTransaction[]
-  createdAt          DateTime            @default(now()) @map("created_at")
-  updatedAt          DateTime            @updatedAt @map("updated_at")
-  deletedAt          DateTime?           @map("deleted_at")
+  RentalRequest      RentalRequest[]
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   @@map("products")
 }
@@ -140,4 +147,51 @@ enum ProductCondition {
   GOOD
   FAIR
   POOR
+}
+
+model RentalRequest {
+  id                 String        @id @default(cuid()) @map("id")
+  productId          String        @map("product_id")
+  requesterId        String        @map("requester_id")
+  ownerId            String        @map("owner_id")
+  status             RequestStatus @default(PENDING) @map("status")
+  submissionDeadline DateTime?     @map("submission_deadline")
+
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  requester User    @relation("RentalRequestsMade", fields: [requesterId], references: [id], onDelete: Cascade)
+  owner     User    @relation("RentalRequestsReceived", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  pickupPointId String?      @map("pickup_point_id")
+  pickupPoint   PickupPoint? @relation(fields: [pickupPointId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@index([ownerId, status])
+  @@index([productId, status])
+  @@map("rental_requests")
+}
+
+enum RequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  RECEIVED
+  DELIVERED
+  CANCELLED
+}
+
+model PickupPoint {
+  id        String   @id @default(cuid()) @map("id")
+  name      String   @map("name")
+  address   String   @map("address")
+  latitude  Float?   @map("latitude")
+  longitude Float?   @map("longitude")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  rentalRequests RentalRequest[] @relation
+
+  @@map("pickup_points")
 }
