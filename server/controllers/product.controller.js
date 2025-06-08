@@ -101,7 +101,7 @@ export const getProducts = async (req, res, next) => {
 
     const filters = {};
 
-    if(productId) {
+    if (productId) {
       filters.id = productId;
     }
 
@@ -135,6 +135,7 @@ export const getProducts = async (req, res, next) => {
 
     const products = await prisma.product.findMany({
       where: {
+        deletedAt: null,
         ...filters,
         ...searchClause,
       },
@@ -145,9 +146,16 @@ export const getProducts = async (req, res, next) => {
             name: true,
             email: true,
             securityScore: true,
-            brittooVerified: true
-          }
-        }
+            brittooVerified: true,
+            suspensionCount: true,
+            _count: {
+              select: {
+                rentedProducts: true,
+                borrowedProducts: true
+              }
+            }
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",
@@ -158,6 +166,7 @@ export const getProducts = async (req, res, next) => {
 
     const total = await prisma.product.count({
       where: {
+        deletedAt: null,
         ...filters,
         ...searchClause,
       },
@@ -181,7 +190,6 @@ export const getProducts = async (req, res, next) => {
     next(error);
   }
 };
-
 
 export const updateProduct = async (req, res, next) => {
   try {
@@ -211,7 +219,10 @@ export const updateProduct = async (req, res, next) => {
       },
     });
     if (existingProduct.ownerId !== req.user.id) {
-      throw new CustomError("Unauthorized: You can only update your own products", 403);
+      throw new CustomError(
+        "Unauthorized: You can only update your own products",
+        403,
+      );
     }
     const updateData = {};
     if (name) updateData.name = name;
@@ -235,7 +246,9 @@ export const updateProduct = async (req, res, next) => {
     // Handle image updates
     let updatedImagePaths = [...existingProduct.productImages];
     if (deleteImages) {
-      const imagesToDelete = Array.isArray(deleteImages) ? deleteImages : JSON.parse(deleteImages || "[]");
+      const imagesToDelete = Array.isArray(deleteImages)
+        ? deleteImages
+        : JSON.parse(deleteImages || "[]");
       for (const imagePath of imagesToDelete) {
         const fullPath = path.join(productUploadsDir, path.basename(imagePath));
         try {
@@ -247,7 +260,9 @@ export const updateProduct = async (req, res, next) => {
           console.error(`Error deleting image ${fullPath}:`, err);
         }
       }
-      updatedImagePaths = updatedImagePaths.filter((path) => !imagesToDelete.includes(path));
+      updatedImagePaths = updatedImagePaths.filter(
+        (path) => !imagesToDelete.includes(path),
+      );
     }
 
     if (req.files && req.files.length > 0) {
@@ -289,10 +304,9 @@ export const updateProduct = async (req, res, next) => {
   }
 };
 
-
 export const deleteProduct = async (req, res, next) => {
   try {
-    const { id } = req.params; 
+    const { id } = req.params;
     if (!req.user || !req.user.id) {
       throw new CustomError("Unauthorized: No user authenticated", 401);
     }
@@ -301,25 +315,31 @@ export const deleteProduct = async (req, res, next) => {
     });
 
     if (product.ownerId !== req.user.id && req.user.role !== "ADMIN") {
-      throw new CustomError("Unauthorized: You can only delete your own products", 403);
+      throw new CustomError(
+        "Unauthorized: You can only delete your own products",
+        403,
+      );
     }
 
-    if (product.productImages && product.productImages.length > 0) {
-      for (const imagePath of product.productImages) {
-        const fullPath = path.join(productUploadsDir, path.basename(imagePath));
-        try {
-          if (fs.existsSync(fullPath)) {
-            fs.unlinkSync(fullPath);
-            console.log(`Deleted image: ${fullPath}`);
-          }
-        } catch (err) {
-          console.error(`Error deleting image ${fullPath}:`, err);
-        }
-      }
-    }
+    // if (product.productImages && product.productImages.length > 0) {
+    //   for (const imagePath of product.productImages) {
+    //     const fullPath = path.join(productUploadsDir, path.basename(imagePath));
+    //     try {
+    //       if (fs.existsSync(fullPath)) {
+    //         fs.unlinkSync(fullPath);
+    //         console.log(`Deleted image: ${fullPath}`);
+    //       }
+    //     } catch (err) {
+    //       console.error(`Error deleting image ${fullPath}:`, err);
+    //     }
+    //   }
+    // }
 
-    await prisma.product.delete({
+    await prisma.product.update({
       where: { id },
+      data: {
+        deletedAt: new Date(),
+      },
     });
 
     const keys = await redisClient.keys("products:*");

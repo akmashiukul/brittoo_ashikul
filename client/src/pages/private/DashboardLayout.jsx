@@ -168,7 +168,7 @@ const Dashboard = () => {
           </ul>
           <div className="flex items-center gap-2 bg-gray-200 p-4">
             <Avatar
-              name={currentUser.name}
+              name={currentUser.email}
               colors={["#482344", "#2b5166", "#429867", "#fab243", "#e02130"]}
               variant="beam"
               size={35}
