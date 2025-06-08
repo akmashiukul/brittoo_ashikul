@@ -154,3 +154,73 @@
   height: 100%;
   object-fit: cover;
 }
+
+
+
+
+
+
+.rdp-root .rdp-day {
+  --rdp-day-width: 26px;
+  --rdp-day-height: 26px;
+  --rdp-day_button-width: 26px;
+  --rdp-day_button-height: 26px;
+  font-size: 0.75rem;
+  margin: 0.5px;
+  border-radius: 0.25rem;
+  transition: background-color 0.2s ease;
+}
+
+.rdp-root .rdp-day_selected,
+.rdp-root .rdp-day_range_start,
+.rdp-root .rdp-day_range_end {
+  background-color: #16a34a;
+  color: white;
+}
+
+.rdp-root .rdp-day_range_middle {
+  background-color: #bbf7d0;
+}
+
+.rdp-root .rdp-day:hover:not(.rdp-day_disabled) {
+  background-color: #dcfce7;
+}
+
+.rdp-root .rdp-day_disabled {
+  color: #d1d5db;
+}
+
+.rdp-root .rdp-head_cell {
+  font-size: 0.65rem;
+  color: #15803d;
+  height: 22px;
+  line-height: 22px;
+}
+
+.rdp-root .rdp-caption_label {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: gray;
+}
+
+.rdp-root .rdp-nav_button {
+  width: 18px;
+  height: 18px;
+  color: #15803d;
+  border-radius: 0.25rem;
+}
+
+.rdp-root .rdp-nav_button:hover {
+  background-color: #dcfce7;
+}
+
+.rdp-root .rdp-table {
+  width: 100%;
+  max-width: 100%;
+  padding: 0;
+}
+
+.rdp-root .rdp-cell {
+  padding: 0;
+  text-align: center;
+}

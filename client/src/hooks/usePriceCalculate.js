@@ -26,18 +26,18 @@ export const usePriceCalculate = () => {
       10: 0.009,
     };
     const conditionMap = {
-      New: 1.0,
-      "Like New": 0.9,
-      Good: 0.75,
-      Fair: 0.5,
-      Poor: 0.3,
+      NEW: 1.0,
+      LIKE_NEW: 0.9,
+      GOOD: 0.75,
+      FAIR: 0.5,
+      POOR: 0.3,
     };
     const securityMap = {
-      "Very Low": 1.2,
-      Low: 1.1,
-      Mid: 1.0,
-      High: 0.95,
-      "Very High": 0.9,
+      VERY_LOW: 1.2,
+      LOW: 1.1,
+      MID: 1.0,
+      HIGH: 0.95,
+      VERY_HIGH: 0.9,
     };
     const usageMultiplier =
       usageYears < 1
