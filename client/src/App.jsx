@@ -17,6 +17,7 @@ import UserAnalytics from "./pages/private/pages/UserAnalytics";
 import UpdateItem from "./pages/private/pages/UpdateItem";
 import ProductDetails from "./components/ProductDetails";
 import RentalRequests from "./pages/private/pages/RentalRequests";
+import CreditModal from "./components/CreditSelectModal";
 
 
 const AppContent = () => {
@@ -35,6 +36,7 @@ const AppContent = () => {
       {!loading && !hideNavbar && <Navbar />}
       <RegisterModal />
       <LoginModal />
+      <CreditModal />
       <div className="overflow-x-hidden">
         <Routes>
 

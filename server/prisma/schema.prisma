@@ -34,9 +34,9 @@ model User {
   isSuspended     Boolean       @default(false) @map("is_suspended")
   suspensionCount Int           @default(0) @map("suspension_count")
 
-  creditTransactions CreditTransaction[]
-  rentedProducts     Product[]           @relation("ProductsRentedOut")
-  borrowedProducts   Product[]           @relation("ProductsBorrowed")
+  cacheCredits     CacheCredit[]
+  rentedProducts   Product[]     @relation("ProductsRentedOut")
+  borrowedProducts Product[]     @relation("ProductsBorrowed")
 
   rentalRequestsMade     RentalRequest[] @relation("RentalRequestsMade")
   rentalRequestsReceived RentalRequest[] @relation("RentalRequestsReceived")
@@ -69,7 +69,7 @@ enum SecurityScore {
   VERY_HIGH
 }
 
-model CreditTransaction {
+model CacheCredit {
   id              String       @id @default(cuid()) @map("id")
   userId          String       @map("user_id")
   amount          Float        @map("amount")
@@ -91,8 +91,8 @@ model CreditTransaction {
 }
 
 enum CreditType {
-  BLUE
-  RED
+  BLUE_CC
+  RED_CC
 }
 
 enum CreditSource {
@@ -118,9 +118,9 @@ model Product {
   holdCreditValidity Int?             @map("hold_credit_validity")
   owner              User             @relation("ProductsRentedOut", fields: [ownerId], references: [id], onDelete: Cascade)
 
-  borrowers          User[]              @relation("ProductsBorrowed")
-  creditTransactions CreditTransaction[]
-  RentalRequest      RentalRequest[]
+  borrowers     User[]          @relation("ProductsBorrowed")
+  cacheCredits  CacheCredit[]
+  RentalRequest RentalRequest[]
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")

@@ -12,6 +12,7 @@ import { usePriceCalculate } from "../hooks/usePriceCalculate";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
 import { differenceInDays } from "date-fns";
+import useCreditModalStore from "../stores/useCreditModalStore";
 
 const ProductDetails = () => {
   const [product, setProduct] = useState(null);
@@ -28,6 +29,8 @@ const ProductDetails = () => {
   });
   const initial = range?.from;
   const final = range?.to;
+
+  const { openCreditModal } = useCreditModalStore();
 
   useEffect(() => {
     if (initial && final) {
@@ -105,7 +108,7 @@ const ProductDetails = () => {
   };
 
   const requestRental = async () => {
-
+    openCreditModal();
   }
 
   if (loading) {
