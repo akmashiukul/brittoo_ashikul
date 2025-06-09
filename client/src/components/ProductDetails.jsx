@@ -104,6 +104,10 @@ const ProductDetails = () => {
     VERY_HIGH: "text-emerald-600",
   };
 
+  const requestRental = async () => {
+
+  }
+
   if (loading) {
     return <Loader />;
   }
@@ -247,12 +251,13 @@ const ProductDetails = () => {
           <h2 className="text-base md:text-lg font-semibold sm:font-bold text-gray-600">
             Details:
           </h2>
-          <p className="text-gray-600 text-sm md:text-base">
+          <p className="text-gray-700 sm:text-[15px] text-xs">
             {product.productDescription}
           </p>
         </div>
       </div>
 
+      {/* 2 - A */}
       <div className="w-full md:w-1/3 md:border-l border-gray-300 sm:my-7 px-4">
         <h2 className="text-green-600 font-bold text-xl sm:text-2xl">
           BDT {price}/<span className="text-sm font-medium">day</span>
@@ -302,6 +307,7 @@ const ProductDetails = () => {
         </div>
         <button
           className="w-full text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-xs md:text-sm px-5 py-2.5 text-center cursor-pointer mt-8"
+          onClick={requestRental}
         >
           Request Rental
         </button>
