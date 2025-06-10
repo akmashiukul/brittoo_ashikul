@@ -63,7 +63,7 @@ export const createProduct = async (req, res, next) => {
         productDescription,
         ownerId: req.user.id,
         productImages: imagePaths,
-        secondHandPrice: parseFloat(secondHandPrice)
+        secondHandPrice: secondHandPrice
       },
     });
     const keys = await redisClient.keys("products:*");

@@ -108,8 +108,8 @@ const ProductDetails = () => {
   };
 
   const requestRental = async () => {
-    openCreditModal();
-  }
+    openCreditModal(product.secondHandPrice);
+  };
 
   if (loading) {
     return <Loader />;
@@ -266,8 +266,8 @@ const ProductDetails = () => {
           BDT {price}/<span className="text-sm font-medium">day</span>
         </h2>
         <p className="text-sm text-gray-700">
-          For <span className="text-blue-600 font-medium">{numberOfDays}</span>{" "}
-          Days
+          If rented for{" "}
+          <span className="text-blue-600 font-medium">{numberOfDays}</span> Days
         </p>
         <div className="flex flex-col">
           <h2 className="text-lg font-bold text-gray-700 mt-8">
@@ -281,6 +281,9 @@ const ProductDetails = () => {
             mode="range"
             selected={range}
             onSelect={setRange}
+            disabled={{
+              before: new Date()
+            }}
             className="rdp-root self-center md:self-start"
           />
           {initial && final && (

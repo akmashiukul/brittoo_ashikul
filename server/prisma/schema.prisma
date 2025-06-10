@@ -110,7 +110,7 @@ model Product {
   productCondition   ProductCondition @map("product_condition")
   productAge         Int              @map("product_age")
   omv                Int              @map("omv")
-  secondHandPrice    Float            @map("second_hand_price")
+  secondHandPrice    Int              @map("second_hand_price")
   tags               String           @map("tags")
   productDescription String           @map("product_description")
   ownerId            String           @map("owner_id")

@@ -32,7 +32,12 @@ export function calculateSecondHandPrice(omv, condition, productAge) {
               : 0.60;
 
 
-  const finalPrice = omv * baseDepreciationRate * conditionMap[condition] * usageMultiplier;
+  const rawPrice = omv * baseDepreciationRate * conditionMap[condition] * usageMultiplier;
 
-  return Math.max(1.0, parseFloat(finalPrice.toFixed(2)));
+  // floor if decimal < 0.5, else ceil
+  const integerPart = Math.floor(rawPrice);
+  const decimalPart = rawPrice - integerPart;
+  const roundedPrice = decimalPart < 0.5 ? integerPart : Math.ceil(rawPrice);
+
+  return Math.max(1.0, roundedPrice);
 }

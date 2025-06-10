@@ -1,7 +1,7 @@
 import useCreditModalStore from "../stores/useCreditModalStore";
 
 const CreditModal = () => {
-  const { closeCreditModal, isCreditModalOpen } = useCreditModalStore();
+  const { closeCreditModal, isCreditModalOpen, requiredDeposit } = useCreditModalStore();
 
   if (!isCreditModalOpen) return null;
 
@@ -13,15 +13,16 @@ const CreditModal = () => {
         if (e.target === e.currentTarget) {
           closeCreditModal();
         }
-      }}
+      }}  
     >
       <div className="relative p-4 w-full max-w-md max-h-full">
         <div className="relative bg-white rounded-lg shadow-sm">
           <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t border-gray-200">
             <div className="flex flex-col items-center text-center w-full">
-              <h3 className="text-xs md:text-lg font-semibold text-gray-700 mt-1 md:mt-4">
-                Login Now & Get Started
+              <h3 className="text-xs md:text-lg font-semibold text-gray-700">
+                Deposit Cache Credit
               </h3>
+              <p className="text-sm text-gray-600"><strong>Required:</strong> <span className="italic text-gray-800">{requiredDeposit} CC</span></p>
             </div>
             <button
               type="button"
@@ -51,9 +52,9 @@ const CreditModal = () => {
           <div className="p-4 md:p-5">
             <button
               type="submit"
-              className="w-full text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-xs md:text-sm px-5 py-2.5 text-center"
+              className="w-full text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-xs md:text-sm px-5 py-2.5 text-center cursor-pointer"
             >
-              Login
+              Deposit
             </button>
           </div>
         </div>
