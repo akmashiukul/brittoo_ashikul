@@ -18,7 +18,7 @@ Prod:
 
 
 TODO: 
-  1. after verification redirect
+  1. after verification wait to show successfull. it would take 2-3 business days redirect
   2. create product route add verification middleware
   3. check before renting 
 

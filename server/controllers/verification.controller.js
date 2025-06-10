@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import prisma from "../config/prisma.js";
 import { uploadsDirPath } from "../middlewares/uploadMiddleware.js";
+import jwt from 'jsonwebtoken';
 
 export const verifyUser = async (req, res) => {
   try {

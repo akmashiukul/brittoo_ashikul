@@ -17,7 +17,7 @@ import UserAnalytics from "./pages/private/pages/UserAnalytics";
 import UpdateItem from "./pages/private/pages/UpdateItem";
 import ProductDetails from "./components/ProductDetails";
 import RentalRequests from "./pages/private/pages/RentalRequests";
-import CreditModal from "./components/CreditSelectModal";
+import CreditModal from "./components/CreditModal";
 
 
 const AppContent = () => {

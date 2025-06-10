@@ -1,11 +1,11 @@
-export function calculateSecondHandPrice(omv, condition, usageYears) {
+export function calculateSecondHandPrice(omv, condition, productAge) {
   if (omv < 0 || !Number.isFinite(omv)) {
     throw new Error("OMV must be a non-negative number");
   }
   if (!["NEW", "LIKE_NEW", "GOOD", "FAIR", "POOR"].includes(condition)) {
     throw new Error("Invalid condition");
   }
-  if (usageYears < 0 || !Number.isFinite(usageYears)) {
+  if (productAge < 0 || !Number.isFinite(productAge)) {
     throw new Error("Usage years must be non-negative");
   }
 
@@ -19,15 +19,15 @@ export function calculateSecondHandPrice(omv, condition, usageYears) {
   };
 
   const usageMultiplier =
-    usageYears < 1
+    productAge < 1
       ? 0.99
-      : usageYears < 2
+      : productAge < 2
         ? 0.97
-        : usageYears < 3
+        : productAge < 3
           ? 0.92
-          : usageYears < 5
+          : productAge < 5
             ? 0.85
-            : usageYears < 8
+            : productAge < 8
               ? 0.75
               : 0.60;
 

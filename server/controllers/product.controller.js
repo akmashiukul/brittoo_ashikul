@@ -1,6 +1,7 @@
 import prisma from "../config/prisma.js";
 import redisClient from "../config/redis.js";
 import { calculatePricePerDay } from "../lib/calculatePrice.js";
+import { calculateSecondHandPrice } from "../lib/calculateSecondHandPrice.js";
 import { CustomError } from "../lib/customError.js";
 
 import fs from "fs";
@@ -40,12 +41,16 @@ export const createProduct = async (req, res, next) => {
       (file) => `/uploads/products/${file.filename}`,
     );
     const pricePerDay = calculatePricePerDay(
-      omv,
+      parseInt(omv),
       productCondition,
-      productAge,
+      parseInt(productAge),
       owner.securityScore,
       3,
     );
+    const secondHandPrice = calculateSecondHandPrice(parseInt(omv), productCondition, parseInt(productAge));
+
+    console.log('sec , ppd: ', secondHandPrice, ' ', pricePerDay);
+
     const product = await prisma.product.create({
       data: {
         name,
@@ -58,6 +63,7 @@ export const createProduct = async (req, res, next) => {
         productDescription,
         ownerId: req.user.id,
         productImages: imagePaths,
+        secondHandPrice: parseFloat(secondHandPrice)
       },
     });
     const keys = await redisClient.keys("products:*");
@@ -240,7 +246,10 @@ export const updateProduct = async (req, res, next) => {
         owner.securityScore,
         3,
       );
+      const newSecondHandPrice = calculateSecondHandPrice(omv, productCondition, productAge);
+
       updateData.pricePerDay = parseFloat(newPrice);
+      updateData.secondHandPrice = parseFloat(newSecondHandPrice);
     }
 
     // Handle image updates
