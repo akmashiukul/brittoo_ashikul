@@ -281,6 +281,7 @@ const ProductDetails = () => {
             mode="range"
             selected={range}
             onSelect={setRange}
+            max={15}
             disabled={{
               before: new Date()
             }}

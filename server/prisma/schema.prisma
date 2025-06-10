@@ -77,15 +77,20 @@ model CacheCredit {
   sourceType      CreditSource @map("source_type")
   sourceProductId String?      @map("source_product_id")
   renterId        String?      @map("renter_id")
-  instantFee      Float?       @map("instant_fee")
-  validityStart   DateTime     @map("validity_start")
-  validityEnd     DateTime     @map("validity_end")
-  isActive        Boolean      @default(true) @map("is_active")
-  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  sourceProduct   Product?     @relation(fields: [sourceProductId], references: [id], onDelete: Cascade)
-  createdAt       DateTime     @default(now()) @map("created_at")
-  updatedAt       DateTime     @updatedAt @map("updated_at")
-  deletedAt       DateTime?    @map("deleted_at")
+  transactionId   String?      @map("transaction_id")
+
+  instantFee Float? @map("instant_fee")
+
+  validityStart DateTime @map("validity_start")
+  validityEnd   DateTime @map("validity_end")
+
+  isActive Boolean @default(false) @map("is_active")
+
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sourceProduct Product?  @relation(fields: [sourceProductId], references: [id], onDelete: Cascade)
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  deletedAt     DateTime? @map("deleted_at")
 
   @@map("credit_transactions")
 }
@@ -93,6 +98,7 @@ model CacheCredit {
 enum CreditType {
   BLUE_CC
   RED_CC
+  GRAY_CC
 }
 
 enum CreditSource {
