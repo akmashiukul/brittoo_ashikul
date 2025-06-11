@@ -10,7 +10,7 @@ import { AiOutlineProduct } from "react-icons/ai";
 import { useEffect } from "react";
 import { FaShoppingCart, FaUserCog } from "react-icons/fa";
 
-const Dashboard = () => {
+const DashboardLayout = () => {
   const { currentUser } = useUserStore();
   const location = useLocation();
   const path = location.pathname;
@@ -208,4 +208,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default DashboardLayout;

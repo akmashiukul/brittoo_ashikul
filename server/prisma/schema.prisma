@@ -85,7 +85,9 @@ model CacheCredit {
   validityStart DateTime @map("validity_start")
   validityEnd   DateTime @map("validity_end")
 
-  isActive Boolean @default(false) @map("is_active")
+  isActive     Boolean @default(false) @map("is_active")
+  isRejected   Boolean @default(false) @map("is_rejected")
+  rejectReason String? @map("reject_reason")
 
   user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   sourceProduct Product?  @relation(fields: [sourceProductId], references: [id], onDelete: Cascade)
@@ -93,7 +95,7 @@ model CacheCredit {
   updatedAt     DateTime  @updatedAt @map("updated_at")
   deletedAt     DateTime? @map("deleted_at")
 
-  @@map("credit_transactions")
+  @@map("cache_credits")
 }
 
 enum PaymentGateway {

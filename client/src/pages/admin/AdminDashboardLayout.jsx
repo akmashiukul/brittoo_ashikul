@@ -2,15 +2,13 @@ import Avatar from "boring-avatars";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import useUserStore from "../../stores/authStores/useUserStore";
 import brittoLogo from "../../assets/britto-logo.png";
-import { IoAnalytics, IoExit, IoHomeSharp } from "react-icons/io5";
-import { MdOutlineManageHistory, MdOutlineSpaceDashboard, MdRequestPage } from "react-icons/md";
+import { IoExit, IoHomeSharp } from "react-icons/io5";
+import { MdOutlineManageHistory, MdOutlineSpaceDashboard } from "react-icons/md";
 import useDashDrawertore from "../../stores/drawerStores/useDashDrawerStore";
 import { Menu, X } from "lucide-react";
-import { AiOutlineProduct } from "react-icons/ai";
 import { useEffect } from "react";
-import { FaShoppingCart, FaUserCog } from "react-icons/fa";
 
-const Dashboard = () => {
+const AdminDashboardLayout = () => {
   const { currentUser } = useUserStore();
   const location = useLocation();
   const path = location.pathname;
@@ -63,9 +61,9 @@ const Dashboard = () => {
           <ul className="mt-6 space-y-2 flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
             <li>
               <Link
-                to="/dashboard/overview"
+                to="/dashboard/admin/admin-overview"
                 className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${
-                  path.includes("/overview")
+                  path.includes("/admin-overview")
                     ? "bg-green-600 text-white"
                     : "text-gray-700"
                 } flex items-center gap-2`}
@@ -80,9 +78,9 @@ const Dashboard = () => {
             </li>
             <li>
               <Link
-                to="/dashboard/list-items"
+                to="/dashboard/admin/credit-requests"
                 className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${
-                  path.includes("/list-items")
+                  path.includes("/credit-requests")
                     ? "bg-green-600 text-white"
                     : "text-gray-700"
                 } flex items-center gap-2`}
@@ -92,57 +90,9 @@ const Dashboard = () => {
                   }
                 }}
               >
-                <AiOutlineProduct /> List Items
+                <MdOutlineManageHistory /> Credit Requests
               </Link>
             </li>
-            <li>
-              <Link
-                to="/dashboard/manage-items"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${
-                  path.includes("/manage-items")
-                    ? "bg-green-600 text-white"
-                    : "text-gray-700"
-                } flex items-center gap-2`}
-                onClick={() => {
-                  if (window.innerWidth <= 425) {
-                    closeDrawer();
-                  }
-                }}
-              >
-                <MdOutlineManageHistory /> Manage Listed Items
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/dashboard/rental-requests"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${
-                  path.includes("/rental-requests") ? "bg-green-600 text-white" : "text-gray-700"
-                } flex items-center gap-2`}
-                onClick={() => {
-                  if (window.innerWidth <= 425) {
-                    closeDrawer();
-                  }
-                }}
-              >
-                <FaShoppingCart /> Rental Requests
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/dashboard/user-analytics"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${
-                  path.includes("/user-analytics") ? "bg-green-600 text-white" : "text-gray-700"
-                } flex items-center gap-2`}
-                onClick={() => {
-                  if (window.innerWidth <= 425) {
-                    closeDrawer();
-                  }
-                }}
-              >
-                <IoAnalytics /> Analytics
-              </Link>
-            </li>
-            <li></li>
           </ul>
         </div>
 
@@ -208,4 +158,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default AdminDashboardLayout;

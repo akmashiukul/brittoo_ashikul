@@ -8,7 +8,7 @@ import VerifyOTP from "./pages/VerifyOTP";
 import VerifyUser from "./pages/VerifyUser";
 import AdminRoute from "./routes/AdminRoute";
 import PrivateRoute from "./routes/PrivateRoute";
-import Dashboard from "./pages/private/DashboardLayout";
+import DashboardLayout from "./pages/private/DashboardLayout";
 import ListItems from "./pages/private/dash-pages/ListItems";
 import Overview from "./pages/private/dash-pages/Overview";
 import ManageItems from "./pages/private/dash-pages/ManageItems";
@@ -25,7 +25,9 @@ import useBuyRccModalStore from "./stores/creditModalStores/useBuyRccModalStore"
 import useBuyGccModalStore from "./stores/creditModalStores/useBuyGccModalStore";
 import useUserStore from "./stores/authStores/useUserStore";
 import BuyCredits from "./pages/BuyCredits";
-
+import AdminDashboardLayout from "./pages/admin/AdminDashboardLayout";
+import CreditRequests from "./pages/admin/admin-dash-pages/CreditRequests";
+import AdminOverview from "./pages/admin/admin-dash-pages/AdminOverview";
 
 const AppContent = () => {
   const location = useLocation();
@@ -34,31 +36,34 @@ const AppContent = () => {
   const { isBuyRccModalOpen } = useBuyRccModalStore();
   const { isBuyGccModalOpen } = useBuyGccModalStore();
 
-  const noNavbarRoutes = ["/dashboard", "/verify-otp", "/verify-user", "/dashboard/admin"];
+  const noNavbarRoutes = [
+    "/dashboard",
+    "/verify-otp",
+    "/verify-user",
+    "/dashboard/admin",
+  ];
 
   const hideNavbar = noNavbarRoutes.some((path) =>
-    location.pathname.startsWith(path)
+    location.pathname.startsWith(path),
   );
-
 
   return (
     <>
       {!loading && !hideNavbar && <Navbar />}
-      
+
       {/* Auth Modals */}
       <RegisterModal />
       <LoginModal />
 
       {/* Credit Modals */}
       <CreditModal />
-      
+
       {isBuyBccModalOpen && <BuyBccModal />}
       {isBuyRccModalOpen && <BuyRccModal />}
       {isBuyGccModalOpen && <BuyGccModal />}
 
       <div className="overflow-x-hidden">
         <Routes>
-
           <Route path="/" element={<Home />} />
           <Route path="/test" element={<Test />} />
           <Route path="/verify-otp" element={<VerifyOTP />} />
@@ -68,12 +73,18 @@ const AppContent = () => {
 
           {/* Admin Routes */}
           <Route element={<AdminRoute />}>
-            <Route path="/dashboard/admin" element={<div>Admin Panel</div>} />
+            <Route
+              path="/dashboard/admin"
+              element={<AdminDashboardLayout />}
+            >
+              <Route path="credit-requests" element={<CreditRequests />} />
+              <Route path="admin-overview" element={<AdminOverview />} />
+            </Route>
           </Route>
 
           {/* Private Routes (User) */}
           <Route element={<PrivateRoute />}>
-            <Route path="/dashboard" element={<Dashboard />}>
+            <Route path="/dashboard" element={<DashboardLayout />}>
               <Route path="overview" element={<Overview />} />
               <Route path="list-items" element={<ListItems />} />
               <Route path="manage-items" element={<ManageItems />} />
@@ -82,7 +93,6 @@ const AppContent = () => {
               <Route path="update-item/:id" element={<UpdateItem />} />
             </Route>
           </Route>
-
         </Routes>
       </div>
     </>

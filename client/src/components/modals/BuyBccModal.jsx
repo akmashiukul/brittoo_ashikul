@@ -100,6 +100,18 @@ const BuyBccModal = () => {
           <h4 className="mb-2 text-xs md:text-sm font-medium text-gray-900 pb-1 pt-2 border-b-2 mx-4 border-gray-300">
             🔵 Available BCC: {0}
           </h4>
+          <div className="bg-white px-4 rounded-lg mt-4 mb-4">
+            <h3 className="font-semibold text-blue-800 mb-2">
+              📋 Instructions :
+            </h3>
+            <ul className="text-xs md:text-sm text-blue-700 space-y-1 text-left">
+              <li>• Do Send Money (Not Payment)</li>
+              <li>• Number: <strong>+8801772967677</strong></li>
+              <li>• Add Your roll at reference</li>
+              <li>• Select the gateway and Enter you sent amount</li>
+              <li>• Carefully paste the trxId below</li>
+            </ul>
+          </div>
           <div className="p-4 md:p-5">
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
@@ -139,7 +151,7 @@ const BuyBccModal = () => {
                   htmlFor="amount"
                   className="block mb-2 text-xs md:text-sm font-medium text-gray-900"
                 >
-                  Enter Paid amount
+                  Enter Paid amount (Send Money)
                 </label>
                 <input
                   type="number"
