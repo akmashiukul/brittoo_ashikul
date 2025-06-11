@@ -18,10 +18,13 @@ Prod:
 
 
 TODO: 
-  1. after verification wait to show successfull. it would take 2-3 business days redirect
+  1. after verification wait to show successfull. it would take 2-3 business days.. then  redirect after 3-4 s.
   2. create product route add verification middleware
   3. check before renting 
 
+
+PROBLEMS:
+  1. After is_verified changed to verified from pending doesn't reflect until user logs out and again logs in.
 
   Get SSL:
     1. Stop the Nginx at docker:

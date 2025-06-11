@@ -219,6 +219,9 @@ export const verifyOTP = async (req, res, next) => {
         emailVerified: true,
         otpSentCount: 0,
       },
+      include: {
+        cacheCredits: true
+      }
     });
 
     const token = jwt.sign(
@@ -254,6 +257,9 @@ export const login = async (req, res, next) => {
       where: {
         email: email,
       },
+      include: {
+        cacheCredits: true
+      }
     });
     if (!user) {
       throw new CustomError("User not found", 401);

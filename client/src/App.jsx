@@ -17,13 +17,22 @@ import UserAnalytics from "./pages/private/dash-pages/UserAnalytics";
 import UpdateItem from "./pages/private/dash-pages/UpdateItem";
 import ProductDetails from "./components/ProductDetails";
 import RentalRequests from "./pages/private/dash-pages/RentalRequests";
-import CreditModal from "./components/CreditModal";
 import BuyCredits from "./pages/private/BuyCredits";
+import CreditModal from "./components/modals/CreditModal";
+import BuyBccModal from "./components/modals/BuyBccModal";
+import BuyRccModal from "./components/modals/BuyRccModal";
+import BuyGccModal from "./components/modals/BuyGccModal";
+import useBuyBccModalStore from "./stores/creditModalStores/useBuyBccModalStore";
+import useBuyRccModalStore from "./stores/creditModalStores/useBuyRccModalStore";
+import useBuyGccModalStore from "./stores/creditModalStores/useBuyGccModalStore";
 
 
 const AppContent = () => {
   const location = useLocation();
   const { loading } = useUserStore();
+  const { isBuyBccModalOpen } = useBuyBccModalStore();
+  const { isBuyRccModalOpen } = useBuyRccModalStore();
+  const { isBuyGccModalOpen } = useBuyGccModalStore();
 
   const noNavbarRoutes = ["/dashboard", "/verify-otp", "/verify-user", "/dashboard/admin"];
 
@@ -35,9 +44,18 @@ const AppContent = () => {
   return (
     <>
       {!loading && !hideNavbar && <Navbar />}
+      
+      {/* Auth Modals */}
       <RegisterModal />
       <LoginModal />
+
+      {/* Credit Modals */}
       <CreditModal />
+      
+      {isBuyBccModalOpen && <BuyBccModal />}
+      {isBuyRccModalOpen && <BuyRccModal />}
+      {isBuyGccModalOpen && <BuyGccModal />}
+
       <div className="overflow-x-hidden">
         <Routes>
 
@@ -46,6 +64,7 @@ const AppContent = () => {
           <Route path="/verify-otp" element={<VerifyOTP />} />
           <Route path="/verify-user" element={<VerifyUser />} />
           <Route path="/product-details/:id" element={<ProductDetails />} />
+          <Route path="/buy-credits" element={<BuyCredits />} />
 
           {/* Admin Routes */}
           <Route element={<AdminRoute />}>
@@ -62,7 +81,6 @@ const AppContent = () => {
               <Route path="user-analytics" element={<UserAnalytics />} />
               <Route path="update-item/:id" element={<UpdateItem />} />
             </Route>
-            <Route path="/buy-credits" element={<BuyCredits />} />
           </Route>
 
         </Routes>

@@ -70,16 +70,17 @@ enum SecurityScore {
 }
 
 model CacheCredit {
-  id              String       @id @default(cuid()) @map("id")
-  userId          String       @map("user_id")
-  amount          Float        @map("amount")
-  creditType      CreditType   @map("credit_type")
-  sourceType      CreditSource @map("source_type")
-  sourceProductId String?      @map("source_product_id")
-  renterId        String?      @map("renter_id")
-  transactionId   String?      @map("transaction_id")
+  id              String          @id @default(cuid()) @map("id")
+  userId          String          @map("user_id")
+  amount          Int             @map("amount")
+  creditType      CreditType      @map("credit_type")
+  sourceType      CreditSource    @map("source_type")
+  sourceProductId String?         @map("source_product_id")
+  renterId        String?         @map("renter_id")
+  paymentGateway  PaymentGateway? @map("payment_gateway")
+  transactionId   String?         @map("transaction_id")
 
-  instantFee Float? @map("instant_fee")
+  instantFee Int? @map("instant_fee")
 
   validityStart DateTime @map("validity_start")
   validityEnd   DateTime @map("validity_end")
@@ -93,6 +94,12 @@ model CacheCredit {
   deletedAt     DateTime? @map("deleted_at")
 
   @@map("credit_transactions")
+}
+
+enum PaymentGateway {
+  BKASH
+  NAGAD
+  ROCKET
 }
 
 enum CreditType {
@@ -119,11 +126,13 @@ model Product {
   secondHandPrice    Int              @map("second_hand_price")
   tags               String           @map("tags")
   productDescription String           @map("product_description")
-  ownerId            String           @map("owner_id")
-  isOnHold           Boolean          @default(false) @map("is_on_hold")
-  isBrittooVerified  Boolean          @default(false) @map("is_brittoo_verified")
-  holdCreditValidity Int?             @map("hold_credit_validity")
-  owner              User             @relation("ProductsRentedOut", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  ownerId            String  @map("owner_id")
+  isOnHold           Boolean @default(false) @map("is_on_hold")
+  isForSale          Boolean @default(false) @map("is_for_sale")
+  isBrittooVerified  Boolean @default(false) @map("is_brittoo_verified")
+  holdCreditValidity Int?    @map("hold_credit_validity")
+  owner              User    @relation("ProductsRentedOut", fields: [ownerId], references: [id], onDelete: Cascade)
 
   borrowers     User[]          @relation("ProductsBorrowed")
   cacheCredits  CacheCredit[]

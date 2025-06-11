@@ -1,31 +1,59 @@
-import React, { useState } from "react";
-import api from "../../lib/api";
 import money from "../../assets/money.png";
 import { ArrowRightLeftIcon, ArrowUpDown } from "lucide-react";
-import nodemcu from '../../assets/nodemcu.png';
+import nodemcu from "../../assets/nodemcu.png";
+import question from "../../assets/question.png";
+import useUserStore from "../../stores/useUserStore";
+import Swal from "sweetalert2";
+import useLoginModalStore from "../../stores/useLoginModalStore";
+import useBuyBccModalStore from "../../stores/creditModalStores/useBuyBccModalStore";
+import useBuyRccModalStore from "../../stores/creditModalStores/useBuyRccModalStore";
+import useBuyGccModalStore from "../../stores/creditModalStores/useBuyGccModalStore";
 
 const BuyCredits = () => {
-  const [activeTab, setActiveTab] = useState("bkash");
-  const [bkashData, setBkashData] = useState({ amount: "", transactionId: "" });
-  const [productData, setProductData] = useState({
-    productId: "",
-    isLoan: false,
-  });
-  const [message, setMessage] = useState("");
+  const { currentUser } = useUserStore();
+  const { openLoginModal } = useLoginModalStore();
+  const { openBuyBccModal } = useBuyBccModalStore();
+  const { openBuyRccModal } = useBuyRccModalStore();
+  const { openBuyGccModal } = useBuyGccModalStore();
 
-  const handleBkashSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await api.post("/api/credits/bkash", {
-        amount: parseFloat(bkashData.amount),
-        transactionId: bkashData.transactionId,
-      });
-      setMessage("Credit purchase submitted for admin approval.");
-      setBkashData({ amount: "", transactionId: "" });
-    } catch (error) {
-      setMessage("Error submitting credit purchase.");
+  const currentUserCheckSwal = () => {
+    Swal.fire({
+      icon: "info",
+      text: "You Need to login before buying Credits!",
+      confirmButtonColor: "#3085d6",
+      confirmButtonText: "Goto Login",
+      showCancelButton: true,
+      cancelButtonColor: "#d33",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        openLoginModal();
+      } else {
+        Swal.fire("Login Denied, Just Like your project Proposal");
+      }
+    });
+  };
+
+  const handleBuyBcc = () => {
+    if (!currentUser) {
+      currentUserCheckSwal();
+    } else {
+      openBuyBccModal();
     }
   };
+  const handleBuyRcc = () => {
+    if (!currentUser) {
+      currentUserCheckSwal();
+    } else {
+      openBuyRccModal();
+    }
+  };
+  const handleBuyGcc = () => {
+    if (!currentUser) {
+      currentUserCheckSwal();
+    } else {
+      openBuyGccModal();
+    }
+  }
 
   return (
     <div className="p-2 sm:p-4 md:p-6">
@@ -33,7 +61,10 @@ const BuyCredits = () => {
         Buy Credits & Start Your Rental Journey
       </h2>
       <p className="text-gray-500 text-xs md:text-sm mt-1">
-        Choose from RED or Blue Credits to access a seamless rental experience. Whether you're earning from your unused items or renting what <br /> you need, our credit system makes it simple, secure, and efficient. Start today and unlock the full potential of peer-to-peer rentals.
+        Choose from RED or Blue Credits to access a seamless rental experience.
+        Whether you're earning from your unused items or renting what <br /> you
+        need, our credit system makes it simple, secure, and efficient. Start
+        today and unlock the full potential of peer-to-peer rentals.
       </p>
       <div className="w-full flex flex-col sm:flex-row gap-4 md:gap-8 mt-8 text-center sm:text-left">
         <div className="w-full md:w-1/2 bg-blue-50 p-2 sm:p-4 rounded-lg pb-8 md:pb-6 border border-blue-300 shadow-md">
@@ -41,7 +72,12 @@ const BuyCredits = () => {
             BCC - BLUE CACHE CREDIT
           </h2>
           <p className="text-gray-700 text-xs md:text-sm mt-1">
-            Blue Credits are purchased with money via online payment methods such as bKash or Nagad. To acquire Blue Credits, simply make a payment to the designated account, then complete the form with the payment amount and transaction ID. Credits will be added to your account within 1–2 hours. These credits can be reconverted to cash once your rental period ends.
+            Blue Credits are purchased with money via online payment methods
+            such as bKash or Nagad. To acquire Blue Credits, simply make a
+            payment to the designated account, then complete the form with the
+            payment amount and transaction ID. Credits will be added to your
+            account within 1–2 hours. These credits can be reconverted to cash
+            once your rental period ends.
           </p>
           <div className="flex flex-col lg:flex-row justify-evenly gap-2 md:gap-0 items-center mt-8">
             <img src={money} className="h-32" alt="money" />
@@ -75,12 +111,12 @@ const BuyCredits = () => {
                 </div>
                 <div className="text-gray-600">
                   <h3 className="text-xs"> Valid Till </h3>
-                  <p className={"font-semibold text-sm"}>14/6/25</p>
+                  <p className={"font-semibold text-sm italic"}>Unlimited</p>
                 </div>
               </div>
             </div>
           </div>
-          <div className="mt-8 bg-blue-50 p-4 rounded-lg">
+          <div className="mt-8 bg-white p-4 rounded-lg">
             <h3 className="font-semibold text-blue-800 mb-2">
               🔵 Features of BCC :
             </h3>
@@ -92,7 +128,10 @@ const BuyCredits = () => {
               <li>• Withdraw Anytime</li>
             </ul>
           </div>
-          <button className="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xs md:text-sm px-5 py-2.5 text-center cursor-pointer mt-4 shadow-md">
+          <button
+            onClick={handleBuyBcc}
+            className="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xs md:text-sm px-5 py-2.5 text-center cursor-pointer mt-4 shadow-md"
+          >
             Get BCC Now
           </button>
         </div>
@@ -102,7 +141,12 @@ const BuyCredits = () => {
             RCC - RED CACHE CREDIT
           </h2>
           <p className="text-gray-700 text-xs md:text-sm mt-1">
-            RED Credits are awarded when users deposit products or when their listed products are successfully rented, based on the item's second-hand value. These credits are valid for the duration of the rental period and are ideal for maximizing the value of owned items through rentals. Please note that RED Credits are not redeemable for cash.
+            RED Credits are awarded when users deposit products or when their
+            listed products are successfully rented, based on the item's
+            second-hand value. These credits are valid for the duration of the
+            rental period and are ideal for maximizing the value of owned items
+            through rentals. Please note that RED Credits are not redeemable for
+            cash.
           </p>
           <div className="flex flex-col lg:flex-row justify-evenly gap-2 md:gap-0 items-center mt-8">
             <img src={nodemcu} className="w-48" alt="money" />
@@ -118,9 +162,7 @@ const BuyCredits = () => {
               color="#1f2937"
               size={40}
             />
-            <div
-              className="text-white w-[210px]  p-5 rounded-xl hover:scale-105 cursor-pointer transition duration-300 shadow-md bg-gradient-to-r from-red-600 to-red-200"
-            >
+            <div className="text-white w-[210px]  p-5 rounded-xl hover:scale-105 cursor-pointer transition duration-300 shadow-md bg-gradient-to-r from-red-600 to-red-200">
               <div className="flex justify-between">
                 <div>
                   <h2 className="text-xs md:text-sm"> CC Amount </h2>
@@ -141,7 +183,7 @@ const BuyCredits = () => {
               </div>
             </div>
           </div>
-          <div className="mt-8 bg-red-50 p-4 rounded-lg">
+          <div className="mt-8 bg-white p-4 rounded-lg">
             <h3 className="font-semibold text-red-800 mb-2">
               🔴 Features of RCC :
             </h3>
@@ -153,7 +195,86 @@ const BuyCredits = () => {
               <li>• Ideal for peer-to-peer rental leverage</li>
             </ul>
           </div>
-          <button className="w-full text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-xs md:text-sm px-5 py-2.5 text-center cursor-pointer mt-4 shadow-md">
+          <button onClick={handleBuyRcc} className="w-full text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-xs md:text-sm px-5 py-2.5 text-center cursor-pointer mt-4 shadow-md">
+            Get RCC Now
+          </button>
+        </div>
+      </div>
+      <div className="mt-16 flex flex-col items-center">
+        <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-800">
+          Don't Have Funds or a Rented Product?
+        </h2>
+        <div className="flex items-center justify-center gap-2 mt-2">
+          <h4 className="text-gray-600 text-xl font-semibold text-center">
+            {" "}
+            Introducing Credit Loan OR Gray Credit{" "}
+          </h4>
+          <div className="h-5 w-5 rounded-full bg-gray-600 mt-[3px]"></div>
+        </div>
+        <div className="w-full md:w-1/2 bg-gray-100 p-2 sm:p-4 rounded-lg pb-8 md:pb-6 border border-gray-300 shadow-md mt-8">
+          <h2 className="text-base md:text-lg font-bold text-gray-800">
+            GCC - GRAY CACHE CREDIT
+          </h2>
+          <p className="text-gray-700 text-xs md:text-sm mt-1">
+            Gray Cache Credit (GCC) is a flexible credit loan option designed
+            for situations where you want to rent an item immediately but
+            don&apos;t have sufficient Blue Credits (BCC) or Red Credits (RCC).
+            It allows you to proceed with the rental, and at the time of pickup,
+            you must provide either a product of equivalent value—converting
+            your Gray Credit into Red Credit—or an equivalent cash amount, which
+            will convert it into Blue Credit. This system ensures a seamless and
+            secure rental experience, even when you're temporarily low on
+            resources.
+          </p>
+          <div className="flex flex-col lg:flex-row justify-evenly gap-2 md:gap-0 items-center mt-8">
+            <img src={question} className="w-40" alt="money" />
+            <ArrowRightLeftIcon
+              className="hidden lg:block"
+              strokeWidth={2}
+              color="#1f2937"
+              size={40}
+            />
+            <ArrowUpDown
+              className="block lg:hidden"
+              strokeWidth={2}
+              color="#1f2937"
+              size={40}
+            />
+            <div className="text-white w-[210px]  p-5 rounded-xl hover:scale-105 cursor-pointer transition duration-300 shadow-md bg-gradient-to-r from-gray-600 to-gray-200">
+              <div className="flex justify-between">
+                <div>
+                  <h2 className="text-xs md:text-sm"> CC Amount </h2>
+                  <p className="text-lg md:text-xl font-bold"> 5000 </p>
+                </div>
+                <img src="brittoofav.png" alt="fav" className="w-10 h-10" />
+              </div>
+
+              <div className="flex justify-between mt-5">
+                <div>
+                  <h3 className="text-xs"> Issued At </h3>
+                  <p className="font-semibold text-sm"> 10/06/25 </p>
+                </div>
+                <div className="text-gray-600">
+                  <h3 className="text-xs"> Valid Till </h3>
+                  <p className={"font-semibold text-sm"}>14/6/25</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="mt-8 bg-white p-4 rounded-lg">
+            <div className="flex items-center gap-2 mt-2  mb-1">
+              <div className="h-4 w-4 rounded-full bg-gray-600 mt-[3px]"></div>
+              <h4 className="text-gray-600 font-semibold">Features of GCC:</h4>
+            </div>
+            <ul className="text-sm text-gray-700 space-y-1 text-left">
+              <li>• Instant rental access without upfront credits</li>
+              <li>• Flexible repayment with product or cash</li>
+              <li>• Converts to Red Credit upon product deposit</li>
+              <li>• Converts to Blue Credit upon cash payment</li>
+              <li>• Ideal for temporary credit shortages</li>
+            </ul>
+          </div>
+          <button onClick={handleBuyGcc} className="w-full text-white bg-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-xs md:text-sm px-5 py-2.5 text-center cursor-pointer mt-4 shadow-md">
             Get RCC Now
           </button>
         </div>

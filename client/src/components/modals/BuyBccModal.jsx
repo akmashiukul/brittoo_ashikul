@@ -1,0 +1,186 @@
+import { useState } from "react";
+import useBuyBccModalStore from "../../stores/creditModalStores/useBuyBccModalStore";
+import bkash from "../../assets/logos/bkash.png";
+import nagad from "../../assets/logos/nagad.svg";
+import rocket from "../../assets/logos/rocket.png";
+import api from "../../lib/api";
+import Swal from "sweetalert2";
+
+const BuyBccModal = () => {
+  const { closeBuyBccModal } = useBuyBccModalStore();
+
+  const [paymentMethod, setPaymentMethod] = useState("");
+  const [amount, setAmount] = useState("");
+  const [trxId, setTrxId] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  console.log(amount, '\n', trxId, '\n', paymentMethod)
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!paymentMethod || !amount || !trxId) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("token");
+      const response = await api.post(
+        "/api/v1/credit/bcc/buy",
+        {
+          paymentGateway: paymentMethod.toUpperCase(),
+          amount,
+          transactionId: trxId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: response.data.message || "Purchase Successfull. Waiting for verification."
+      });
+      closeBuyBccModal();
+    } catch (error) {
+      console.error("BCC purchase error:", error);
+      alert(error.response?.data?.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div
+      id="authentication-modal"
+      className="fixed inset-0 z-50 flex justify-center items-center bg-black/70"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) closeBuyBccModal();
+      }}
+    >
+      <div className="relative p-4 w-full max-w-md max-h-full">
+        <div className="relative bg-white rounded-lg shadow-sm">
+          <div className="flex items-center justify-between p-4 md:p-5 rounded-t">
+            <div className="flex flex-col items-center text-center w-full">
+              <h3 className="text-base md:text-lg font-semibold text-gray-700 mt-1 md:mt-3">
+                Get Your Blue Cache Credit
+              </h3>
+              <p className="text-gray-500 text-xs font-medium">
+                1.00 TK = 1 BCC
+              </p>
+            </div>
+            <button
+              type="button"
+              className="absolute top-1 cursor-pointer right-1  text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-xs md:text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
+              data-modal-hide="authentication-modal"
+              onClick={closeBuyBccModal}
+            >
+              <svg
+                className="w-3 h-3"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 14 14"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+                />
+              </svg>
+              <span className="sr-only">Close modal</span>
+            </button>
+          </div>
+          <h4 className="mb-2 text-xs md:text-sm font-medium text-gray-900 pb-1 pt-2 border-b-2 mx-4 border-gray-300">
+            🔵 Available BCC: {0}
+          </h4>
+          <div className="p-4 md:p-5">
+            <form className="space-y-4" onSubmit={handleSubmit}>
+              <div>
+                <h4 className="block mb-2 text-xs md:text-sm font-medium text-gray-900">
+                  Select Gateway
+                </h4>
+                <div className="flex items-center gap-4 mt-2">
+                  {["bkash", "rocket", "nagad"].map((method) => (
+                    <label
+                      key={method}
+                      className="cursor-pointer bg-gray-100 shadow-md hover:scale-105 transition duration-300 hover:bg-blue-200"
+                    >
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value={method}
+                        className="hidden peer"
+                        onChange={() => setPaymentMethod(method)}
+                      />
+                      <img
+                        src={
+                          method === "bkash"
+                            ? bkash
+                            : method === "rocket"
+                            ? rocket
+                            : nagad
+                        }
+                        alt={method}
+                        className="w-14 h-9 p-1 object-contain border-2 border-gray-500 peer-checked:border-blue-500 peer-checked:bg-blue-200 rounded"
+                      />
+                    </label>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label
+                  htmlFor="amount"
+                  className="block mb-2 text-xs md:text-sm font-medium text-gray-900"
+                >
+                  Enter Paid amount
+                </label>
+                <input
+                  type="number"
+                  name="amount"
+                  id="amount"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-xs md:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 md:p-2.5"
+                  required
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="trxId"
+                  className="block mb-2 text-xs md:text-sm font-medium text-gray-900"
+                >
+                  Transaction ID
+                </label>
+                <input
+                  type="text"
+                  name="trxId"
+                  id="trxId"
+                  value={trxId}
+                  onChange={(e) => setTrxId(e.target.value)}
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-xs md:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 md:p-2.5"
+                  required
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xs md:text-sm px-5 py-2.5 text-center cursor-pointer"
+              >
+                {loading ? "Submitting..." : "Submit Request"}
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default BuyBccModal;
