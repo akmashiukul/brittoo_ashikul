@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../lib/api";
 import Swal from "sweetalert2";
-import useUserStore from "../stores/useUserStore";
 import Loader from "./shared/Loader";
 import { useParams } from "react-router-dom";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
@@ -12,7 +11,8 @@ import { usePriceCalculate } from "../hooks/usePriceCalculate";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
 import { differenceInDays } from "date-fns";
-import useCreditModalStore from "../stores/useCreditModalStore";
+import useUserStore from "../stores/authStores/useUserStore";
+import useCreditModalStore from "../stores/creditModalStores/useCreditModalStore";
 
 const ProductDetails = () => {
   const [product, setProduct] = useState(null);

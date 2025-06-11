@@ -1,4 +1,5 @@
-import useCreditModalStore from "../../stores/useCreditModalStore";
+import useCreditModalStore from "../../stores/creditModalStores/useCreditModalStore";
+
 
 const CreditModal = () => {
   const { closeCreditModal, isCreditModalOpen, requiredDeposit } = useCreditModalStore();

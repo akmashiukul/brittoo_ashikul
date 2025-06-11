@@ -1,13 +1,13 @@
-import money from "../../assets/money.png";
+import money from "../assets/money.png";
 import { ArrowRightLeftIcon, ArrowUpDown } from "lucide-react";
-import nodemcu from "../../assets/nodemcu.png";
-import question from "../../assets/question.png";
-import useUserStore from "../../stores/useUserStore";
+import nodemcu from "../assets/nodemcu.png";
+import question from "../assets/question.png";
 import Swal from "sweetalert2";
-import useLoginModalStore from "../../stores/useLoginModalStore";
-import useBuyBccModalStore from "../../stores/creditModalStores/useBuyBccModalStore";
-import useBuyRccModalStore from "../../stores/creditModalStores/useBuyRccModalStore";
-import useBuyGccModalStore from "../../stores/creditModalStores/useBuyGccModalStore";
+import useBuyBccModalStore from "../stores/creditModalStores/useBuyBccModalStore";
+import useBuyRccModalStore from "../stores/creditModalStores/useBuyRccModalStore";
+import useLoginModalStore from "../stores/authStores/useLoginModalStore";
+import useBuyGccModalStore from "../stores/creditModalStores/useBuyGccModalStore";
+import useUserStore from "../stores/authStores/useUserStore";
 
 const BuyCredits = () => {
   const { currentUser } = useUserStore();

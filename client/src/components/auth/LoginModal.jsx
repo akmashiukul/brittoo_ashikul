@@ -1,11 +1,13 @@
-import useLoginModalStore from "../../stores/useLoginModalStore";
+
 import brittoLogo from "../../assets/britto-logo.png";
-import useRegModalStore from "../../stores/useRegModalStore";
-import useUserStore from "../../stores/useUserStore";
+
 import { useState } from "react";
 import api from "../../lib/api";
 import Swal from "sweetalert2";
 import Loader from "../shared/Loader";
+import useLoginModalStore from "../../stores/authStores/useLoginModalStore";
+import useRegModalStore from "../../stores/authStores/useRegModalStore";
+import useUserStore from "../../stores/authStores/useUserStore";
 
 const LoginModal = () => {
   const { isLoginModalOpen, closeLoginModal } = useLoginModalStore();

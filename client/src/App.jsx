@@ -5,7 +5,6 @@ import RegisterModal from "./components/auth/RegisterModal";
 import LoginModal from "./components/auth/LoginModal";
 import Test from "./pages/Test";
 import VerifyOTP from "./pages/VerifyOTP";
-import useUserStore from "./stores/useUserStore";
 import VerifyUser from "./pages/VerifyUser";
 import AdminRoute from "./routes/AdminRoute";
 import PrivateRoute from "./routes/PrivateRoute";
@@ -17,7 +16,6 @@ import UserAnalytics from "./pages/private/dash-pages/UserAnalytics";
 import UpdateItem from "./pages/private/dash-pages/UpdateItem";
 import ProductDetails from "./components/ProductDetails";
 import RentalRequests from "./pages/private/dash-pages/RentalRequests";
-import BuyCredits from "./pages/private/BuyCredits";
 import CreditModal from "./components/modals/CreditModal";
 import BuyBccModal from "./components/modals/BuyBccModal";
 import BuyRccModal from "./components/modals/BuyRccModal";
@@ -25,6 +23,8 @@ import BuyGccModal from "./components/modals/BuyGccModal";
 import useBuyBccModalStore from "./stores/creditModalStores/useBuyBccModalStore";
 import useBuyRccModalStore from "./stores/creditModalStores/useBuyRccModalStore";
 import useBuyGccModalStore from "./stores/creditModalStores/useBuyGccModalStore";
+import useUserStore from "./stores/authStores/useUserStore";
+import BuyCredits from "./pages/BuyCredits";
 
 
 const AppContent = () => {

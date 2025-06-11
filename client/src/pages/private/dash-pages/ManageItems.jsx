@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
-import useUserStore from "../../../stores/useUserStore";
 import ManageItemCard from "../../../components/ManageItemCard";
 import api from "../../../lib/api";
 import Loader from "../../../components/shared/Loader";
+import useUserStore from "../../../stores/authStores/useUserStore";
 
 const ManageItems = () => {
   const [products, setProducts] = useState([]);

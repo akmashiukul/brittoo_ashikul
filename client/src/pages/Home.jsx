@@ -1,5 +1,5 @@
 import Banner from "../components/HomePage/Banner"
-import useUserStore from "../stores/useUserStore"
+import useUserStore from "../stores/authStores/useUserStore";
 
 const Home = () => {
   const { currentUser } = useUserStore();

@@ -1,6 +1,6 @@
-import React from 'react'
-import useUserStore from '../../stores/useUserStore';
-import useBuyRccModalStore from '../../stores/creditModalStores/useBuyRccModalStore';
+import useUserStore from "../../stores/authStores/useUserStore";
+import useBuyRccModalStore from "../../stores/creditModalStores/useBuyRccModalStore";
+
 
 const BuyRccModal = () => {
   

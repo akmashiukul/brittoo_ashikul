@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import useUserStore from "../stores/useUserStore";
 import { useNavigate } from "react-router-dom";
 import api from "../lib/api";
+import useUserStore from "../stores/authStores/useUserStore";
 
 export default function VerifyOTP() {
   const [otp, setOtp] = useState("");

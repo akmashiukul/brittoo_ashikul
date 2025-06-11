@@ -1,14 +1,14 @@
-import useRegModalStore from "../../stores/useRegModalStore";
 import brittoLogo from "../../assets/britto-logo.png";
-import useLoginModalStore from "../../stores/useLoginModalStore";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import api from "../../lib/api";
 import Swal from "sweetalert2";
-import useUserStore from "../../stores/useUserStore";
 import { useGeoLocation } from "../../hooks/useGeoLocation";
 import { PacmanLoader } from "react-spinners";
 import Loader from "../shared/Loader";
+import useRegModalStore from "../../stores/authStores/useRegModalStore";
+import useLoginModalStore from "../../stores/authStores/useLoginModalStore";
+import useUserStore from "../../stores/authStores/useUserStore";
 
 const RegisterModal = () => {
   const { isRegModalOpen, closeRegModal } = useRegModalStore();
@@ -85,8 +85,7 @@ const RegisterModal = () => {
       }
       closeRegModal();
       await setTempUser(res.data.user);
-      navigate('/verify-otp');
-      
+      navigate("/verify-otp");
     } catch (error) {
       console.error("Registration Error:", error);
       Swal.fire({
@@ -102,9 +101,7 @@ const RegisterModal = () => {
   if (!isRegModalOpen) return null;
 
   if (loading) {
-    return (
-      <Loader />
-    );
+    return <Loader />;
   }
 
   return (

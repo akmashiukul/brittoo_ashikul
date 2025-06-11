@@ -3,11 +3,11 @@ import brittoLogo from "../../assets/britto-logo.png";
 import { IoLogOut } from "react-icons/io5";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { useState } from "react";
-import useRegModalStore from "../../stores/useRegModalStore";
-import useLoginModalStore from "../../stores/useLoginModalStore";
-import useUserStore from "../../stores/useUserStore";
 import Avatar from "boring-avatars";
 import Swal from "sweetalert2";
+import useRegModalStore from "../../stores/authStores/useRegModalStore";
+import useLoginModalStore from "../../stores/authStores/useLoginModalStore";
+import useUserStore from "../../stores/authStores/useUserStore";
 
 const Navbar = () => {
   const menuClassname =

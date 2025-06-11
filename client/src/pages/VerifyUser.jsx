@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-import useUserStore from '../stores/useUserStore';
 import { useNavigate } from 'react-router-dom';
 import { Camera, Upload, Check, X } from 'lucide-react';
 import api from '../lib/api.js';
+import useUserStore from '../stores/authStores/useUserStore.js';
 
 const VerifyUser = () => {
   const [idCardImage, setIdCardImage] = useState(null);

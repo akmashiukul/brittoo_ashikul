@@ -1,6 +1,7 @@
 import Loader from "../components/shared/Loader";
-import useUserStore from "../stores/useUserStore";
+
 import { Navigate, Outlet } from "react-router-dom";
+import useUserStore from "../stores/authStores/useUserStore";
 
 const AdminRoute = () => {
   const { currentUser, loading } = useUserStore();
