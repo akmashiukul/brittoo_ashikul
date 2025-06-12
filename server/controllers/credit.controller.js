@@ -44,103 +44,43 @@ export const buyBcc = async (req, res, next) => {
   }
 };
 
-
-
 export const getPendingCreditRequests = async (req, res, next) => {
   try {
     const pendingCredits = await prisma.cacheCredit.findMany({
       where: {
         isActive: false,
-        deletedAt: null
+        deletedAt: null,
+        isRejected: false,
       },
       include: {
         user: {
           select: {
             id: true,
             name: true,
-            email: true
-          }
+            email: true,
+          },
         },
         sourceProduct: {
           select: {
             id: true,
-            name: true
-          }
-        }
+            name: true,
+          },
+        },
       },
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: "desc",
+      },
     });
 
     res.status(200).json({
       success: true,
       message: "Successfully Fetched Pending Credits",
       data: pendingCredits,
-      count: pendingCredits.length
+      count: pendingCredits.length,
     });
   } catch (error) {
-    console.error('Error fetching pending credit requests:', error);
+    console.error("Error fetching pending credit requests:", error);
     next(error);
-  }
-};
-
-// Search credit request by transaction ID
-const searchCreditByTransactionId = async (req, res) => {
-  try {
-    const { transactionId } = req.params;
-
-    if (!transactionId) {
-      return res.status(400).json({
-        success: false,
-        message: 'Transaction ID is required'
-      });
-    }
-
-    const creditRequest = await prisma.cacheCredit.findFirst({
-      where: {
-        transactionId: {
-          contains: transactionId,
-          mode: 'insensitive'
-        },
-        isActive: false,
-        deletedAt: null
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true
-          }
-        },
-        sourceProduct: {
-          select: {
-            id: true,
-            name: true
-          }
-        }
-      }
-    });
-
-    if (!creditRequest) {
-      return res.status(404).json({
-        success: false,
-        message: 'Credit request not found with this transaction ID'
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      data: creditRequest
-    });
-  } catch (error) {
-    console.error('Error searching credit request:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to search credit request',
-      error: error.message
-    });
   }
 };
 
@@ -151,11 +91,9 @@ export const acceptCreditRequest = async (req, res) => {
     if (!creditId) {
       return res.status(400).json({
         success: false,
-        message: 'Credit ID is required'
+        message: "Credit ID is required",
       });
     }
-
-    // Check if credit request exists and is pending
     const existingCredit = await prisma.cacheCredit.findUnique({
       where: { id: creditId },
       include: {
@@ -163,165 +101,107 @@ export const acceptCreditRequest = async (req, res) => {
           select: {
             id: true,
             name: true,
-            email: true
-          }
-        }
-      }
+            email: true,
+          },
+        },
+      },
     });
 
     if (!existingCredit) {
       return res.status(404).json({
         success: false,
-        message: 'Credit request not found'
+        message: "Credit request not found",
       });
     }
 
     if (existingCredit.isActive) {
       return res.status(400).json({
         success: false,
-        message: 'Credit request is already accepted'
+        message: "Credit request is already accepted",
       });
     }
 
     if (existingCredit.deletedAt) {
       return res.status(400).json({
         success: false,
-        message: 'Credit request has been rejected'
+        message: "Credit request has been rejected",
       });
     }
 
-    // Update credit request to active
     const updatedCredit = await prisma.cacheCredit.update({
-      where: { id: creditId },
+      where: { id: creditId, isRejected: false },
       data: {
         isActive: true,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
       include: {
         user: {
           select: {
             id: true,
             name: true,
-            email: true
-          }
-        }
-      }
+            email: true,
+          },
+        },
+      },
     });
-
-    // TODO: Log the admin action
-    // await prisma.adminLog.create({
-    //   data: {
-    //     adminId: adminId,
-    //     action: 'ACCEPT_CREDIT_REQUEST',
-    //     targetId: creditId,
-    //     targetType: 'CACHE_CREDIT',
-    //     details: `Accepted credit request for user ${existingCredit.user.email}`
-    //   }
-    // });
 
     // TODO: Send notification to user
     // await sendCreditApprovalNotification(existingCredit.user);
 
     res.status(200).json({
       success: true,
-      message: 'Credit request accepted successfully',
-      data: updatedCredit
+      message: "Credit request accepted successfully",
+      data: updatedCredit,
     });
   } catch (error) {
-    console.error('Error accepting credit request:', error);
+    console.error("Error accepting credit request:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to accept credit request',
-      error: error.message
+      message: "Failed to accept credit request",
+      error: error.message,
     });
   }
 };
 
-// Reject credit request
-const rejectCreditRequest = async (req, res) => {
+export const rejectCreditRequest = async (req, res, next) => {
   try {
     const { creditId } = req.params;
-    const { adminId, reason } = req.body; // Assuming admin info and reason are passed
-
+    const { rejectReason } = req.body;
     if (!creditId) {
-      return res.status(400).json({
-        success: false,
-        message: 'Credit ID is required'
-      });
+      throw new CustomError("CreditId required!", 400);
     }
-
-    // Check if credit request exists and is pending
     const existingCredit = await prisma.cacheCredit.findUnique({
       where: { id: creditId },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true
-          }
-        }
-      }
     });
-
     if (!existingCredit) {
-      return res.status(404).json({
-        success: false,
-        message: 'Credit request not found'
-      });
+      throw new CustomError("Credit request not found", 401);
     }
-
     if (existingCredit.isActive) {
-      return res.status(400).json({
-        success: false,
-        message: 'Cannot reject an already accepted credit request'
-      });
+      throw new CustomError(
+        "Cannot reject an already accepted credit request",
+        400,
+      );
     }
-
     if (existingCredit.deletedAt) {
-      return res.status(400).json({
-        success: false,
-        message: 'Credit request is already rejected'
-      });
+      throw new CustomError("Credit request is already rejected", 400);
     }
 
-    // Soft delete the credit request (mark as rejected)
     const rejectedCredit = await prisma.cacheCredit.update({
       where: { id: creditId },
       data: {
-        deletedAt: new Date(),
-        updatedAt: new Date()
-      }
+        isRejected: true,
+        rejectReason: rejectReason,
+      },
     });
 
-    // Optional: Log the admin action
-    // await prisma.adminLog.create({
-    //   data: {
-    //     adminId: adminId,
-    //     action: 'REJECT_CREDIT_REQUEST',
-    //     targetId: creditId,
-    //     targetType: 'CACHE_CREDIT',
-    //     details: `Rejected credit request for user ${existingCredit.user.email}. Reason: ${reason || 'No reason provided'}`
-    //   }
-    // });
-
-    // Optional: Send notification to user about rejection
-    // await sendCreditRejectionNotification(existingCredit.user, reason);
+    // Send notification to user about rejection
 
     res.status(200).json({
       success: true,
-      message: 'Credit request rejected successfully',
-      data: {
-        id: rejectedCredit.id,
-        rejectedAt: rejectedCredit.deletedAt
-      }
+      message: "Credit request rejected successfully",
     });
   } catch (error) {
-    console.error('Error rejecting credit request:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to reject credit request',
-      error: error.message
-    });
+    console.error("Error rejecting credit request:", error);
+    next(error);
   }
 };
