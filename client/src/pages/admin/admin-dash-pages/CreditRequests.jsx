@@ -65,48 +65,50 @@ const CreditRequests = () => {
       cancelButtonColor: "#d33",
       cancelButtonText: "Abort",
       confirmButtonText: "Accept!",
-    }).then( async (result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
         setProcessingId(creditId);
-    try {
-      const token = localStorage.getItem("token");
-      const res = await api.post(
-        `/api/v1/credit/bcc/accept/${creditId}`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-      if (!res.data.success) {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: res.data.message || "Something went wrong",
-        });
-        return null;
-      }
-      setCreditRequests((prev) =>
-        prev.map((request) =>
-          request.id === creditId ? { ...request, isActive: true } : request,
-        ),
-      );
-      setTimeout(() => {
-        setCreditRequests((prev) =>
-          prev.filter((request) => request.id !== creditId),
-        );
-      }, 300);
-      Swal.fire({
-        icon: "success",
-        title: "Success",
-        text: res.data.message || "Accepted Successfully",
-      });
-    } catch (error) {
-      console.error("Error accepting credit request:", error);
-    } finally {
-      setProcessingId(null);
-    }
+        try {
+          const token = localStorage.getItem("token");
+          const res = await api.post(
+            `/api/v1/credit/bcc/accept/${creditId}`,
+            {},
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            },
+          );
+          if (!res.data.success) {
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: res.data.message || "Something went wrong",
+            });
+            return null;
+          }
+          setCreditRequests((prev) =>
+            prev.map((request) =>
+              request.id === creditId
+                ? { ...request, isActive: true }
+                : request,
+            ),
+          );
+          setTimeout(() => {
+            setCreditRequests((prev) =>
+              prev.filter((request) => request.id !== creditId),
+            );
+          }, 300);
+          Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: res.data.message || "Accepted Successfully",
+          });
+        } catch (error) {
+          console.error("Error accepting credit request:", error);
+        } finally {
+          setProcessingId(null);
+        }
       }
     });
   };
@@ -114,13 +116,40 @@ const CreditRequests = () => {
   const handleReject = async (creditId) => {
     setProcessingId(creditId);
     try {
-      // API call to reject credit
-      // await rejectCreditRequest(creditId);
-
-      // Remove from list
-      setCreditRequests((prev) =>
-        prev.filter((request) => request.id !== creditId),
-      );
+      const token = localStorage.getItem("token");
+      const { value: rejectReason } = await Swal.fire({
+        title: "Enter Reject Reason",
+        input: "textarea",
+        inputPlaceholder: "Enter your rejecting reason here..",
+      });
+      if (rejectReason) {
+        const res = await api.put(
+          `/api/v1/credit/bcc/reject/${creditId}`,
+          {
+            rejectReason,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+        if (!res.data.success) {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: res.data.message || "Something went wrong",
+          });
+          return null;
+        }
+        Swal.fire({
+          icon: "success",
+          title: "Rejected",
+        });
+        setCreditRequests((prev) =>
+          prev.filter((request) => request.id !== creditId),
+        );
+      }
     } catch (error) {
       console.error("Error rejecting credit request:", error);
     } finally {
