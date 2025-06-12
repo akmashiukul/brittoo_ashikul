@@ -1,75 +1,114 @@
-import React, { useState, useEffect } from 'react';
-import { Search, Check, X, Clock, User, CreditCard, Calendar, Hash } from 'lucide-react';
-import api from '../../../lib/api';
-import Swal from 'sweetalert2';
+import React, { useState, useEffect } from "react";
+import {
+  Search,
+  Check,
+  X,
+  Clock,
+  User,
+  CreditCard,
+  Calendar,
+  Hash,
+} from "lucide-react";
+import api from "../../../lib/api";
+import Swal from "sweetalert2";
 
 const CreditRequests = () => {
   const [creditRequests, setCreditRequests] = useState([]);
-  const [searchTxnId, setSearchTxnId] = useState('');
+  const [searchTxnId, setSearchTxnId] = useState("");
   const [filteredRequests, setFilteredRequests] = useState([]);
   const [processingId, setProcessingId] = useState(null);
 
-
   useEffect(() => {
     const fetchPendingBcc = async () => {
-      const token = localStorage.getItem('token');
-      const res = await api.get('/api/v1/credit/bcc/pending', {
+      const token = localStorage.getItem("token");
+      const res = await api.get("/api/v1/credit/bcc/pending", {
         headers: {
-            Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       if (!res.data.success) {
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: res.data.message || "Something went wrong"
+          text: res.data.message || "Something went wrong",
         });
         return null;
       }
-      console.log(res)
+      console.log(res);
       setCreditRequests(res.data.data);
       setFilteredRequests(res.data.data);
     };
     fetchPendingBcc();
   }, []);
 
-
   useEffect(() => {
-    if (searchTxnId.trim() === '') {
+    if (searchTxnId.trim() === "") {
       setFilteredRequests(creditRequests);
     } else {
-      const filtered = creditRequests.filter(request => 
-        request.transactionId?.toLowerCase().includes(searchTxnId.toLowerCase())
+      const filtered = creditRequests.filter((request) =>
+        request.transactionId
+          ?.toLowerCase()
+          .includes(searchTxnId.toLowerCase()),
       );
       setFilteredRequests(filtered);
     }
   }, [searchTxnId, creditRequests]);
 
-  const handleAccept = async (creditId) => {
-    setProcessingId(creditId);
+  const handleAccept = async (request) => {
+    const creditId = request.id;
+    Swal.fire({
+      title: "Accepting BCC req for trxId:",
+      text: `#${request.transactionId}`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      cancelButtonText: "Abort",
+      confirmButtonText: "Accept!",
+    }).then( async (result) => {
+      if (result.isConfirmed) {
+        setProcessingId(creditId);
     try {
-      // API call to accept credit
-      // await acceptCreditRequest(creditId);
-      
-      // Update local state
-      setCreditRequests(prev => 
-        prev.map(request => 
-          request.id === creditId 
-            ? { ...request, isActive: true }
-            : request
-        )
+      const token = localStorage.getItem("token");
+      const res = await api.post(
+        `/api/v1/credit/bcc/accept/${creditId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
       );
-      
-      // Remove from pending list after acceptance
+      if (!res.data.success) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: res.data.message || "Something went wrong",
+        });
+        return null;
+      }
+      setCreditRequests((prev) =>
+        prev.map((request) =>
+          request.id === creditId ? { ...request, isActive: true } : request,
+        ),
+      );
       setTimeout(() => {
-        setCreditRequests(prev => prev.filter(request => request.id !== creditId));
-      }, 1000);
-      
+        setCreditRequests((prev) =>
+          prev.filter((request) => request.id !== creditId),
+        );
+      }, 300);
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: res.data.message || "Accepted Successfully",
+      });
     } catch (error) {
-      console.error('Error accepting credit request:', error);
+      console.error("Error accepting credit request:", error);
     } finally {
       setProcessingId(null);
     }
+      }
+    });
   };
 
   const handleReject = async (creditId) => {
@@ -77,12 +116,13 @@ const CreditRequests = () => {
     try {
       // API call to reject credit
       // await rejectCreditRequest(creditId);
-      
+
       // Remove from list
-      setCreditRequests(prev => prev.filter(request => request.id !== creditId));
-      
+      setCreditRequests((prev) =>
+        prev.filter((request) => request.id !== creditId),
+      );
     } catch (error) {
-      console.error('Error rejecting credit request:', error);
+      console.error("Error rejecting credit request:", error);
     } finally {
       setProcessingId(null);
     }
@@ -90,29 +130,37 @@ const CreditRequests = () => {
 
   const getCreditTypeColor = (type) => {
     switch (type) {
-      case 'BLUE_CC': return 'bg-blue-100 text-blue-800';
-      case 'RED_CC': return 'bg-red-100 text-red-800';
-      case 'GRAY_CC': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "BLUE_CC":
+        return "bg-blue-100 text-blue-800";
+      case "RED_CC":
+        return "bg-red-100 text-red-800";
+      case "GRAY_CC":
+        return "bg-gray-100 text-gray-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const getPaymentGatewayColor = (gateway) => {
     switch (gateway) {
-      case 'BKASH': return 'bg-pink-100 text-pink-800';
-      case 'NAGAD': return 'bg-orange-100 text-orange-800';
-      case 'ROCKET': return 'bg-purple-100 text-purple-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "BKASH":
+        return "bg-pink-100 text-pink-800";
+      case "NAGAD":
+        return "bg-orange-100 text-orange-800";
+      case "ROCKET":
+        return "bg-purple-100 text-purple-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -121,7 +169,9 @@ const CreditRequests = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Credit Requests</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Credit Requests
+          </h1>
           <p className="text-gray-600">Manage pending cache credit requests</p>
         </div>
 
@@ -150,9 +200,13 @@ const CreditRequests = () => {
           {filteredRequests.length === 0 ? (
             <div className="text-center py-12">
               <Clock className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No pending requests</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No pending requests
+              </h3>
               <p className="text-gray-500">
-                {searchTxnId ? 'No requests match your search criteria.' : 'All credit requests have been processed.'}
+                {searchTxnId
+                  ? "No requests match your search criteria."
+                  : "All credit requests have been processed."}
               </p>
             </div>
           ) : (
@@ -182,7 +236,10 @@ const CreditRequests = () => {
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {filteredRequests.map((request) => (
-                    <tr key={request.id} className="hover:bg-gray-50 transition-colors">
+                    <tr
+                      key={request.id}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
                       <td className="px-6 py-4">
                         <div className="flex items-center space-x-3">
                           <div className="flex-shrink-0">
@@ -209,7 +266,11 @@ const CreditRequests = () => {
                             </span>
                           </div>
                           <div className="flex space-x-2">
-                            <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getCreditTypeColor(request.creditType)}`}>
+                            <span
+                              className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getCreditTypeColor(
+                                request.creditType,
+                              )}`}
+                            >
                               {request.creditType}
                             </span>
                             <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">
@@ -220,7 +281,11 @@ const CreditRequests = () => {
                       </td>
                       <td className="px-6 py-4">
                         <div className="space-y-1">
-                          <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getPaymentGatewayColor(request.paymentGateway)}`}>
+                          <span
+                            className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getPaymentGatewayColor(
+                              request.paymentGateway,
+                            )}`}
+                          >
                             {request.paymentGateway}
                           </span>
                           {request.instantFee && (
@@ -242,7 +307,9 @@ const CreditRequests = () => {
                         <div className="space-y-1">
                           <div className="flex items-center space-x-1 text-xs text-gray-500">
                             <Calendar className="w-3 h-3" />
-                            <span>Start: {formatDate(request.validityStart)}</span>
+                            <span>
+                              Start: {formatDate(request.validityStart)}
+                            </span>
                           </div>
                           <div className="flex items-center space-x-1 text-xs text-gray-500">
                             <Calendar className="w-3 h-3" />
@@ -253,9 +320,9 @@ const CreditRequests = () => {
                       <td className="px-6 py-4">
                         <div className="flex space-x-2">
                           <button
-                            onClick={() => handleAccept(request.id)}
+                            onClick={() => handleAccept(request)}
                             disabled={processingId === request.id}
-                            className="inline-flex items-center px-3 py-2 border border-transparent text-xs font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 transition-colors"
+                            className="inline-flex items-center px-3 py-2 border border-transparent text-xs font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 transition-colors cursor-pointer"
                           >
                             <Check className="w-4 h-4 mr-1" />
                             Accept
@@ -263,7 +330,7 @@ const CreditRequests = () => {
                           <button
                             onClick={() => handleReject(request.id)}
                             disabled={processingId === request.id}
-                            className="inline-flex items-center px-3 py-2 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 transition-colors"
+                            className="inline-flex items-center px-3 py-2 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 transition-colors cursor-pointer"
                           >
                             <X className="w-4 h-4 mr-1" />
                             Reject

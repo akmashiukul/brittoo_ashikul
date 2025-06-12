@@ -147,7 +147,6 @@ const searchCreditByTransactionId = async (req, res) => {
 export const acceptCreditRequest = async (req, res) => {
   try {
     const { creditId } = req.params;
-    const { adminId } = req.body; // Assuming admin info is passed
 
     if (!creditId) {
       return res.status(400).json({
