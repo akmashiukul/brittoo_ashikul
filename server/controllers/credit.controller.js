@@ -166,7 +166,7 @@ export const acceptCreditRequest = async (req, res) => {
 export const rejectCreditRequest = async (req, res, next) => {
   try {
     const { creditId } = req.params;
-    const { rejectReason } = req.body;
+    const { rejectReason, refundTrxId } = req.body;
     if (!creditId) {
       throw new CustomError("CreditId required!", 400);
     }
@@ -186,11 +186,14 @@ export const rejectCreditRequest = async (req, res, next) => {
       throw new CustomError("Credit request is already rejected", 400);
     }
 
+    const updatedRefundTrxArr = [...existingCredit.refundTrxIds, refundTrxId];
+
     const rejectedCredit = await prisma.cacheCredit.update({
       where: { id: creditId },
       data: {
         isRejected: true,
         rejectReason: rejectReason,
+        refundTrxIds: updatedRefundTrxArr
       },
     });
 

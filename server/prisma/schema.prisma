@@ -78,7 +78,9 @@ model CacheCredit {
   sourceProductId String?         @map("source_product_id")
   renterId        String?         @map("renter_id")
   paymentGateway  PaymentGateway? @map("payment_gateway")
-  transactionId   String?         @map("transaction_id")
+
+  transactionId String?  @map("transaction_id")
+  refundTrxIds  String[] @default([]) @map("refund_trx_ids")
 
   instantFee Int? @map("instant_fee")
 
