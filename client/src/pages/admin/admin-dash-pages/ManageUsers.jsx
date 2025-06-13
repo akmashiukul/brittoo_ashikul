@@ -1,99 +1,106 @@
-import React, { useState, useEffect } from 'react';
-import { Eye, Shield, ShieldCheck, CheckCircle, XCircle, User, Package, CreditCard, Clock, MapPin, Mail, Phone } from 'lucide-react';
-import UserDetails from './UserDetails';
+import React, { useState, useEffect } from "react";
+import {
+  Eye,
+  ShieldCheck,
+  CheckCircle,
+  XCircle,
+  User,
+  Clock,
+} from "lucide-react";
+import UserDetails from "./UserDetails";
+import api from "../../../lib/api";
+import Swal from "sweetalert2";
 
-// Mock data - replace with actual API calls
-const mockUsers = [
-  {
-    id: "1",
-    name: "John Doe",
-    email: "john@example.com",
-    roll: "CSE2019001",
-    role: "USER",
-    isVerified: "VERIFIED",
-    brittooVerified: true,
-    emailVerified: true,
-    securityScore: "HIGH",
-    isSuspended: false,
-    createdAt: "2024-01-15T10:30:00Z",
-    selfie: "present",
-    idCardFront: "present",
-    idCardBack: "absent",
-    ipAddress: "192.168.1.1",
-    latitude: 23.8103,
-    longitude: 90.4125
-  },
-  {
-    id: "2",
-    name: "Jane Smith",
-    email: "jane@example.com",
-    roll: "CSE2019002",
-    role: "USER",
-    isVerified: "PENDING",
-    brittooVerified: false,
-    emailVerified: true,
-    securityScore: "MID",
-    isSuspended: false,
-    createdAt: "2024-02-10T14:20:00Z",
-    selfie: "present",
-    idCardFront: "present",
-    idCardBack: "present",
-    ipAddress: "192.168.1.2",
-    latitude: 23.7504,
-    longitude: 90.3742
-  }
-];
 
 const ManageUsers = () => {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('ALL');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("ALL");
 
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      setUsers(mockUsers);
-      setLoading(false);
-    }, 1000);
+    const fetchAllUsers = async () => {
+      setLoading(true);
+      const token = localStorage.getItem("token");
+      try {
+        const res = await api.get("/api/v1/users", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.data.success) {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: res.data.message || "Something went wrong",
+          });
+          return null;
+        }
+
+        setUsers(res.data.data.users);
+        setSummary(res.data.data.summary);
+      } catch (error) {
+        console.error("Err In fetching users: ", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAllUsers();
   }, []);
 
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.roll.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    if (filterStatus === 'ALL') return matchesSearch;
-    if (filterStatus === 'VERIFIED') return matchesSearch && user.isVerified === 'VERIFIED';
-    if (filterStatus === 'PENDING') return matchesSearch && user.isVerified === 'PENDING';
-    if (filterStatus === 'SUSPENDED') return matchesSearch && user.isSuspended;
-    
+  const filteredUsers = users.filter((user) => {
+    const matchesSearch =
+      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.roll.toLowerCase().includes(searchTerm.toLowerCase());
+
+    if (filterStatus === "ALL") return matchesSearch;
+    if (filterStatus === "VERIFIED")
+      return matchesSearch && user.isVerified === "VERIFIED";
+    if (filterStatus === "PENDING")
+      return matchesSearch && user.isVerified === "PENDING";
+    if (filterStatus === "SUSPENDED") return matchesSearch && user.isSuspended;
+
     return matchesSearch;
   });
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'VERIFIED': return 'text-green-600 bg-green-100';
-      case 'PENDING': return 'text-yellow-600 bg-yellow-100';
-      case 'UNVERIFIED': return 'text-red-600 bg-red-100';
-      default: return 'text-gray-600 bg-gray-100';
+      case "VERIFIED":
+        return "text-green-600 bg-green-100";
+      case "PENDING":
+        return "text-yellow-600 bg-yellow-100";
+      case "UNVERIFIED":
+        return "text-red-600 bg-red-100";
+      default:
+        return "text-gray-600 bg-gray-100";
     }
   };
 
   const getSecurityScoreColor = (score) => {
     switch (score) {
-      case 'VERY_HIGH': return 'text-green-700 bg-green-200';
-      case 'HIGH': return 'text-green-600 bg-green-100';
-      case 'MID': return 'text-yellow-600 bg-yellow-100';
-      case 'LOW': return 'text-orange-600 bg-orange-100';
-      case 'VERY_LOW': return 'text-red-600 bg-red-100';
-      default: return 'text-gray-600 bg-gray-100';
+      case "VERY_HIGH":
+        return "text-green-700 bg-green-200";
+      case "HIGH":
+        return "text-green-600 bg-green-100";
+      case "MID":
+        return "text-yellow-600 bg-yellow-100";
+      case "LOW":
+        return "text-orange-600 bg-orange-100";
+      case "VERY_LOW":
+        return "text-red-600 bg-red-100";
+      default:
+        return "text-gray-600 bg-gray-100";
     }
   };
 
   if (selectedUser) {
-    return <UserDetails user={selectedUser} onBack={() => setSelectedUser(null)} />;
+    return (
+      <UserDetails user={selectedUser} onBack={() => setSelectedUser(null)} />
+    );
   }
 
   return (
@@ -101,8 +108,12 @@ const ManageUsers = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">User Management</h1>
-          <p className="text-gray-600">Manage and monitor all registered users</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            User Management
+          </h1>
+          <p className="text-gray-600">
+            Manage and monitor all registered users
+          </p>
         </div>
 
         {/* Filters and Search */}
@@ -142,12 +153,24 @@ const ManageUsers = () => {
               <table className="w-full">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Security Score</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Verification</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Join Date</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      User
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Security Score
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Verification
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Join Date
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -167,13 +190,21 @@ const ManageUsers = () => {
                                 <ShieldCheck className="h-4 w-4 text-blue-500 ml-1" />
                               )}
                             </div>
-                            <div className="text-sm text-gray-500">{user.email}</div>
-                            <div className="text-xs text-gray-400">{user.roll}</div>
+                            <div className="text-sm text-gray-500">
+                              {user.email}
+                            </div>
+                            <div className="text-xs text-gray-400">
+                              {user.roll}
+                            </div>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(user.isVerified)}`}>
+                        <span
+                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
+                            user.isVerified,
+                          )}`}
+                        >
                           {user.isVerified}
                         </span>
                         {user.isSuspended && (
@@ -185,7 +216,11 @@ const ManageUsers = () => {
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getSecurityScoreColor(user.securityScore)}`}>
+                        <span
+                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getSecurityScoreColor(
+                            user.securityScore,
+                          )}`}
+                        >
                           {user.securityScore}
                         </span>
                       </td>
@@ -199,7 +234,8 @@ const ManageUsers = () => {
                           <span className="text-xs">Email</span>
                         </div>
                         <div className="flex items-center space-x-2 mt-1">
-                          {user.selfie !== 'absent' && user.idCardFront !== 'absent' ? (
+                          {user.selfie !== "absent" &&
+                          user.idCardFront !== "absent" ? (
                             <CheckCircle className="h-4 w-4 text-green-500" />
                           ) : (
                             <XCircle className="h-4 w-4 text-red-500" />
@@ -234,7 +270,9 @@ const ManageUsers = () => {
               <User className="h-8 w-8 text-green-600" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Total Users</p>
-                <p className="text-2xl font-bold text-gray-900">{users.length}</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {summary?.totalUsers}
+                </p>
               </div>
             </div>
           </div>
@@ -244,7 +282,7 @@ const ManageUsers = () => {
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Verified</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {users.filter(u => u.isVerified === 'VERIFIED').length}
+                  {summary?.verified}
                 </p>
               </div>
             </div>
@@ -255,7 +293,7 @@ const ManageUsers = () => {
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Pending</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {users.filter(u => u.isVerified === 'PENDING').length}
+                  {summary?.pending}
                 </p>
               </div>
             </div>
@@ -264,9 +302,11 @@ const ManageUsers = () => {
             <div className="flex items-center">
               <ShieldCheck className="h-8 w-8 text-blue-600" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Brittoo Verified</p>
+                <p className="text-sm font-medium text-gray-600">
+                  Brittoo Verified
+                </p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {users.filter(u => u.brittooVerified).length}
+                  {summary?.brittooVerified}
                 </p>
               </div>
             </div>
