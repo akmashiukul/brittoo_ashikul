@@ -33,7 +33,7 @@ const AdminDashboardLayout = () => {
 
 
   return (
-    <div className="relative flex min-h-screen">
+    <div className="relative flex min-h-screen overflow-x-scroll">
       <div
         className={`fixed inset-y-0 left-0 z-50 w-56 md:w-80 bg-gray-100 border-r border-gray-200 transform transition-transform duration-300 ease-in-out ${
           isDrawerOpen ? "translate-x-0" : "-translate-x-full"
