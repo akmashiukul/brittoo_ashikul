@@ -32,6 +32,9 @@ const ProductDetails = () => {
 
   const { openCreditModal } = useCreditModalStore();
 
+  //sss
+  console.log(`${base_url}${product?.productImages[0]}`)
+
   useEffect(() => {
     if (initial && final) {
       setNumberOfDays(differenceInDays(final, initial) + 1);

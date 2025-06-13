@@ -66,8 +66,8 @@ export const verifyUser = async (req, res) => {
     const updatedUser = await prisma.user.update({
       where: { email },
       data: {
-        idCardFront: idCardFile.filename,
-        selfie: selfieFile.filename,
+        idCardFront: `/uploads/${idCardFile.filename}`,
+        selfie: `/uploads/${selfieFile.filename}`,
         isVerified: "PENDING",
       },
       include: {

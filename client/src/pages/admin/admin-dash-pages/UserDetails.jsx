@@ -1,28 +1,7 @@
 import { CheckCircle, CreditCard, MapPin, Package, Shield, ShieldCheck, User, XCircle } from "lucide-react";
 import { useEffect, useState } from "react";
-
-
-const mockUserDetails = {
-  "1": {
-    cacheCredits: [
-      { id: "cc1", amount: 500, creditType: "BLUE_CC", sourceType: "PRODUCT", isActive: true, validityEnd: "2024-12-31" },
-      { id: "cc2", amount: 200, creditType: "RED_CC", sourceType: "MONEY", isActive: true, validityEnd: "2024-11-30" },
-      { id: "cc3", amount: 100, creditType: "GRAY_CC", sourceType: "INSTANT", isActive: false, validityEnd: "2024-10-15" }
-    ],
-    rentedProducts: [
-      { id: "p1", name: "MacBook Pro", productType: "ELECTRONICS", pricePerDay: 50, status: "ACTIVE" },
-      { id: "p2", name: "Gaming Chair", productType: "FURNITURE", pricePerDay: 15, status: "RETURNED" }
-    ],
-    borrowedProducts: [
-      { id: "p3", name: "iPhone 13", productType: "ELECTRONICS", pricePerDay: 30, status: "ACTIVE" },
-      { id: "p4", name: "Textbook", productType: "BOOK", pricePerDay: 5, status: "RETURNED" }
-    ],
-    rentalRequests: [
-      { id: "r1", productName: "Laptop", status: "PENDING", type: "MADE" },
-      { id: "r2", productName: "Camera", status: "ACCEPTED", type: "RECEIVED" }
-    ]
-  }
-};
+import api from "../../../lib/api";
+import Swal from "sweetalert2";
 
 
 const UserDetails = ({ user, onBack }) => {
@@ -30,23 +9,42 @@ const UserDetails = ({ user, onBack }) => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
 
+  const base_url = import.meta.env.VITE_BASE_URL;
+  console.log(userDetails);
+  console.log(`${base_url}/${userDetails?.user.selfie}`)
+
   useEffect(() => {
-    // Simulate API call to get detailed user data
-    setTimeout(() => {
-      setUserDetails(mockUserDetails[user.id] || {
-        cacheCredits: [],
-        rentedProducts: [],
-        borrowedProducts: [],
-        rentalRequests: []
-      });
-      setLoading(false);
-    }, 500);
+    const getUserDetails = async () => {
+      try {
+        setLoading(true);
+        const token = localStorage.getItem("token");
+        const res = await api.get(`/api/v1/users/${user.id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.data.success) {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: res.data.message || "Something went wrong",
+          });
+          return null;
+        }
+        setUserDetails(res.data.data);
+      }  catch (error) {
+        console.error("Err In fetching users: ", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    getUserDetails();
   }, [user.id]);
 
   const handleVerification = async (action) => {
-    // Handle verification logic here
     console.log(`${action} user:`, user.id);
-    // API call to update user verification status
+
   };
 
   const calculateTotalCredits = (credits, type) => {
@@ -242,7 +240,7 @@ const UserDetails = ({ user, onBack }) => {
                 {user.selfie !== 'absent' ? (
                   <div>
                     <div className="h-32 w-32 mx-auto bg-gray-200 rounded-full flex items-center justify-center">
-                      <User className="h-16 w-16 text-gray-400" />
+                      <img className="h-32 w-32 rounded-full object-cover" src={`${base_url}${userDetails.user.selfie}`} alt="" />
                     </div>
                     <p className="mt-2 text-sm text-green-600">Selfie uploaded</p>
                     <button className="mt-2 text-green-600 hover:text-green-700 font-medium text-sm">
@@ -264,7 +262,7 @@ const UserDetails = ({ user, onBack }) => {
                 {user.idCardFront !== 'absent' ? (
                   <div>
                     <div className="h-32 w-48 mx-auto bg-gray-200 rounded flex items-center justify-center">
-                      <CreditCard className="h-12 w-12 text-gray-400" />
+                      <img className="h-32 w-48 object-cover" src={`${base_url}${userDetails.user.idCardFront}`} alt="" />
                     </div>
                     <p className="mt-2 text-sm text-green-600">ID Card uploaded</p>
                     <button className="mt-2 text-green-600 hover:text-green-700 font-medium text-sm">
