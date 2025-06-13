@@ -8,6 +8,7 @@ import { multerErrorHandler } from "./lib/multerErrorHandler.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import creditRoutes from './routes/credit.routes.js';
+import userRoutes from './routes/user.routes.js';
 
 dotenv.config();
 const app = express();
@@ -27,6 +28,7 @@ app.get("/", (req, res) => {
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/products", productRoutes);
 app.use("/api/v1/credit", creditRoutes);
+app.use("/api/v1/users", userRoutes);
 
 app.use(errorHandler);
 app.use(multerErrorHandler);
