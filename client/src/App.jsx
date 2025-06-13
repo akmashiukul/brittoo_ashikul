@@ -28,6 +28,7 @@ import BuyCredits from "./pages/BuyCredits";
 import AdminDashboardLayout from "./pages/admin/AdminDashboardLayout";
 import CreditRequests from "./pages/admin/admin-dash-pages/CreditRequests";
 import AdminOverview from "./pages/admin/admin-dash-pages/AdminOverview";
+import ManageUsers from "./pages/admin/admin-dash-pages/ManageUsers";
 
 const AppContent = () => {
   const location = useLocation();
@@ -79,6 +80,7 @@ const AppContent = () => {
             >
               <Route path="credit-requests" element={<CreditRequests />} />
               <Route path="admin-overview" element={<AdminOverview />} />
+              <Route path="manage-users" element={<ManageUsers />} />
             </Route>
           </Route>
 
