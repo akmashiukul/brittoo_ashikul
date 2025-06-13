@@ -117,16 +117,59 @@ const CreditRequests = () => {
     setProcessingId(creditId);
     try {
       const token = localStorage.getItem("token");
-      const { value: rejectReason } = await Swal.fire({
-        title: "Enter Reject Reason",
-        input: "textarea",
-        inputPlaceholder: "Enter your rejecting reason here..",
+
+      const { value: formValues } = await Swal.fire({
+        html: `
+      <div style="padding: 0 10px; box-sizing: border-box;">
+        <div style="margin-bottom: 15px;">
+          <label style="display: block; text-align: left; font-weight: 500; margin-bottom: 8px; color: #374151;" for="swal-input1">
+            Refund Transaction ID
+          </label>
+          <input 
+            id="swal-input1" 
+            class="swal2-input" 
+            style="width: 100%; margin: 0; padding: 8px 12px; box-sizing: border-box; border: 1px solid #d1d5db; border-radius: 4px;" 
+            placeholder="Enter transaction ID"
+          />
+        </div>
+        
+        <div style="margin-bottom: 10px;">
+          <label style="display: block; text-align: left; font-weight: 500; margin-bottom: 8px; color: #374151;" for="swal-input2">
+            Reject Reason
+          </label>
+          <textarea 
+            id="swal-input2" 
+            class="swal2-textarea" 
+            style="width: 100%; height: 80px; margin: 0; padding: 8px 12px; box-sizing: border-box; border: 1px solid #d1d5db; border-radius: 4px; resize: vertical;" 
+            placeholder="Enter reason for rejection"
+          ></textarea>
+        </div>
+      </div>
+    `,
+        width: "500px",
+        focusConfirm: false,
+        showCancelButton: true,
+        confirmButtonText: "Reject",
+        cancelButtonText: "Cancel",
+        preConfirm: () => {
+          const trxId = document.getElementById("swal-input1").value.trim();
+          const reason = document.getElementById("swal-input2").value.trim();
+
+          if (!trxId || !reason) {
+            Swal.showValidationMessage("Both fields are required");
+            return false;
+          }
+
+          return [trxId, reason];
+        },
       });
-      if (rejectReason) {
+
+      if (formValues) {
         const res = await api.put(
           `/api/v1/credit/bcc/reject/${creditId}`,
           {
-            rejectReason,
+            refundTrxId: formValues[0],
+            rejectReason: formValues[1],
           },
           {
             headers: {
