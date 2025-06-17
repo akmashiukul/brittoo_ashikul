@@ -88,8 +88,7 @@ export const getProducts = async (req, res, next) => {
       search = "",
       productType,
       productCondition,
-      minAge,
-      maxAge,
+      productAge,
       ownerId,
       page = 1,
       limit = 20,
@@ -123,10 +122,10 @@ export const getProducts = async (req, res, next) => {
       filters.ownerId = ownerId;
     }
 
-    if (minAge || maxAge) {
-      filters.productAge = {};
-      if (minAge) filters.productAge.gte = parseInt(minAge);
-      if (maxAge) filters.productAge.lte = parseInt(maxAge);
+    if (productAge) {
+      filters.productAge = {
+        lte: parseInt(productAge)
+      }
     }
 
     const searchClause = search
@@ -138,6 +137,8 @@ export const getProducts = async (req, res, next) => {
           ],
         }
       : {};
+
+      console.log(filters)
 
     const products = await prisma.product.findMany({
       where: {

@@ -29,6 +29,7 @@ import AdminDashboardLayout from "./pages/admin/AdminDashboardLayout";
 import CreditRequests from "./pages/admin/admin-dash-pages/CreditRequests";
 import AdminOverview from "./pages/admin/admin-dash-pages/AdminOverview";
 import ManageUsers from "./pages/admin/admin-dash-pages/ManageUsers";
+import AllProducts from "./pages/AllProducts";
 
 const AppContent = () => {
   const location = useLocation();
@@ -71,6 +72,7 @@ const AppContent = () => {
           <Route path="/verify-user" element={<VerifyUser />} />
           <Route path="/product-details/:id" element={<ProductDetails />} />
           <Route path="/buy-credits" element={<BuyCredits />} />
+          <Route path="/browse" element={<AllProducts />} />
 
           {/* Admin Routes */}
           <Route element={<AdminRoute />}>

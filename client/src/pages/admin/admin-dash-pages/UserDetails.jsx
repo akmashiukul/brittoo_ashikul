@@ -11,12 +11,14 @@ import {
 import { useEffect, useState } from "react";
 import api from "../../../lib/api";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 const UserDetails = ({ user, onBack }) => {
   const [userDetails, setUserDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
 
+  const navigate = useNavigate();
   const base_url = import.meta.env.VITE_BASE_URL;
   console.log(userDetails);
 
@@ -51,12 +53,6 @@ const UserDetails = ({ user, onBack }) => {
 
   const handleVerification = async (action) => {
     console.log(`${action} user:`, user.id);
-  };
-
-  const calculateTotalCredits = (credits, type) => {
-    return credits
-      .filter((credit) => credit.creditType === type && credit.isActive)
-      .reduce((sum, credit) => sum + credit.amount, 0);
   };
 
   if (loading) {
@@ -493,7 +489,7 @@ const UserDetails = ({ user, onBack }) => {
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {userDetails?.user?.rentedProducts.map((product) => (
-                      <tr key={product.id}>
+                      <tr onClick={() => navigate(`/product-details/${product.id}`)} key={product.id} className="cursor-pointer hover:bg-gray-200">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <Package className="h-8 w-8 text-gray-400 mr-3" />
