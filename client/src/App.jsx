@@ -33,10 +33,12 @@ import AllProducts from "./pages/AllProducts";
 
 const AppContent = () => {
   const location = useLocation();
-  const { loading } = useUserStore();
+  const { loading, currentUser } = useUserStore();
   const { isBuyBccModalOpen } = useBuyBccModalStore();
   const { isBuyRccModalOpen } = useBuyRccModalStore();
   const { isBuyGccModalOpen } = useBuyGccModalStore();
+
+  console.log(currentUser)
 
   const noNavbarRoutes = [
     "/dashboard",

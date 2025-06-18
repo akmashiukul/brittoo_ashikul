@@ -44,7 +44,7 @@ export const buyBcc = async (req, res, next) => {
   }
 };
 
-export const getPendingCreditRequests = async (req, res, next) => {
+export const getPendingBCCRequests = async (req, res, next) => {
   try {
     const pendingCredits = await prisma.cacheCredit.findMany({
       where: {
@@ -84,7 +84,7 @@ export const getPendingCreditRequests = async (req, res, next) => {
   }
 };
 
-export const acceptCreditRequest = async (req, res) => {
+export const acceptBCCRequest = async (req, res) => {
   try {
     const { creditId } = req.params;
 
@@ -163,7 +163,7 @@ export const acceptCreditRequest = async (req, res) => {
   }
 };
 
-export const rejectCreditRequest = async (req, res, next) => {
+export const rejectBCCRequest = async (req, res, next) => {
   try {
     const { creditId } = req.params;
     const { rejectReason, refundTrxId } = req.body;

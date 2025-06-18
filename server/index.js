@@ -7,7 +7,7 @@ import cors from 'cors';
 import { multerErrorHandler } from "./lib/multerErrorHandler.js";
 import path from "path";
 import { fileURLToPath } from "url";
-import creditRoutes from './routes/credit.routes.js';
+import bccRoutes from './routes/bcc.routes.js';
 import userRoutes from './routes/user.routes.js';
 
 dotenv.config();
@@ -27,7 +27,7 @@ app.get("/", (req, res) => {
 });
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/products", productRoutes);
-app.use("/api/v1/credit", creditRoutes);
+app.use("/api/v1/credit/bcc", bccRoutes);
 app.use("/api/v1/users", userRoutes);
 
 app.use(errorHandler);

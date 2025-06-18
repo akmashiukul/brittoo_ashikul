@@ -13,6 +13,7 @@ model User {
   email       String  @unique @map("email")
   roll        String  @unique @map("roll")
   password    String  @map("password")
+  phoneNumber String  @map("phone_number")
   selfie      String  @default("absent") @map("selfie")
   idCardFront String  @default("absent") @map("id_card_front")
   idCardBack  String  @default("absent") @map("id_card_back")
@@ -34,9 +35,12 @@ model User {
   isSuspended     Boolean       @default(false) @map("is_suspended")
   suspensionCount Int           @default(0) @map("suspension_count")
 
-  cacheCredits     CacheCredit[]
-  rentedProducts   Product[]     @relation("ProductsRentedOut")
-  borrowedProducts Product[]     @relation("ProductsBorrowed")
+  blueCacheCredits BlueCacheCredit[]
+  redCacheCredits  RedCacheCredits[]
+  grayCacheCredits GrayCacheCredits[]
+
+  rentedProducts   Product[] @relation("ProductsRentedOut")
+  borrowedProducts Product[] @relation("ProductsBorrowed")
 
   rentalRequestsMade     RentalRequest[] @relation("RentalRequestsMade")
   rentalRequestsReceived RentalRequest[] @relation("RentalRequestsReceived")
@@ -69,35 +73,63 @@ enum SecurityScore {
   VERY_HIGH
 }
 
-model CacheCredit {
-  id              String          @id @default(cuid()) @map("id")
-  userId          String          @map("user_id")
-  amount          Int             @map("amount")
-  creditType      CreditType      @map("credit_type")
-  sourceType      CreditSource    @map("source_type")
-  sourceProductId String?         @map("source_product_id")
-  renterId        String?         @map("renter_id")
-  paymentGateway  PaymentGateway? @map("payment_gateway")
-
-  transactionId String?  @map("transaction_id")
-  refundTrxIds  String[] @default([]) @map("refund_trx_ids")
-
-  instantFee Int? @map("instant_fee")
-
-  validityStart DateTime @map("validity_start")
-  validityEnd   DateTime @map("validity_end")
+model BlueCacheCredit {
+  id             String         @id @default(cuid()) @map("id")
+  userId         String         @map("user_id")
+  amount         Int            @map("amount")
+  paymentGateway PaymentGateway @map("payment_gateway")
+  transactionId  String         @map("transaction_id")
+  refundTrxIds   String[]       @default([]) @map("refund_trx_ids")
 
   isActive     Boolean @default(false) @map("is_active")
   isRejected   Boolean @default(false) @map("is_rejected")
   rejectReason String? @map("reject_reason")
 
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  sourceProduct Product?  @relation(fields: [sourceProductId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id])
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("blue_cache_credits")
+}
+
+model RedCacheCredits {
+  id              String   @id @default(cuid()) @map("id")
+  userId          String   @map("user_id")
+  amount          Int      @map("amount")
+  sourceProductId String   @map("source_product_id")
+  renterId        String   @map("renter_id")
+  validityStart   DateTime @map("validity_start")
+  validityEnd     DateTime @map("validity_end")
+
+  user          User      @relation(fields: [userId], references: [id])
+  sourceProduct Product?  @relation(fields: [sourceProductId], references: [id])
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
   deletedAt     DateTime? @map("deleted_at")
 
-  @@map("cache_credits")
+  @@map("red_cache_credits")
+}
+
+model GrayCacheCredits {
+  id              String  @id @default(cuid()) @map("id")
+  userId          String  @map("user_id")
+  amount          Int     @map("amount")
+  sourceProductId String? @map("source_product_id")
+  fee             Int     @map("fee")
+
+  validityStart DateTime @map("validity_start")
+  validityEnd   DateTime @map("validity_end")
+
+  user          User     @relation(fields: [userId], references: [id])
+  sourceProduct Product? @relation(fields: [sourceProductId], references: [id])
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("gray_cache_credits")
 }
 
 enum PaymentGateway {
@@ -138,9 +170,11 @@ model Product {
   holdCreditValidity Int?    @map("hold_credit_validity")
   owner              User    @relation("ProductsRentedOut", fields: [ownerId], references: [id], onDelete: Cascade)
 
-  borrowers     User[]          @relation("ProductsBorrowed")
-  cacheCredits  CacheCredit[]
-  RentalRequest RentalRequest[]
+  borrowers User[] @relation("ProductsBorrowed")
+
+  redCacheCredits  RedCacheCredits[]
+  grayCacheCredits GrayCacheCredits[]
+  RentalRequest    RentalRequest[]
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
@@ -176,6 +210,7 @@ model RentalRequest {
   requesterId        String        @map("requester_id")
   ownerId            String        @map("owner_id")
   status             RequestStatus @default(PENDING) @map("status")
+  pickupTime         DateTime      @map("pickup_time")
   submissionDeadline DateTime?     @map("submission_deadline")
 
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)

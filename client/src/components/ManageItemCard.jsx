@@ -70,7 +70,7 @@ const ManageItemCard = ({ product, products, setProducts }) => {
     }[productCondition] || productCondition;
 
   return (
-    <Link to={`/product-details/${id}`} className="w-full max-w-sm mx-auto group hover:scale-105 transition duration-300">
+    <div className="w-full max-w-sm mx-auto group hover:scale-105 transition duration-300">
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="relative h-40 overflow-hidden">
           <img
@@ -105,8 +105,8 @@ const ManageItemCard = ({ product, products, setProducts }) => {
               <div className="flex flex-wrap gap-1">
                 {tags
                   .split(",")
-                  .map(tag => tag.trim())
-                  .filter(tag => tag.length > 0)
+                  .map((tag) => tag.trim())
+                  .filter((tag) => tag.length > 0)
                   .slice(0, 3)
                   .map((tag, index) => (
                     <span
@@ -137,8 +137,15 @@ const ManageItemCard = ({ product, products, setProducts }) => {
             <span className="text-red-500">Delete</span>
           </button>
         </div>
+        <Link to={`/product-details/${id}`} className="flex justify-center">
+          <button
+            className="mb-4 w-fit text-sm text-green-600 underline cursor-pointer"
+          >
+            View Details
+          </button>
+        </Link>
       </div>
-    </Link>
+    </div>
   );
 };
 

@@ -1,6 +1,5 @@
-import {  TagIcon } from "lucide-react";
+import { TagIcon } from "lucide-react";
 import { Link } from "react-router-dom";
-
 
 const ProductCard = ({ product }) => {
   const {
@@ -17,11 +16,11 @@ const ProductCard = ({ product }) => {
 
   const conditionColor =
     {
-      NEW: "bg-gray-100 text-gray-800",
-      LIKE_NEW: "bg-gray-100 text-gray-800",
-      GOOD: "bg-gray-100 text-gray-800",
-      FAIR: "bg-gray-200 text-gray-800",
-      POOR: "bg-gray-200 text-gray-800",
+      NEW: "bg-green-200 text-green-800",
+      LIKE_NEW: "bg-emerald-100 text-emerald-800",
+      GOOD: "bg-yellow-100 text-yellow-800",
+      FAIR: "bg-orange-100 text-orange-800",
+      POOR: "bg-red-100 text-red-800",
     }[productCondition] || "bg-gray-100 text-gray-800";
 
   const conditionLabel =
@@ -34,7 +33,10 @@ const ProductCard = ({ product }) => {
     }[productCondition] || productCondition;
 
   return (
-    <Link to={`/product-details/${id}`} className="w-full max-w-72 mx-auto group hover:scale-105 transition duration-300">
+    <Link
+      to={`/product-details/${id}`}
+      className="w-full max-w-72 mx-auto group hover:scale-105 transition duration-300"
+    >
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="relative h-40 overflow-hidden">
           <img
@@ -43,13 +45,6 @@ const ProductCard = ({ product }) => {
             className="w-full h-full object-cover group-hover:scale-110 transition duration-400 group-hover:translate-x-2"
           />
           <div className="absolute top-2 left-2">
-            <div
-              className={`px-2 py-1 rounded text-xs font-medium ${conditionColor}`}
-            >
-              {conditionLabel}
-            </div>
-          </div>
-          <div className="absolute top-2 right-2">
             <div
               className={`px-2 py-1 rounded text-xs font-medium ${conditionColor}`}
             >
@@ -76,8 +71,8 @@ const ProductCard = ({ product }) => {
               <div className="flex flex-wrap gap-1">
                 {tags
                   .split(",")
-                  .map(tag => tag.trim())
-                  .filter(tag => tag.length > 0)
+                  .map((tag) => tag.trim())
+                  .filter((tag) => tag.length > 0)
                   .slice(0, 3)
                   .map((tag, index) => (
                     <span
@@ -93,9 +88,8 @@ const ProductCard = ({ product }) => {
         </div>
 
         <div className="px-4 pb-4 flex space-x-2">
-          <button
-            className="flex-1 cursor-pointer bg-green-600 hover:bg-green-700 text-white py-1.5 text-xs rounded font-medium border border-gray-300 flex items-center justify-center space-x-1"
-          >View Details
+          <button className="flex-1 cursor-pointer bg-green-600 hover:bg-green-700 text-white py-1.5 text-xs rounded font-medium border border-gray-300 flex items-center justify-center space-x-1">
+            View Details
           </button>
         </div>
       </div>
