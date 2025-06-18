@@ -34,7 +34,7 @@ const ProductCard = ({ product }) => {
     }[productCondition] || productCondition;
 
   return (
-    <Link to={`/product-details/${id}`} className="w-full max-w-sm mx-auto group hover:scale-105 transition duration-300">
+    <Link to={`/product-details/${id}`} className="w-full max-w-72 mx-auto group hover:scale-105 transition duration-300">
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="relative h-40 overflow-hidden">
           <img
@@ -43,6 +43,13 @@ const ProductCard = ({ product }) => {
             className="w-full h-full object-cover group-hover:scale-110 transition duration-400 group-hover:translate-x-2"
           />
           <div className="absolute top-2 left-2">
+            <div
+              className={`px-2 py-1 rounded text-xs font-medium ${conditionColor}`}
+            >
+              {conditionLabel}
+            </div>
+          </div>
+          <div className="absolute top-2 right-2">
             <div
               className={`px-2 py-1 rounded text-xs font-medium ${conditionColor}`}
             >

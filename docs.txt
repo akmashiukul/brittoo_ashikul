@@ -24,6 +24,7 @@ TODO:
   1. after verification wait to show successfull. it would take 2-3 business days.. then  redirect after 3-4 s.
   2. in navbar on click on dashboard make it dynamic. for admin admin dash for user user dash.
   3. add is for sale option while adding product
+  4. Set diff price for ACADEMIC_BOOK category.
 
 
 PROBLEMS:
