@@ -5,6 +5,7 @@ import nagad from "../../assets/logos/nagad.svg";
 import rocket from "../../assets/logos/rocket.png";
 import api from "../../lib/api";
 import Swal from "sweetalert2";
+import { X } from "lucide-react";
 
 const BuyBccModal = () => {
   const { closeBuyBccModal } = useBuyBccModalStore();
@@ -79,21 +80,7 @@ const BuyBccModal = () => {
               data-modal-hide="authentication-modal"
               onClick={closeBuyBccModal}
             >
-              <svg
-                className="w-3 h-3"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 14 14"
-              >
-                <path
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-                />
-              </svg>
+              <X />
               <span className="sr-only">Close modal</span>
             </button>
           </div>

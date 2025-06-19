@@ -213,7 +213,7 @@ const BuyCredits = () => {
         </div>
         <div className="w-full md:w-1/2 bg-gray-100 p-2 sm:p-4 rounded-lg pb-8 md:pb-6 border border-gray-300 shadow-md mt-8">
           <h2 className="text-base md:text-lg font-bold text-gray-800">
-            GCC - GRAY CACHE CREDIT
+            Gray-CC - GRAY CACHE CREDIT
           </h2>
           <p className="text-gray-700 text-xs md:text-sm mt-1">
             Gray Cache Credit (GCC) is a flexible credit loan option designed
@@ -264,7 +264,7 @@ const BuyCredits = () => {
           <div className="mt-8 bg-white p-4 rounded-lg">
             <div className="flex items-center gap-2 mt-2  mb-1">
               <div className="h-4 w-4 rounded-full bg-gray-600 mt-[3px]"></div>
-              <h4 className="text-gray-600 font-semibold">Features of GCC:</h4>
+              <h4 className="text-gray-600 font-semibold">Features of Gray-CC:</h4>
             </div>
             <ul className="text-sm text-gray-700 space-y-1 text-left">
               <li>• Instant rental access without upfront credits</li>
@@ -275,7 +275,7 @@ const BuyCredits = () => {
             </ul>
           </div>
           <button onClick={handleBuyGcc} className="w-full text-white bg-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-xs md:text-sm px-5 py-2.5 text-center cursor-pointer mt-4 shadow-md">
-            Get RCC Now
+            Get Gray-CC Now
           </button>
         </div>
       </div>

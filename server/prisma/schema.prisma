@@ -140,25 +140,34 @@ model GccRequest {
   id            String        @id @default(cuid()) @map("id")
   userId        String        @map("user_id")
   gccId         String        @map("gcc_id")
-  pickupPointId String?       @unique @map("pickup_point_id")
   phoneNumber   String        @map("phone_number")
-  productName   String        @map("product_name")
+  productName   String?       @map("product_name")
   status        GccStatus     @default(PENDING) @map("status")
   depositMethod DepositMethod @map("deposit_method")
 
-  location    String?      @map("location")
-  city        String?      @map("city")
-  pickupPoint PickupPoint? @relation(fields: [pickupPointId], references: [id])
+  address                  String?  @map("address")
+  city                     String?  @map("city")
+  estimatedDepositDateTime DateTime @map("estimated_deposit_datetime")
 
-  user User             @relation(fields: [userId], references: [id])
-  gcc  GrayCacheCredit?
+  user          User             @relation(fields: [userId], references: [id])
+  gcc           GrayCacheCredit?
+  PickupPoint   PickupPoint?     @relation(fields: [pickupPointId], references: [id])
+  pickupPointId String?
 
   @@map("gcc_requests")
 }
 
 enum DepositMethod {
-  DROP_ON_PUP
+  DROP_AT_PUP
   DEPOSIT_FROM_HOME
+}
+
+enum DroppingPoint {
+  CSE_1
+  ADMIN_1
+  BANGABANDHU_HALL_1
+  ZIA_HALL_1
+  LIBRARY_1
 }
 
 enum GccStatus {
