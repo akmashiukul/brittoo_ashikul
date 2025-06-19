@@ -12,7 +12,7 @@ import {
 import api from "../../../lib/api";
 import Swal from "sweetalert2";
 
-const CreditRequests = () => {
+const BlueCCRequests = () => {
   const [creditRequests, setCreditRequests] = useState([]);
   const [searchTxnId, setSearchTxnId] = useState("");
   const [filteredRequests, setFilteredRequests] = useState([]);
@@ -200,19 +200,6 @@ const CreditRequests = () => {
     }
   };
 
-  const getCreditTypeColor = (type) => {
-    switch (type) {
-      case "BLUE_CC":
-        return "bg-blue-100 text-blue-800";
-      case "RED_CC":
-        return "bg-red-100 text-red-800";
-      case "GRAY_CC":
-        return "bg-gray-100 text-gray-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
   const getPaymentGatewayColor = (gateway) => {
     switch (gateway) {
       case "BKASH":
@@ -299,7 +286,7 @@ const CreditRequests = () => {
                       Transaction ID
                     </th>
                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Validity
+                      Requested At
                     </th>
                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Actions
@@ -337,18 +324,6 @@ const CreditRequests = () => {
                               BDT {request.amount.toLocaleString()}
                             </span>
                           </div>
-                          <div className="flex space-x-2">
-                            <span
-                              className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getCreditTypeColor(
-                                request.creditType,
-                              )}`}
-                            >
-                              {request.creditType}
-                            </span>
-                            <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">
-                              {request.sourceType}
-                            </span>
-                          </div>
                         </div>
                       </td>
                       <td className="px-6 py-4">
@@ -360,11 +335,6 @@ const CreditRequests = () => {
                           >
                             {request.paymentGateway}
                           </span>
-                          {request.instantFee && (
-                            <div className="text-xs text-gray-500">
-                              Fee: ৳{request.instantFee}
-                            </div>
-                          )}
                         </div>
                       </td>
                       <td className="px-6 py-4">
@@ -378,14 +348,9 @@ const CreditRequests = () => {
                       <td className="px-6 py-4">
                         <div className="space-y-1">
                           <div className="flex items-center space-x-1 text-xs text-gray-500">
-                            <Calendar className="w-3 h-3" />
                             <span>
-                              Start: {formatDate(request.validityStart)}
+                              {formatDate(request.createdAt)}
                             </span>
-                          </div>
-                          <div className="flex items-center space-x-1 text-xs text-gray-500">
-                            <Calendar className="w-3 h-3" />
-                            <span>End: {formatDate(request.validityEnd)}</span>
                           </div>
                         </div>
                       </td>
@@ -421,4 +386,4 @@ const CreditRequests = () => {
   );
 };
 
-export default CreditRequests;
+export default BlueCCRequests;

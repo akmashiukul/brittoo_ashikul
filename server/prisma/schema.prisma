@@ -13,7 +13,7 @@ model User {
   email       String  @unique @map("email")
   roll        String  @unique @map("roll")
   password    String  @map("password")
-  phoneNumber String  @map("phone_number")
+  phoneNumber String  @default("absent") @map("phone_number")
   selfie      String  @default("absent") @map("selfie")
   idCardFront String  @default("absent") @map("id_card_front")
   idCardBack  String  @default("absent") @map("id_card_back")
@@ -36,8 +36,10 @@ model User {
   suspensionCount Int           @default(0) @map("suspension_count")
 
   blueCacheCredits BlueCacheCredit[]
-  redCacheCredits  RedCacheCredits[]
-  grayCacheCredits GrayCacheCredits[]
+  redCacheCredits  RedCacheCredit[]
+  grayCacheCredits GrayCacheCredit[]
+
+  gccRequests GccRequest[]
 
   rentedProducts   Product[] @relation("ProductsRentedOut")
   borrowedProducts Product[] @relation("ProductsBorrowed")
@@ -94,7 +96,7 @@ model BlueCacheCredit {
   @@map("blue_cache_credits")
 }
 
-model RedCacheCredits {
+model RedCacheCredit {
   id              String   @id @default(cuid()) @map("id")
   userId          String   @map("user_id")
   amount          Int      @map("amount")
@@ -112,18 +114,20 @@ model RedCacheCredits {
   @@map("red_cache_credits")
 }
 
-model GrayCacheCredits {
+model GrayCacheCredit {
   id              String  @id @default(cuid()) @map("id")
   userId          String  @map("user_id")
   amount          Int     @map("amount")
   sourceProductId String? @map("source_product_id")
+  gccRequestId    String? @unique @map("gcc_request_id")
   fee             Int     @map("fee")
 
   validityStart DateTime @map("validity_start")
   validityEnd   DateTime @map("validity_end")
 
-  user          User     @relation(fields: [userId], references: [id])
-  sourceProduct Product? @relation(fields: [sourceProductId], references: [id])
+  user          User        @relation(fields: [userId], references: [id])
+  sourceProduct Product?    @relation(fields: [sourceProductId], references: [id])
+  gccRequest    GccRequest? @relation(fields: [gccRequestId], references: [id])
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
@@ -132,22 +136,41 @@ model GrayCacheCredits {
   @@map("gray_cache_credits")
 }
 
+model GccRequest {
+  id            String        @id @default(cuid()) @map("id")
+  userId        String        @map("user_id")
+  gccId         String        @map("gcc_id")
+  pickupPointId String?       @unique @map("pickup_point_id")
+  phoneNumber   String        @map("phone_number")
+  productName   String        @map("product_name")
+  status        GccStatus     @default(PENDING) @map("status")
+  depositMethod DepositMethod @map("deposit_method")
+
+  location    String?      @map("location")
+  city        String?      @map("city")
+  pickupPoint PickupPoint? @relation(fields: [pickupPointId], references: [id])
+
+  user User             @relation(fields: [userId], references: [id])
+  gcc  GrayCacheCredit?
+
+  @@map("gcc_requests")
+}
+
+enum DepositMethod {
+  DROP_ON_PUP
+  DEPOSIT_FROM_HOME
+}
+
+enum GccStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 enum PaymentGateway {
   BKASH
   NAGAD
   ROCKET
-}
-
-enum CreditType {
-  BLUE_CC
-  RED_CC
-  GRAY_CC
-}
-
-enum CreditSource {
-  PRODUCT
-  MONEY
-  INSTANT
 }
 
 model Product {
@@ -172,8 +195,8 @@ model Product {
 
   borrowers User[] @relation("ProductsBorrowed")
 
-  redCacheCredits  RedCacheCredits[]
-  grayCacheCredits GrayCacheCredits[]
+  redCacheCredits  RedCacheCredit[]
+  grayCacheCredits GrayCacheCredit[]
   RentalRequest    RentalRequest[]
 
   createdAt DateTime  @default(now()) @map("created_at")
@@ -239,15 +262,18 @@ enum RequestStatus {
 }
 
 model PickupPoint {
-  id        String   @id @default(cuid()) @map("id")
-  name      String   @map("name")
-  address   String   @map("address")
-  latitude  Float?   @map("latitude")
-  longitude Float?   @map("longitude")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id        String @id @default(cuid()) @map("id")
+  name      String @map("name")
+  address   String @map("address")
+  latitude  Float? @map("latitude")
+  longitude Float? @map("longitude")
 
-  rentalRequests RentalRequest[] @relation
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  rentalRequests RentalRequest[]
+  gccRequests    GccRequest[]
 
   @@map("pickup_points")
 }

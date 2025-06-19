@@ -3,6 +3,8 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 import useUserStore from "../../stores/authStores/useUserStore";
 import brittoLogo from "../../assets/britto-logo.png";
 import { IoExit, IoHomeSharp } from "react-icons/io5";
+import { BiSolidCreditCardAlt } from "react-icons/bi";
+import { PiCreditCardDuotone } from "react-icons/pi";
 import { MdOutlineManageHistory, MdOutlineSpaceDashboard } from "react-icons/md";
 import useDashDrawertore from "../../stores/drawerStores/useDashDrawerStore";
 import { Menu, Users, X } from "lucide-react";
@@ -78,9 +80,9 @@ const AdminDashboardLayout = () => {
             </li>
             <li>
               <Link
-                to="/dashboard/admin/credit-requests"
+                to="/dashboard/admin/blue-cc-requests"
                 className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${
-                  path.includes("/credit-requests")
+                  path.includes("/blue-cc-requests")
                     ? "bg-green-600 text-white"
                     : "text-gray-700"
                 } flex items-center gap-2`}
@@ -90,7 +92,24 @@ const AdminDashboardLayout = () => {
                   }
                 }}
               >
-                <MdOutlineManageHistory /> Credit Requests
+                <BiSolidCreditCardAlt /> Blue CC Requests
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/dashboard/admin/gray-cc-requests"
+                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${
+                  path.includes("/gray-cc-requests")
+                    ? "bg-green-600 text-white"
+                    : "text-gray-700"
+                } flex items-center gap-2`}
+                onClick={() => {
+                  if (window.innerWidth <= 425) {
+                    closeDrawer();
+                  }
+                }}
+              >
+                <PiCreditCardDuotone /> Gray CC Requests
               </Link>
             </li>
             <li>

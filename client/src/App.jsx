@@ -26,10 +26,10 @@ import useBuyGccModalStore from "./stores/creditModalStores/useBuyGccModalStore"
 import useUserStore from "./stores/authStores/useUserStore";
 import BuyCredits from "./pages/BuyCredits";
 import AdminDashboardLayout from "./pages/admin/AdminDashboardLayout";
-import CreditRequests from "./pages/admin/admin-dash-pages/CreditRequests";
 import AdminOverview from "./pages/admin/admin-dash-pages/AdminOverview";
 import ManageUsers from "./pages/admin/admin-dash-pages/ManageUsers";
 import AllProducts from "./pages/AllProducts";
+import BlueCCRequests from "./pages/admin/admin-dash-pages/BlueCCRequests";
 
 const AppContent = () => {
   const location = useLocation();
@@ -82,7 +82,7 @@ const AppContent = () => {
               path="/dashboard/admin"
               element={<AdminDashboardLayout />}
             >
-              <Route path="credit-requests" element={<CreditRequests />} />
+              <Route path="blue-cc-requests" element={<BlueCCRequests />} />
               <Route path="admin-overview" element={<AdminOverview />} />
               <Route path="manage-users" element={<ManageUsers />} />
             </Route>

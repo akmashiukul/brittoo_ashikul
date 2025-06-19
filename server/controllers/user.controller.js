@@ -3,13 +3,13 @@ import { CustomError } from "../lib/customError.js";
 
 export const getAllUsers = async (req, res, next) => {
   try {
-    const { 
-      page = 1, 
-      limit = 10, 
-      search = '', 
-      status = 'ALL',
-      sortBy = 'createdAt',
-      sortOrder = 'desc'
+    const {
+      page = 1,
+      limit = 10,
+      search = "",
+      status = "ALL",
+      sortBy = "createdAt",
+      sortOrder = "desc",
     } = req.query;
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
@@ -17,19 +17,26 @@ export const getAllUsers = async (req, res, next) => {
     const whereClause = {
       AND: [
         { deletedAt: null },
-        search ? {
-          OR: [
-            { name: { contains: search, mode: 'insensitive' } },
-            { email: { contains: search, mode: 'insensitive' } },
-            { roll: { contains: search, mode: 'insensitive' } }
-          ]
-        } : {},
-        
-        status === 'VERIFIED' ? { isVerified: 'VERIFIED' } :
-        status === 'PENDING' ? { isVerified: 'PENDING' } :
-        status === 'UNVERIFIED' ? { isVerified: 'UNVERIFIED' } :
-        status === 'SUSPENDED' ? { isSuspended: true } : {}
-      ]
+        search
+          ? {
+              OR: [
+                { name: { contains: search, mode: "insensitive" } },
+                { email: { contains: search, mode: "insensitive" } },
+                { roll: { contains: search, mode: "insensitive" } },
+              ],
+            }
+          : {},
+
+        status === "VERIFIED"
+          ? { isVerified: "VERIFIED" }
+          : status === "PENDING"
+            ? { isVerified: "PENDING" }
+            : status === "UNVERIFIED"
+              ? { isVerified: "UNVERIFIED" }
+              : status === "SUSPENDED"
+                ? { isSuspended: true }
+                : {},
+      ],
     };
 
     const [users, totalUsers] = await Promise.all([
@@ -59,32 +66,44 @@ export const getAllUsers = async (req, res, next) => {
             select: {
               rentedProducts: true,
               borrowedProducts: true,
-              cacheCredits: true,
+              blueCacheCredits: true,
+              redCacheCredits: true,
+              grayCacheCredits: true,
               rentalRequestsMade: true,
-              rentalRequestsReceived: true
-            }
-          }
+              rentalRequestsReceived: true,
+            },
+          },
         },
         skip,
         take: parseInt(limit),
-        orderBy: { [sortBy]: sortOrder }
+        orderBy: { [sortBy]: sortOrder },
       }),
-      prisma.user.count({ where: whereClause })
+      prisma.user.count({ where: whereClause }),
     ]);
 
     const stats = await prisma.user.groupBy({
-      by: ['isVerified', 'brittooVerified', 'isSuspended'],
+      by: ["isVerified", "brittooVerified", "isSuspended"],
       _count: true,
-      where: { deletedAt: null }
+      where: { deletedAt: null },
     });
 
     const summary = {
       totalUsers,
-      verified: stats.filter(s => s.isVerified === 'VERIFIED').reduce((acc, s) => acc + s._count, 0),
-      pending: stats.filter(s => s.isVerified === 'PENDING').reduce((acc, s) => acc + s._count, 0),
-      unverified: stats.filter(s => s.isVerified === 'UNVERIFIED').reduce((acc, s) => acc + s._count, 0),
-      brittooVerified: stats.filter(s => s.brittooVerified === true).reduce((acc, s) => acc + s._count, 0),
-      suspended: stats.filter(s => s.isSuspended === true).reduce((acc, s) => acc + s._count, 0)
+      verified: stats
+        .filter((s) => s.isVerified === "VERIFIED")
+        .reduce((acc, s) => acc + s._count, 0),
+      pending: stats
+        .filter((s) => s.isVerified === "PENDING")
+        .reduce((acc, s) => acc + s._count, 0),
+      unverified: stats
+        .filter((s) => s.isVerified === "UNVERIFIED")
+        .reduce((acc, s) => acc + s._count, 0),
+      brittooVerified: stats
+        .filter((s) => s.brittooVerified === true)
+        .reduce((acc, s) => acc + s._count, 0),
+      suspended: stats
+        .filter((s) => s.isSuspended === true)
+        .reduce((acc, s) => acc + s._count, 0),
     };
 
     res.json({
@@ -95,55 +114,30 @@ export const getAllUsers = async (req, res, next) => {
           currentPage: parseInt(page),
           totalPages: Math.ceil(totalUsers / parseInt(limit)),
           totalUsers,
-          limit: parseInt(limit)
+          limit: parseInt(limit),
         },
-        summary
-      }
+        summary,
+      },
     });
   } catch (error) {
-    console.error('Get all users error:', error);
+    console.error("Get all users error:", error);
     next(error);
   }
 };
-
-
 
 export const getUserDetails = async (req, res) => {
   try {
     const { userId } = req.params;
 
     const user = await prisma.user.findUnique({
-      where: { 
+      where: {
         id: userId,
-        deletedAt: null 
+        deletedAt: null,
       },
       include: {
-        cacheCredits: {
-          select: {
-            id: true,
-            amount: true,
-            creditType: true,
-            sourceType: true,
-            sourceProductId: true,
-            paymentGateway: true,
-            transactionId: true,
-            instantFee: true,
-            validityStart: true,
-            validityEnd: true,
-            isActive: true,
-            isRejected: true,
-            rejectReason: true,
-            createdAt: true,
-            sourceProduct: {
-              select: {
-                id: true,
-                name: true,
-                productType: true
-              }
-            }
-          },
-          orderBy: { createdAt: 'desc' }
-        },
+        blueCacheCredits: true,
+        redCacheCredits: true,
+        grayCacheCredits: true,
         rentedProducts: {
           where: { deletedAt: null },
           select: {
@@ -158,10 +152,10 @@ export const getUserDetails = async (req, res) => {
               select: {
                 id: true,
                 name: true,
-                email: true
-              }
-            }
-          }
+                email: true,
+              },
+            },
+          },
         },
         borrowedProducts: {
           where: { deletedAt: null },
@@ -176,10 +170,10 @@ export const getUserDetails = async (req, res) => {
               select: {
                 id: true,
                 name: true,
-                email: true
-              }
-            }
-          }
+                email: true,
+              },
+            },
+          },
         },
         rentalRequestsMade: {
           select: {
@@ -191,19 +185,19 @@ export const getUserDetails = async (req, res) => {
               select: {
                 id: true,
                 name: true,
-                productType: true
-              }
+                productType: true,
+              },
             },
             owner: {
               select: {
                 id: true,
                 name: true,
-                email: true
-              }
-            }
+                email: true,
+              },
+            },
           },
-          orderBy: { createdAt: 'desc' },
-          take: 10
+          orderBy: { createdAt: "desc" },
+          take: 10,
         },
         rentalRequestsReceived: {
           select: {
@@ -215,43 +209,47 @@ export const getUserDetails = async (req, res) => {
               select: {
                 id: true,
                 name: true,
-                productType: true
-              }
+                productType: true,
+              },
             },
             requester: {
               select: {
                 id: true,
                 name: true,
-                email: true
-              }
-            }
+                email: true,
+              },
+            },
           },
-          orderBy: { createdAt: 'desc' },
-          take: 10
-        }
-      }
+          orderBy: { createdAt: "desc" },
+          take: 10,
+        },
+      },
     });
 
     if (!user) {
-      throw new CustomError('User not found', 404);
+      throw new CustomError("User not found", 404);
     }
 
     const creditSummary = {
-      totalBlueCredits: user.cacheCredits
-        .filter(c => c.creditType === 'BLUE_CC' && c.isActive)
+      totalBlueCredits: user.blueCacheCredits.reduce(
+        (sum, c) => sum + c.amount,
+        0,
+      ),
+      totalRedCredits: user.redCacheCredits.reduce(
+        (sum, c) => sum + c.amount,
+        0,
+      ),
+      totalGrayCredits: user.grayCacheCredits.reduce(
+        (sum, c) => sum + c.amount,
+        0,
+      ),
+      pendingBCC: user.blueCacheCredits
+        .filter((c) => !c.isActive && !c.isRejected)
         .reduce((sum, c) => sum + c.amount, 0),
-      totalRedCredits: user.cacheCredits
-        .filter(c => c.creditType === 'RED_CC' && c.isActive)
+      rejectedBCC: user.blueCacheCredits
+        .filter((c) => c.isRejected)
         .reduce((sum, c) => sum + c.amount, 0),
-      totalGrayCredits: user.cacheCredits
-        .filter(c => c.creditType === 'GRAY_CC' && c.isActive)
-        .reduce((sum, c) => sum + c.amount, 0),
-      pendingCredits: user.cacheCredits
-        .filter(c => !c.isActive && !c.isRejected)
-        .reduce((sum, c) => sum + c.amount, 0),
-      rejectedCredits: user.cacheCredits
-        .filter(c => c.isRejected)
-        .reduce((sum, c) => sum + c.amount, 0)
+      pendingGCC: user.grayCacheCredits.filter,
     };
 
     res.json({
@@ -263,16 +261,16 @@ export const getUserDetails = async (req, res) => {
           totalProductsRented: user.rentedProducts.length,
           totalProductsBorrowed: user.borrowedProducts.length,
           totalRequestsMade: user.rentalRequestsMade.length,
-          totalRequestsReceived: user.rentalRequestsReceived.length
-        }
-      }
+          totalRequestsReceived: user.rentalRequestsReceived.length,
+        },
+      },
     });
   } catch (error) {
-    console.error('Get user details error:', error);
+    console.error("Get user details error:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch user details',
-      error: error.message
+      message: "Failed to fetch user details",
+      error: error.message,
     });
   }
 };

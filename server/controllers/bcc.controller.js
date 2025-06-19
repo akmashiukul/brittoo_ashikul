@@ -19,24 +19,19 @@ export const buyBcc = async (req, res, next) => {
       throw new CustomError("User Not Authenticated!", 403);
     }
 
-    const cacheCredit = await prisma.cacheCredit.create({
+    const blueCacheCredit = await prisma.blueCacheCredit.create({
       data: {
         userId: user.id,
         amount: parseInt(amount),
-        creditType: "BLUE_CC",
-        sourceType: "MONEY",
         paymentGateway,
         transactionId,
-        validityStart: new Date(),
-        validityEnd: new Date("2100-01-01"),
-        isActive: false,
       },
     });
 
     res.status(201).json({
       success: true,
       message: "Blue Credit purchase request submitted. Awaiting verification.",
-      data: cacheCredit,
+      data: blueCacheCredit,
     });
   } catch (error) {
     console.error("Error in purchaseBcc Controller: ", error);
@@ -46,7 +41,7 @@ export const buyBcc = async (req, res, next) => {
 
 export const getPendingBCCRequests = async (req, res, next) => {
   try {
-    const pendingCredits = await prisma.cacheCredit.findMany({
+    const pendingBCC = await prisma.blueCacheCredit.findMany({
       where: {
         isActive: false,
         deletedAt: null,
@@ -60,12 +55,6 @@ export const getPendingBCCRequests = async (req, res, next) => {
             email: true,
           },
         },
-        sourceProduct: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
       },
       orderBy: {
         createdAt: "desc",
@@ -75,8 +64,8 @@ export const getPendingBCCRequests = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "Successfully Fetched Pending Credits",
-      data: pendingCredits,
-      count: pendingCredits.length,
+      data: pendingBCC,
+      count: pendingBCC.length,
     });
   } catch (error) {
     console.error("Error fetching pending credit requests:", error);
@@ -94,7 +83,7 @@ export const acceptBCCRequest = async (req, res) => {
         message: "Credit ID is required",
       });
     }
-    const existingCredit = await prisma.cacheCredit.findUnique({
+    const existingCredit = await prisma.blueCacheCredit.findUnique({
       where: { id: creditId },
       include: {
         user: {
@@ -128,7 +117,7 @@ export const acceptBCCRequest = async (req, res) => {
       });
     }
 
-    const updatedCredit = await prisma.cacheCredit.update({
+    const updatedCredit = await prisma.blueCacheCredit.update({
       where: { id: creditId, isRejected: false },
       data: {
         isActive: true,
@@ -170,7 +159,7 @@ export const rejectBCCRequest = async (req, res, next) => {
     if (!creditId) {
       throw new CustomError("CreditId required!", 400);
     }
-    const existingCredit = await prisma.cacheCredit.findUnique({
+    const existingCredit = await prisma.blueCacheCredit.findUnique({
       where: { id: creditId },
     });
     if (!existingCredit) {
@@ -188,7 +177,7 @@ export const rejectBCCRequest = async (req, res, next) => {
 
     const updatedRefundTrxArr = [...existingCredit.refundTrxIds, refundTrxId];
 
-    const rejectedCredit = await prisma.cacheCredit.update({
+    const rejectedCredit = await prisma.blueCacheCredit.update({
       where: { id: creditId },
       data: {
         isRejected: true,
@@ -197,6 +186,7 @@ export const rejectBCCRequest = async (req, res, next) => {
       },
     });
 
+    // TODO:
     // Send notification to user about rejection
 
     res.status(200).json({
