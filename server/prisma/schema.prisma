@@ -13,10 +13,10 @@ model User {
   email       String  @unique @map("email")
   roll        String  @unique @map("roll")
   password    String  @map("password")
-  phoneNumber String  @default("absent") @map("phone_number")
-  selfie      String  @default("absent") @map("selfie")
-  idCardFront String  @default("absent") @map("id_card_front")
-  idCardBack  String  @default("absent") @map("id_card_back")
+  phoneNumber String? @map("phone_number")
+  selfie      String? @map("selfie")
+  idCardFront String? @map("id_card_front")
+  idCardBack  String? @map("id_card_back")
   ipAddress   String? @map("ip_address")
   latitude    Float?  @map("latitude")
   longitude   Float?  @map("longitude")
@@ -37,9 +37,8 @@ model User {
 
   blueCacheCredits BlueCacheCredit[]
   redCacheCredits  RedCacheCredit[]
-  grayCacheCredits GrayCacheCredit[]
 
-  gccRequests GccRequest[]
+  rccRequests RccRequest[]
 
   rentedProducts   Product[] @relation("ProductsRentedOut")
   borrowedProducts Product[] @relation("ProductsBorrowed")
@@ -97,27 +96,10 @@ model BlueCacheCredit {
 }
 
 model RedCacheCredit {
-  id              String   @id @default(cuid()) @map("id")
-  userId          String   @map("user_id")
-  amount          Int      @map("amount")
-  sourceProductId String   @map("source_product_id")
-  renterId        String   @map("renter_id")
-  validityStart   DateTime @map("validity_start")
-  validityEnd     DateTime @map("validity_end")
-
-  user          User      @relation(fields: [userId], references: [id])
-  sourceProduct Product?  @relation(fields: [sourceProductId], references: [id])
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime  @updatedAt @map("updated_at")
-  deletedAt     DateTime? @map("deleted_at")
-
-  @@map("red_cache_credits")
-}
-
-model GrayCacheCredit {
   id            String   @id @default(cuid()) @map("id")
   amount        Int      @map("amount")
-  fee           Int      @map("fee")
+  fee           Int?     @map("fee")
+  renterId      String?  @map("renter_id")
   validityStart DateTime @map("validity_start")
   validityEnd   DateTime @map("validity_end")
 
@@ -125,47 +107,49 @@ model GrayCacheCredit {
   user            User        @relation(fields: [userId], references: [id])
   sourceProductId String?     @map("source_product_id")
   sourceProduct   Product?    @relation(fields: [sourceProductId], references: [id])
-  gccRequestId    String?     @unique @map("gcc_request_id")
-  gccRequest      GccRequest? @relation(fields: [gccRequestId], references: [id])
+  rccRequestId    String?     @unique @map("rcc_request_id")
+  rccRequest      RccRequest? @relation(fields: [rccRequestId], references: [id])
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  @@map("gray_cache_credits")
+  @@map("red_cache_credits")
 }
 
-model GccRequest {
-  id            String        @id @default(cuid()) @map("id")
-  userId        String        @map("user_id")
-  gccId         String?       @map("gcc_id")
+model RccRequest {
+  id String @id @default(cuid()) @map("id")
+
   phoneNumber   String        @map("phone_number")
   productName   String?       @map("product_name")
-  status        GccStatus     @default(PENDING) @map("status")
+  status        RccStatus     @default(PENDING) @map("status")
   depositMethod DepositMethod @map("deposit_method")
   rejectReason  String?       @map("reject_reason")
 
-  address                  String?        @map("address")
-  city                     String?        @map("city")
-  estimatedDepositDateTime DateTime       @map("estimated_deposit_datetime")
-  droppingPoint            DroppingPoint? @map("dropping_point")
+  address                  String?          @map("address")
+  city                     String?          @map("city")
+  estimatedDepositDateTime DateTime         @map("estimated_deposit_datetime")
+  droppingPoint            CollectionPoint? @map("dropping_point")
 
-  user User             @relation(fields: [userId], references: [id])
-  gcc  GrayCacheCredit?
+  userId String          @map("user_id")
+  user   User            @relation(fields: [userId], references: [id])
+  rccId  String          @map("rcc_id")
+  rcc    RedCacheCredit?
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  @@map("gcc_requests")
+  @@index([userId])
+  @@map("rcc_requests")
 }
 
 enum DepositMethod {
-  DROP_AT_PUP
-  DEPOSIT_FROM_HOME
+  FROM_HOME
+  BRITTOO_TERMINAL
 }
 
-enum DroppingPoint {
+enum CollectionPoint {
   CSE_1
   ADMIN_1
   BANGABANDHU_HALL_1
@@ -173,7 +157,7 @@ enum DroppingPoint {
   LIBRARY_1
 }
 
-enum GccStatus {
+enum RccStatus {
   PENDING
   APPROVED
   REJECTED
@@ -187,6 +171,8 @@ enum PaymentGateway {
 
 model Product {
   id                 String           @id @default(cuid()) @map("id")
+  productSlNo        Int              @default(autoincrement()) @map("product_sl_no")
+  productSL          String           @map("product_sl")
   name               String           @map("name")
   pricePerDay        Float?           @map("price_per_day")
   productImages      String[]         @map("product_images")
@@ -207,9 +193,8 @@ model Product {
 
   borrowers User[] @relation("ProductsBorrowed")
 
-  redCacheCredits  RedCacheCredit[]
-  grayCacheCredits GrayCacheCredit[]
-  RentalRequest    RentalRequest[]
+  redCacheCredits RedCacheCredit[]
+  rentalRequests  RentalRequest[]
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
