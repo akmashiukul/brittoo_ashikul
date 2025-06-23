@@ -166,3 +166,30 @@ export const getPendingGccRequests = async (req, res, next) => {
     next(error);
   }
 };
+
+
+export const getUserGccBalance = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const credits = await prisma.grayCacheCredit.findMany({
+      where: {
+        userId,
+        validityEnd: { gte: new Date() },
+        deletedAt: null,
+      },
+    });
+    const totalBalance = credits.reduce((sum, credit) => sum + credit.amount, 0);
+
+    res.status(200).json({
+      success: true,
+      message: 'GCC Balance retrieved successfully',
+      data: {
+        credits,
+        balance: totalBalance
+      }
+    })
+  } catch (error) {
+    console.error("Error in getUserGccBalance controller:", error);
+    next(error);
+  }
+}
