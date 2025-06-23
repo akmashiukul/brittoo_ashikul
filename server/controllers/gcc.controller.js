@@ -101,3 +101,37 @@ export const acceptGccRequest = async (req, res, next) => {
     next(error);
   }
 };
+
+export const rejectGccRequest = async (req, res, next) => {
+  try {
+    const { requestId } = req.params;
+    const { rejectReason } = req.body;
+    const gccRequest = await prisma.gccRequest.findUnique({
+      where: {
+        id: requestId,
+        deletedAt: null,
+      },
+    });
+    if (!gccRequest) {
+      throw new CustomError("Gcc request not found", 404);
+    }
+
+    await prisma.gccRequest.update({
+      where: {
+        id: requestId,
+        deletedAt: null,
+      },
+      data: {
+        rejectReason,
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "GCC Request Rejected",
+    });
+  } catch (error) {
+    console.error("Error in rejecting Gcc Req:", error);
+    next(error);
+  }
+};
