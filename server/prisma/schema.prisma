@@ -115,19 +115,18 @@ model RedCacheCredit {
 }
 
 model GrayCacheCredit {
-  id              String  @id @default(cuid()) @map("id")
-  userId          String  @map("user_id")
-  amount          Int     @map("amount")
-  sourceProductId String? @map("source_product_id")
-  gccRequestId    String? @unique @map("gcc_request_id")
-  fee             Int     @map("fee")
-
+  id            String   @id @default(cuid()) @map("id")
+  amount        Int      @map("amount")
+  fee           Int      @map("fee")
   validityStart DateTime @map("validity_start")
   validityEnd   DateTime @map("validity_end")
 
-  user          User        @relation(fields: [userId], references: [id])
-  sourceProduct Product?    @relation(fields: [sourceProductId], references: [id])
-  gccRequest    GccRequest? @relation(fields: [gccRequestId], references: [id])
+  userId          String      @map("user_id")
+  user            User        @relation(fields: [userId], references: [id])
+  sourceProductId String?     @map("source_product_id")
+  sourceProduct   Product?    @relation(fields: [sourceProductId], references: [id])
+  gccRequestId    String?     @unique @map("gcc_request_id")
+  gccRequest      GccRequest? @relation(fields: [gccRequestId], references: [id])
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
@@ -144,11 +143,12 @@ model GccRequest {
   productName   String?       @map("product_name")
   status        GccStatus     @default(PENDING) @map("status")
   depositMethod DepositMethod @map("deposit_method")
+  rejectReason  String?       @map("reject_reason")
 
   address                  String?        @map("address")
   city                     String?        @map("city")
   estimatedDepositDateTime DateTime       @map("estimated_deposit_datetime")
-  pickUpPoint              DroppingPoint?
+  droppingPoint            DroppingPoint? @map("dropping_point")
 
   user User             @relation(fields: [userId], references: [id])
   gcc  GrayCacheCredit?
