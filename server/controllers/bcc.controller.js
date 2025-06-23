@@ -39,116 +39,40 @@ export const buyBcc = async (req, res, next) => {
   }
 };
 
-export const getPendingBCCRequests = async (req, res, next) => {
-  try {
-    const pendingBCC = await prisma.blueCacheCredit.findMany({
-      where: {
-        isActive: false,
-        deletedAt: null,
-        isRejected: false,
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-
-    res.status(200).json({
-      success: true,
-      message: "Successfully Fetched Pending Credits",
-      data: pendingBCC,
-      count: pendingBCC.length,
-    });
-  } catch (error) {
-    console.error("Error fetching pending credit requests:", error);
-    next(error);
-  }
-};
-
-export const acceptBCCRequest = async (req, res) => {
+export const acceptBCCRequest = async (req, res, next) => {
   try {
     const { creditId } = req.params;
-
     if (!creditId) {
-      return res.status(400).json({
-        success: false,
-        message: "Credit ID is required",
-      });
+      throw new CustomError("Credit ID is required", 400);
     }
     const existingCredit = await prisma.blueCacheCredit.findUnique({
-      where: { id: creditId },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
+      where: {
+        id: creditId,
+        deletedAt: null,
       },
     });
-
     if (!existingCredit) {
-      return res.status(404).json({
-        success: false,
-        message: "Credit request not found",
-      });
+      throw new CustomError("Credit request not found", 404);
     }
-
-    if (existingCredit.isActive) {
-      return res.status(400).json({
-        success: false,
-        message: "Credit request is already accepted",
-      });
-    }
-
     if (existingCredit.deletedAt) {
-      return res.status(400).json({
-        success: false,
-        message: "Credit request has been rejected",
-      });
+      throw new CustomError("Credit request has been rejected", 401);
     }
-
-    const updatedCredit = await prisma.blueCacheCredit.update({
+    await prisma.blueCacheCredit.update({
       where: { id: creditId, isRejected: false },
       data: {
         isActive: true,
         updatedAt: new Date(),
       },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-      },
     });
-
     // TODO: Send notification to user
     // await sendCreditApprovalNotification(existingCredit.user);
-
     res.status(200).json({
       success: true,
       message: "Credit request accepted successfully",
-      data: updatedCredit,
     });
   } catch (error) {
     console.error("Error accepting credit request:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to accept credit request",
-      error: error.message,
-    });
+    next(error);
   }
 };
 
@@ -177,18 +101,16 @@ export const rejectBCCRequest = async (req, res, next) => {
 
     const updatedRefundTrxArr = [...existingCredit.refundTrxIds, refundTrxId];
 
-    const rejectedCredit = await prisma.blueCacheCredit.update({
+    await prisma.blueCacheCredit.update({
       where: { id: creditId },
       data: {
         isRejected: true,
         rejectReason: rejectReason,
-        refundTrxIds: updatedRefundTrxArr
+        refundTrxIds: updatedRefundTrxArr,
       },
     });
-
     // TODO:
     // Send notification to user about rejection
-
     res.status(200).json({
       success: true,
       message: "Credit request rejected successfully",

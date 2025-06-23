@@ -139,20 +139,23 @@ model GrayCacheCredit {
 model GccRequest {
   id            String        @id @default(cuid()) @map("id")
   userId        String        @map("user_id")
-  gccId         String        @map("gcc_id")
+  gccId         String?       @map("gcc_id")
   phoneNumber   String        @map("phone_number")
   productName   String?       @map("product_name")
   status        GccStatus     @default(PENDING) @map("status")
   depositMethod DepositMethod @map("deposit_method")
 
-  address                  String?  @map("address")
-  city                     String?  @map("city")
-  estimatedDepositDateTime DateTime @map("estimated_deposit_datetime")
+  address                  String?        @map("address")
+  city                     String?        @map("city")
+  estimatedDepositDateTime DateTime       @map("estimated_deposit_datetime")
+  pickUpPoint              DroppingPoint?
 
-  user          User             @relation(fields: [userId], references: [id])
-  gcc           GrayCacheCredit?
-  PickupPoint   PickupPoint?     @relation(fields: [pickupPointId], references: [id])
-  pickupPointId String?
+  user User             @relation(fields: [userId], references: [id])
+  gcc  GrayCacheCredit?
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   @@map("gcc_requests")
 }
@@ -249,9 +252,6 @@ model RentalRequest {
   requester User    @relation("RentalRequestsMade", fields: [requesterId], references: [id], onDelete: Cascade)
   owner     User    @relation("RentalRequestsReceived", fields: [ownerId], references: [id], onDelete: Cascade)
 
-  pickupPointId String?      @map("pickup_point_id")
-  pickupPoint   PickupPoint? @relation(fields: [pickupPointId], references: [id], onDelete: SetNull)
-
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
@@ -280,9 +280,6 @@ model PickupPoint {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
-
-  rentalRequests RentalRequest[]
-  gccRequests    GccRequest[]
 
   @@map("pickup_points")
 }
