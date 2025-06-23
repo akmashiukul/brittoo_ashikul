@@ -65,7 +65,6 @@ export const acceptBCCRequest = async (req, res, next) => {
       },
     });
     // TODO: Send notification to user
-    // await sendCreditApprovalNotification(existingCredit.user);
     res.status(200).json({
       success: true,
       message: "Credit request accepted successfully",
@@ -109,8 +108,7 @@ export const rejectBCCRequest = async (req, res, next) => {
         refundTrxIds: updatedRefundTrxArr,
       },
     });
-    // TODO:
-    // Send notification to user about rejection
+    // TODO: Send notification to user about rejection
     res.status(200).json({
       success: true,
       message: "Credit request rejected successfully",

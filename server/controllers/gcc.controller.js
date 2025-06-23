@@ -1,5 +1,6 @@
-import prisma from "../config/prisma";
-import { CustomError } from "../lib/customError";
+import prisma from "../config/prisma.js";
+import { CustomError } from "../lib/customError.js";
+import { userSafeSelect } from "../lib/prismaSelects.js";
 
 export const requestGcc = async (req, res, next) => {
   try {
@@ -132,6 +133,36 @@ export const rejectGccRequest = async (req, res, next) => {
     });
   } catch (error) {
     console.error("Error in rejecting Gcc Req:", error);
+    next(error);
+  }
+};
+
+export const getPendingGccRequests = async (req, res, next) => {
+  try {
+    const [requests, total] = await Promise.all([
+      prisma.gccRequest.findMany({
+        where: {
+          status: "PENDING",
+        },
+        include: {
+          user: {
+            select: userSafeSelect,
+          },
+        },
+        orderBy: "desc",
+      }),
+      prisma.gccRequest.count({ where: { status: "PENDING" } }),
+    ]);
+
+    res.status(200).json({
+      message: 'GCC requests retrieved successfully',
+      data: {
+        requests,
+        total
+      }
+    });
+  } catch (error) {
+    console.error("Error in getting pending Gcc Req:", error);
     next(error);
   }
 };
