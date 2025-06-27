@@ -18,11 +18,7 @@ import ProductDetails from "./components/ProductDetails";
 import RentalRequests from "./pages/private/dash-pages/RentalRequests";
 import CreditModal from "./components/modals/CreditModal";
 import BuyBccModal from "./components/modals/BuyBccModal";
-import BuyRccModal from "./components/modals/BuyRccModal";
-import BuyGccModal from "./components/modals/BuyGccModal";
 import useBuyBccModalStore from "./stores/creditModalStores/useBuyBccModalStore";
-import useBuyRccModalStore from "./stores/creditModalStores/useBuyRccModalStore";
-import useBuyGccModalStore from "./stores/creditModalStores/useBuyGccModalStore";
 import useUserStore from "./stores/authStores/useUserStore";
 import BuyCredits from "./pages/BuyCredits";
 import AdminDashboardLayout from "./pages/admin/AdminDashboardLayout";
@@ -30,13 +26,14 @@ import AdminOverview from "./pages/admin/admin-dash-pages/AdminOverview";
 import ManageUsers from "./pages/admin/admin-dash-pages/ManageUsers";
 import AllProducts from "./pages/AllProducts";
 import BlueCCRequests from "./pages/admin/admin-dash-pages/BlueCCRequests";
+import useShowRccModalStore from "./stores/creditModalStores/useShowRccModalStore";
+import ShowRccModal from "./components/modals/ShowRccModal";
 
 const AppContent = () => {
   const location = useLocation();
   const { loading, currentUser } = useUserStore();
   const { isBuyBccModalOpen } = useBuyBccModalStore();
-  const { isBuyRccModalOpen } = useBuyRccModalStore();
-  const { isBuyGccModalOpen } = useBuyGccModalStore();
+  const { isShowRccModalOpen } = useShowRccModalStore();
 
   console.log(currentUser)
 
@@ -63,8 +60,7 @@ const AppContent = () => {
       <CreditModal />
 
       {isBuyBccModalOpen && <BuyBccModal />}
-      {isBuyRccModalOpen && <BuyRccModal />}
-      {isBuyGccModalOpen && <BuyGccModal />}
+      {isShowRccModalOpen && <ShowRccModal />}
 
       <div className="overflow-x-hidden">
         <Routes>

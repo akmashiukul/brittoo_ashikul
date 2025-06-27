@@ -64,7 +64,7 @@ export const createProduct = async (req, res, next) => {
           productSL: 'TEMP',
           productType,
           productCondition,
-          isForSale,
+          isForSale: isForSale === "false" ? false: true,
           productAge: parseInt(productAge),
           omv: parseInt(omv),
           tags,

@@ -3,6 +3,7 @@ import { useState } from "react";
 import Swal from "sweetalert2";
 import Loader from "../../../components/shared/Loader";
 import api from "../../../lib/api";
+import useShowRccModalStore from "../../../stores/creditModalStores/useShowRccModalStore";
 
 const ListItems = () => {
   const [selectedImages, setSelectedImages] = useState([]);
@@ -17,6 +18,8 @@ const ListItems = () => {
     productDescription: "",
     isForSale: false,
   });
+
+  const { openShowRccModal, setRcc } = useShowRccModalStore();
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -75,6 +78,9 @@ const ListItems = () => {
       }
 
       // Show cache credit
+      await setRcc(res.data.rcc);
+      openShowRccModal();
+      
     } catch (error) {
       console.error("Error in Listing Item:", error);
       Swal.fire({
