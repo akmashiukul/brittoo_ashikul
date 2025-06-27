@@ -71,7 +71,8 @@ export const verifyUser = async (req, res) => {
         isVerified: "PENDING",
       },
       include: {
-        cacheCredits: true
+        blueCacheCredits: true,
+        redCacheCredits: true
       }
     });
 

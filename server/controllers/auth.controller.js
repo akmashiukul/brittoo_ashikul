@@ -222,7 +222,6 @@ export const verifyOTP = async (req, res, next) => {
       include: {
         blueCacheCredits: true,
         redCacheCredits: true,
-        grayCacheCredits: true
       }
     });
 
@@ -262,7 +261,6 @@ export const login = async (req, res, next) => {
       include: {
         blueCacheCredits: true,
         redCacheCredits: true,
-        grayCacheCredits: true
       }
     });
     if (!user) {

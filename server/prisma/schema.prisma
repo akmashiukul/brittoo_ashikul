@@ -181,6 +181,7 @@ model Product {
   deletedAt DateTime? @map("deleted_at")
 
   @@unique([ownerId, productSL])
+  @@unique([productSL])
   @@unique([productSlNo, deletedAt])
   @@map("products")
 }

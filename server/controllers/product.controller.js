@@ -47,25 +47,53 @@ export const createProduct = async (req, res, next) => {
       owner.securityScore,
       3,
     );
-    const secondHandPrice = calculateSecondHandPrice(parseInt(omv), productCondition, parseInt(productAge));
+    const secondHandPrice = calculateSecondHandPrice(
+      parseInt(omv),
+      productCondition,
+      parseInt(productAge),
+    );
 
-    console.log('sec , ppd: ', secondHandPrice, ' ', pricePerDay);
+    console.log("sec , ppd: ", secondHandPrice, " ", pricePerDay);
 
-    const product = await prisma.product.create({
-      data: {
-        name,
-        pricePerDay: parseFloat(pricePerDay),
-        productType,
-        productCondition,
-        productAge: parseInt(productAge),
-        omv: parseInt(omv),
-        tags,
-        productDescription,
-        ownerId: req.user.id,
-        productImages: imagePaths,
-        secondHandPrice: secondHandPrice
-      },
+    const result = await prisma.$transaction(async (tx) => {
+      const product = await tx.product.create({
+        data: {
+          name,
+          pricePerDay: parseFloat(pricePerDay),
+          productSL: 'TEMP',
+          productType,
+          productCondition,
+          productAge: parseInt(productAge),
+          omv: parseInt(omv),
+          tags,
+          productDescription,
+          ownerId: req.user.id,
+          productImages: imagePaths,
+          secondHandPrice: secondHandPrice,
+        },
+      });
+      const prefix = product.productType.charAt(0);
+      const generatedSL = `${prefix}${product.productSlNo}`;
+      const updatedProduct = await tx.product.update({
+        where: {
+          id: product.id
+        },
+        data: {
+          productSL: generatedSL
+        }
+      })
+
+      const rcc = await tx.redCacheCredit.create({
+        data: {
+          amount: secondHandPrice,
+          validityStart: new Date(),
+          userId: req.user.id,
+          sourceProductId: updatedProduct.id,
+        }
+      })
+      return { updatedProduct, rcc };
     });
+
     const keys = await redisClient.keys("products:*");
     if (keys.length > 0) {
       await redisClient.del(keys);
@@ -74,7 +102,8 @@ export const createProduct = async (req, res, next) => {
     return res.status(201).json({
       success: true,
       message: "Product Listed Successfully",
-      product,
+      product: result.updatedProduct,
+      rcc: result.rcc,
     });
   } catch (error) {
     console.error(error);
@@ -124,8 +153,8 @@ export const getProducts = async (req, res, next) => {
 
     if (productAge) {
       filters.productAge = {
-        lte: parseInt(productAge)
-      }
+        lte: parseInt(productAge),
+      };
     }
 
     const searchClause = search
@@ -138,7 +167,7 @@ export const getProducts = async (req, res, next) => {
         }
       : {};
 
-      console.log(filters)
+    console.log(filters);
 
     const products = await prisma.product.findMany({
       where: {
@@ -158,9 +187,9 @@ export const getProducts = async (req, res, next) => {
             _count: {
               select: {
                 rentedProducts: true,
-                borrowedProducts: true
-              }
-            }
+                borrowedProducts: true,
+              },
+            },
           },
         },
       },
@@ -247,7 +276,11 @@ export const updateProduct = async (req, res, next) => {
         owner.securityScore,
         3,
       );
-      const newSecondHandPrice = calculateSecondHandPrice(omv, productCondition, productAge);
+      const newSecondHandPrice = calculateSecondHandPrice(
+        omv,
+        productCondition,
+        productAge,
+      );
 
       updateData.pricePerDay = parseFloat(newPrice);
       updateData.secondHandPrice = parseFloat(newSecondHandPrice);
