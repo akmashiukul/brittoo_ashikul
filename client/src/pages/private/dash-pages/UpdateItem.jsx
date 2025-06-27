@@ -20,6 +20,7 @@ const UpdateItem = () => {
     tags: "",
     omv: "",
     productDescription: "",
+    isForSale: false,
   });
 
   useEffect(() => {
@@ -41,6 +42,7 @@ const UpdateItem = () => {
           tags: product.tags || "",
           omv: product.omv.toString(),
           productDescription: product.productDescription || "",
+          isForSale: product.isForSale || false,
         });
         setExistingImages(
           product.productImages.map((path) => ({
@@ -68,7 +70,11 @@ const UpdateItem = () => {
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    const totalImages = existingImages.length + selectedImages.length + files.length - imagesToDelete.length;
+    const totalImages =
+      existingImages.length +
+      selectedImages.length +
+      files.length -
+      imagesToDelete.length;
 
     if (totalImages <= 4) {
       const filesWithPreview = files.map((file) => ({
@@ -129,7 +135,8 @@ const UpdateItem = () => {
         Swal.fire({
           icon: "error",
           title: "Update Failed",
-          text: res.data.message || "An error occurred while updating the item.",
+          text:
+            res.data.message || "An error occurred while updating the item.",
         });
         return;
       }
@@ -169,7 +176,7 @@ const UpdateItem = () => {
       <form className="mt-8 flex flex-col gap-4" onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-2 w-full gap-4">
           <div>
-            {(existingImages.length > 0 || selectedImages.length > 0) ? (
+            {existingImages.length > 0 || selectedImages.length > 0 ? (
               <div className="flex items-center justify-center">
                 <div className="grid grid-cols-2 gap-2 border border-gray-200 rounded-lg p-4">
                   {existingImages.map((img, idx) => (
@@ -204,7 +211,10 @@ const UpdateItem = () => {
                       </button>
                     </div>
                   ))}
-                  {existingImages.length + selectedImages.length - imagesToDelete.length < 4 && (
+                  {existingImages.length +
+                    selectedImages.length -
+                    imagesToDelete.length <
+                    4 && (
                     <label
                       htmlFor="File"
                       className="flex flex-col h-28 md:h-40 items-center justify-center rounded border border-gray-200 p-4 text-gray-700 cursor-pointer hover:bg-gray-100"
@@ -250,7 +260,9 @@ const UpdateItem = () => {
           </div>
           <div className="flex w-full flex-col gap-3 flex-1">
             <label htmlFor="name" className="flex flex-col gap-1.5 w-full">
-              <span className="text-sm font-medium text-gray-600">Item Name</span>
+              <span className="text-sm font-medium text-gray-600">
+                Item Name
+              </span>
               <input
                 type="text"
                 id="name"
@@ -260,8 +272,13 @@ const UpdateItem = () => {
                 onChange={handleInputChange}
               />
             </label>
-            <label htmlFor="productType" className="flex flex-col gap-1.5 w-full">
-              <span className="text-sm font-medium text-gray-600">Item Type</span>
+            <label
+              htmlFor="productType"
+              className="flex flex-col gap-1.5 w-full"
+            >
+              <span className="text-sm font-medium text-gray-600">
+                Item Type
+              </span>
               <select
                 id="productType"
                 value={formData.productType}
@@ -281,7 +298,9 @@ const UpdateItem = () => {
               </select>
             </label>
             <label htmlFor="omv" className="flex flex-col gap-1.5 w-full">
-              <span className="text-sm font-medium text-gray-600">Original Market Price</span>
+              <span className="text-sm font-medium text-gray-600">
+                Original Market Price
+              </span>
               <input
                 type="number"
                 id="omv"
@@ -291,8 +310,13 @@ const UpdateItem = () => {
                 onChange={handleInputChange}
               />
             </label>
-            <label htmlFor="productCondition" className="flex flex-col gap-1.5 w-full">
-              <span className="text-sm font-medium text-gray-600">Product Condition</span>
+            <label
+              htmlFor="productCondition"
+              className="flex flex-col gap-1.5 w-full"
+            >
+              <span className="text-sm font-medium text-gray-600">
+                Product Condition
+              </span>
               <select
                 id="productCondition"
                 value={formData.productCondition}
@@ -311,7 +335,9 @@ const UpdateItem = () => {
         </div>
         <div className="flex flex-col sm:flex-row gap-4">
           <label htmlFor="productAge" className="flex flex-col gap-1.5 w-full">
-            <span className="text-sm font-medium text-gray-600">Age of the Item (Approx.)</span>
+            <span className="text-sm font-medium text-gray-600">
+              Age of the Item (Approx.)
+            </span>
             <select
               id="productAge"
               value={formData.productAge}
@@ -329,7 +355,9 @@ const UpdateItem = () => {
           </label>
         </div>
         <label htmlFor="tags" className="flex flex-col gap-1.5 w-full">
-          <span className="text-sm font-medium text-gray-600">Tags (Comma-separated)</span>
+          <span className="text-sm font-medium text-gray-600">
+            Tags (Comma-separated)
+          </span>
           <input
             type="text"
             id="tags"
@@ -339,8 +367,40 @@ const UpdateItem = () => {
             onChange={handleInputChange}
           />
         </label>
-        <label htmlFor="productDescription" className="flex flex-col gap-1.5 w-full">
-          <span className="text-sm font-medium text-gray-600">Product Description</span>
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-700">
+            Is this item also available for sale?
+          </label>
+          <div className="flex gap-4">
+            <label className="flex items-center space-x-2">
+              <input
+                type="radio"
+                name="isForSale"
+                value="true"
+                checked={formData.isForSale}
+                onChange={() => setFormData({ ...formData, isForSale: true })}
+              />
+              <span>Yes</span>
+            </label>
+            <label className="flex items-center space-x-2">
+              <input
+                type="radio"
+                name="isForSale"
+                value="false"
+                checked={!formData.isForSale}
+                onChange={() => setFormData({ ...formData, isForSale: false })}
+              />
+              <span>No</span>
+            </label>
+          </div>
+        </div>
+        <label
+          htmlFor="productDescription"
+          className="flex flex-col gap-1.5 w-full"
+        >
+          <span className="text-sm font-medium text-gray-600">
+            Product Description
+          </span>
           <textarea
             id="productDescription"
             value={formData.productDescription}

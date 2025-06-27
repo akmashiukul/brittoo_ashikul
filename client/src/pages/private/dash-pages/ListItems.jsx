@@ -15,7 +15,7 @@ const ListItems = () => {
     tags: "",
     omv: "",
     productDescription: "",
-    isForSell: false,
+    isForSale: false,
   });
 
   const handleInputChange = (e) => {
@@ -91,7 +91,7 @@ const ListItems = () => {
         tags: "",
         omv: "",
         productDescription: "",
-        isForSell: false
+        isForSale: false
       });
       setSelectedImages([]);
       setLoading(false);
@@ -302,8 +302,8 @@ const ListItems = () => {
                 type="radio"
                 name="isForSale"
                 value="true"
-                checked={formData.isForSell}
-                onChange={() => setFormData({ ...formData, isForSell: true })}
+                checked={formData.isForSale}
+                onChange={() => setFormData({ ...formData, isForSale: true })}
               />
               <span>Yes</span>
             </label>
@@ -312,8 +312,8 @@ const ListItems = () => {
                 type="radio"
                 name="isForSale"
                 value="false"
-                checked={!formData.isForSell}
-                onChange={() => setFormData({ ...formData, isForSell: false })}
+                checked={!formData.isForSale}
+                onChange={() => setFormData({ ...formData, isForSale: false })}
               />
               <span>No</span>
             </label>

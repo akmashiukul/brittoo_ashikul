@@ -21,6 +21,7 @@ export const createProduct = async (req, res, next) => {
       omv,
       tags,
       productDescription,
+      isForSale,
     } = req.body;
     if (!req.user || !req.user.id) {
       throw new CustomError("Unauthorized: No user authenticated", 401);
@@ -63,6 +64,7 @@ export const createProduct = async (req, res, next) => {
           productSL: 'TEMP',
           productType,
           productCondition,
+          isForSale,
           productAge: parseInt(productAge),
           omv: parseInt(omv),
           tags,
@@ -239,6 +241,7 @@ export const updateProduct = async (req, res, next) => {
       tags,
       productDescription,
       deleteImages,
+      isForSale,
     } = req.body;
 
     if (!req.user || !req.user.id) {
@@ -262,6 +265,7 @@ export const updateProduct = async (req, res, next) => {
     }
     const updateData = {};
     if (name) updateData.name = name;
+    if (isForSale) updateData.isForSale = isForSale;
     if (productType) updateData.productType = productType;
     if (productCondition) updateData.productCondition = productCondition;
     if (productAge) updateData.productAge = parseInt(productAge);
