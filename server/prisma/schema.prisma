@@ -8,19 +8,19 @@ datasource db {
 }
 
 model User {
-  id          String  @id @default(cuid()) @map("id")
-  name        String  @map("name")
-  email       String  @unique @map("email")
-  roll        String  @unique @map("roll")
-  password    String  @map("password")
-  phoneNumber String? @map("phone_number")
-  selfie      String? @map("selfie")
-  idCardFront String? @map("id_card_front")
-  idCardBack  String? @map("id_card_back")
-  ipAddress   String? @map("ip_address")
-  latitude    Float?  @map("latitude")
-  longitude   Float?  @map("longitude")
-  role        Role    @default(USER) @map("role")
+  id          String   @id @default(cuid()) @map("id")
+  name        String   @map("name")
+  email       String   @unique @map("email")
+  roll        String   @unique @map("roll")
+  password    String   @map("password")
+  phoneNumber String?  @map("phone_number")
+  selfie      String?  @map("selfie")
+  idCardFront String?  @map("id_card_front")
+  idCardBack  String?  @map("id_card_back")
+  ipAddress   String?  @map("ip_address")
+  latitude    Decimal? @map("latitude")
+  longitude   Decimal? @map("longitude")
+  role        Role     @default(USER) @map("role")
 
   emailVerified   Boolean      @default(false) @map("email_verified")
   isVerified      VerifyStatus @default(UNVERIFIED) @map("is_verified")
@@ -38,10 +38,8 @@ model User {
   blueCacheCredits BlueCacheCredit[]
   redCacheCredits  RedCacheCredit[]
 
-  rccRequests RccRequest[]
-
-  rentedProducts   Product[] @relation("ProductsRentedOut")
-  borrowedProducts Product[] @relation("ProductsBorrowed")
+  rentedOutProducts Product[] @relation("ProductsRentedOut")
+  borrowedProducts  Product[] @relation("ProductsBorrowed")
 
   rentalRequestsMade     RentalRequest[] @relation("RentalRequestsMade")
   rentalRequestsReceived RentalRequest[] @relation("RentalRequestsReceived")
@@ -50,6 +48,9 @@ model User {
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
+  @@unique([email, deletedAt])
+  @@unique([roll, deletedAt])
+  @@unique([phoneNumber, deletedAt])
   @@index([latitude, longitude])
   @@map("users")
 }
@@ -86,7 +87,8 @@ model BlueCacheCredit {
   isRejected   Boolean @default(false) @map("is_rejected")
   rejectReason String? @map("reject_reason")
 
-  user User @relation(fields: [userId], references: [id])
+  user          User            @relation(fields: [userId], references: [id])
+  usedInRentals RentalRequest[]
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
@@ -95,20 +97,27 @@ model BlueCacheCredit {
   @@map("blue_cache_credits")
 }
 
+enum PaymentGateway {
+  BKASH
+  NAGAD
+  ROCKET
+}
+
 model RedCacheCredit {
   id            String   @id @default(cuid()) @map("id")
   amount        Int      @map("amount")
-  fee           Int?     @map("fee")
   renterId      String?  @map("renter_id")
   validityStart DateTime @map("validity_start")
   validityEnd   DateTime @map("validity_end")
 
-  userId          String      @map("user_id")
-  user            User        @relation(fields: [userId], references: [id])
-  sourceProductId String?     @map("source_product_id")
-  sourceProduct   Product?    @relation(fields: [sourceProductId], references: [id])
-  rccRequestId    String?     @unique @map("rcc_request_id")
-  rccRequest      RccRequest? @relation(fields: [rccRequestId], references: [id])
+  userId          String  @map("user_id")
+  user            User    @relation(fields: [userId], references: [id])
+  sourceProductId String  @map("source_product_id")
+  sourceProduct   Product @relation(fields: [sourceProductId], references: [id])
+
+  activatedByRentalId String?        @map("activated_by_rental_id")
+  activatedByRental   RentalRequest? @relation(fields: [activatedByRentalId], references: [id])
+  status              RccStatus      @default(INACTIVE) @map("status")
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
@@ -117,36 +126,9 @@ model RedCacheCredit {
   @@map("red_cache_credits")
 }
 
-model RccRequest {
-  id String @id @default(cuid()) @map("id")
-
-  phoneNumber   String        @map("phone_number")
-  productName   String?       @map("product_name")
-  status        RccStatus     @default(PENDING) @map("status")
-  depositMethod DepositMethod @map("deposit_method")
-  rejectReason  String?       @map("reject_reason")
-
-  address                  String?          @map("address")
-  city                     String?          @map("city")
-  estimatedDepositDateTime DateTime         @map("estimated_deposit_datetime")
-  droppingPoint            CollectionPoint? @map("dropping_point")
-
-  userId String          @map("user_id")
-  user   User            @relation(fields: [userId], references: [id])
-  rccId  String          @map("rcc_id")
-  rcc    RedCacheCredit?
-
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
-
-  @@index([userId])
-  @@map("rcc_requests")
-}
-
 enum DepositMethod {
-  FROM_HOME
-  BRITTOO_TERMINAL
+  HOME_DEPOSIT
+  TERMINAL_DEPOSIT
 }
 
 enum CollectionPoint {
@@ -158,15 +140,10 @@ enum CollectionPoint {
 }
 
 enum RccStatus {
-  PENDING
-  APPROVED
+  ACTIVE
+  INACTIVE
   REJECTED
-}
-
-enum PaymentGateway {
-  BKASH
-  NAGAD
-  ROCKET
+  IN_USE
 }
 
 model Product {
@@ -174,7 +151,7 @@ model Product {
   productSlNo        Int              @default(autoincrement()) @map("product_sl_no")
   productSL          String           @map("product_sl")
   name               String           @map("name")
-  pricePerDay        Float?           @map("price_per_day")
+  pricePerDay        Decimal?         @map("price_per_day")
   productImages      String[]         @map("product_images")
   productType        ProductType      @map("product_type")
   productCondition   ProductCondition @map("product_condition")
@@ -184,14 +161,17 @@ model Product {
   tags               String           @map("tags")
   productDescription String           @map("product_description")
 
-  ownerId            String  @map("owner_id")
-  isOnHold           Boolean @default(false) @map("is_on_hold")
-  isForSale          Boolean @default(false) @map("is_for_sale")
-  isBrittooVerified  Boolean @default(false) @map("is_brittoo_verified")
-  holdCreditValidity Int?    @map("hold_credit_validity")
-  owner              User    @relation("ProductsRentedOut", fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId            String    @map("owner_id")
+  isOnHold           Boolean   @default(false) @map("is_on_hold")
+  holdStartDate      DateTime? @map("hold_start_date")
+  holdEndDate        DateTime? @map("hold_end_date")
+  isForSale          Boolean   @default(false) @map("is_for_sale")
+  isRented           Boolean   @default(false) @map("is_rented")
+  isBrittooVerified  Boolean   @default(false) @map("is_brittoo_verified")
+  holdCreditValidity Int?      @map("hold_credit_validity")
 
-  borrowers User[] @relation("ProductsBorrowed")
+  owner   User   @relation("ProductsRentedOut", fields: [ownerId], references: [id], onDelete: Cascade)
+  renters User[] @relation("ProductsBorrowed")
 
   redCacheCredits RedCacheCredit[]
   rentalRequests  RentalRequest[]
@@ -200,6 +180,8 @@ model Product {
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
+  @@unique([ownerId, productSL])
+  @@unique([productSlNo, deletedAt])
   @@map("products")
 }
 
@@ -225,46 +207,58 @@ enum ProductCondition {
 }
 
 model RentalRequest {
-  id                 String        @id @default(cuid()) @map("id")
-  productId          String        @map("product_id")
-  requesterId        String        @map("requester_id")
-  ownerId            String        @map("owner_id")
-  status             RequestStatus @default(PENDING) @map("status")
-  pickupTime         DateTime      @map("pickup_time")
-  submissionDeadline DateTime?     @map("submission_deadline")
+  id                 String              @id @default(cuid()) @map("id")
+  productId          String              @map("product_id")
+  requesterId        String              @map("requester_id")
+  ownerId            String              @map("owner_id")
+  status             RentalRequestStatus @map("status")
+  submissionDeadline DateTime?           @map("submission_deadline")
 
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  requester User    @relation("RentalRequestsMade", fields: [requesterId], references: [id], onDelete: Cascade)
-  owner     User    @relation("RentalRequestsReceived", fields: [ownerId], references: [id], onDelete: Cascade)
+  rentalStartDate DateTime @map("rental_start_date")
+  rentalEndDate   DateTime @map("rental_end_date")
+  totalDays       Int      @map("total_days")
+
+  ownerDepositMethod     DepositMethod    @map("owner_deposit_method")
+  renterCollectionMethod CollectionMethod @map("renter_collection_method")
+  deliveryAddress        String?          @map("delivery_address")
+  pickUpPoint            CollectionPoint? @map("pickup_point")
+
+  paidWithRcc   Boolean @default(false) @map("paid_with_rcc")
+  usedRccId     String? @map("used_rcc_id")
+  usedRccAmount Int?    @map("used_rcc_amount")
+
+  paidWithBcc         Boolean @default(false) @map("paid_with_bcc")
+  usedBccId           String? @map("used_bcc_id")
+  useBccAmount        Int?    @map("used_bcc_amount")
+  rccProductSubmitted Boolean @default(false) @map("rcc_product_submitted")
+
+  usedBcc   BlueCacheCredit? @relation(fields: [usedBccId], references: [id])
+  product   Product          @relation(fields: [productId], references: [id])
+  requester User             @relation("RentalRequestsMade", fields: [requesterId], references: [id])
+  owner     User             @relation("RentalRequestsReceived", fields: [ownerId], references: [id])
+
+  activatedRccCredits RedCacheCredit[]
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
+  @@unique([productId, requesterId, status])
   @@index([ownerId, status])
   @@index([productId, status])
   @@map("rental_requests")
 }
 
-enum RequestStatus {
-  PENDING
-  ACCEPTED
-  REJECTED
-  RECEIVED
-  DELIVERED
-  CANCELLED
+enum CollectionMethod {
+  TERMINAL_PICKUP
+  HOME_DELIVERY
 }
 
-model PickupPoint {
-  id        String @id @default(cuid()) @map("id")
-  name      String @map("name")
-  address   String @map("address")
-  latitude  Float? @map("latitude")
-  longitude Float? @map("longitude")
-
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
-
-  @@map("pickup_points")
+enum RentalRequestStatus {
+  ACCEPTED_BY_OWNER
+  REJECTED_BY_OWNER
+  PRODUCT_SUBMITTED_BY_OWNER
+  PRODUCT_COLLECTED_BY_RENTER
+  PRODUCT_RETURNED_BY_RENTER
+  PRODUCT_RETURNED_TO_OWNER
 }
