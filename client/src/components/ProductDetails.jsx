@@ -5,7 +5,7 @@ import Loader from "./shared/Loader";
 import { useParams } from "react-router-dom";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
-import { TagIcon } from "lucide-react";
+import { CheckCircle, TagIcon, XCircle } from "lucide-react";
 import Avatar from "boring-avatars";
 import { usePriceCalculate } from "../hooks/usePriceCalculate";
 import { DayPicker } from "react-day-picker";
@@ -33,7 +33,7 @@ const ProductDetails = () => {
   const { openCreditModal } = useCreditModalStore();
 
   //sss
-  console.log(`${base_url}${product?.productImages[0]}`)
+  console.log(`${base_url}${product?.productImages[0]}`);
 
   useEffect(() => {
     if (initial && final) {
@@ -184,6 +184,17 @@ const ProductDetails = () => {
                 BDT {product.omv}.00
               </span>
             </p>
+            {product.isForSale ? (
+              <div className="flex items-center gap-1 text-green-600 text-sm mt-2 font-semibold">
+                <CheckCircle className="w-4 h-4" />
+                <span>Available for Sale</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1 text-red-500 text-sm mt-2 font-semibold">
+                <XCircle className="w-4 h-4" />
+                <span>Not for Sale</span>
+              </div>
+            )}
 
             <div className="mt-6 md:mt-8">
               <h2 className="text-base md:text-lg font-semibold sm:font-bold text-gray-600">
@@ -286,7 +297,7 @@ const ProductDetails = () => {
             onSelect={setRange}
             max={15}
             disabled={{
-              before: new Date()
+              before: new Date(),
             }}
             className="rdp-root self-center md:self-start"
           />

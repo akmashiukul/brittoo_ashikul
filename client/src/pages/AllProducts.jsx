@@ -28,6 +28,8 @@ const AllProducts = () => {
   const [total, setTotal] = useState(0);
   const limit = 12;
 
+  console.log(products)
+
   const productTypes = [
     "GADGET",
     "FURNITURE",

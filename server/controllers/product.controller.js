@@ -188,7 +188,7 @@ export const getProducts = async (req, res, next) => {
             suspensionCount: true,
             _count: {
               select: {
-                rentedProducts: true,
+                rentedOutProducts: true,
                 borrowedProducts: true,
               },
             },
