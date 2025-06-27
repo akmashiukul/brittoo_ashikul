@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Search,
   Check,
@@ -213,16 +213,6 @@ const BlueCCRequests = () => {
     }
   };
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
@@ -286,7 +276,7 @@ const BlueCCRequests = () => {
                       Transaction ID
                     </th>
                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Requested At
+                      Phone number
                     </th>
                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Actions
@@ -349,7 +339,7 @@ const BlueCCRequests = () => {
                         <div className="space-y-1">
                           <div className="flex items-center space-x-1 text-xs text-gray-500">
                             <span>
-                              {formatDate(request.createdAt)}
+                              {request.trxNo}
                             </span>
                           </div>
                         </div>

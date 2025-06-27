@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import api from "../../../lib/api";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import { formatDistanceToNow } from 'date-fns';
 
 const UserDetails = ({ user, onBack }) => {
   const [userDetails, setUserDetails] = useState(null);
@@ -265,7 +266,8 @@ const UserDetails = ({ user, onBack }) => {
             </div>
           </div>
         )}
-
+        
+        {/* Documents */}
         {activeTab === "documents" && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -334,9 +336,9 @@ const UserDetails = ({ user, onBack }) => {
           </div>
         )}
 
+        {/* Credits */}
         {activeTab === "credits" && (
           <div className="space-y-6">
-            {/* Credit Summary */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <div className="flex items-center">
@@ -369,29 +371,13 @@ const UserDetails = ({ user, onBack }) => {
                   </div>
                 </div>
               </div>
-
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <div className="flex items-center">
-                  <div className="h-12 w-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                    <CreditCard className="h-6 w-6 text-gray-600" />
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">
-                      Total GCC
-                    </p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {userDetails?.creditSummary.totalGrayCredits}
-                    </p>
-                  </div>
-                </div>
-              </div>
             </div>
 
             {/* Credit History */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
               <div className="px-6 py-4 border-b border-gray-200">
                 <h3 className="text-lg font-semibold text-gray-900">
-                  Credit History
+                  Blue Cache Credit History
                 </h3>
               </div>
               <div className="overflow-x-auto">
@@ -402,54 +388,40 @@ const UserDetails = ({ user, onBack }) => {
                         Amount
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Type
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Source
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Status
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Validity
+                        Phone Number
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Trx Id
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Requested
                       </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {userDetails?.user.cacheCredits.map((credit) => (
+                    {userDetails?.user.blueCacheCredits.map((credit) => (
                       <tr key={credit.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        <td className="px-6 py-4 whitespace-nowrap text-xs font-medium text-gray-900">
                           {credit.amount}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span
-                            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                              credit.creditType === "BLUE_CC"
-                                ? "bg-blue-100 text-blue-600"
-                                : credit.creditType === "RED_CC"
-                                ? "bg-red-100 text-red-600"
-                                : "bg-gray-100 text-gray-600"
-                            }`}
+                            className={`inline-flex px-2 py-1 text-xs font-semibold ${(credit.status == 'REJECTED') ? "bg-red-100 text-red-600" : (credit.status == 'ACCEPTED') ? "bg-green-100 text-green-600" : "bg-gray-100 text-gray-600"}`}
                           >
-                            {credit.creditType}
+                            {credit.status}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {credit.sourceType}
+                        <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-500">
+                          {credit.trxNo}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span
-                            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                              credit.isActive
-                                ? "bg-green-100 text-green-600"
-                                : "bg-gray-100 text-gray-600"
-                            }`}
-                          >
-                            {credit.isActive ? "Active" : "Inactive"}
-                          </span>
+                        <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-500">
+                          {credit.transactionId}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {new Date(credit.validityEnd).toLocaleDateString()}
+                        <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-500">
+                          {formatDistanceToNow(credit.createdAt, {addSuffix: true})}
                         </td>
                       </tr>
                     ))}
@@ -488,7 +460,7 @@ const UserDetails = ({ user, onBack }) => {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {userDetails?.user?.rentedProducts.map((product) => (
+                    {userDetails?.user?.rentedOutProducts.map((product) => (
                       <tr onClick={() => navigate(`/product-details/${product.id}`)} key={product.id} className="cursor-pointer hover:bg-gray-200">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">

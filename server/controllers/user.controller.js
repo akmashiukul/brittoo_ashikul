@@ -1,5 +1,6 @@
 import prisma from "../config/prisma.js";
 import { CustomError } from "../lib/customError.js";
+import { userSafeSelect } from "../lib/prismaSelects.js";
 
 export const getAllUsers = async (req, res, next) => {
   try {
@@ -42,38 +43,7 @@ export const getAllUsers = async (req, res, next) => {
     const [users, totalUsers] = await Promise.all([
       prisma.user.findMany({
         where: whereClause,
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          roll: true,
-          role: true,
-          selfie: true,
-          idCardFront: true,
-          idCardBack: true,
-          ipAddress: true,
-          latitude: true,
-          longitude: true,
-          emailVerified: true,
-          isVerified: true,
-          brittooVerified: true,
-          securityScore: true,
-          isSuspended: true,
-          suspensionCount: true,
-          createdAt: true,
-          updatedAt: true,
-          _count: {
-            select: {
-              rentedProducts: true,
-              borrowedProducts: true,
-              blueCacheCredits: true,
-              redCacheCredits: true,
-              grayCacheCredits: true,
-              rentalRequestsMade: true,
-              rentalRequestsReceived: true,
-            },
-          },
-        },
+        select: userSafeSelect,
         skip,
         take: parseInt(limit),
         orderBy: { [sortBy]: sortOrder },
@@ -135,10 +105,11 @@ export const getUserDetails = async (req, res) => {
         deletedAt: null,
       },
       include: {
-        blueCacheCredits: true,
+        blueCacheCredits: {
+          orderBy: { createdAt: 'desc'}
+        },
         redCacheCredits: true,
-        grayCacheCredits: true,
-        rentedProducts: {
+        rentedOutProducts: {
           where: { deletedAt: null },
           select: {
             id: true,
@@ -148,7 +119,7 @@ export const getUserDetails = async (req, res) => {
             pricePerDay: true,
             isOnHold: true,
             createdAt: true,
-            borrowers: {
+            renters: {
               select: {
                 id: true,
                 name: true,
@@ -239,17 +210,12 @@ export const getUserDetails = async (req, res) => {
         (sum, c) => sum + c.amount,
         0,
       ),
-      totalGrayCredits: user.grayCacheCredits.reduce(
-        (sum, c) => sum + c.amount,
-        0,
-      ),
       pendingBCC: user.blueCacheCredits
         .filter((c) => !c.isActive && !c.isRejected)
         .reduce((sum, c) => sum + c.amount, 0),
       rejectedBCC: user.blueCacheCredits
         .filter((c) => c.isRejected)
         .reduce((sum, c) => sum + c.amount, 0),
-      pendingGCC: user.grayCacheCredits.filter,
     };
 
     res.json({
@@ -258,7 +224,7 @@ export const getUserDetails = async (req, res) => {
         user,
         creditSummary,
         stats: {
-          totalProductsRented: user.rentedProducts.length,
+          totalProductsRented: user.rentedOutProducts.length,
           totalProductsBorrowed: user.borrowedProducts.length,
           totalRequestsMade: user.rentalRequestsMade.length,
           totalRequestsReceived: user.rentalRequestsReceived.length,

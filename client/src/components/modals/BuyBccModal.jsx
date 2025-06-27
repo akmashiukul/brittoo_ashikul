@@ -12,6 +12,7 @@ const BuyBccModal = () => {
 
   const [paymentMethod, setPaymentMethod] = useState("");
   const [amount, setAmount] = useState("");
+  const [trxNo, setTrxNo] = useState("");
   const [trxId, setTrxId] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -33,6 +34,7 @@ const BuyBccModal = () => {
           paymentGateway: paymentMethod.toUpperCase(),
           amount,
           transactionId: trxId,
+          trxNo
         },
         {
           headers: {
@@ -58,7 +60,7 @@ const BuyBccModal = () => {
   return (
     <div
       id="authentication-modal"
-      className="fixed inset-0 z-50 flex justify-center items-center bg-black/70"
+      className="fixed overflow-y-scroll inset-0 z-50 flex justify-center items-center bg-black/70"
       onClick={(e) => {
         if (e.target === e.currentTarget) closeBuyBccModal();
       }}
@@ -146,6 +148,23 @@ const BuyBccModal = () => {
                   id="amount"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-xs md:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 md:p-2.5"
+                  required
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="trxNo"
+                  className="block mb-2 text-xs md:text-sm font-medium text-gray-900"
+                >
+                  Phone Number (Used For Transaction)
+                </label>
+                <input
+                  type="text"
+                  name="trxNo"
+                  id="trxNo"
+                  value={trxNo}
+                  onChange={(e) => setTrxNo(e.target.value)}
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-xs md:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 md:p-2.5"
                   required
                 />

@@ -4,7 +4,7 @@ import { userSafeSelect } from "../lib/prismaSelects.js";
 
 export const buyBcc = async (req, res, next) => {
   try {
-    const { paymentGateway, amount, transactionId } = req.body;
+    const { paymentGateway, amount, transactionId, trxNo } = req.body;
     const user = req.user;
 
     if (!paymentGateway || !amount || !transactionId) {
@@ -26,6 +26,7 @@ export const buyBcc = async (req, res, next) => {
         amount: parseInt(amount),
         paymentGateway,
         transactionId,
+        trxNo
       },
     });
 
@@ -44,27 +45,27 @@ export const getPendingCreditRequests = async (req, res, next) => {
   try {
     const pendingCredits = await prisma.blueCacheCredit.findMany({
       where: {
-        isActive: false,
-        deletedAt: null
+        status: "PENDING",
+        deletedAt: null,
       },
       include: {
         user: {
-          select: userSafeSelect
+          select: userSafeSelect,
         },
       },
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: "desc",
+      },
     });
 
     res.status(200).json({
       success: true,
       message: "Successfully Fetched Pending Credits",
       data: pendingCredits,
-      count: pendingCredits.length
+      count: pendingCredits.length,
     });
   } catch (error) {
-    console.error('Error fetching pending credit requests:', error);
+    console.error("Error fetching pending credit requests:", error);
     next(error);
   }
 };
@@ -84,13 +85,10 @@ export const acceptBCCRequest = async (req, res, next) => {
     if (!existingCredit) {
       throw new CustomError("Credit request not found", 404);
     }
-    if (existingCredit.deletedAt) {
-      throw new CustomError("Credit request has been rejected", 401);
-    }
     await prisma.blueCacheCredit.update({
-      where: { id: creditId, isRejected: false },
+      where: { id: creditId },
       data: {
-        isActive: true,
+        status: "ACCEPTED",
         updatedAt: new Date(),
       },
     });
@@ -109,16 +107,13 @@ export const rejectBCCRequest = async (req, res, next) => {
   try {
     const { creditId } = req.params;
     const { rejectReason, refundTrxId } = req.body;
-    if (!creditId) {
-      throw new CustomError("CreditId required!", 400);
-    }
     const existingCredit = await prisma.blueCacheCredit.findUnique({
       where: { id: creditId },
     });
     if (!existingCredit) {
       throw new CustomError("Credit request not found", 401);
     }
-    if (existingCredit.isActive) {
+    if (existingCredit.status === "ACCEPTED") {
       throw new CustomError(
         "Cannot reject an already accepted credit request",
         400,
@@ -133,7 +128,7 @@ export const rejectBCCRequest = async (req, res, next) => {
     await prisma.blueCacheCredit.update({
       where: { id: creditId },
       data: {
-        isRejected: true,
+        status: "REJECTED",
         rejectReason: rejectReason,
         refundTrxIds: updatedRefundTrxArr,
       },

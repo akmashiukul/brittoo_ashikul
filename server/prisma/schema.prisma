@@ -82,10 +82,10 @@ model BlueCacheCredit {
   paymentGateway PaymentGateway @map("payment_gateway")
   transactionId  String         @map("transaction_id")
   refundTrxIds   String[]       @default([]) @map("refund_trx_ids")
+  trxNo          String         @map("trx_no")
 
-  isActive     Boolean @default(false) @map("is_active")
-  isRejected   Boolean @default(false) @map("is_rejected")
-  rejectReason String? @map("reject_reason")
+  status       BccStatus @default(PENDING) @map("status")
+  rejectReason String?   @map("reject_reason")
 
   user          User            @relation(fields: [userId], references: [id])
   usedInRentals RentalRequest[]
@@ -95,6 +95,12 @@ model BlueCacheCredit {
   deletedAt DateTime? @map("deleted_at")
 
   @@map("blue_cache_credits")
+}
+
+enum BccStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
 }
 
 enum PaymentGateway {
