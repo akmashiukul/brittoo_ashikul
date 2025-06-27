@@ -1,5 +1,6 @@
 import prisma from "../config/prisma.js";
 import { CustomError } from "../lib/customError.js";
+import { userSafeSelect } from "../lib/prismaSelects.js";
 
 export const buyBcc = async (req, res, next) => {
   try {
@@ -35,6 +36,35 @@ export const buyBcc = async (req, res, next) => {
     });
   } catch (error) {
     console.error("Error in purchaseBcc Controller: ", error);
+    next(error);
+  }
+};
+
+export const getPendingCreditRequests = async (req, res, next) => {
+  try {
+    const pendingCredits = await prisma.blueCacheCredit.findMany({
+      where: {
+        isActive: false,
+        deletedAt: null
+      },
+      include: {
+        user: {
+          select: userSafeSelect
+        },
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Successfully Fetched Pending Credits",
+      data: pendingCredits,
+      count: pendingCredits.length
+    });
+  } catch (error) {
+    console.error('Error fetching pending credit requests:', error);
     next(error);
   }
 };

@@ -72,9 +72,8 @@ const ProductDetails = () => {
         setLoading(false);
       }
     };
-
     fetchProduct();
-  }, [currentUser.id, id]);
+  }, [id]);
 
   let days;
   if (product) {
@@ -111,6 +110,13 @@ const ProductDetails = () => {
   };
 
   const requestRental = async () => {
+    if (!currentUser) {
+      return Swal.fire({
+        icon: "error",
+        title: "You Can't Rent!",
+        text: "You Need to Login First to Rent Something",
+      });
+    }
     openCreditModal(product.secondHandPrice);
   };
 
