@@ -104,11 +104,11 @@ enum PaymentGateway {
 }
 
 model RedCacheCredit {
-  id            String   @id @default(cuid()) @map("id")
-  amount        Int      @map("amount")
-  renterId      String?  @map("renter_id")
-  validityStart DateTime @map("validity_start")
-  validityEnd   DateTime @map("validity_end")
+  id            String    @id @default(cuid()) @map("id")
+  amount        Int       @map("amount")
+  renterId      String?   @map("renter_id")
+  validityStart DateTime  @map("validity_start")
+  validityEnd   DateTime? @map("validity_end")
 
   userId          String  @map("user_id")
   user            User    @relation(fields: [userId], references: [id])
@@ -165,7 +165,7 @@ model Product {
   isOnHold           Boolean   @default(false) @map("is_on_hold")
   holdStartDate      DateTime? @map("hold_start_date")
   holdEndDate        DateTime? @map("hold_end_date")
-  isForSale          Boolean   @default(false) @map("is_for_sale")
+  isForSale          Boolean   @map("is_for_sale")
   isRented           Boolean   @default(false) @map("is_rented")
   isBrittooVerified  Boolean   @default(false) @map("is_brittoo_verified")
   holdCreditValidity Int?      @map("hold_credit_validity")

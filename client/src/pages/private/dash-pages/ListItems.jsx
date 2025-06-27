@@ -3,12 +3,10 @@ import { useState } from "react";
 import Swal from "sweetalert2";
 import Loader from "../../../components/shared/Loader";
 import api from "../../../lib/api";
-import { useNavigate } from "react-router-dom";
 
 const ListItems = () => {
   const [selectedImages, setSelectedImages] = useState([]);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     productType: "",
@@ -17,6 +15,7 @@ const ListItems = () => {
     tags: "",
     omv: "",
     productDescription: "",
+    isForSell: false,
   });
 
   const handleInputChange = (e) => {
@@ -75,7 +74,7 @@ const ListItems = () => {
         return;
       }
 
-      navigate("/dashboard/manage-items");
+      // Show cache credit
     } catch (error) {
       console.error("Error in Listing Item:", error);
       Swal.fire({
@@ -92,6 +91,7 @@ const ListItems = () => {
         tags: "",
         omv: "",
         productDescription: "",
+        isForSell: false
       });
       setSelectedImages([]);
       setLoading(false);
@@ -292,6 +292,33 @@ const ListItems = () => {
             onChange={handleInputChange}
           />
         </label>
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-700">
+            Is this item also available for sale?
+          </label>
+          <div className="flex gap-4">
+            <label className="flex items-center space-x-2">
+              <input
+                type="radio"
+                name="isForSale"
+                value="true"
+                checked={formData.isForSell}
+                onChange={() => setFormData({ ...formData, isForSell: true })}
+              />
+              <span>Yes</span>
+            </label>
+            <label className="flex items-center space-x-2">
+              <input
+                type="radio"
+                name="isForSale"
+                value="false"
+                checked={!formData.isForSell}
+                onChange={() => setFormData({ ...formData, isForSell: false })}
+              />
+              <span>No</span>
+            </label>
+          </div>
+        </div>
         <label
           htmlFor="productDescription"
           className="flex flex-col gap-1.5 w-full"
