@@ -13,6 +13,7 @@ import "react-day-picker/style.css";
 import { differenceInDays } from "date-fns";
 import useUserStore from "../stores/authStores/useUserStore";
 import useCreditModalStore from "../stores/creditModalStores/useCreditModalStore";
+import { formatDistanceToNow } from "date-fns";
 
 const ProductDetails = () => {
   const [product, setProduct] = useState(null);
@@ -74,14 +75,6 @@ const ProductDetails = () => {
     };
     fetchProduct();
   }, [id]);
-
-  let days;
-  if (product) {
-    days = Math.floor(
-      (Date.now() - new Date(product.createdAt).getTime()) /
-        (1000 * 60 * 60 * 24),
-    );
-  }
 
   const conditionColor =
     {
@@ -147,7 +140,8 @@ const ProductDetails = () => {
               {product.name}
             </h2>
             <p className="text-xs text-gray-500">
-              Listed {days <= 0 ? "Today" : `${days} days ago.`}
+              Listed{" "}
+              {formatDistanceToNow(product.createdAt, { addSuffix: true })}
             </p>
 
             <div className="flex items-center gap-2 mt-4 sm:mt-6">
@@ -259,7 +253,7 @@ const ProductDetails = () => {
                       </span>
                       <span className={`text-xs`}>
                         {product.owner._count.borrowedProducts +
-                          product.owner._count.rentedProducts}
+                          product.owner._count.rentedOutProducts}
                       </span>
                     </p>
                   </div>

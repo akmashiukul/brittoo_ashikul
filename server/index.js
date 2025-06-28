@@ -8,6 +8,7 @@ import { multerErrorHandler } from "./lib/multerErrorHandler.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import bccRoutes from './routes/bcc.routes.js';
+import rccRoutes from './routes/rcc.routes.js';
 import userRoutes from './routes/user.routes.js';
 
 dotenv.config();
@@ -28,6 +29,7 @@ app.get("/", (req, res) => {
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/products", productRoutes);
 app.use("/api/v1/credit/bcc", bccRoutes);
+app.use("/api/v1/credit/rcc", rccRoutes);
 app.use("/api/v1/users", userRoutes);
 
 app.use(errorHandler);

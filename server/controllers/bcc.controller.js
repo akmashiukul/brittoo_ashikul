@@ -143,3 +143,31 @@ export const rejectBCCRequest = async (req, res, next) => {
     next(error);
   }
 };
+
+
+export const getUsersAvailableBcc = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const result = await prisma.blueCacheCredit.aggregate({
+      _sum: {
+        amount: true,
+      },
+      where: {
+        userId,
+        status: 'ACCEPTED',
+        deletedAt: null
+      }
+    });
+
+    const totalBcc = result._sum.amount ?? 0;
+
+    res.status(200).json({
+      success: true,
+      message: "Successfully fetched accumulated Blue Cache Credits",
+      data: totalBcc,
+    });
+  } catch (error) {
+    console.error("Error in getUsersAvailableBcc controller:", error);
+    next(error);
+  }
+}

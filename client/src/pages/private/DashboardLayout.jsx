@@ -9,16 +9,24 @@ import { Menu, X } from "lucide-react";
 import { AiOutlineProduct } from "react-icons/ai";
 import { useEffect } from "react";
 import { FaShoppingCart, FaUserCog } from "react-icons/fa";
+import useShowRccModalStore from "../../stores/creditModalStores/useShowRccModalStore";
 
 const DashboardLayout = () => {
   const { currentUser } = useUserStore();
   const location = useLocation();
   const path = location.pathname;
   const { isDrawerOpen, openDrawer, closeDrawer } = useDashDrawertore();
+  const { isShowRccModalOpen } = useShowRccModalStore();
+
+  useEffect(() => {
+    if (isShowRccModalOpen) {
+      closeDrawer();
+    }
+  }, [closeDrawer, isShowRccModalOpen]);
 
   useEffect(() => {
   const handleResize = () => {
-    if (window.innerWidth >= 768) {
+    if (window.innerWidth >= 768 && !isShowRccModalOpen) {
       openDrawer();
     } else {
       closeDrawer();
@@ -29,7 +37,7 @@ const DashboardLayout = () => {
   window.addEventListener("resize", handleResize);
 
   return () => window.removeEventListener("resize", handleResize);
-}, [closeDrawer, openDrawer]);
+}, [closeDrawer, isShowRccModalOpen, openDrawer]);
 
 
 

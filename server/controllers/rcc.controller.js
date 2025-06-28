@@ -2,11 +2,26 @@ import prisma from "../config/prisma.js";
 import { CustomError } from "../lib/customError.js";
 import { userSafeSelect } from "../lib/prismaSelects.js";
 
-export const getUserInactiveRcc = async (req, res, next) => {
+export const getUsersAvailableRcc = async (req, res, next) => {
   try {
-    
+    const { userId } = req.params;
+    const availableRcc = await prisma.redCacheCredit.findMany({
+      where: {
+        userId,
+        deletedAt: null,
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Successfully fetched accumulated Red Cache Credits",
+      data: availableRcc
+    });
   } catch (error) {
-    console.error("Error in geUserInactiveRcc controller: ", error);
+    console.error("Error in geUsersAvailableRcc controller: ", error);
     next(error);
   }
 }

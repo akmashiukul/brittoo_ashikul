@@ -261,6 +261,9 @@ export const login = async (req, res, next) => {
       include: {
         blueCacheCredits: true,
         redCacheCredits: true,
+        rentalRequestsMade: true,
+        rentedOutProducts: true,
+        rentalRequestsReceived: true,
       }
     });
     if (!user) {
