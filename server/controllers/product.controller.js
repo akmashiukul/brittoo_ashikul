@@ -88,7 +88,6 @@ export const createProduct = async (req, res, next) => {
       const rcc = await tx.redCacheCredit.create({
         data: {
           amount: secondHandPrice,
-          validityStart: new Date(),
           userId: req.user.id,
           sourceProductId: updatedProduct.id,
         }

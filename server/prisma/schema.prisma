@@ -113,7 +113,7 @@ model RedCacheCredit {
   id            String    @id @default(cuid()) @map("id")
   amount        Int       @map("amount")
   renterId      String?   @map("renter_id")
-  validityStart DateTime  @map("validity_start")
+  validityStart DateTime? @map("validity_start")
   validityEnd   DateTime? @map("validity_end")
 
   userId          String  @map("user_id")
