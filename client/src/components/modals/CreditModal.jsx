@@ -6,6 +6,7 @@ import api from "../../lib/api";
 import Loader from "../shared/Loader";
 import BCC from "../CacheCreditCard/BCC";
 import RCC from "../CacheCreditCard/RCC";
+import CCDisplay from "../CacheCreditCard/CCDisplay";
 
 const CreditModal = () => {
   const { closeCreditModal, isCreditModalOpen, requiredDeposit } =
@@ -14,6 +15,7 @@ const CreditModal = () => {
   const [bcc, setBcc] = useState(null);
   const [rcc, setRcc] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [totalSelectedCredit, setTotalSelectedCredit] = useState(0);
 
   useEffect(() => {
     const getAvailableBcc = async () => {
@@ -79,7 +81,7 @@ const CreditModal = () => {
   return (
     <div
       id="authentication-modal"
-      className="fixed inset-0 overflow-y-scroll z-50 flex justify-center items-center bg-black/70"
+      className="fixed inset-0 z-50 flex justify-center items-center bg-black/70"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           closeCreditModal();
@@ -87,19 +89,17 @@ const CreditModal = () => {
       }}
     >
       <div className="relative p-4 w-full max-w-[760px] max-h-full">
-        <div className="relative bg-white rounded-lg shadow-sm flex flex-col max-h-[90vh]">
-          {/* Fixed Header */}
-          <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t border-gray-200 flex-shrink-0">
-            <div id="credit-calc" className="flex flex-col items-center text-center w-full">
-              <h3 className="text-xs md:text-lg font-semibold text-gray-700">
+        <div className="relative bg-white rounded-lg shadow-sm flex flex-col max-h-[95vh]">
+
+          <div className="flex items-center justify-between mx-4 md:mx-5 border-b rounded-t border-gray-200 flex-shrink-0 pb-4">
+            <div
+              id="credit-calc"
+              className="flex flex-col items-center text-center w-full"
+            >
+              <h3 className="text-lg font-semibold text-gray-700 mt-2">
                 Deposit Cache Credit
               </h3>
-              <p className="text-sm text-gray-600">
-                <strong>Required:</strong>{" "}
-                <span className="italic text-gray-800">
-                  {requiredDeposit} CC
-                </span>
-              </p>
+              <CCDisplay required={requiredDeposit} selected={9} />
             </div>
             <button
               type="button"
@@ -112,17 +112,18 @@ const CreditModal = () => {
             </button>
           </div>
 
-          {/* Scrollable Content */}
           <div className="flex-1 overflow-y-auto">
             <div className="px-3 md:px-5 mt-2">
-              <h3 className="mt-1 text-sm font-semibold text-center sm:text-left">🔵Available Blue Cache Credits</h3>
-              {/* blue */}
-              <div className="mt-4 flex flex-col md:flex-row items-center">
+              <h3 className="mt-1 text-sm font-semibold text-center sm:text-left">
+                🔵Available Blue Cache Credits
+              </h3>
+              <div className="mt-4 flex flex-col sm:flex-row items-center">
                 <BCC bcc={bcc} />
               </div>
-              {/* reds */}
-              <h3 className="mt-6 text-sm font-semibold text-center sm:text-left">🔴Available Red Cache Credits</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-2 justify-self-center">
+              <h3 className="mt-6 text-sm font-semibold text-center sm:text-left">
+                🔴Available Red Cache Credits
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-2 justify-self-center sm:justify-self-start">
                 {rcc?.map((credit) => (
                   <RCC key={credit.id} rcc={credit} />
                 ))}
@@ -130,7 +131,6 @@ const CreditModal = () => {
             </div>
           </div>
 
-          {/* Fixed Footer */}
           <div className="p-4 md:p-5 border-t border-gray-200 flex-shrink-0">
             <button
               type="submit"
