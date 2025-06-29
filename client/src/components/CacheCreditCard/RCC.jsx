@@ -1,12 +1,13 @@
 import brittoofav from "../../assets/brittoofav.png";
 
-const RCC = ({ rcc }) => {
+const RCC = ({ rcc, handleSelect, selectedRCCs }) => {
+  const selectedRcc = selectedRCCs?.find((r) => r.rcc.id === rcc.id);
   return (
-    <div className="text-black w-[210px]  p-5 rounded-xl hover:scale-105 cursor-pointer transition duration-300 shadow-md bg-gradient-to-r from-red-400 to-red-100">
+    <div onClick={() => handleSelect(rcc)} className={`text-black w-[210px]  p-5 rounded-xl hover:scale-105 cursor-pointer transition duration-300 shadow-md ${selectedRcc ? "bg-red-100 border-[3px] border-red-700" : "bg-gradient-to-r from-red-400 to-red-100"}`}>
       <div className="flex justify-between">
         <div>
           <h2 className="text-xs md:text-sm"> CC Amount </h2>
-          <p className="text-lg md:text-xl font-bold"> {rcc.amount} </p>
+          <p className="text-lg font-bold italic"> {rcc.amount} {selectedRcc && <span className='text-red-600'> -{selectedRcc.selectedAmount}</span>} </p>
         </div>
         <img src={brittoofav} alt="fav" className="w-10 h-10" />
       </div>

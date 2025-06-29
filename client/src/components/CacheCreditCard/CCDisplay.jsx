@@ -1,6 +1,12 @@
-const CCDisplay = ({ required, selected }) => {
-  const remaining = required - selected;
+const CCDisplay = ({ required, selectedBcc, selectedRCCs, remaining, selected }) => {
+  const totalSelectedRcc = selectedRCCs.reduce(
+    (sum, selectedRcc) => sum + (selectedRcc.selectedAmount),
+    0,
+  );
+  
   const progressPercentage = (selected / required) * 100;
+  console.log("srcc: ", totalSelectedRcc);
+  console.log("sbcc: ", selectedBcc);
 
   return (
     <div className="w-full mt-3">
@@ -11,8 +17,8 @@ const CCDisplay = ({ required, selected }) => {
           <div className="flex-1">
             <div className="flex justify-between items-center mb-2">
               <span className="text-xs text-gray-500">Progress</span>
-              <span className="text-xs text-gray-700 font-medium">
-                {Math.round(progressPercentage)}% Selected
+              <span className="text-xs font-medium">
+                <span className="text-gray-700">{selected}</span><sapn className='font-bold text-black text-sm'>/</sapn><span className="text-gray-700">{required}</span> Selected
               </span>
             </div>
             <div className="w-full bg-gray-100 rounded-full h-2">
@@ -43,28 +49,25 @@ const CCDisplay = ({ required, selected }) => {
             {/* Selected */}
             <div className="text-center border-r border-gray-300 w-full">
               <div className="text-xs text-gray-500 mb-1">Selected</div>
-              <div
-                className={`text-lg font-semibold ${
-                  progressPercentage === 100
-                    ? "text-emerald-600"
-                    : "text-blue-600"
-                }`}
-              >
-                {selected.toLocaleString()}
-                <span className="text-xs font-normal text-gray-500 ml-1">
-                  CC
+              <h3 className="text-lg font-semibold">
+                <span className={`text-blue-600`}>
+                  {selectedBcc.toLocaleString()}
                 </span>
-              </div>
+                {selectedRCCs.length > 0 && (
+                  <>
+                    <span className="text-gray-500">+</span>
+                    <span className={`text-red-600`}>
+                      {totalSelectedRcc.toLocaleString()}
+                    </span>
+                  </>
+                )}
+              </h3>
             </div>
 
             {/* Remaining */}
             <div className="text-center w-full">
               <div className="text-xs text-gray-500 mb-1">Remaining</div>
-              <div
-                className={`text-lg font-semibold ${
-                  remaining === 0 ? "text-gray-400" : "text-amber-600"
-                }`}
-              >
+              <div className={`text-lg font-semibold text-amber-600`}>
                 {remaining.toLocaleString()}
                 <span className="text-xs font-normal text-gray-500 ml-1">
                   CC

@@ -15,7 +15,8 @@ const CreditModal = () => {
   const [bcc, setBcc] = useState(null);
   const [rcc, setRcc] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [totalSelectedCredit, setTotalSelectedCredit] = useState(0);
+  const [selectedBcc, setSelectedBcc] = useState(0);
+  const [selectedRCCs, setSelectedRCCs] = useState([]);
 
   useEffect(() => {
     const getAvailableBcc = async () => {
@@ -72,6 +73,35 @@ const CreditModal = () => {
     }
   }, [currentUser.id, isCreditModalOpen]);
 
+
+  const totalSelectedRcc = selectedRCCs.reduce(
+    (sum, selectedRcc) => sum + selectedRcc.selectedAmount,
+    0,
+  );
+  const selected = selectedBcc + totalSelectedRcc;
+  const remaining = requiredDeposit - selected;
+
+  const handleBccSelect = () => {
+    if (remaining > 0 && bcc >= remaining) {
+      setSelectedBcc(remaining);
+    } else if (remaining > 0 && selectedBcc === 0) {
+      setSelectedBcc(bcc);
+    } else {
+      setSelectedBcc(0)
+    }
+  }
+  const handleRccSelect = (rccParams) => {
+    const alreadySelected = selectedRCCs.find((selectedRcc) => selectedRcc.rcc.id === rccParams.id)
+    if (alreadySelected) {
+      setSelectedRCCs(selectedRCCs.filter((selectedRcc) => selectedRcc.rcc.id !== rccParams.id));
+    }
+    else if(remaining > 0 && rccParams.amount >= remaining) {
+      setSelectedRCCs([...selectedRCCs, {rcc: rccParams, selectedAmount: remaining}]);
+    } else if (remaining > 0) {
+      setSelectedRCCs([...selectedRCCs, {rcc: rccParams, selectedAmount: rccParams.amount}]);;
+    }
+  }
+
   if (loading) {
     return <Loader />;
   }
@@ -99,7 +129,7 @@ const CreditModal = () => {
               <h3 className="text-lg font-semibold text-gray-700 mt-2">
                 Deposit Cache Credit
               </h3>
-              <CCDisplay required={requiredDeposit} selected={9} />
+              <CCDisplay required={requiredDeposit} selectedBcc={selectedBcc} selectedRCCs={selectedRCCs} remaining={remaining} selected={selected} />
             </div>
             <button
               type="button"
@@ -118,14 +148,14 @@ const CreditModal = () => {
                 🔵Available Blue Cache Credits
               </h3>
               <div className="mt-4 flex flex-col sm:flex-row items-center">
-                <BCC bcc={bcc} />
+                <BCC handleSelect={handleBccSelect} bcc={bcc} selectedBcc={selectedBcc} />
               </div>
               <h3 className="mt-6 text-sm font-semibold text-center sm:text-left">
                 🔴Available Red Cache Credits
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-2 justify-self-center sm:justify-self-start">
                 {rcc?.map((credit) => (
-                  <RCC key={credit.id} rcc={credit} />
+                  <RCC handleSelect={handleRccSelect} key={credit.id} rcc={credit} selectedRCCs={selectedRCCs} />
                 ))}
               </div>
             </div>
