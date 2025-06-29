@@ -142,7 +142,7 @@ const AllProducts = () => {
               <div
                 className={`${
                   isFilterOpen ? "block" : "hidden"
-                } sm:flex sm:items-center sm:gap-2 sm:static bg-white sm:bg-transparent p-4 sm:p-0 sm:w-auto z-10`}
+                } sm:flex sm:items-center sm:gap-2 sm:static bg-white sm:bg-transparent p-4 sm:p-0 sm:w-auto`}
               >
                 {(search || productType || productCondition || productAge) && (
                   <button

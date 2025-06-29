@@ -18,7 +18,7 @@ const CCDisplay = ({ required, selectedBcc, selectedRCCs, remaining, selected })
             <div className="flex justify-between items-center mb-2">
               <span className="text-xs text-gray-500">Progress</span>
               <span className="text-xs font-medium">
-                <span className="text-gray-700">{selected}</span><sapn className='font-bold text-black text-sm'>/</sapn><span className="text-gray-700">{required}</span> Selected
+                <span className="text-gray-700">{selected}</span><span className='font-bold text-black text-sm'>/</span><span className="text-gray-700">{required}</span> Selected
               </span>
             </div>
             <div className="w-full bg-gray-100 rounded-full h-2">

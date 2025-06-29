@@ -19,31 +19,30 @@ const Navbar = () => {
   const { currentUser, setCurrentUser } = useUserStore();
 
   const handleLogOut = () => {
-  Swal.fire({
-    title: "Logging Out?",
-    text: "Your first year study group lasted longer than this session",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#dc2626",
-    cancelButtonColor: "#6b7280",
-    confirmButtonText: "Yes! Take me outta this shit",
-    cancelButtonText: "Let me rot a little longer",
-  }).then((result) => {
-    if (result.isConfirmed) {
-      setCurrentUser(null);
-      localStorage.removeItem("token");
-      setIsUserDropDownOpen(false);
-      Swal.fire({
-        title: "Session Terminated",
-        text: "Unlike your CG, this completed successfully.",
-        icon: "success",
-      });
-    } else {
-      setIsUserDropDownOpen(false);
-    }
-  });
-};
-
+    Swal.fire({
+      title: "Logging Out?",
+      text: "Your first year study group lasted longer than this session",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#dc2626",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: "Yes! Take me outta this shit",
+      cancelButtonText: "Let me rot a little longer",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setCurrentUser(null);
+        localStorage.removeItem("token");
+        setIsUserDropDownOpen(false);
+        Swal.fire({
+          title: "Session Terminated",
+          text: "Unlike your CG, this completed successfully.",
+          icon: "success",
+        });
+      } else {
+        setIsUserDropDownOpen(false);
+      }
+    });
+  };
 
   return (
     <header className="bg-white shadow-md z-10 relative">
@@ -122,19 +121,18 @@ const Navbar = () => {
             )}
             {isUserDropDownOpen && (
               <div
-                className="absolute end-0 z-10 mt-0.5 w-48 divide-gray-100 rounded-md border border-gray-100 bg-white shadow-lg top-14 right-1.5
+                className="absolute end-0 z-20 mt-0.5 w-48 divide-gray-100 rounded-md border border-gray-100 bg-white shadow-lg top-14 right-1.5
                overflow-x-hidden"
               >
                 <div className="p-2">
                   <Link to="/dashboard/overview" className={menuClassname}>
                     My Dashboard
                   </Link>
-                  <Link to="" className={menuClassname}>
-                    Billing summary
-                  </Link>
-                  <Link to="" className={menuClassname}>
-                    Team settings
-                  </Link>
+                  {currentUser.role === "ADMIN" && (
+                    <Link to="" className={menuClassname}>
+                      Admin Dashboard
+                    </Link>
+                  )}
                 </div>
                 {currentUser && (
                   <button

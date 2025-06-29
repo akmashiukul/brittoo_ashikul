@@ -81,13 +81,19 @@ const CreditModal = () => {
   const selected = selectedBcc + totalSelectedRcc;
   const remaining = requiredDeposit - selected;
 
+  
+
   const handleBccSelect = () => {
-    if (remaining > 0 && bcc >= remaining) {
+    if (remaining > 0 && (bcc - selectedBcc) >= remaining) {
+      //console.log('case 1')
       setSelectedBcc(remaining);
     } else if (remaining > 0 && selectedBcc === 0) {
+      //console.log('case 2')
       setSelectedBcc(bcc);
     } else {
-      setSelectedBcc(0)
+      //console.log('case 3')
+      setSelectedBcc(0);
+
     }
   }
   const handleRccSelect = (rccParams) => {
