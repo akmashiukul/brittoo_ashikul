@@ -1,10 +1,71 @@
-import { X } from "lucide-react";
+import { Home, MapPin, TagIcon, X } from "lucide-react";
 import useConfirmRentalRequestModalStore from "../../stores/creditModalStores/useConfirmRentalRequestModalStore";
-
+import RCC from "../CacheCreditCard/RCC";
+import BCC from "../CacheCreditCard/BCC";
+import { differenceInDays } from "date-fns";
+import { usePriceCalculate } from "../../hooks/usePriceCalculate";
+import { useState } from "react";
 
 const ConfirmRentalRequestModal = () => {
+  const {
+    closeConfirmRentalRequestModal,
+    isConfirmRentalRequestModalOpen,
+    data,
+  } = useConfirmRentalRequestModalStore();
+  const base_url = import.meta.env.VITE_BASE_URL;
 
-  const { closeConfirmRentalRequestModal, isConfirmRentalRequestModalOpen, data } = useConfirmRentalRequestModalStore();
+  const { calculatePricePerDay } = usePriceCalculate();
+  const numberOfDays =
+    differenceInDays(
+      data?.rentalDetails?.final.toDateString(),
+      data?.rentalDetails?.initial?.toDateString(),
+    ) + 1;
+
+  const pricePerDay = calculatePricePerDay(
+    data?.rentalDetails?.product?.omv,
+    data?.rentalDetails?.product?.productCondition,
+    data?.rentalDetails?.product?.productAge,
+    data?.rentalDetails?.product?.owner.securityScore,
+    numberOfDays,
+  );
+
+  const conditionColor =
+    {
+      NEW: "text-green-400",
+      LIKE_NEW: "text-emerald-400",
+      GOOD: "text-teal-400",
+      FAIR: "text-yellow-400",
+      POOR: "text-red-400",
+    }[data?.rentalDetails?.product?.productCondition] ||
+    "bg-gray-100 text-gray-800";
+
+  const [selectedMethod, setSelectedMethod] = useState("TERMINAL_PICKUP");
+  console.log(selectedMethod);
+
+  const methods = [
+    {
+      id: "TERMINAL_PICKUP",
+      label: "Terminal Pickup",
+      icon: MapPin,
+      description: "Collect from our terminal (No Charge)",
+    },
+    {
+      id: "HOME_DELIVERY",
+      label: "Home Delivery",
+      icon: Home,
+      description: "Delivered to your address. (10TK extra charge)",
+    },
+  ];
+
+  const conditionLabel =
+    {
+      NEW: "🆕 New",
+      LIKE_NEW: "✨ Like New",
+      GOOD: "👍 Good",
+      FAIR: "👌 Fair",
+      POOR: "⚠️ Poor",
+    }[data?.rentalDetails?.product?.productCondition] ||
+    data?.rentalDetails?.product?.productCondition;
 
   if (!isConfirmRentalRequestModalOpen) {
     return null;
@@ -28,16 +89,16 @@ const ConfirmRentalRequestModal = () => {
               className="flex flex-col items-center text-center w-full"
             >
               <h3 className="text-lg font-semibold text-gray-700 mt-2">
-                Deposit Cache Credit
+                Confirm Your Request
               </h3>
               <p className="text-xs text-gray-600">
-                No worries nigga! you'll get this back after you return the
-                product
+                Bro! brittoo will be at your support 24/7. Just start your
+                renting journey without hesitation.
               </p>
             </div>
             <button
               type="button"
-              className="absolute top-1 cursor-pointer right-1 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-xs md:text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
+              className="absolute top-1 cursor-pointer right-1 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-xs md:text-xs w-8 h-8 ms-auto inline-flex justify-center items-center"
               data-modal-hide="authentication-modal"
               onClick={closeConfirmRentalRequestModal}
             >
@@ -46,18 +107,236 @@ const ConfirmRentalRequestModal = () => {
             </button>
           </div>
 
-          <div className="p-4 md:p-5 border-t border-gray-200 flex-shrink-0">
+          <div className="overflow-y-auto">
+            <div className="mt-6 mx-4 flex gap-4 items-start border-b border-gray-200 pb-4">
+              <img
+                src={`${base_url}${data?.rentalDetails?.product?.productImages[0]}`}
+                alt="image"
+                className="w-24 h-24 object-cover"
+              />
+              <div>
+                <h2 className="text-lg p-0 font-semibold">
+                  {data?.rentalDetails?.product?.name}
+                </h2>
+                <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap gap-1">
+                    {data?.rentalDetails?.product?.tags
+                      .split(",")
+                      .map((tag) => tag.trim())
+                      .filter((tag) => tag.length > 0)
+                      .slice(0, 3)
+                      .map((tag, index) => (
+                        <span
+                          key={index}
+                          className="px-2 py-1 text-xs md:text-xs bg-green-50 text-green-700 rounded-md border border-green-100"
+                        >
+                          {tag.trim()}
+                        </span>
+                      ))}
+                  </div>
+                </div>
+
+                <p className="text-xs text-gray-600 mt-2">
+                  <span className="font-semibold">Condition:</span>{" "}
+                  <span
+                    className={`px-2 py-1 rounded-md text-xs ${conditionColor}`}
+                  >
+                    {conditionLabel}
+                  </span>
+                </p>
+                <p className="text-xs text-gray-600 mt-2">
+                  <span className="font-semibold">Product Age: </span>{" "}
+                  <span className={`px-2 py-1 rounded-md text-xs`}>
+                    Less than {data?.rentalDetails?.product?.productAge}{" "}
+                    {data?.rentalDetails?.product?.productAge == 1
+                      ? "Year"
+                      : "Years"}
+                  </span>
+                </p>
+                <p className="text-xs text-gray-600 mt-2">
+                  <span className="font-semibold">Original Market Price: </span>{" "}
+                  <span className={`px-2 py-1 rounded-md text-xs`}>
+                    BDT {data?.rentalDetails?.product?.omv}.00
+                  </span>
+                </p>
+                <p className="text-xs text-gray-600 mt-2">
+                  <span className="font-semibold">Quantity: </span>{" "}
+                  <span className={`px-2 py-1 rounded-md text-xs`}>
+                    {data?.rentalDetails?.product?.quantity}
+                  </span>
+                </p>
+              </div>
+            </div>
+
+            <div className="mx-4 py-4">
+              <h2 className="text-lg font-medium text-gray-900 mb-2">
+                Rental Period
+              </h2>
+              <div className="border-b w-fit border-gray-300 pb-1 space-y-1">
+                <h3 className="text-sm text-gray-800 ">
+                  <span className="font-medium">Start date:</span>{" "}
+                  {data?.rentalDetails?.initial.toDateString()}
+                </h3>
+                <h3 className="text-sm text-gray-800 ">
+                  <span className="font-medium">End date: </span>
+                  {data?.rentalDetails?.final?.toDateString()}
+                </h3>
+              </div>
+              <h3 className="text-sm text-gray-800 mt-1">
+                <span className="font-medium">Total Days:</span> {numberOfDays}
+              </h3>
+              {/* one case for initial == final */}
+            </div>
+
+            <div>
+              <div className="max-w-sm mx-4">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">
+                  Collection Method
+                </h3>
+
+                <div className="space-y-3">
+                  {methods.map((method) => {
+                    const IconComponent = method.icon;
+                    const isSelected = selectedMethod === method.id;
+
+                    return (
+                      <label
+                        key={method.id}
+                        className={`
+                flex items-center p-4 rounded-lg border-2 cursor-pointer transition-all duration-200
+                ${
+                  isSelected
+                    ? "border-green-500 bg-green-50 shadow-sm"
+                    : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                }
+              `}
+                      >
+                        <input
+                          type="radio"
+                          name="collectionMethod"
+                          value={method.id}
+                          checked={isSelected}
+                          onChange={(e) => setSelectedMethod(e.target.value)}
+                          className="sr-only"
+                        />
+
+                        <div
+                          className={`
+                flex items-center justify-center w-10 h-10 rounded-full mr-4 transition-colors
+                ${
+                  isSelected
+                    ? "bg-green-500 text-white"
+                    : "bg-gray-100 text-gray-600"
+                }
+              `}
+                        >
+                          <IconComponent size={20} />
+                        </div>
+
+                        <div className="flex-1">
+                          <div
+                            className={`font-medium ${
+                              isSelected ? "text-green-900" : "text-gray-900"
+                            }`}
+                          >
+                            {method.label}
+                          </div>
+                          <div className="text-xs text-gray-500 mt-1">
+                            {method.description}
+                          </div>
+                        </div>
+
+                        <div
+                          className={`
+                w-5 h-5 rounded-full border-2 ml-4 transition-all
+                ${
+                  isSelected
+                    ? "border-green-500 bg-green-500"
+                    : "border-gray-300"
+                }
+              `}
+                        >
+                          {isSelected && (
+                            <div className="w-2 h-2 bg-white rounded-full mx-auto mt-0.5"></div>
+                          )}
+                        </div>
+                      </label>
+                    );
+                  })}
+                </div>
+
+                <div className="mt-4 px-2 py-2 bg-gray-100 rounded-lg">
+                  <p className="text-xs text-gray-600">
+                    Selected:{" "}
+                    <span className="font-medium text-gray-900">
+                      {methods.find((m) => m.id === selectedMethod)?.label}
+                    </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mx-4 py-4 mt-2">
+              <h2 className="text-lg font-medium text-gray-900 mb-2">
+                Total Amount
+              </h2>
+              <div className="border-b w-fit border-gray-300 pb-1 space-y-1">
+                <h3 className="text-sm text-gray-800 ">
+                  <span className="">Price Per Day</span>{" "}
+                  {pricePerDay}
+                </h3>
+                <h3 className="text-sm text-gray-800 ">
+                  <span className="">Subtotal Price: </span>
+                  {pricePerDay*numberOfDays}
+                </h3>
+                <h3 className="text-sm text-gray-800 ">
+                  <span className="">Delivery Charge: </span>
+                  BDT {selectedMethod === 'HOME_DELIVERY' ? '10' : '0'}
+                </h3>
+              </div>
+              <h3 className="text-sm text-gray-800 mt-1">
+                <span className="">Total: </span> <span className="font-bold"> BDT {(pricePerDay*numberOfDays + (selectedMethod === 'HOME_DELIVERY' ? 10 : 0)).toFixed(2)}</span>
+              </h3>
+              {/* one case for initial == final */}
+            </div>
+
+            <div className="space-y-4 mx-4 mt-2">
+              <h2 className="text-lg font-medium text-gray-900 mb-2">Selected Credits</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-2">
+                {data?.selectedRCCs?.map((selectedRcc) => (
+                  <RCC
+                    handleSelect={() => {}}
+                    key={selectedRcc.rcc.id}
+                    rcc={selectedRcc.rcc}
+                    selectedRCCs={data?.selectedRCCs}
+                  />
+                ))}
+              </div>
+              {/* remove the not below */}
+              {!data?.selectedBcc && (
+                <div>
+                  <BCC
+                    handleSelect={() => {}}
+                    bcc={data?.bcc}
+                    selectedBcc={data?.selectedBcc}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="py-4 md:py-5 border-t mx-4 border-gray-200 flex-shrink-0 mt-4">
             <button
               type="submit"
-              className="w-full text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-xs md:text-sm px-5 py-2.5 text-center cursor-pointer"
+              className="w-full text-green-600 hover:text-white bg-gray-50 hover:bg-green-600 font-medium rounded-lg text-xs md:text-sm px-5 py-2.5 text-center cursor-pointer border-2 border-green-600 shadow-md transition-all duration-300"
             >
-              Deposit
+              Confirm Rental Request
             </button>
           </div>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ConfirmRentalRequestModal
+export default ConfirmRentalRequestModal;

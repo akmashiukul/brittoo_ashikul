@@ -129,7 +129,7 @@ const CreditModal = () => {
       });
       return;
     }
-    openConfirmRentalRequestModal({data, selectedBcc, selectedRCCs});
+    openConfirmRentalRequestModal({rentalDetails: data, bcc, selectedBcc, selectedRCCs});
   };
 
   if (loading) return <Loader />;
@@ -178,7 +178,7 @@ const CreditModal = () => {
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto pb-4">
             <div className="px-3 md:px-5 mt-2">
               <h3 className="mt-1 text-sm font-semibold text-center sm:text-left">
                 🔵Available Blue Cache Credits
