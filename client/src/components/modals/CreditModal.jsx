@@ -8,10 +8,13 @@ import BCC from "../CacheCreditCard/BCC";
 import RCC from "../CacheCreditCard/RCC";
 import CCDisplay from "../CacheCreditCard/CCDisplay";
 import Swal from "sweetalert2";
+import useConfirmRentalRequestModalStore from "../../stores/creditModalStores/useConfirmRentalRequestModalStore";
 
 const CreditModal = () => {
   const { closeCreditModal, isCreditModalOpen, data } =
     useCreditModalStore();
+  const { openConfirmRentalRequestModal } = useConfirmRentalRequestModalStore();
+
   console.log(data)
   const { currentUser } = useUserStore();
   const [bcc, setBcc] = useState(null);
@@ -126,7 +129,7 @@ const CreditModal = () => {
       });
       return;
     }
-    alert('ok')
+    openConfirmRentalRequestModal({data, selectedBcc, selectedRCCs});
   };
 
   if (loading) return <Loader />;

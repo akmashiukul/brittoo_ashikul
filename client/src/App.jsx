@@ -28,6 +28,7 @@ import AllProducts from "./pages/AllProducts";
 import BlueCCRequests from "./pages/admin/admin-dash-pages/BlueCCRequests";
 import useShowRccModalStore from "./stores/creditModalStores/useShowRccModalStore";
 import ShowRccModal from "./components/modals/ShowRccModal";
+import ConfirmRentalRequestModal from "./components/modals/ConfirmRentalRequestModal";
 
 const AppContent = () => {
   const location = useLocation();
@@ -58,6 +59,7 @@ const AppContent = () => {
 
       {/* Credit Modals */}
       <CreditModal />
+      <ConfirmRentalRequestModal />
 
       {isBuyBccModalOpen && <BuyBccModal />}
       {isShowRccModalOpen && <ShowRccModal />}

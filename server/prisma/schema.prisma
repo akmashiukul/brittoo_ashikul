@@ -116,14 +116,13 @@ model RedCacheCredit {
   validityStart DateTime? @map("validity_start")
   validityEnd   DateTime? @map("validity_end")
 
-  userId          String  @map("user_id")
-  user            User    @relation(fields: [userId], references: [id])
-  sourceProductId String  @map("source_product_id")
-  sourceProduct   Product @relation(fields: [sourceProductId], references: [id])
+  userId          String    @map("user_id")
+  user            User      @relation(fields: [userId], references: [id])
+  sourceProductId String    @map("source_product_id")
+  sourceProduct   Product   @relation(fields: [sourceProductId], references: [id])
+  status          RccStatus @default(INACTIVE) @map("status")
 
-  activatedByRentalId String?        @map("activated_by_rental_id")
-  activatedByRental   RentalRequest? @relation(fields: [activatedByRentalId], references: [id])
-  status              RccStatus      @default(INACTIVE) @map("status")
+  rentalRequests RentalRequest[]
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
@@ -231,9 +230,7 @@ model RentalRequest {
   deliveryAddress        String?          @map("delivery_address")
   pickUpPoint            CollectionPoint? @map("pickup_point")
 
-  paidWithRcc   Boolean @default(false) @map("paid_with_rcc")
-  usedRccId     String? @map("used_rcc_id")
-  usedRccAmount Int?    @map("used_rcc_amount")
+  paidWithRcc Boolean @default(false) @map("paid_with_rcc")
 
   paidWithBcc         Boolean @default(false) @map("paid_with_bcc")
   usedBccId           String? @map("used_bcc_id")
@@ -244,8 +241,7 @@ model RentalRequest {
   product   Product          @relation(fields: [productId], references: [id])
   requester User             @relation("RentalRequestsMade", fields: [requesterId], references: [id])
   owner     User             @relation("RentalRequestsReceived", fields: [ownerId], references: [id])
-
-  activatedRccCredits RedCacheCredit[]
+  usedRCCs  RedCacheCredit[]
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
