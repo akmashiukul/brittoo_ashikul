@@ -222,11 +222,17 @@ export const verifyOTP = async (req, res, next) => {
       include: {
         blueCacheCredits: true,
         redCacheCredits: true,
-      }
+      },
     });
 
     const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role, isVerified: user.isVerified, isSuspended: user.isSuspended },
+      {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        isVerified: user.isVerified,
+        isSuspended: user.isSuspended,
+      },
       process.env.JWT_SECRET,
       { expiresIn: "2d" },
     );
@@ -264,7 +270,7 @@ export const login = async (req, res, next) => {
         rentalRequestsMade: true,
         rentedOutProducts: true,
         rentalRequestsReceived: true,
-      }
+      },
     });
     if (!user) {
       throw new CustomError("User not found", 401);
@@ -309,7 +315,13 @@ export const login = async (req, res, next) => {
     */
 
     const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role, isVerified: user.isVerified, isSuspended: user.isSuspended },
+      {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        isVerified: user.isVerified,
+        isSuspended: user.isSuspended,
+      },
       process.env.JWT_SECRET,
       { expiresIn: "2d" },
     );
@@ -324,6 +336,37 @@ export const login = async (req, res, next) => {
     });
   } catch (error) {
     console.error(error);
+    next(error);
+  }
+};
+
+export const checkPassword = async (req, res, next) => {
+  try {
+    const { password } = req.body;
+    const loggedInUser = await prisma.user.findUnique({
+      where: {
+        email: req.user.email,
+      },
+    });
+    if (!loggedInUser) {
+      throw new CustomError(
+        "You are not allowed to perform this operation",
+        403,
+      );
+    }
+    const isPasswordValid = await bcrypt.compare(
+      password,
+      loggedInUser.password,
+    );
+    if (!isPasswordValid) {
+      throw new CustomError("Invalid password", 401);
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Authentication Successfull",
+    });
+  } catch (error) {
+    console.error("error in passcheck", error);
     next(error);
   }
 };

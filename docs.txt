@@ -18,6 +18,7 @@ Prod:
 
 --------TEST_TODO VVII:--------
   1. check one more registration if image path /uploads/... is save to db or not;
+  2. Rate LImiter in password check while deposit
 
 
 TODO: 

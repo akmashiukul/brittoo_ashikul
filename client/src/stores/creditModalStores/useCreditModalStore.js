@@ -2,10 +2,10 @@ import { create } from 'zustand';
 
 const useCreditModalStore = create((set) => ({
   isCreditModalOpen: false,
-  requiredDeposit: 0,
+  data: null,
 
-  openCreditModal: (amount) => set({ isCreditModalOpen: true, requiredDeposit: amount}),
-  closeCreditModal: () => set({ isCreditModalOpen: false, requiredDeposit: 0}),
+  openCreditModal: (data) => set({ isCreditModalOpen: true, data: data}),
+  closeCreditModal: () => set({ isCreditModalOpen: false, data: null}),
 
 }));
 

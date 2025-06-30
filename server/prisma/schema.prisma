@@ -166,6 +166,7 @@ model Product {
   secondHandPrice    Int              @map("second_hand_price")
   tags               String           @map("tags")
   productDescription String           @map("product_description")
+  quantity           Int              @default(1) @map("quantity")
 
   ownerId            String    @map("owner_id")
   isOnHold           Boolean   @default(false) @map("is_on_hold")
@@ -218,7 +219,7 @@ model RentalRequest {
   productId          String              @map("product_id")
   requesterId        String              @map("requester_id")
   ownerId            String              @map("owner_id")
-  status             RentalRequestStatus @map("status")
+  status             RentalRequestStatus @default(REQUESTED_BY_RENTER) @map("status")
   submissionDeadline DateTime?           @map("submission_deadline")
 
   rentalStartDate DateTime @map("rental_start_date")
@@ -262,6 +263,7 @@ enum CollectionMethod {
 }
 
 enum RentalRequestStatus {
+  REQUESTED_BY_RENTER
   ACCEPTED_BY_OWNER
   REJECTED_BY_OWNER
   PRODUCT_SUBMITTED_BY_OWNER

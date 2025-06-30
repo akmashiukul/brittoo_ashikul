@@ -129,7 +129,7 @@ const Navbar = () => {
                     My Dashboard
                   </Link>
                   {currentUser.role === "ADMIN" && (
-                    <Link to="" className={menuClassname}>
+                    <Link to="/dashboard/admin/manage-users" className={menuClassname}>
                       Admin Dashboard
                     </Link>
                   )}

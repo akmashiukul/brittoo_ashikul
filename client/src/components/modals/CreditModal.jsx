@@ -7,10 +7,12 @@ import Loader from "../shared/Loader";
 import BCC from "../CacheCreditCard/BCC";
 import RCC from "../CacheCreditCard/RCC";
 import CCDisplay from "../CacheCreditCard/CCDisplay";
+import Swal from "sweetalert2";
 
 const CreditModal = () => {
-  const { closeCreditModal, isCreditModalOpen, requiredDeposit } =
+  const { closeCreditModal, isCreditModalOpen, data } =
     useCreditModalStore();
+  console.log(data)
   const { currentUser } = useUserStore();
   const [bcc, setBcc] = useState(null);
   const [rcc, setRcc] = useState([]);
@@ -71,20 +73,17 @@ const CreditModal = () => {
       getAvailableBcc();
       getAvailableRcc();
     }
-  }, [currentUser.id, isCreditModalOpen]);
-
+  }, [currentUser?.id, isCreditModalOpen]);
 
   const totalSelectedRcc = selectedRCCs.reduce(
     (sum, selectedRcc) => sum + selectedRcc.selectedAmount,
     0,
   );
   const selected = selectedBcc + totalSelectedRcc;
-  const remaining = requiredDeposit - selected;
-
-  
+  const remaining = data?.product?.secondHandPrice - selected;
 
   const handleBccSelect = () => {
-    if (remaining > 0 && (bcc - selectedBcc) >= remaining) {
+    if (remaining > 0 && bcc - selectedBcc >= remaining) {
       //console.log('case 1')
       setSelectedBcc(remaining);
     } else if (remaining > 0 && selectedBcc === 0) {
@@ -93,25 +92,44 @@ const CreditModal = () => {
     } else {
       //console.log('case 3')
       setSelectedBcc(0);
-
     }
-  }
+  };
   const handleRccSelect = (rccParams) => {
-    const alreadySelected = selectedRCCs.find((selectedRcc) => selectedRcc.rcc.id === rccParams.id)
+    const alreadySelected = selectedRCCs.find(
+      (selectedRcc) => selectedRcc.rcc.id === rccParams.id,
+    );
     if (alreadySelected) {
-      setSelectedRCCs(selectedRCCs.filter((selectedRcc) => selectedRcc.rcc.id !== rccParams.id));
-    }
-    else if(remaining > 0 && rccParams.amount >= remaining) {
-      setSelectedRCCs([...selectedRCCs, {rcc: rccParams, selectedAmount: remaining}]);
+      setSelectedRCCs(
+        selectedRCCs.filter(
+          (selectedRcc) => selectedRcc.rcc.id !== rccParams.id,
+        ),
+      );
+    } else if (remaining > 0 && rccParams.amount >= remaining) {
+      setSelectedRCCs([
+        ...selectedRCCs,
+        { rcc: rccParams, selectedAmount: remaining },
+      ]);
     } else if (remaining > 0) {
-      setSelectedRCCs([...selectedRCCs, {rcc: rccParams, selectedAmount: rccParams.amount}]);;
+      setSelectedRCCs([
+        ...selectedRCCs,
+        { rcc: rccParams, selectedAmount: rccParams.amount },
+      ]);
     }
-  }
+  };
 
-  if (loading) {
-    return <Loader />;
-  }
+  const handleDeposit = async () => {
+    if (remaining > 0) {
+      Swal.fire({
+        icon: "error",
+        title: "Hey Nigga!",
+        text: "No deposit amount selected",
+      });
+      return;
+    }
+    alert('ok')
+  };
 
+  if (loading) return <Loader />;
   if (!isCreditModalOpen) return null;
 
   return (
@@ -126,7 +144,6 @@ const CreditModal = () => {
     >
       <div className="relative p-4 w-full max-w-[760px] max-h-full">
         <div className="relative bg-white rounded-lg shadow-sm flex flex-col max-h-[95vh]">
-
           <div className="flex items-center justify-between mx-4 md:mx-5 border-b rounded-t border-gray-200 flex-shrink-0 pb-4">
             <div
               id="credit-calc"
@@ -135,7 +152,17 @@ const CreditModal = () => {
               <h3 className="text-lg font-semibold text-gray-700 mt-2">
                 Deposit Cache Credit
               </h3>
-              <CCDisplay required={requiredDeposit} selectedBcc={selectedBcc} selectedRCCs={selectedRCCs} remaining={remaining} selected={selected} />
+              <p className="text-xs text-gray-600">
+                No worries nigga! you'll get this back after you return the
+                product
+              </p>
+              <CCDisplay
+                required={data?.product?.secondHandPrice}
+                selectedBcc={selectedBcc}
+                selectedRCCs={selectedRCCs}
+                remaining={remaining}
+                selected={selected}
+              />
             </div>
             <button
               type="button"
@@ -154,14 +181,23 @@ const CreditModal = () => {
                 🔵Available Blue Cache Credits
               </h3>
               <div className="mt-4 flex flex-col sm:flex-row items-center">
-                <BCC handleSelect={handleBccSelect} bcc={bcc} selectedBcc={selectedBcc} />
+                <BCC
+                  handleSelect={handleBccSelect}
+                  bcc={bcc}
+                  selectedBcc={selectedBcc}
+                />
               </div>
               <h3 className="mt-6 text-sm font-semibold text-center sm:text-left">
                 🔴Available Red Cache Credits
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-2 justify-self-center sm:justify-self-start">
                 {rcc?.map((credit) => (
-                  <RCC handleSelect={handleRccSelect} key={credit.id} rcc={credit} selectedRCCs={selectedRCCs} />
+                  <RCC
+                    handleSelect={handleRccSelect}
+                    key={credit.id}
+                    rcc={credit}
+                    selectedRCCs={selectedRCCs}
+                  />
                 ))}
               </div>
             </div>
@@ -170,6 +206,7 @@ const CreditModal = () => {
           <div className="p-4 md:p-5 border-t border-gray-200 flex-shrink-0">
             <button
               type="submit"
+              onClick={handleDeposit}
               className="w-full text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-xs md:text-sm px-5 py-2.5 text-center cursor-pointer"
             >
               Deposit

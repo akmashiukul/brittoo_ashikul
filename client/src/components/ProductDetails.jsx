@@ -33,13 +33,12 @@ const ProductDetails = () => {
 
   const { openCreditModal } = useCreditModalStore();
 
-  //sss
-  console.log(`${base_url}${product?.productImages[0]}`);
+  ///console.log(`${base_url}${product?.productImages[0]}`);
 
   useEffect(() => {
     if (initial && final) {
       setNumberOfDays(differenceInDays(final, initial) + 1);
-    }
+    } 
   }, [initial, final]);
 
   useEffect(() => {
@@ -62,7 +61,6 @@ const ProductDetails = () => {
         const response = await api.get(`/api/v1/products?productId=${id}`);
         setProduct(response.data.products[0]);
         setPrice(response.data.products[0].pricePerDay);
-        console.log(response.data.products[0]);
       } catch (err) {
         Swal.fire({
           icon: "error",
@@ -103,6 +101,12 @@ const ProductDetails = () => {
   };
 
   const requestRental = async () => {
+    if (!initial) {
+      return Swal.fire({
+        icon: "error",
+        title: "Select date/range you wanna rent for",
+      });
+    }
     if (!currentUser) {
       return Swal.fire({
         icon: "error",
@@ -110,7 +114,7 @@ const ProductDetails = () => {
         text: "You Need to Login First to Rent Something",
       });
     }
-    openCreditModal(product.secondHandPrice);
+    openCreditModal({initial, final, product});
   };
 
   if (loading) {
@@ -321,6 +325,7 @@ const ProductDetails = () => {
             type="text"
             name="coupon"
             id="coupon"
+            disabled
             className="bg-gray-50 border border-gray-300 text-gray-900 text-xs md:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-1.5 md:p-2.5"
             placeholder="AF4K3LK3"
             required
