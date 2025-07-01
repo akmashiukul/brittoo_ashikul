@@ -225,8 +225,10 @@ model RentalRequest {
   rentalEndDate   DateTime @map("rental_end_date")
   totalDays       Int      @map("total_days")
 
-  ownerDepositMethod     DepositMethod    @map("owner_deposit_method")
+  ownerDepositMethod     DepositMethod?   @map("owner_deposit_method")
   renterCollectionMethod CollectionMethod @map("renter_collection_method")
+  ownerPhoneNumber       String?          @map("owner_phone_number")
+  renterPhoneNumber      String           @map("renter_phone_number")
   deliveryAddress        String?          @map("delivery_address")
   pickupPoint            BrittoTerminal?  @map("pickup_point")
 

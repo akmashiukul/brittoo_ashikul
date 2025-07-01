@@ -14,6 +14,8 @@ const ConfirmRentalRequestModal = () => {
   } = useConfirmRentalRequestModalStore();
   const base_url = import.meta.env.VITE_BASE_URL;
   const [pickupPoint, setPickupPoint] = useState("ZIA_HALL_1");
+  const [deliveryAddress, setDeliveryAddress] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
 
   const { calculatePricePerDay } = usePriceCalculate();
   const numberOfDays =
@@ -265,20 +267,55 @@ const ConfirmRentalRequestModal = () => {
                     );
                   })}
                 </div>
+                <label
+                  htmlFor="phone"
+                  className="flex flex-col gap-1.5 w-full mt-4"
+                >
+                  <span className="text-sm font-medium text-gray-700">
+                    Phone Number
+                  </span>
+                  <div className="flex items-center border bg-white border-gray-300 rounded-md w-full focus-within:border-gray-400">
+                    <span className="flex items-center gap-1 px-3 text-xs md:text-sm text-gray-600 bg-gray-100 border-r border-gray-300 rounded-l-md">
+                      <img
+                        src="https://flagcdn.com/w40/bd.png"
+                        alt="BD Flag"
+                        className="w-5 h-4 object-cover"
+                      />
+                      +880
+                    </span>
+
+                    <input
+                      type="tel"
+                      required
+                      id="phone"
+                      className="w-full px-2 py-2 md:py-3 md:px-4 focus:outline-none text-xs md:text-sm rounded-r-md"
+                      placeholder="1XXXXXXXXX"
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                    />
+                  </div>
+                </label>
 
                 {selectedMethod === "HOME_DELIVERY" ? (
-                  <div className="mt-4 px-2 py-2 bg-gray-100 rounded-lg">
-                    <p className="text-xs text-gray-600">
-                      Selected:{" "}
-                      <span className="font-medium text-gray-900">
-                        Home Delivery
-                      </span>
-                    </p>
-                  </div>
+                  <label
+                    htmlFor="deliveryAddress"
+                    className="flex flex-col gap-1.5 w-full"
+                  >
+                    <span className="text-sm font-medium text-gray-700">
+                      Delivery Address
+                    </span>
+                    <textarea
+                      type="text"
+                      required
+                      id="deliveryAddress"
+                      className="border h-24 bg-white border-gray-300 rounded-md w-full px-2 py-2 md:py-3 p md:px-4 focus:border-gray-400 focus:outline-none text-xs md:text-sm"
+                      placeholder="Enter your delivery address"
+                      onChange={(e) => setDeliveryAddress(e.target.value)}
+                    />
+                  </label>
                 ) : (
                   <div
                     htmlFor="pickupPoint"
-                    className="flex flex-col gap-1.5 mt-4"
+                    className="flex flex-col gap-1.5 mt-1"
                   >
                     <span className="text-sm font-medium text-gray-700">
                       Select Pickup Point
@@ -310,15 +347,20 @@ const ConfirmRentalRequestModal = () => {
               </h2>
               <div className="border-b w-fit border-gray-300 pb-1 space-y-1">
                 <h3 className="text-sm text-gray-800 ">
-                  <span className="">Price Per Day</span> {pricePerDay}
+                  <span className="">Price Per Day: </span>{" "}
+                  <span className="font-medium">৳{pricePerDay}</span>
                 </h3>
                 <h3 className="text-sm text-gray-800 ">
                   <span className="">Subtotal Price: </span>
-                  {pricePerDay * numberOfDays}
+                  <span className="font-medium">
+                    ৳{pricePerDay * numberOfDays}
+                  </span>
                 </h3>
                 <h3 className="text-sm text-gray-800 ">
                   <span className="">Delivery Charge: </span>
-                  BDT {selectedMethod === "HOME_DELIVERY" ? "10" : "0"}
+                  <span className="font-medium">
+                    ৳{selectedMethod === "HOME_DELIVERY" ? "10" : "0"}
+                  </span>
                 </h3>
               </div>
               <h3 className="text-sm text-gray-800 mt-1">
@@ -346,6 +388,7 @@ const ConfirmRentalRequestModal = () => {
                     key={selectedRcc.rcc.id}
                     rcc={selectedRcc.rcc}
                     selectedRCCs={data?.selectedRCCs}
+                    inRRModal={true}
                   />
                 ))}
               </div>
