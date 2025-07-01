@@ -136,7 +136,7 @@ enum DepositMethod {
   TERMINAL_DEPOSIT
 }
 
-enum CollectionPoint {
+enum BrittoTerminal {
   CSE_1
   ADMIN_1
   BANGABANDHU_HALL_1
@@ -228,7 +228,7 @@ model RentalRequest {
   ownerDepositMethod     DepositMethod    @map("owner_deposit_method")
   renterCollectionMethod CollectionMethod @map("renter_collection_method")
   deliveryAddress        String?          @map("delivery_address")
-  pickUpPoint            CollectionPoint? @map("pickup_point")
+  pickupPoint            BrittoTerminal?  @map("pickup_point")
 
   paidWithRcc Boolean @default(false) @map("paid_with_rcc")
 

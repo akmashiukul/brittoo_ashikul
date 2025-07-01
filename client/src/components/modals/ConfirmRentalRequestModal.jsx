@@ -13,6 +13,7 @@ const ConfirmRentalRequestModal = () => {
     data,
   } = useConfirmRentalRequestModalStore();
   const base_url = import.meta.env.VITE_BASE_URL;
+  const [pickupPoint, setPickupPoint] = useState("ZIA_HALL_1");
 
   const { calculatePricePerDay } = usePriceCalculate();
   const numberOfDays =
@@ -265,14 +266,41 @@ const ConfirmRentalRequestModal = () => {
                   })}
                 </div>
 
-                <div className="mt-4 px-2 py-2 bg-gray-100 rounded-lg">
-                  <p className="text-xs text-gray-600">
-                    Selected:{" "}
-                    <span className="font-medium text-gray-900">
-                      {methods.find((m) => m.id === selectedMethod)?.label}
+                {selectedMethod === "HOME_DELIVERY" ? (
+                  <div className="mt-4 px-2 py-2 bg-gray-100 rounded-lg">
+                    <p className="text-xs text-gray-600">
+                      Selected:{" "}
+                      <span className="font-medium text-gray-900">
+                        Home Delivery
+                      </span>
+                    </p>
+                  </div>
+                ) : (
+                  <div
+                    htmlFor="pickupPoint"
+                    className="flex flex-col gap-1.5 mt-4"
+                  >
+                    <span className="text-sm font-medium text-gray-700">
+                      Select Pickup Point
                     </span>
-                  </p>
-                </div>
+                    <select
+                      name="pickupPoint"
+                      id="pickupPoint"
+                      required
+                      className="border bg-white border-gray-300 rounded-md px-2 py-2 md:py-3 p md:px-4 focus:border-gray-400 focus:outline-none text-xs md:text-sm max-w-64 sm:max-w-xl"
+                      onChange={(e) => setPickupPoint(e.target.value)}
+                    >
+                      <option value="">Please select</option>
+                      <option value="CSE_1">CSE-1</option>
+                      <option value="ADMIN_1">Admin-1</option>
+                      <option value="BANGABANDHU_HALL_1">
+                        Bangabandhu Hall-1
+                      </option>
+                      <option value="ZIA_HALL_1">Zia Hall-1</option>
+                      <option value="LIBRARY_1">Library-1</option>
+                    </select>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -282,26 +310,35 @@ const ConfirmRentalRequestModal = () => {
               </h2>
               <div className="border-b w-fit border-gray-300 pb-1 space-y-1">
                 <h3 className="text-sm text-gray-800 ">
-                  <span className="">Price Per Day</span>{" "}
-                  {pricePerDay}
+                  <span className="">Price Per Day</span> {pricePerDay}
                 </h3>
                 <h3 className="text-sm text-gray-800 ">
                   <span className="">Subtotal Price: </span>
-                  {pricePerDay*numberOfDays}
+                  {pricePerDay * numberOfDays}
                 </h3>
                 <h3 className="text-sm text-gray-800 ">
                   <span className="">Delivery Charge: </span>
-                  BDT {selectedMethod === 'HOME_DELIVERY' ? '10' : '0'}
+                  BDT {selectedMethod === "HOME_DELIVERY" ? "10" : "0"}
                 </h3>
               </div>
               <h3 className="text-sm text-gray-800 mt-1">
-                <span className="">Total: </span> <span className="font-bold"> BDT {(pricePerDay*numberOfDays + (selectedMethod === 'HOME_DELIVERY' ? 10 : 0)).toFixed(2)}</span>
+                <span className="">Total: </span>{" "}
+                <span className="font-bold">
+                  {" "}
+                  BDT{" "}
+                  {(
+                    pricePerDay * numberOfDays +
+                    (selectedMethod === "HOME_DELIVERY" ? 10 : 0)
+                  ).toFixed(2)}
+                </span>
               </h3>
               {/* one case for initial == final */}
             </div>
 
             <div className="space-y-4 mx-4 mt-2">
-              <h2 className="text-lg font-medium text-gray-900 mb-2">Selected Credits</h2>
+              <h2 className="text-lg font-medium text-gray-900 mb-2">
+                Selected Credits
+              </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-2">
                 {data?.selectedRCCs?.map((selectedRcc) => (
                   <RCC
