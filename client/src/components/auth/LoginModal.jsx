@@ -48,6 +48,7 @@ const LoginModal = () => {
       });
       await setCurrentUser(res.data.user);
       localStorage.setItem("token", res.data.token);
+      localStorage.setItem("login-dt", new Date().toISOString());
     } catch (error) {
       console.error("Registration Error:", error);
       Swal.fire({

@@ -32,6 +32,7 @@ const Navbar = () => {
       if (result.isConfirmed) {
         setCurrentUser(null);
         localStorage.removeItem("token");
+        localStorage.removeItem("login-dt");
         setIsUserDropDownOpen(false);
         Swal.fire({
           title: "Session Terminated",
@@ -74,10 +75,10 @@ const Navbar = () => {
                   Browse Items
                 </NavLink>
                 <NavLink
-                  to="/how-it-works"
+                  to="/buy-credits"
                   className="text-gray-600 text-[16px] cursor-pointer hover:text-green-500"
                 >
-                  How Brittoo Works
+                  Buy Credits
                 </NavLink>
                 <NavLink
                   to="/faq"
@@ -154,8 +155,8 @@ const Navbar = () => {
                   <NavLink to="/browse" className={menuClassname}>
                     Browse Items
                   </NavLink>
-                  <NavLink to="/how-it-works" className={menuClassname}>
-                    How Brittoo Works
+                  <NavLink to="/buy-credits" className={menuClassname}>
+                    Buy Credits
                   </NavLink>
                   <NavLink to="/faq" className={menuClassname}>
                     FAQ

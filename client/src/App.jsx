@@ -29,14 +29,33 @@ import BlueCCRequests from "./pages/admin/admin-dash-pages/BlueCCRequests";
 import useShowRccModalStore from "./stores/creditModalStores/useShowRccModalStore";
 import ShowRccModal from "./components/modals/ShowRccModal";
 import ConfirmRentalRequestModal from "./components/modals/ConfirmRentalRequestModal";
+import Swal from "sweetalert2";
 
 const AppContent = () => {
   const location = useLocation();
-  const { loading, currentUser } = useUserStore();
+  const { loading, setCurrentUser } = useUserStore();
   const { isBuyBccModalOpen } = useBuyBccModalStore();
   const { isShowRccModalOpen } = useShowRccModalStore();
 
-  console.log(currentUser)
+  const loginDtStr = localStorage.getItem("login-dt");
+  if (loginDtStr) {
+    const loginDT = new Date(loginDtStr);
+    const now = new Date();
+
+    const diff = now - loginDT;
+    const diffInDays = diff / (1000 * 60 * 60 * 24);
+
+    if (diffInDays >= 2) {
+      setCurrentUser(null);
+      localStorage.removeItem("token");
+      localStorage.removeItem("login-dt");
+      Swal.fire({
+        title: "Session Terminated",
+        text: "This session is expired. Login again to start renting",
+        icon: "success",
+      });
+    }
+  }
 
   const noNavbarRoutes = [
     "/dashboard",
@@ -76,10 +95,7 @@ const AppContent = () => {
 
           {/* Admin Routes */}
           <Route element={<AdminRoute />}>
-            <Route
-              path="/dashboard/admin"
-              element={<AdminDashboardLayout />}
-            >
+            <Route path="/dashboard/admin" element={<AdminDashboardLayout />}>
               <Route path="blue-cc-requests" element={<BlueCCRequests />} />
               <Route path="admin-overview" element={<AdminOverview />} />
               <Route path="manage-users" element={<ManageUsers />} />

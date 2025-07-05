@@ -1,10 +1,10 @@
 import brittoofav from '../../assets/brittoofav.png';
 import useUserStore from '../../stores/authStores/useUserStore';
 
-const BCC = ({bcc, handleSelect, selectedBcc}) => {
+const BCC = ({bcc, handleSelect, selectedBcc, inRRModal}) => {
   const { currentUser } = useUserStore();
   return (
-    <div onClick={handleSelect} className={`text-black w-[190px]  p-4 rounded-xl hover:scale-105 cursor-pointer transition duration-300 shadow-md ${selectedBcc > 0 ? "bg-blue-100 border-[3px] border-blue-700" : "bg-gradient-to-r from-blue-400 to-blue-100"}`}>
+    <div onClick={handleSelect} className={`text-black w-[190px]  p-4 rounded-xl hover:scale-105 cursor-pointer transition duration-300 shadow-md ${selectedBcc > 0 && !inRRModal ? "bg-blue-100 border-[3px] border-blue-700" : "bg-gradient-to-r from-blue-400 to-blue-100"}`}>
       <div className="flex justify-between">
         <div>
           <h2 className="text-xs"> CC Amount </h2>

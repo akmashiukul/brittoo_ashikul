@@ -79,6 +79,7 @@ model BlueCacheCredit {
   id             String         @id @default(cuid()) @map("id")
   userId         String         @map("user_id")
   amount         Int            @map("amount")
+  inUse          Int            @default(0) @map("in_use")
   paymentGateway PaymentGateway @map("payment_gateway")
   transactionId  String         @map("transaction_id")
   refundTrxIds   String[]       @default([]) @map("refund_trx_ids")
@@ -112,6 +113,7 @@ enum PaymentGateway {
 model RedCacheCredit {
   id            String    @id @default(cuid()) @map("id")
   amount        Int       @map("amount")
+  inUse         Int       @default(0) @map("in_use")
   renterId      String?   @map("renter_id")
   validityStart DateTime? @map("validity_start")
   validityEnd   DateTime? @map("validity_end")

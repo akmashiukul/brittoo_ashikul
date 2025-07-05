@@ -11,13 +11,12 @@ import Swal from "sweetalert2";
 import useConfirmRentalRequestModalStore from "../../stores/creditModalStores/useConfirmRentalRequestModalStore";
 
 const CreditModal = () => {
-  const { closeCreditModal, isCreditModalOpen, data } =
-    useCreditModalStore();
+  const { closeCreditModal, isCreditModalOpen, data } = useCreditModalStore();
   const { openConfirmRentalRequestModal } = useConfirmRentalRequestModalStore();
 
-  console.log(data)
+  console.log(data);
   const { currentUser } = useUserStore();
-  const [bcc, setBcc] = useState(null);
+  const [bcc, setBcc] = useState(0);
   const [rcc, setRcc] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedBcc, setSelectedBcc] = useState(0);
@@ -129,7 +128,12 @@ const CreditModal = () => {
       });
       return;
     }
-    openConfirmRentalRequestModal({rentalDetails: data, bcc, selectedBcc, selectedRCCs});
+    openConfirmRentalRequestModal({
+      rentalDetails: data,
+      bcc,
+      selectedBcc,
+      selectedRCCs,
+    });
   };
 
   if (loading) return <Loader />;
@@ -184,11 +188,12 @@ const CreditModal = () => {
                 🔵Available Blue Cache Credits
               </h3>
               <div className="mt-4 flex flex-col sm:flex-row items-center">
-                <BCC
-                  handleSelect={handleBccSelect}
-                  bcc={bcc}
-                  selectedBcc={selectedBcc}
-                />
+
+                  <BCC
+                    handleSelect={handleBccSelect}
+                    bcc={bcc}
+                    selectedBcc={selectedBcc}
+                  />
               </div>
               <h3 className="mt-6 text-sm font-semibold text-center sm:text-left">
                 🔴Available Red Cache Credits

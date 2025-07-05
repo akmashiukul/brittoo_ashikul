@@ -13,6 +13,7 @@ const ConfirmRentalRequestModal = () => {
     data,
   } = useConfirmRentalRequestModalStore();
   const base_url = import.meta.env.VITE_BASE_URL;
+  const [selectedMethod, setSelectedMethod] = useState("TERMINAL_PICKUP");
   const [pickupPoint, setPickupPoint] = useState("ZIA_HALL_1");
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -23,7 +24,6 @@ const ConfirmRentalRequestModal = () => {
       data?.rentalDetails?.final.toDateString(),
       data?.rentalDetails?.initial?.toDateString(),
     ) + 1;
-
   const pricePerDay = calculatePricePerDay(
     data?.rentalDetails?.product?.omv,
     data?.rentalDetails?.product?.productCondition,
@@ -31,7 +31,6 @@ const ConfirmRentalRequestModal = () => {
     data?.rentalDetails?.product?.owner.securityScore,
     numberOfDays,
   );
-
   const conditionColor =
     {
       NEW: "text-green-400",
@@ -41,10 +40,6 @@ const ConfirmRentalRequestModal = () => {
       POOR: "text-red-400",
     }[data?.rentalDetails?.product?.productCondition] ||
     "bg-gray-100 text-gray-800";
-
-  const [selectedMethod, setSelectedMethod] = useState("TERMINAL_PICKUP");
-  console.log(selectedMethod);
-
   const methods = [
     {
       id: "TERMINAL_PICKUP",
@@ -59,7 +54,6 @@ const ConfirmRentalRequestModal = () => {
       description: "Delivered to your address. (10TK extra charge)",
     },
   ];
-
   const conditionLabel =
     {
       NEW: "🆕 New",
@@ -69,6 +63,24 @@ const ConfirmRentalRequestModal = () => {
       POOR: "⚠️ Poor",
     }[data?.rentalDetails?.product?.productCondition] ||
     data?.rentalDetails?.product?.productCondition;
+
+  function conditionalCeilOrFloor(value) {
+    const decimalPart = value - Math.floor(value);
+
+    if (decimalPart >= 0.5) {
+      return {
+        value: Math.ceil(value),
+        ceil: true,
+      };
+    } else {
+      return {
+        value: Math.floor(value),
+        floor: true,
+      };
+    }
+  }
+
+  const handleConfirm = async () => {};
 
   if (!isConfirmRentalRequestModalOpen) {
     return null;
@@ -353,7 +365,10 @@ const ConfirmRentalRequestModal = () => {
                 <h3 className="text-sm text-gray-800 ">
                   <span className="">Subtotal Price: </span>
                   <span className="font-medium">
-                    ৳{pricePerDay * numberOfDays}
+                    ৳{pricePerDay * numberOfDays}{" "}
+                    <span className="text-[11px] font-normal">
+                      (For {numberOfDays} {numberOfDays == 1 ? "Day" : "Days"})
+                    </span>
                   </span>
                 </h3>
                 <h3 className="text-sm text-gray-800 ">
@@ -364,14 +379,24 @@ const ConfirmRentalRequestModal = () => {
                 </h3>
               </div>
               <h3 className="text-sm text-gray-800 mt-1">
-                <span className="">Total: </span>{" "}
+                <span className="">Total </span>{" "}
                 <span className="font-bold">
-                  {" "}
+                  ≈
                   BDT{" "}
-                  {(
-                    pricePerDay * numberOfDays +
-                    (selectedMethod === "HOME_DELIVERY" ? 10 : 0)
-                  ).toFixed(2)}
+                  {
+                    conditionalCeilOrFloor(
+                      pricePerDay * numberOfDays +
+                        (selectedMethod === "HOME_DELIVERY" ? 10 : 0),
+                    ).value
+                  }{" "}
+                  <span className="text-[11px] font-normal ml-0.5">
+                    {conditionalCeilOrFloor(
+                      pricePerDay * numberOfDays +
+                        (selectedMethod === "HOME_DELIVERY" ? 10 : 0),
+                    ).ceil
+                      ? "(ceiled)"
+                      : "(floored)"}
+                  </span>
                 </span>
               </h3>
               {/* one case for initial == final */}
@@ -392,13 +417,13 @@ const ConfirmRentalRequestModal = () => {
                   />
                 ))}
               </div>
-              {/* remove the not below */}
-              {!data?.selectedBcc && (
+              {data?.selectedBcc && (
                 <div>
                   <BCC
                     handleSelect={() => {}}
                     bcc={data?.bcc}
                     selectedBcc={data?.selectedBcc}
+                    inRRModal={true}
                   />
                 </div>
               )}
@@ -407,7 +432,7 @@ const ConfirmRentalRequestModal = () => {
 
           <div className="py-4 md:py-5 border-t mx-4 border-gray-200 flex-shrink-0 mt-4">
             <button
-              type="submit"
+              onClick={handleConfirm}
               className="w-full text-green-600 hover:text-white bg-gray-50 hover:bg-green-600 font-medium rounded-lg text-xs md:text-sm px-5 py-2.5 text-center cursor-pointer border-2 border-green-600 shadow-md transition-all duration-300"
             >
               Confirm Rental Request
