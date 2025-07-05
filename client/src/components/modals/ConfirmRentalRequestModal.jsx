@@ -5,6 +5,7 @@ import BCC from "../CacheCreditCard/BCC";
 import { differenceInDays } from "date-fns";
 import { usePriceCalculate } from "../../hooks/usePriceCalculate";
 import { useState } from "react";
+import useUserStore from "../../stores/authStores/useUserStore";
 
 const ConfirmRentalRequestModal = () => {
   const {
@@ -12,6 +13,8 @@ const ConfirmRentalRequestModal = () => {
     isConfirmRentalRequestModalOpen,
     data,
   } = useConfirmRentalRequestModalStore();
+  const { currentUser } = useUserStore();
+
   const base_url = import.meta.env.VITE_BASE_URL;
   const [selectedMethod, setSelectedMethod] = useState("TERMINAL_PICKUP");
   const [pickupPoint, setPickupPoint] = useState("ZIA_HALL_1");
@@ -80,7 +83,27 @@ const ConfirmRentalRequestModal = () => {
     }
   }
 
-  const handleConfirm = async () => {};
+  const handleConfirm = async () => {
+    const rentalData = {
+      productId: data?.rentalDetails?.product?.id,
+      requesterId: currentUser.id,
+      ownerId: data?.rentalDetails?.product?.owner.id,
+      rentalStartDate: new Date(data?.rentalDetails?.initial).toISOString(),
+      rentalEndDate: new Date(data?.rentalDetails?.final).toISOString(),
+      totalDays: parseInt(numberOfDays),
+      renterCollectionMethod: selectedMethod,
+      renterPhoneNumber: phoneNumber,
+      deliveryAddress,
+      pickupPoint,
+      paidWithBcc: !!data?.selectedBcc,
+      usedBccAmount: Number(data?.selectedBcc || 0),
+      paidWithRcc: data?.selectedRCCs?.length > 0 ? true : false,
+      usedRccData: data?.selectedRCCs?.map((item) => ({
+        rccId: item.rcc.id,
+        selectedAmount: item.selectedAmount,
+      })),
+    };
+  };
 
   if (!isConfirmRentalRequestModalOpen) {
     return null;
@@ -365,7 +388,7 @@ const ConfirmRentalRequestModal = () => {
                 <h3 className="text-sm text-gray-800 ">
                   <span className="">Subtotal Price: </span>
                   <span className="font-medium">
-                    ৳{pricePerDay * numberOfDays}{" "}
+                    ৳{(pricePerDay * numberOfDays).toFixed(2)}{" "}
                     <span className="text-[11px] font-normal">
                       (For {numberOfDays} {numberOfDays == 1 ? "Day" : "Days"})
                     </span>
@@ -381,8 +404,7 @@ const ConfirmRentalRequestModal = () => {
               <h3 className="text-sm text-gray-800 mt-1">
                 <span className="">Total </span>{" "}
                 <span className="font-bold">
-                  ≈
-                  BDT{" "}
+                  ≈ BDT{" "}
                   {
                     conditionalCeilOrFloor(
                       pricePerDay * numberOfDays +

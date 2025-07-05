@@ -7,7 +7,7 @@ export const buyBcc = async (req, res, next) => {
     const { paymentGateway, amount, transactionId, trxNo } = req.body;
     const user = req.user;
 
-    if (!paymentGateway || !amount || !transactionId) {
+    if (!paymentGateway || !amount || !transactionId || !trxNo) {
       throw new CustomError(
         "Payment gateway, amount, and transaction ID are required",
         400,
@@ -20,21 +20,40 @@ export const buyBcc = async (req, res, next) => {
       throw new CustomError("User Not Authenticated!", 403);
     }
 
-    const blueCacheCredit = await prisma.blueCacheCredit.create({
+    let wallet = await prisma.bccWallet.findUnique({
+      where: {
+        userId: user.id
+      }
+    });
+
+    if(!wallet) {
+      wallet = await prisma.bccWallet.create({
+        data: {
+          userId: user.id,
+          totalBalance: 0,
+          lockedBalance: 0
+        }
+      })
+    }
+    const bccTransaction = await prisma.bccTransaction.create({
       data: {
         userId: user.id,
+        walletId: wallet.id,
         amount: parseInt(amount),
         paymentGateway,
         transactionId,
-        trxNo
+        numberUsedInTrx: trxNo,
+        transactionType: "PURCHASE",
+        status: "PENDING"
       },
     });
 
     res.status(201).json({
       success: true,
-      message: "Blue Credit purchase request submitted. Awaiting verification.",
-      data: blueCacheCredit,
+      message: "Blue Cache Credit purchase request submitted. Awaiting verification.",
+      data: bccTransaction,
     });
+
   } catch (error) {
     console.error("Error in purchaseBcc Controller: ", error);
     next(error);
@@ -43,9 +62,10 @@ export const buyBcc = async (req, res, next) => {
 
 export const getPendingCreditRequests = async (req, res, next) => {
   try {
-    const pendingCredits = await prisma.blueCacheCredit.findMany({
+    const pendingCredits = await prisma.bccTransaction.findMany({
       where: {
         status: "PENDING",
+        transactionType: "PURCHASE",
         deletedAt: null,
       },
       include: {
@@ -70,28 +90,47 @@ export const getPendingCreditRequests = async (req, res, next) => {
   }
 };
 
+
 export const acceptBCCRequest = async (req, res, next) => {
   try {
     const { creditId } = req.params;
     if (!creditId) {
       throw new CustomError("Credit ID is required", 400);
     }
-    const existingCredit = await prisma.blueCacheCredit.findUnique({
+    const existingCredit = await prisma.bccTransaction.findUnique({
       where: {
         id: creditId,
         deletedAt: null,
       },
+      include: {
+        wallet: true
+      }
     });
     if (!existingCredit) {
       throw new CustomError("Credit request not found", 404);
     }
-    await prisma.blueCacheCredit.update({
-      where: { id: creditId },
-      data: {
-        status: "ACCEPTED",
-        updatedAt: new Date(),
-      },
+    if (existingCredit.status !== "PENDING") {
+      throw new CustomError("Only pending requests can be accepted", 400);
+    }
+
+    await prisma.$transaction(async (tx) => {
+      await tx.bccTransaction.update({
+        where: { id: creditId },
+        data: {
+          status: "ACCEPTED",
+          updatedAt: new Date(),
+        },
+      });
+      await tx.bccWallet.update({
+        where: { id: existingCredit.walletId },
+        data: {
+          totalBalance: {
+            increment: existingCredit.amount
+          }
+        }
+      });
     });
+
     // TODO: Send notification to user
     res.status(200).json({
       success: true,
@@ -103,15 +142,17 @@ export const acceptBCCRequest = async (req, res, next) => {
   }
 };
 
+
 export const rejectBCCRequest = async (req, res, next) => {
   try {
     const { creditId } = req.params;
-    const { rejectReason, refundTrxId } = req.body;
-    const existingCredit = await prisma.blueCacheCredit.findUnique({
-      where: { id: creditId },
+    const { rejectReason } = req.body;
+    
+    const existingCredit = await prisma.bccTransaction.findUnique({
+      where: { id: creditId, deletedAt: null },
     });
     if (!existingCredit) {
-      throw new CustomError("Credit request not found", 401);
+      throw new CustomError("Credit request not found", 404);
     }
     if (existingCredit.status === "ACCEPTED") {
       throw new CustomError(
@@ -119,20 +160,18 @@ export const rejectBCCRequest = async (req, res, next) => {
         400,
       );
     }
-    if (existingCredit.deletedAt) {
+    if (existingCredit.status === "REJECTED") {
       throw new CustomError("Credit request is already rejected", 400);
     }
-
-    const updatedRefundTrxArr = [...existingCredit.refundTrxIds, refundTrxId];
-
-    await prisma.blueCacheCredit.update({
+    await prisma.bccTransaction.update({
       where: { id: creditId },
       data: {
         status: "REJECTED",
         rejectReason: rejectReason,
-        refundTrxIds: updatedRefundTrxArr,
+        updatedAt: new Date(),
       },
     });
+
     // TODO: Send notification to user about rejection
     res.status(200).json({
       success: true,
@@ -148,26 +187,30 @@ export const rejectBCCRequest = async (req, res, next) => {
 export const getUsersAvailableBcc = async (req, res, next) => {
   try {
     const { userId } = req.params;
-    const result = await prisma.blueCacheCredit.aggregate({
-      _sum: {
-        amount: true,
-      },
-      where: {
-        userId,
-        status: 'ACCEPTED',
-        deletedAt: null
-      }
+    
+    const wallet = await prisma.bccWallet.findUnique({
+      where: { userId }
     });
 
-    const totalBcc = result._sum.amount ?? 0;
+    if (!wallet) {
+      return res.status(200).json({
+        success: true,
+        message: "User wallet not found",
+        data: {
+          totalBalance: 0,
+          availableBalance: 0,
+          lockedBalance: 0
+        },
+      });
+    }
 
     res.status(200).json({
       success: true,
-      message: "Successfully fetched accumulated Blue Cache Credits",
-      data: totalBcc,
+      message: "Successfully fetched user's BCC wallet balance",
+      data: wallet,
     });
   } catch (error) {
     console.error("Error in getUsersAvailableBcc controller:", error);
     next(error);
   }
-}
+};

@@ -103,7 +103,7 @@ const ProductDetails = () => {
   const requestRental = async () => {
     if (!initial) {
       return Swal.fire({
-        icon: "error",
+        icon: "warning",
         title: "Select date/range you wanna rent for",
       });
     }
