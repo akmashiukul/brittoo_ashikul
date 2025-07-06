@@ -1,5 +1,5 @@
 
-import brittoLogo from "../../assets/britto-logo.png";
+import brittoLogo from "../../assets/brittoo-logo.png";
 
 import { useState } from "react";
 import api from "../../lib/api";

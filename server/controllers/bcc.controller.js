@@ -22,18 +22,18 @@ export const buyBcc = async (req, res, next) => {
 
     let wallet = await prisma.bccWallet.findUnique({
       where: {
-        userId: user.id
-      }
+        userId: user.id,
+      },
     });
 
-    if(!wallet) {
+    if (!wallet) {
       wallet = await prisma.bccWallet.create({
         data: {
           userId: user.id,
           totalBalance: 0,
-          lockedBalance: 0
-        }
-      })
+          lockedBalance: 0,
+        },
+      });
     }
     const bccTransaction = await prisma.bccTransaction.create({
       data: {
@@ -44,16 +44,16 @@ export const buyBcc = async (req, res, next) => {
         transactionId,
         numberUsedInTrx: trxNo,
         transactionType: "PURCHASE",
-        status: "PENDING"
+        status: "PENDING",
       },
     });
 
     res.status(201).json({
       success: true,
-      message: "Blue Cache Credit purchase request submitted. Awaiting verification.",
+      message:
+        "Blue Cache Credit purchase request submitted. Awaiting verification.",
       data: bccTransaction,
     });
-
   } catch (error) {
     console.error("Error in purchaseBcc Controller: ", error);
     next(error);
@@ -90,7 +90,6 @@ export const getPendingCreditRequests = async (req, res, next) => {
   }
 };
 
-
 export const acceptBCCRequest = async (req, res, next) => {
   try {
     const { creditId } = req.params;
@@ -103,8 +102,8 @@ export const acceptBCCRequest = async (req, res, next) => {
         deletedAt: null,
       },
       include: {
-        wallet: true
-      }
+        wallet: true,
+      },
     });
     if (!existingCredit) {
       throw new CustomError("Credit request not found", 404);
@@ -125,9 +124,9 @@ export const acceptBCCRequest = async (req, res, next) => {
         where: { id: existingCredit.walletId },
         data: {
           totalBalance: {
-            increment: existingCredit.amount
-          }
-        }
+            increment: existingCredit.amount,
+          },
+        },
       });
     });
 
@@ -142,12 +141,11 @@ export const acceptBCCRequest = async (req, res, next) => {
   }
 };
 
-
 export const rejectBCCRequest = async (req, res, next) => {
   try {
     const { creditId } = req.params;
-    const { rejectReason } = req.body;
-    
+    const { rejectReason, refundTrxId } = req.body;
+
     const existingCredit = await prisma.bccTransaction.findUnique({
       where: { id: creditId, deletedAt: null },
     });
@@ -168,6 +166,7 @@ export const rejectBCCRequest = async (req, res, next) => {
       data: {
         status: "REJECTED",
         rejectReason: rejectReason,
+        refundTrxId,
         updatedAt: new Date(),
       },
     });
@@ -183,29 +182,30 @@ export const rejectBCCRequest = async (req, res, next) => {
   }
 };
 
-
 export const getUsersAvailableBcc = async (req, res, next) => {
   try {
     const { userId } = req.params;
-    
+
     const wallet = await prisma.bccWallet.findUnique({
-      where: { userId }
+      where: { userId },
     });
 
     if (!wallet) {
       return res.status(200).json({
         success: true,
+        isWalletPresent: false,
         message: "User wallet not found",
         data: {
           totalBalance: 0,
           availableBalance: 0,
-          lockedBalance: 0
+          lockedBalance: 0,
         },
       });
     }
 
     res.status(200).json({
       success: true,
+      isWalletPresent: true,
       message: "Successfully fetched user's BCC wallet balance",
       data: wallet,
     });

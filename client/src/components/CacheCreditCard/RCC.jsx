@@ -1,4 +1,4 @@
-import brittoofav from "../../assets/brittoofav.png";
+import rccLogo from '../../assets/logos/rcc-logo.png';
 
 const RCC = ({ rcc, handleSelect, selectedRCCs, inRRModal=false }) => {
   const selectedRcc = selectedRCCs?.find((r) => r.rcc.id === rcc.id);
@@ -9,7 +9,7 @@ const RCC = ({ rcc, handleSelect, selectedRCCs, inRRModal=false }) => {
           <h2 className="text-xs"> CC Amount </h2>
           <p className="text-base font-bold italic"> {rcc.amount} {selectedRcc && <span className='text-red-600'> -{selectedRcc.selectedAmount}</span>} </p>
         </div>
-        <img src={brittoofav} alt="fav" className="w-10 h-10" />
+        <img src={rccLogo} alt="fav" className="w-10 h-10" />
       </div>
 
       <div className="mt-2">

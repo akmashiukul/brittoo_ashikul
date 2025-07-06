@@ -16,7 +16,7 @@ const CreditModal = () => {
 
   console.log(data);
   const { currentUser } = useUserStore();
-  const [bcc, setBcc] = useState(0);
+  const [bccWallet, setBccWallet] = useState(0);
   const [rcc, setRcc] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedBcc, setSelectedBcc] = useState(0);
@@ -38,7 +38,7 @@ const CreditModal = () => {
         if (!res.data.success) {
           return;
         }
-        setBcc(res.data.data);
+        setBccWallet(res.data.data);
       } catch (error) {
         console.log(error);
         alert("error in getting users bcc");
@@ -77,6 +77,7 @@ const CreditModal = () => {
     }
   }, [currentUser?.id, isCreditModalOpen]);
 
+  const availableBcc = bccWallet?.totalBalance - bccWallet?.lockedBalance;
   const totalSelectedRcc = selectedRCCs.reduce(
     (sum, selectedRcc) => sum + selectedRcc.selectedAmount,
     0,
@@ -85,12 +86,12 @@ const CreditModal = () => {
   const remaining = data?.product?.secondHandPrice - selected;
 
   const handleBccSelect = () => {
-    if (remaining > 0 && bcc - selectedBcc >= remaining) {
+    if (remaining > 0 && availableBcc - selectedBcc >= remaining) {
       //console.log('case 1')
       setSelectedBcc(remaining);
     } else if (remaining > 0 && selectedBcc === 0) {
       //console.log('case 2')
-      setSelectedBcc(bcc);
+      setSelectedBcc(availableBcc);
     } else {
       //console.log('case 3')
       setSelectedBcc(0);
@@ -130,7 +131,7 @@ const CreditModal = () => {
     }
     openConfirmRentalRequestModal({
       rentalDetails: data,
-      bcc,
+      bccWallet,
       selectedBcc,
       selectedRCCs,
     });
@@ -191,7 +192,7 @@ const CreditModal = () => {
 
                   <BCC
                     handleSelect={handleBccSelect}
-                    bcc={bcc}
+                    bccWallet={bccWallet}
                     selectedBcc={selectedBcc}
                   />
               </div>

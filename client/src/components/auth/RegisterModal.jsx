@@ -1,4 +1,4 @@
-import brittoLogo from "../../assets/britto-logo.png";
+import brittoLogo from "../../assets/brittoo-logo.png";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import api from "../../lib/api";

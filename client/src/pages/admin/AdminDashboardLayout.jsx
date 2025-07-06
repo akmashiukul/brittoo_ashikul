@@ -1,11 +1,11 @@
 import Avatar from "boring-avatars";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import useUserStore from "../../stores/authStores/useUserStore";
-import brittoLogo from "../../assets/britto-logo.png";
+import brittoLogo from "../../assets/brittoo-logo.png";
 import { IoExit, IoHomeSharp } from "react-icons/io5";
 import { BiSolidCreditCardAlt } from "react-icons/bi";
 import { PiCreditCardDuotone } from "react-icons/pi";
-import { MdOutlineManageHistory, MdOutlineSpaceDashboard } from "react-icons/md";
+import { MdOutlineSpaceDashboard } from "react-icons/md";
 import useDashDrawertore from "../../stores/drawerStores/useDashDrawerStore";
 import { Menu, Users, X } from "lucide-react";
 import { useEffect } from "react";

@@ -1,7 +1,7 @@
 import Avatar from "boring-avatars";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import useUserStore from "../../stores/authStores/useUserStore";
-import brittoLogo from "../../assets/britto-logo.png";
+import brittoLogo from "../../assets/brittoo-logo.png";
 import { IoAnalytics, IoExit, IoHomeSharp } from "react-icons/io5";
 import { MdOutlineManageHistory, MdOutlineSpaceDashboard, MdRequestPage } from "react-icons/md";
 import useDashDrawertore from "../../stores/drawerStores/useDashDrawerStore";

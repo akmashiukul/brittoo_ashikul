@@ -443,7 +443,7 @@ const ConfirmRentalRequestModal = () => {
                 <div>
                   <BCC
                     handleSelect={() => {}}
-                    bcc={data?.bcc}
+                    bccWallet={data?.bccWallet}
                     selectedBcc={data?.selectedBcc}
                     inRRModal={true}
                   />

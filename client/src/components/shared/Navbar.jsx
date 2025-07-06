@@ -1,5 +1,5 @@
 import { Link, NavLink } from "react-router-dom";
-import brittoLogo from "../../assets/britto-logo.png";
+import brittoLogo from "../../assets/brittoo-logo.png";
 import { IoLogOut } from "react-icons/io5";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { useState } from "react";
