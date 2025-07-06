@@ -15,6 +15,7 @@ export const createRentalRequest = async (req, res, next) => {
       deliveryAddress,
       pickupPoint,
       paidWithBcc,
+      bccWalletId,
       usedBccAmount,
       paidWithRcc,
       usedRccData = [],
@@ -22,6 +23,9 @@ export const createRentalRequest = async (req, res, next) => {
 
     if (!productId || !requesterId || !ownerId) {
       throw new CustomError("Missing required IDs", 400);
+    }
+    if (paidWithBcc && !bccWalletId) {
+      throw new CustomError("Missing Bcc Wallet Id", 400);
     }
     if (!rentalStartDate || !rentalEndDate || !totalDays) {
       throw new CustomError("Missing rental period info", 400);
@@ -35,9 +39,10 @@ export const createRentalRequest = async (req, res, next) => {
     if (renterCollectionMethod === "TERMINAL_PICKUP" && !pickupPoint) {
       throw new CustomError("Pickup point required for terminal pickup", 400);
     }
+
     const product = await prisma.product.findUnique({
       where: { id: productId },
-      include: { owner: true }
+      include: { owner: true },
     });
     if (!product) {
       throw new CustomError("Product not found", 404);
@@ -48,146 +53,305 @@ export const createRentalRequest = async (req, res, next) => {
     if (product.isOnHold) {
       throw new CustomError("Product is currently on hold", 400);
     }
-    // TODO: impl this in frontend asap
+    //TODO: Implement this in client asap
     if (requesterId === ownerId) {
       throw new CustomError("Cannot rent your own product", 400);
     }
-    // TODO: also impl this in frontend. if this user already requested for this
+    // TODO: (client) Check for existing pending request
     const existingRequest = await prisma.rentalRequest.findFirst({
       where: {
         productId,
         requesterId,
-        status: "REQUESTED_BY_RENTER"
-      }
+        status: "REQUESTED_BY_RENTER",
+      },
     });
     if (existingRequest) {
-      throw new CustomError("You already have a pending request for this product", 400);
+      throw new CustomError(
+        "You already have a pending request for this product",
+        400,
+      );
     }
 
+    //Validate Bcc
+    if (paidWithBcc) {
+      const bccWallet = await prisma.bccWallet.findUnique({
+        where: { id: bccWalletId },
+      });
+      if (!bccWallet) {
+        throw new CustomError("BCC Wallet not found", 404);
+      }
+      if (bccWallet.userId !== requesterId) {
+        throw new CustomError("BCC Wallet does not belong to requester", 403);
+      }
+      const availableBalance = bccWallet.totalBalance - bccWallet.lockedBalance;
+      if (availableBalance < usedBccAmount) {
+        throw new CustomError("Insufficient BCC balance", 400);
+      }
+    }
 
-    let rccCreditsToUpdate = [];
+    // Validate Rcc
     if (paidWithRcc && usedRccData.length > 0) {
-      const rccIds = usedRccData.map(item => item.rccId);
-      const totalUsedRccAmount = usedRccData.reduce((sum, item) => sum + item.selectedAmount, 0);
-      
-      // Verify RCCs belong to requester && are available
+      const rccIds = usedRccData.map((item) => item.rccId);
       const rccCredits = await prisma.redCacheCredit.findMany({
         where: {
           id: { in: rccIds },
           userId: requesterId,
-        }
+        },
       });
       if (rccCredits.length !== rccIds.length) {
-        throw new CustomError("Invalid or unavailable RCC credits", 400);
+        throw new CustomError(
+          "Some RCC credits not found or don't belong to requester",
+          400,
+        );
       }
-
-      // Check if RCC has sufficient balance for the selected amount
-      for (const usedRcc of usedRccData) {
-        const rccCredit = rccCredits.find(rcc => rcc.id === usedRcc.rccId);
-        if (!rccCredit) {
-          throw new CustomError(`RCC credit ${usedRcc.rccId} not found`, 400);
-        }
+      // Validate each RCC credit has sufficient balance
+      for (const rccUsage of usedRccData) {
+        const rccCredit = rccCredits.find((rcc) => rcc.id === rccUsage.rccId);
         const availableAmount = rccCredit.amount - rccCredit.inUse;
-        if (availableAmount < usedRcc.selectedAmount) {
-          throw new CustomError(`Insufficient balance in RCC credit ${usedRcc.rccId}`, 400);
+        if (availableAmount < rccUsage.selectedAmount) {
+          throw new CustomError(
+            `Insufficient RCC credit balance for credit ID: ${rccUsage.rccId}`,
+            400,
+          );
         }
-      }
-
-      const requiredAmount = product.pricePerDay * totalDays;
-      const totalPaidAmount = totalUsedRccAmount + (usedBccAmount || 0);
-      if (totalPaidAmount !== requiredAmount) {
-        throw new CustomError(`Total payment (${totalPaidAmount}) doesn't match rental cost (${requiredAmount})`, 400);
-      }
-      rccCreditsToUpdate = usedRccData.map(item => ({
-        ...rccCredits.find(rcc => rcc.id === item.rccId),
-        selectedAmount: item.selectedAmount
-      }));
-    }
-
-    // validate usedBcc prsnt or not
-    if (paidWithBcc && usedBccAmount) {
-      const userBccCredits = await prisma.blueCacheCredit.findMany({
-        where: {
-          userId: requesterId,
-          status: "ACCEPTED"
-        }
-      });
-      const totalBccAvailable = userBccCredits.reduce((sum, bcc) => sum + (bcc.amount - bcc.inUse), 0);
-      if (totalBccAvailable < usedBccAmount) {
-        throw new CustomError("Insufficient BCC credits", 400);
       }
     }
 
-    // =====================CREATE RENTAL REQ=====================
-    const rentalRequest = await prisma.$transaction(async (tx) => {
-      const newRequest = await tx.rentalRequest.create({
+    const result = await prisma.$transaction(async (tx) => {
+      const rentalRequest = await tx.rentalRequest.create({
         data: {
           productId,
           requesterId,
           ownerId,
+          bccWalletId: paidWithBcc ? bccWalletId : null,
           rentalStartDate: new Date(rentalStartDate),
           rentalEndDate: new Date(rentalEndDate),
           totalDays,
           renterCollectionMethod,
           renterPhoneNumber,
-          deliveryAddress,
-          pickupPoint,
-          paidWithBcc: paidWithBcc || false,
-          usedBccAmount,
-          paidWithRcc: paidWithRcc || false,
-          usedRCCs: paidWithRcc ? { connect: usedRccData.map(item => ({ id: item.rccId })) } : undefined
+          deliveryAddress:
+            renterCollectionMethod === "HOME_DELIVERY" ? deliveryAddress : null,
+          pickupPoint:
+            renterCollectionMethod === "TERMINAL_PICKUP" ? pickupPoint : null,
+          paidWithBcc,
+          usedBccAmount: paidWithBcc ? usedBccAmount : null,
+          paidWithRcc,
+          status: "REQUESTED_BY_RENTER",
         },
         include: {
           product: true,
           requester: true,
-          owner: true
-        }
+          owner: true,
+        },
       });
-      if (paidWithRcc && rccCreditsToUpdate.length > 0) {
-        for (const rccData of rccCreditsToUpdate) {
-          await tx.redCacheCredit.update({
-            where: { id: rccData.id },
-            data: { 
-              inUse: rccData.inUse + rccData.selectedAmount,
-            }
-          });
-        }
-      }
-      if (paidWithBcc && usedBccAmount) {
-        const userBccCredits = await tx.blueCacheCredit.findMany({
-          where: {
-            userId: requesterId,
-            status: "ACCEPTED"
+
+      if (paidWithBcc && usedBccAmount > 0) {
+        await tx.bccWallet.update({
+          where: { id: bccWalletId },
+          data: {
+            lockedBalance: {
+              increment: usedBccAmount,
+            },
           },
-          orderBy: { createdAt: 'asc' }
         });
+      }
 
-        let remainingAmount = usedBccAmount;
-        
-        for (const bcc of userBccCredits) {
-          if (remainingAmount <= 0) break;
-          
-          const availableAmount = bcc.amount - bcc.inUse;
-          const amountToUse = Math.min(remainingAmount, availableAmount);
-          
-          await tx.blueCacheCredit.update({
-            where: { id: bcc.id },
-            data: { inUse: bcc.inUse + amountToUse }
+      if (paidWithRcc && usedRccData.length > 0) {
+        for (const rccUsage of usedRccData) {
+          await tx.redCacheCredit.update({
+            where: {
+              id: rccUsage.rccId,
+            },
+            data: {
+              inUse: {
+                increment: rccUsage.selectedAmount,
+              },
+            },
           });
-          
-          remainingAmount -= amountToUse;
+          await tx.rentalRequestRccUsage.create({
+            data: {
+              rentalRequestId: rentalRequest.id,
+              redCacheCreditId: rccUsage.rccId,
+              usedAmount: rccUsage.selectedAmount,
+            },
+          });
         }
       }
 
-      return newRequest;
+      return rentalRequest;
     });
 
     res.status(201).json({
       success: true,
       message: "Rental request created successfully",
-      data: rentalRequest
+      data: result,
+    });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+
+export const acceptRentalRequest = async (req, res, next) => {
+  try {
+    const { requestId } = req.params;
+    const { ownerDepositMethod, ownerPhoneNumber } = req.body;
+
+    if (!requestId) {
+      throw new CustomError("Request ID is required", 400);
+    }
+
+    // Validate deposit method and phone number
+    if (!ownerDepositMethod || !ownerPhoneNumber) {
+      throw new CustomError(
+        "Owner deposit method and phone number are required",
+        400,
+      );
+    }
+
+    // Find the rental request
+    const rentalRequest = await prisma.rentalRequest.findUnique({
+      where: { id: requestId },
+      include: {
+        product: true,
+        requester: true,
+        owner: true,
+      },
     });
 
+    if (!rentalRequest) {
+      throw new CustomError("Rental request not found", 404);
+    }
+
+    if (rentalRequest.status !== "REQUESTED_BY_RENTER") {
+      throw new CustomError(
+        "Request is not in a state that can be accepted",
+        400,
+      );
+    }
+
+    // Check if product is still available
+    if (rentalRequest.product.isRented) {
+      throw new CustomError("Product is already rented", 400);
+    }
+
+    if (rentalRequest.product.isOnHold) {
+      throw new CustomError("Product is currently on hold", 400);
+    }
+
+    // Update the rental request
+    const updatedRequest = await prisma.rentalRequest.update({
+      where: { id: requestId },
+      data: {
+        status: "ACCEPTED_BY_OWNER",
+        ownerDepositMethod,
+        ownerPhoneNumber,
+      },
+      include: {
+        product: true,
+        requester: true,
+        owner: true,
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Rental request accepted successfully",
+      data: updatedRequest,
+    });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+
+export const rejectRentalRequest = async (req, res, next) => {
+  try {
+    const { requestId } = req.params;
+    const { rejectionReason } = req.body;
+
+    if (!requestId) {
+      throw new CustomError("Request ID is required", 400);
+    }
+
+    // Find the rental request
+    const rentalRequest = await prisma.rentalRequest.findUnique({
+      where: { id: requestId },
+      include: {
+        product: true,
+        requester: true,
+        owner: true,
+        rccUsageDetails: true,
+      },
+    });
+
+    if (!rentalRequest) {
+      throw new CustomError("Rental request not found", 404);
+    }
+
+    if (rentalRequest.status !== "REQUESTED_BY_RENTER") {
+      throw new CustomError(
+        "Request is not in a state that can be rejected",
+        400,
+      );
+    }
+
+    // Handle rejection with transaction to unlock funds
+    const result = await prisma.$transaction(async (tx) => {
+      // Update rental request status
+      const updatedRequest = await tx.rentalRequest.update({
+        where: { id: requestId },
+        data: {
+          status: "REJECTED_BY_OWNER",
+        },
+        include: {
+          product: true,
+          requester: true,
+          owner: true,
+        },
+      });
+
+      // Unlock BCC funds if they were locked
+      if (rentalRequest.paidWithBcc && rentalRequest.usedBccAmount > 0) {
+        await tx.bccWallet.update({
+          where: { id: rentalRequest.bccWalletId },
+          data: {
+            lockedBalance: {
+              decrement: rentalRequest.usedBccAmount,
+            },
+          },
+        });
+      }
+
+      // Unlock RCC funds if they were locked
+      if (
+        rentalRequest.paidWithRcc &&
+        rentalRequest.rccUsageDetails.length > 0
+      ) {
+        const unlockPromises = rentalRequest.rccUsageDetails.map(
+          async (usage) => {
+            await tx.redCacheCredit.update({
+              where: { id: usage.redCacheCreditId },
+              data: {
+                inUse: {
+                  decrement: usage.usedAmount,
+                },
+              },
+            });
+          },
+        );
+
+        await Promise.all(unlockPromises);
+      }
+
+      return updatedRequest;
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Rental request rejected successfully",
+      data: result,
+    });
   } catch (error) {
     console.error(error);
     next(error);

@@ -4,7 +4,7 @@ const BCC = ({ bccWallet, handleSelect, selectedBcc, inRRModal }) => {
   return (
     <div
       onClick={handleSelect}
-      className={`text-black w-[190px]  p-4 rounded-xl hover:scale-105 cursor-pointer transition duration-300 shadow-md ${
+      className={`text-black w-[185px]  p-3 rounded-xl hover:scale-105 cursor-pointer transition duration-300 shadow-md ${
         selectedBcc > 0 && !inRRModal
           ? "bg-blue-100 border-[3px] border-blue-700"
           : "bg-gradient-to-r from-blue-400 to-blue-100"
@@ -22,7 +22,7 @@ const BCC = ({ bccWallet, handleSelect, selectedBcc, inRRModal }) => {
               )}{" "}
             </p>
           </div>
-          <img src={bccLogo} alt="fav" className="h-10 w-10" />
+          <img src={bccLogo} alt="fav" className="h-8 w-8" />
         </div>
 
         <div className="flex justify-between mt-2">

@@ -149,7 +149,6 @@ model RedCacheCredit {
   sourceProductId String  @map("source_product_id")
   sourceProduct   Product @relation(fields: [sourceProductId], references: [id])
 
-  rentalRequests      RentalRequest[]
   rentalRequestUsages RentalRequestRccUsage[]
 
   createdAt DateTime  @default(now()) @map("created_at")
@@ -262,7 +261,6 @@ model RentalRequest {
   product         Product                 @relation(fields: [productId], references: [id])
   requester       User                    @relation("RentalRequestsMade", fields: [requesterId], references: [id])
   owner           User                    @relation("RentalRequestsReceived", fields: [ownerId], references: [id])
-  usedRCCs        RedCacheCredit[]
   rccUsageDetails RentalRequestRccUsage[]
 
   createdAt DateTime   @default(now()) @map("created_at")
