@@ -54,9 +54,9 @@ export const createRentalRequest = async (req, res, next) => {
       throw new CustomError("Product is currently on hold", 400);
     }
     //TODO: Implement this in client asap
-    if (requesterId === ownerId) {
-      throw new CustomError("Cannot rent your own product", 400);
-    }
+    // if (requesterId === ownerId) {
+    //   throw new CustomError("Cannot rent your own product", 400);
+    // }
     // TODO: (client) Check for existing pending request
     const existingRequest = await prisma.rentalRequest.findFirst({
       where: {
@@ -195,7 +195,7 @@ export const createRentalRequest = async (req, res, next) => {
 export const acceptRentalRequest = async (req, res, next) => {
   try {
     const { requestId } = req.params;
-    const { ownerDepositMethod, ownerPhoneNumber } = req.body;
+    const { ownerDepositMethod, ownerPhoneNumber } = req.body;  
 
     if (!requestId) {
       throw new CustomError("Request ID is required", 400);

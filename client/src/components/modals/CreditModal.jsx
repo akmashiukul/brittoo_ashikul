@@ -22,6 +22,12 @@ const CreditModal = () => {
   const [selectedBcc, setSelectedBcc] = useState(0);
   const [selectedRCCs, setSelectedRCCs] = useState([]);
 
+  const handleCloseCreditModal = () => {
+    closeCreditModal();
+    setSelectedBcc(0);
+    setSelectedRCCs([]);
+  }
+
   useEffect(() => {
     const getAvailableBcc = async () => {
       try {
@@ -86,6 +92,9 @@ const CreditModal = () => {
   const remaining = data?.product?.secondHandPrice - selected;
 
   const handleBccSelect = () => {
+    if (availableBcc === 0) {
+      return alert("No available credit in this card")
+    }
     if (remaining > 0 && availableBcc - selectedBcc >= remaining) {
       //console.log('case 1')
       setSelectedBcc(remaining);
@@ -101,13 +110,16 @@ const CreditModal = () => {
     const alreadySelected = selectedRCCs.find(
       (selectedRcc) => selectedRcc.rcc.id === rccParams.id,
     );
+    if (rccParams.amount - rccParams.inUse === 0) {
+      return alert("No available credit in this card")
+    }
     if (alreadySelected) {
       setSelectedRCCs(
         selectedRCCs.filter(
           (selectedRcc) => selectedRcc.rcc.id !== rccParams.id,
         ),
       );
-    } else if (remaining > 0 && rccParams.amount >= remaining) {
+    } else if (remaining > 0 && (rccParams.amount - rccParams.inUse) >= remaining) {
       setSelectedRCCs([
         ...selectedRCCs,
         { rcc: rccParams, selectedAmount: remaining },
@@ -115,7 +127,7 @@ const CreditModal = () => {
     } else if (remaining > 0) {
       setSelectedRCCs([
         ...selectedRCCs,
-        { rcc: rccParams, selectedAmount: rccParams.amount },
+        { rcc: rccParams, selectedAmount: (rccParams.amount - rccParams.inUse) },
       ]);
     }
   };
@@ -134,6 +146,8 @@ const CreditModal = () => {
       bccWallet,
       selectedBcc,
       selectedRCCs,
+      setSelectedBcc,
+      setSelectedRCCs
     });
   };
 
@@ -176,7 +190,7 @@ const CreditModal = () => {
               type="button"
               className="absolute top-1 cursor-pointer right-1 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-xs md:text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
               data-modal-hide="authentication-modal"
-              onClick={closeCreditModal}
+              onClick={handleCloseCreditModal}
             >
               <X />
               <span className="sr-only">Close modal</span>

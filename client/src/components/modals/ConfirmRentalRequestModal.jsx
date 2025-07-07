@@ -1,4 +1,4 @@
-import { Home, MapPin, TagIcon, X } from "lucide-react";
+import { Home, Loader2, MapPin, TagIcon, X } from "lucide-react";
 import useConfirmRentalRequestModalStore from "../../stores/creditModalStores/useConfirmRentalRequestModalStore";
 import RCC from "../CacheCreditCard/RCC";
 import BCC from "../CacheCreditCard/BCC";
@@ -6,6 +6,10 @@ import { differenceInDays } from "date-fns";
 import { usePriceCalculate } from "../../hooks/usePriceCalculate";
 import { useState } from "react";
 import useUserStore from "../../stores/authStores/useUserStore";
+import api from "../../lib/api";
+import Swal from "sweetalert2";
+import Loader from "../shared/Loader";
+import useCreditModalStore from "../../stores/creditModalStores/useCreditModalStore";
 
 const ConfirmRentalRequestModal = () => {
   const {
@@ -13,13 +17,15 @@ const ConfirmRentalRequestModal = () => {
     isConfirmRentalRequestModalOpen,
     data,
   } = useConfirmRentalRequestModalStore();
+  const { closeCreditModal } = useCreditModalStore();
   const { currentUser } = useUserStore();
 
   const base_url = import.meta.env.VITE_BASE_URL;
   const [selectedMethod, setSelectedMethod] = useState("TERMINAL_PICKUP");
-  const [pickupPoint, setPickupPoint] = useState("ZIA_HALL_1");
+  const [pickupPoint, setPickupPoint] = useState("");
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const { calculatePricePerDay } = usePriceCalculate();
   const numberOfDays =
@@ -84,25 +90,76 @@ const ConfirmRentalRequestModal = () => {
   }
 
   const handleConfirm = async () => {
-    const rentalData = {
-      productId: data?.rentalDetails?.product?.id,
-      requesterId: currentUser.id,
-      ownerId: data?.rentalDetails?.product?.owner.id,
-      rentalStartDate: new Date(data?.rentalDetails?.initial).toISOString(),
-      rentalEndDate: new Date(data?.rentalDetails?.final).toISOString(),
-      totalDays: parseInt(numberOfDays),
-      renterCollectionMethod: selectedMethod,
-      renterPhoneNumber: phoneNumber,
-      deliveryAddress,
-      pickupPoint,
-      paidWithBcc: !!data?.selectedBcc,
-      usedBccAmount: Number(data?.selectedBcc || 0),
-      paidWithRcc: data?.selectedRCCs?.length > 0 ? true : false,
-      usedRccData: data?.selectedRCCs?.map((item) => ({
-        rccId: item.rcc.id,
-        selectedAmount: item.selectedAmount,
-      })),
-    };
+    try {
+      setLoading(true);
+      if (selectedMethod === "HOME_DELIVERY" && !deliveryAddress) {
+        return alert("Please enter the delivery address");
+      }
+      if (selectedMethod === "TERMINAL_PICKUP" && !pickupPoint) {
+        return alert("Please enter your nearest pickup point");
+      }
+      if (!phoneNumber) {
+        return alert("Please Enter Your phone number");
+      }
+      const rentalData = {
+        productId: data?.rentalDetails?.product?.id,
+        requesterId: currentUser.id,
+        ownerId: data?.rentalDetails?.product?.owner.id,
+        rentalStartDate: new Date(data?.rentalDetails?.initial).toISOString(),
+        rentalEndDate: new Date(data?.rentalDetails?.final).toISOString(),
+        totalDays: parseInt(numberOfDays),
+        renterCollectionMethod: selectedMethod,
+        renterPhoneNumber: "+880" + phoneNumber,
+        deliveryAddress:
+          selectedMethod === "HOME_DELIVERY" ? deliveryAddress : null,
+        pickupPoint: selectedMethod === "TERMINAL_PICKUP" ? pickupPoint : null,
+        paidWithBcc: !!data?.selectedBcc,
+        bccWalletId: data?.bccWallet.id,
+        usedBccAmount: Number(data?.selectedBcc || 0),
+        paidWithRcc: data?.selectedRCCs?.length > 0 ? true : false,
+        usedRccData: data?.selectedRCCs?.map((item) => ({
+          rccId: item.rcc.id,
+          selectedAmount: item.selectedAmount,
+        })),
+      };
+      const token = localStorage.getItem("token");
+      const res = await api.post(
+        "/api/v1/rentalRequest/createRequest",
+        rentalData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      console.log(res.data);
+      if (!res.data.success) {
+        Swal.fire({
+          icon: "error",
+          title: "OOPS!",
+          text: res.data.message || "Something Went Wrong",
+        });
+        return;
+      }
+      closeCreditModal();
+      data?.setSelectedBcc(0);
+      data?.setSelectedRCCs([]);
+      Swal.fire({
+        icon: "success",
+        title: "Rental request place successfully",
+        text: "Waiting for owner's approval.",
+        footer: '<a href="/dashboard">Go to my requests</a>',
+      });
+    } catch (error) {
+      console.log(error);
+      Swal.fire({
+        icon: "error",
+        title: "OOPS!",
+        text: error.response?.data?.message || "Something went wrong!",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!isConfirmRentalRequestModalOpen) {
@@ -453,12 +510,21 @@ const ConfirmRentalRequestModal = () => {
           </div>
 
           <div className="py-4 md:py-5 border-t mx-4 border-gray-200 flex-shrink-0 mt-4">
-            <button
-              onClick={handleConfirm}
-              className="w-full text-green-600 hover:text-white bg-gray-50 hover:bg-green-600 font-medium rounded-lg text-xs md:text-sm px-5 py-2.5 text-center cursor-pointer border-2 border-green-600 shadow-md transition-all duration-300"
-            >
-              Confirm Rental Request
-            </button>
+            {loading ? (
+              <button
+                onClick={handleConfirm}
+                className="w-full text-gray-600 hover:text-white bg-gray-50 font-medium rounded-lg text-xs md:text-sm px-5 py-2.5 text-center cursor-pointer border-2 border-gray-600 shadow-md transition-all duration-300"
+              >
+                Please Hold Tight....
+              </button>
+            ) : (
+              <button
+                onClick={handleConfirm}
+                className="w-full text-green-600 hover:text-white bg-gray-50 hover:bg-green-600 font-medium rounded-lg text-xs md:text-sm px-5 py-2.5 text-center cursor-pointer border-2 border-green-600 shadow-md transition-all duration-300"
+              >
+                Confirm Rental Request
+              </button>
+            )}
           </div>
         </div>
       </div>

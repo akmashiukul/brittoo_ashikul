@@ -1,7 +1,6 @@
 import rccLogo from "../../assets/logos/rcc-logo.png";
 
 const RCC = ({ rcc, handleSelect, selectedRCCs, inRRModal = false }) => {
-  console.log(rcc);
   const selectedRcc = selectedRCCs?.find((r) => r.rcc.id === rcc.id);
   return (
     <div
