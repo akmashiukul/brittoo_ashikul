@@ -264,13 +264,6 @@ export const login = async (req, res, next) => {
       where: {
         email: email,
       },
-      include: {
-        blueCacheCredits: true,
-        redCacheCredits: true,
-        rentalRequestsMade: true,
-        rentedOutProducts: true,
-        rentalRequestsReceived: true,
-      },
     });
     if (!user) {
       throw new CustomError("User not found", 401);

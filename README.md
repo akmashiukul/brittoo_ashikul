@@ -1,4 +1,4 @@
-<img src="client/src/assets/britto.jpg" alt="Britto Logo" width="400" />
+<img src="client/src/assets/brittoo.jpg" alt="Britto Logo" width="400" />
 
 <br>
 

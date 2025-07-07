@@ -1,4 +1,4 @@
-export const userSafeSelect = {
+export const safeAuthUserSelect = {
   id: true,
   name: true,
   email: true,

@@ -1,6 +1,4 @@
 import prisma from "../config/prisma.js";
-import { CustomError } from "../lib/customError.js";
-import { userSafeSelect } from "../lib/prismaSelects.js";
 
 export const getUsersAvailableRcc = async (req, res, next) => {
   try {

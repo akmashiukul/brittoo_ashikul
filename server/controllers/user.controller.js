@@ -1,6 +1,6 @@
 import prisma from "../config/prisma.js";
 import { CustomError } from "../lib/customError.js";
-import { userSafeSelect } from "../lib/prismaSelects.js";
+import { safeAuthUserSelect } from "../lib/prismaSelects.js";
 
 export const getAllUsers = async (req, res, next) => {
   try {
@@ -43,7 +43,7 @@ export const getAllUsers = async (req, res, next) => {
     const [users, totalUsers] = await Promise.all([
       prisma.user.findMany({
         where: whereClause,
-        select: userSafeSelect,
+        select: safeAuthUserSelect,
         skip,
         take: parseInt(limit),
         orderBy: { [sortBy]: sortOrder },
