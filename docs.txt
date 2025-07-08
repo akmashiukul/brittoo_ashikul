@@ -18,7 +18,7 @@ Prod:
 
 --------TEST_TODO VVII:--------
   1. check one more registration if image path /uploads/... is save to db or not;
-  2. Rate LImiter in password check while deposit
+  2. check if one can place rental request on a already requested product.
 
 
 TODO: 
@@ -26,7 +26,8 @@ TODO:
   2. in navbar on click on dashboard make it dynamic. for admin admin dash for user user dash.
   3. add is for sale option while adding product
   4. Set diff price for ACADEMIC_BOOK category.
-
+  5. while buying bcc if not all field selected the error should be more precise .like please select the payment_gateway.
+  6. after buying bcc show its waiting for confirmation.
 
 PROBLEMS:
   1. After is_verified changed to verified from pending doesn't reflect until user logs out and again logs in.

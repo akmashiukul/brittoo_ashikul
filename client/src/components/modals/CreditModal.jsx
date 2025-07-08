@@ -97,13 +97,10 @@ const CreditModal = () => {
       return alert("No available credit in this card")
     }
     if (remaining > 0 && availableBcc - selectedBcc >= remaining) {
-      //console.log('case 1')
       setSelectedBcc(remaining);
     } else if (remaining > 0 && selectedBcc === 0) {
-      //console.log('case 2')
       setSelectedBcc(availableBcc);
     } else {
-      //console.log('case 3')
       setSelectedBcc(0);
     }
   };
@@ -134,11 +131,19 @@ const CreditModal = () => {
   };
 
   const handleDeposit = async () => {
-    if (remaining > 0) {
+    if (!selectedBcc || !selectedRCCs) {
       Swal.fire({
         icon: "error",
         title: "Hey Nigga!",
         text: "No deposit amount selected",
+      });
+      return;
+    }
+    if (remaining > 0) {
+      Swal.fire({
+        icon: "error",
+        title: "Deposit not fulfilled",
+        text: "Kana naki re vai. Dekhos na progress bar fillup hoynai",
       });
       return;
     }

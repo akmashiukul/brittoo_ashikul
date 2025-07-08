@@ -149,9 +149,10 @@ const ConfirmRentalRequestModal = () => {
       }
       Swal.fire({
         icon: "success",
-        title: "Rental request place successfully",
+        title: "Rental request placed successfully",
         text: "Waiting for owner's approval.",
-        footer: '<a href="/dashboard/placed-requests">Go to my requests</a>',
+        footer:
+          '<a href="/dashboard/placed-requests" style="color: #2563eb; text-decoration: underline;">Go to my requests</a>',
       });
     } catch (error) {
       console.log(error);

@@ -8,13 +8,12 @@ import { Carousel } from "react-responsive-carousel";
 import { CheckCircle, TagIcon, XCircle } from "lucide-react";
 import Avatar from "boring-avatars";
 import { usePriceCalculate } from "../hooks/usePriceCalculate";
-import { DayPicker } from "react-day-picker";
-import "react-day-picker/style.css";
 import { differenceInDays } from "date-fns";
 import useUserStore from "../stores/authStores/useUserStore";
 import useCreditModalStore from "../stores/creditModalStores/useCreditModalStore";
 import calendarImage from "../assets/calendar.png";
 import { formatDistanceToNow } from "date-fns";
+import DaysDisplay from "./DaysDisplay";
 
 const ProductDetails = () => {
   const [product, setProduct] = useState(null);
@@ -284,42 +283,14 @@ const ProductDetails = () => {
 
       {/* 2 - A */}
       <div className="w-full md:w-1/3 md:border-l border-gray-300 sm:my-7 px-4">
-        <h2 className="text-green-600 font-bold text-xl sm:text-2xl">
-          BDT {price}/<span className="text-sm font-medium">day</span>
-        </h2>
-        <p className="text-sm text-gray-700">
-          If rented for{" "}
-          <span className="text-blue-600 font-medium">{numberOfDays}</span> Days
-        </p>
-        <div className="flex flex-col">
-          <h2 className="text-lg font-bold text-gray-700 mt-8">
-            Pick a custom range{" "}
-            <span className="text-sm font-medium">(max 15 days)</span>:{" "}
-          </h2>
-          <p className="text-gray-700 text-xs mb-2">
-            Price varies according to you selected range.
-          </p>
-          <DayPicker
-            mode="range"
-            selected={range}
-            onSelect={setRange}
-            max={15}
-            disabled={{
-              before: new Date(),
-            }}
-            className="rdp-root self-center md:self-start"
-          />
-          {initial && final && (
-            <div className="mt-4 text-xs">
-              <p className="text-gray-700">
-                <strong>Start:</strong> {initial.toDateString()}
-              </p>
-              <p className="text-gray-700">
-                <strong>End:</strong> {final.toDateString()}
-              </p>
-            </div>
-          )}
-        </div>
+        <DaysDisplay
+          numberOfDays={numberOfDays}
+          price={price}
+          range={range}
+          setRange={setRange}
+          initial={initial}
+          final={final}
+        />
         <div className="mt-8">
           <label htmlFor="coupon" className="text-lg font-bold text-gray-700">
             Enter Coupon{" "}
