@@ -118,7 +118,7 @@ const ProductDetails = () => {
         text: "You Need to Login First to Rent Something",
       });
     }
-    openCreditModal({ initial, final, product });
+    openCreditModal({ initial, final, product, setProduct });
   };
 
   if (loading) {

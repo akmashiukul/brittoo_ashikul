@@ -70,10 +70,6 @@ export const verifyUser = async (req, res) => {
         selfie: `/uploads/${selfieFile.filename}`,
         isVerified: "PENDING",
       },
-      include: {
-        blueCacheCredits: true,
-        redCacheCredits: true
-      }
     });
 
     const token = jwt.sign(

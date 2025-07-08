@@ -6,6 +6,6 @@ import { getUsersAvailableRcc } from '../controllers/rcc.controller.js';
 
 const router = express.Router();
 
-router.get('/available/:userId', verifyToken, verificationMiddleware, getUsersAvailableRcc);
+router.get('/available/:userId', verifyToken, getUsersAvailableRcc);
 
 export default router;

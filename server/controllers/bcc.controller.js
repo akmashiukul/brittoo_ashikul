@@ -185,10 +185,13 @@ export const rejectBCCRequest = async (req, res, next) => {
 export const getUsersAvailableBcc = async (req, res, next) => {
   try {
     const { userId } = req.params;
+    console.log('hi1')
 
     const wallet = await prisma.bccWallet.findUnique({
       where: { userId },
     });
+
+    console.log('hi2')
 
     if (!wallet) {
       return res.status(200).json({
@@ -197,11 +200,12 @@ export const getUsersAvailableBcc = async (req, res, next) => {
         message: "User wallet not found",
         data: {
           totalBalance: 0,
-          availableBalance: 0,
           lockedBalance: 0,
         },
       });
     }
+
+    console.log('hi3')
 
     res.status(200).json({
       success: true,

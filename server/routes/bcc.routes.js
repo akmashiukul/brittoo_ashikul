@@ -7,7 +7,7 @@ import { adminMiddleware } from '../middlewares/adminMiddleware.js';
 const router = express.Router();
 
 router.post('/buy', verifyToken, verificationMiddleware, buyBcc);
-router.get('/available/:userId', verifyToken, verificationMiddleware, getUsersAvailableBcc);
+router.get('/available/:userId', verifyToken, getUsersAvailableBcc);
 router.post('/accept/:creditId', verifyToken, adminMiddleware, acceptBCCRequest);
 router.put('/reject/:creditId', verifyToken, adminMiddleware, rejectBCCRequest);
 router.get('/pending', verifyToken, adminMiddleware, getPendingCreditRequests);

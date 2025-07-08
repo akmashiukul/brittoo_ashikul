@@ -38,7 +38,8 @@ const AppContent = () => {
   const { isShowRccModalOpen } = useShowRccModalStore();
 
   const loginDtStr = localStorage.getItem("login-dt");
-  if (loginDtStr) {
+  const token = localStorage.getItem("token");
+  if (token && loginDtStr) {
     const loginDT = new Date(loginDtStr);
     const now = new Date();
 
@@ -108,7 +109,7 @@ const AppContent = () => {
               <Route path="overview" element={<Overview />} />
               <Route path="list-items" element={<ListItems />} />
               <Route path="manage-items" element={<ManageItems />} />
-              <Route path="rental-requests" element={<RentalRequests />} />
+              <Route path="placed-requests" element={<RentalRequests />} />
               <Route path="user-analytics" element={<UserAnalytics />} />
               <Route path="update-item/:id" element={<UpdateItem />} />
             </Route>

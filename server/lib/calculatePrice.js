@@ -63,4 +63,4 @@ export function calculatePricePerDay(
   return parseFloat(finalPrice.toFixed(2));
 }
 
-//console.log(calculatePricePerDay(8000, 'GOOD', 2, 'MID', 8))
+//console.log(calculatePricePerDay(800, 'GOOD', 2, 'MID', 15))

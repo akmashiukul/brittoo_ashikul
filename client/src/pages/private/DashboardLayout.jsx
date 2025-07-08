@@ -122,9 +122,9 @@ const DashboardLayout = () => {
             </li>
             <li>
               <Link
-                to="/dashboard/rental-requests"
+                to="/dashboard/placed-requests"
                 className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${
-                  path.includes("/rental-requests") ? "bg-green-600 text-white" : "text-gray-700"
+                  path.includes("/placed-requests") ? "bg-green-600 text-white" : "text-gray-700"
                 } flex items-center gap-2`}
                 onClick={() => {
                   if (window.innerWidth <= 425) {
@@ -132,7 +132,7 @@ const DashboardLayout = () => {
                   }
                 }}
               >
-                <FaShoppingCart /> Rental Requests
+                <FaShoppingCart /> Placed Requests
               </Link>
             </li>
             <li>

@@ -219,10 +219,6 @@ export const verifyOTP = async (req, res, next) => {
         emailVerified: true,
         otpSentCount: 0,
       },
-      include: {
-        blueCacheCredits: true,
-        redCacheCredits: true,
-      },
     });
 
     const token = jwt.sign(

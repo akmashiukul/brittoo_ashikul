@@ -8,7 +8,6 @@ import { useState } from "react";
 import useUserStore from "../../stores/authStores/useUserStore";
 import api from "../../lib/api";
 import Swal from "sweetalert2";
-import Loader from "../shared/Loader";
 import useCreditModalStore from "../../stores/creditModalStores/useCreditModalStore";
 
 const ConfirmRentalRequestModal = () => {
@@ -101,6 +100,13 @@ const ConfirmRentalRequestModal = () => {
       if (!phoneNumber) {
         return alert("Please Enter Your phone number");
       }
+      if (
+        !data?.rentalDetails?.product?.id ||
+        !data?.rentalDetails?.product?.owner?.id
+      ) {
+        return alert("Product or owner info not found.");
+      }
+
       const rentalData = {
         productId: data?.rentalDetails?.product?.id,
         requesterId: currentUser.id,
@@ -109,12 +115,12 @@ const ConfirmRentalRequestModal = () => {
         rentalEndDate: new Date(data?.rentalDetails?.final).toISOString(),
         totalDays: parseInt(numberOfDays),
         renterCollectionMethod: selectedMethod,
-        renterPhoneNumber: "+880" + phoneNumber,
+        renterPhoneNumber: "+880" + phoneNumber.trim(),
         deliveryAddress:
           selectedMethod === "HOME_DELIVERY" ? deliveryAddress : null,
         pickupPoint: selectedMethod === "TERMINAL_PICKUP" ? pickupPoint : null,
         paidWithBcc: !!data?.selectedBcc,
-        bccWalletId: data?.bccWallet.id,
+        bccWalletId: data?.bccWallet?.id,
         usedBccAmount: Number(data?.selectedBcc || 0),
         paidWithRcc: data?.selectedRCCs?.length > 0 ? true : false,
         usedRccData: data?.selectedRCCs?.map((item) => ({
@@ -141,14 +147,11 @@ const ConfirmRentalRequestModal = () => {
         });
         return;
       }
-      closeCreditModal();
-      data?.setSelectedBcc(0);
-      data?.setSelectedRCCs([]);
       Swal.fire({
         icon: "success",
         title: "Rental request place successfully",
         text: "Waiting for owner's approval.",
-        footer: '<a href="/dashboard">Go to my requests</a>',
+        footer: '<a href="/dashboard/placed-requests">Go to my requests</a>',
       });
     } catch (error) {
       console.log(error);
@@ -159,6 +162,10 @@ const ConfirmRentalRequestModal = () => {
       });
     } finally {
       setLoading(false);
+      closeConfirmRentalRequestModal();
+      closeCreditModal();
+      data?.setSelectedBcc(0);
+      data?.setSelectedRCCs([]);
     }
   };
 
