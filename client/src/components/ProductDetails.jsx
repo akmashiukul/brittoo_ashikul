@@ -125,11 +125,11 @@ const ProductDetails = () => {
   }
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen">
-      <div className="w-full md:w-2/3 p-4 md:p-6">
-        <div className="flex flex-col sm:flex-row gap-4 md:gap-6">
+    <div className="flex flex-col lg:flex-row min-h-screen">
+      <div className="w-full lg:w-2/3 p-4 lg:p-6">
+        <div className="flex flex-col lg:flex-row gap-4 md:gap-6">
           {/* 1 - A */}
-          <div className="w-full sm:w-1/2">
+          <div className="w-full lg:w-1/2">
             <Carousel showThumbs={true} className="text-center">
               {product?.productImages?.map((image) => (
                 <div key={image}>
@@ -142,7 +142,7 @@ const ProductDetails = () => {
             </Carousel>
           </div>
           {/*  1 - B */}
-          <div className="w-full sm:w-1/2">
+          <div className="w-full lg:w-1/2">
             <h2 className="text-xl md:text-2xl font-semibold sm:font-bold">
               {product.name}
             </h2>
@@ -282,7 +282,7 @@ const ProductDetails = () => {
       </div>
 
       {/* 2 - A */}
-      <div className="w-full md:w-1/3 md:border-l border-gray-300 sm:my-7 px-4">
+      <div className="w-full lg:w-1/3 lg:border-l border-gray-300 sm:my-7 px-4">
         <DaysDisplay
           numberOfDays={numberOfDays}
           price={price}

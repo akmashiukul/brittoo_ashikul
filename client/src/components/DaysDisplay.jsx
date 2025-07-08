@@ -23,8 +23,8 @@ const DaysDisplay = ({
         </div>
       </div>
       <div className="px-6 py-4 bg-gradient-to-br from-green-50 to-emerald-50 border-b border-green-200">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4 flex-1">
             <div className="relative">
               <div className="w-16 h-16 bg-white rounded-xl border-2 border-green-200 flex items-center justify-center shadow-sm">
                 <div className="absolute top-0 left-0 right-0 h-3 bg-green-500 rounded-t-xl"></div>
@@ -44,14 +44,14 @@ const DaysDisplay = ({
               </div>
             </div>
 
-            <div className="hidden sm:block">
+            <div className="hidden sm:block w-full flex-1">
               <div className="flex items-center gap-2 mb-1">
                 <TrendingUp className="w-4 h-4 text-green-600" />
                 <span className="text-sm font-medium text-gray-700">
                   Duration
                 </span>
               </div>
-              <div className="w-24 bg-gray-200 rounded-full h-2">
+              <div className="bg-gray-200 rounded-full h-2">
                 <div
                   className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full transition-all duration-500"
                   style={{
@@ -60,8 +60,12 @@ const DaysDisplay = ({
                 ></div>
               </div>
               <div className="flex justify-between text-xs text-gray-500 mt-1">
-                <span>1</span>
-                <span>15</span>
+                <span>
+                  1 <span className="text-[10px] ml-0.5">(min)</span>
+                </span>
+                <span>
+                  15<span className="text-[10px] ml-0.5">(max)</span>
+                </span>
               </div>
             </div>
           </div>
@@ -72,6 +76,28 @@ const DaysDisplay = ({
               <Clock className="w-3 h-3" />
               per day
             </div>
+          </div>
+        </div>
+        <div className="block mt-4 sm:hidden">
+          <div className="flex items-center gap-2 mb-1">
+            <TrendingUp className="w-4 h-4 text-green-600" />
+            <span className="text-sm font-medium text-gray-700">Duration</span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div
+              className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full transition-all duration-500"
+              style={{
+                width: `${Math.min((numberOfDays / 15) * 100, 100)}%`,
+              }}
+            ></div>
+          </div>
+          <div className="flex justify-between text-xs text-gray-500 mt-1">
+            <span>
+              1 <span className="text-[10px] ml-0.5">(min)</span>
+            </span>
+            <span>
+              15<span className="text-[10px] ml-0.5">(max)</span>
+            </span>
           </div>
         </div>
 
@@ -100,7 +126,11 @@ const DaysDisplay = ({
 
       <div className="px-6 py-4">
         <div className="flex items-center gap-2 mb-4">
-          <Tooltip style="light" content="This is a helpful tooltip!">
+          <Tooltip
+            placement="top-start"
+            style="dark"
+            content="Select the range of dates you wanna rent for."
+          >
             <Info className="w-4 h-4 text-blue-500" />
           </Tooltip>
           <span className="text-sm text-gray-700 font-semibold">
