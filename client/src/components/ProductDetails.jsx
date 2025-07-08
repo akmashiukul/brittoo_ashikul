@@ -13,6 +13,7 @@ import "react-day-picker/style.css";
 import { differenceInDays } from "date-fns";
 import useUserStore from "../stores/authStores/useUserStore";
 import useCreditModalStore from "../stores/creditModalStores/useCreditModalStore";
+import calendarImage from "../assets/calendar.png";
 import { formatDistanceToNow } from "date-fns";
 
 const ProductDetails = () => {
@@ -38,7 +39,7 @@ const ProductDetails = () => {
   useEffect(() => {
     if (initial && final) {
       setNumberOfDays(differenceInDays(final, initial) + 1);
-    } 
+    }
   }, [initial, final]);
 
   useEffect(() => {
@@ -103,7 +104,10 @@ const ProductDetails = () => {
   const requestRental = async () => {
     if (!initial) {
       return Swal.fire({
-        icon: "warning",
+        imageUrl: calendarImage,
+        imageWidth: 190,
+        imageHeight: 180,
+        imageAlt: "Custom image",
         title: "Select date/range you wanna rent for",
       });
     }
@@ -114,7 +118,7 @@ const ProductDetails = () => {
         text: "You Need to Login First to Rent Something",
       });
     }
-    openCreditModal({initial, final, product});
+    openCreditModal({ initial, final, product });
   };
 
   if (loading) {
