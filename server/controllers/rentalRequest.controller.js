@@ -248,10 +248,9 @@ export const getUserPlacedRequests = async (req, res) => {
   }
 };
 
-// Get rental requests for owner
 export const getOwnerRentalRequests = async (req, res) => {
   try {
-    const userId = req.user.id; // Owner ID from auth middleware
+    const userId = req.user.id;
     
     const rentalRequests = await prisma.rentalRequest.findMany({
       where: {

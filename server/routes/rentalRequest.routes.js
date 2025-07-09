@@ -1,6 +1,7 @@
 import express from "express";
 import {
   createRentalRequest,
+  getOwnerRentalRequests,
   getUserPlacedRequests
 } from "../controllers/rentalRequest.controller.js";
 import { verifyToken } from "../middlewares/authMiddleware.js";
@@ -15,5 +16,6 @@ router.post(
   createRentalRequest,
 );
 router.get("/placed-requests", verifyToken, getUserPlacedRequests);
+router.get("/owner-requests", verifyToken, getOwnerRentalRequests);
 
 export default router;

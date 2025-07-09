@@ -30,6 +30,7 @@ import ShowRccModal from "./components/modals/ShowRccModal";
 import ConfirmRentalRequestModal from "./components/modals/ConfirmRentalRequestModal";
 import Swal from "sweetalert2";
 import PlacedRequests from "./pages/private/dash-pages/PlacedRequests";
+import RecievedRequests from "./pages/private/dash-pages/RecievedRequests";
 
 const AppContent = () => {
   const location = useLocation();
@@ -110,6 +111,7 @@ const AppContent = () => {
               <Route path="list-items" element={<ListItems />} />
               <Route path="manage-items" element={<ManageItems />} />
               <Route path="placed-requests" element={<PlacedRequests />} />
+              <Route path="recieved-requests" element={<RecievedRequests />} />
               <Route path="user-analytics" element={<UserAnalytics />} />
               <Route path="update-item/:id" element={<UpdateItem />} />
             </Route>

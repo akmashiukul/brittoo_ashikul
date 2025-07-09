@@ -1,11 +1,25 @@
-import { useState, useEffect } from 'react';
-import { Clock, User, Calendar, MapPin, Phone, Shield, Package, DollarSign, CheckCircle, XCircle, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
-import api from '../../../lib/api';
+import { useState, useEffect } from "react";
+import {
+  Clock,
+  User,
+  Calendar,
+  MapPin,
+  Phone,
+  Shield,
+  Package,
+  DollarSign,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
+import api from "../../../lib/api";
 
 const PlacedRequests = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [expandedRows, setExpandedRows] = useState(new Set());
   const base_url = import.meta.env.VITE_BASE_URL;
 
@@ -15,14 +29,14 @@ const PlacedRequests = () => {
 
   const fetchPlacedRequests = async () => {
     try {
-      const res = await api.get('/api/v1/rental-requests/placed-requests', {
+      const res = await api.get("/api/v1/rental-requests/placed-requests", {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       });
-      
+
       if (!res.data.success) {
-        throw new Error('Failed to fetch requests');
+        throw new Error("Failed to fetch requests");
       }
       setRequests(res.data.data);
     } catch (err) {
@@ -44,28 +58,28 @@ const PlacedRequests = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'REQUESTED_BY_RENTER':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'ACCEPTED_BY_OWNER':
-        return 'bg-green-100 text-green-800 border-green-200';
-      case 'REJECTED_BY_OWNER':
-        return 'bg-red-100 text-red-800 border-red-200';
-      case 'PRODUCT_SUBMITTED_BY_OWNER':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
+      case "REQUESTED_BY_RENTER":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "ACCEPTED_BY_OWNER":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "REJECTED_BY_OWNER":
+        return "bg-red-100 text-red-800 border-red-200";
+      case "PRODUCT_SUBMITTED_BY_OWNER":
+        return "bg-blue-100 text-blue-800 border-blue-200";
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case 'REQUESTED_BY_RENTER':
+      case "REQUESTED_BY_RENTER":
         return <Clock className="w-4 h-4" />;
-      case 'ACCEPTED_BY_OWNER':
+      case "ACCEPTED_BY_OWNER":
         return <CheckCircle className="w-4 h-4" />;
-      case 'REJECTED_BY_OWNER':
+      case "REJECTED_BY_OWNER":
         return <XCircle className="w-4 h-4" />;
-      case 'PRODUCT_SUBMITTED_BY_OWNER':
+      case "PRODUCT_SUBMITTED_BY_OWNER":
         return <Package className="w-4 h-4" />;
       default:
         return <AlertCircle className="w-4 h-4" />;
@@ -73,31 +87,34 @@ const PlacedRequests = () => {
   };
 
   const formatStatus = (status) => {
-    return status.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
+    return status
+      .replace(/_/g, " ")
+      .toLowerCase()
+      .replace(/\b\w/g, (l) => l.toUpperCase());
   };
 
   const getSecurityScoreColor = (score) => {
     switch (score) {
-      case 'VERY_HIGH':
-        return 'text-green-600';
-      case 'HIGH':
-        return 'text-green-500';
-      case 'MID':
-        return 'text-yellow-500';
-      case 'LOW':
-        return 'text-orange-500';
-      case 'VERY_LOW':
-        return 'text-red-500';
+      case "VERY_HIGH":
+        return "text-green-600";
+      case "HIGH":
+        return "text-green-500";
+      case "MID":
+        return "text-yellow-500";
+      case "LOW":
+        return "text-orange-500";
+      case "VERY_LOW":
+        return "text-red-500";
       default:
-        return 'text-gray-500';
+        return "text-gray-500";
     }
   };
 
   const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+    return new Date(date).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
@@ -131,15 +148,25 @@ const PlacedRequests = () => {
     <div className="min-h-screen bg-gradient-to-br p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-green-800 mb-2">My Rental Requests</h1>
-          <p className="text-green-600">Track your placed rental requests and their status</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
+            My Placed Requests
+          </h1>
+          <p className="text-gray-600">
+            Track your placed rental requests and their status
+          </p>
         </div>
 
         {requests.length === 0 ? (
-          <div className="text-center py-12">
-            <Package className="w-16 h-16 text-green-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-green-800 mb-2">No Requests Found</h3>
-            <p className="text-green-600">You haven't placed any rental requests yet.</p>
+          <div className="min-h-[70vh] flex flex-col items-center justify-center">
+            <div className="text-center py-12">
+              <Package className="w-16 h-16 text-green-400 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-green-800 mb-2">
+                No Requests Found
+              </h3>
+              <p className="text-green-600">
+                You haven't placed any rental requests yet.
+              </p>
+            </div>
           </div>
         ) : (
           <div className="bg-white rounded-md border border-gray-200 overflow-hidden">
@@ -154,7 +181,10 @@ const PlacedRequests = () => {
 
             <div className="divide-y divide-green-100">
               {requests.map((request) => (
-                <div key={request.id} className="hover:bg-green-25 transition-colors duration-150">
+                <div
+                  key={request.id}
+                  className="hover:bg-green-25 transition-colors duration-150"
+                >
                   {/* Only visible in lg devices */}
                   <div className="hidden lg:grid lg:grid-cols-12 gap-4 p-6 items-center">
                     {/* Product */}
@@ -166,7 +196,9 @@ const PlacedRequests = () => {
                           className="w-12 h-12 rounded-lg object-cover"
                         />
                         <div>
-                          <h3 className="font-semibold text-gray-800 text-sm">{request.product.name}</h3>
+                          <h3 className="font-semibold text-gray-800 text-sm">
+                            {request.product.name}
+                          </h3>
                           <div className="flex items-center gap-2 text-xs text-gray-600">
                             <DollarSign className="w-3 h-3" />
                             <span>৳{request.product.pricePerDay}/day</span>
@@ -177,29 +209,47 @@ const PlacedRequests = () => {
 
                     {/* Status */}
                     <div className="col-span-2">
-                      <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(request.status)}`}>
+                      <div
+                        className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
+                          request.status,
+                        )}`}
+                      >
                         {getStatusIcon(request.status)}
-                        <span className="hidden md:inline">{formatStatus(request.status)}</span>
+                        <span className="hidden md:inline">
+                          {formatStatus(request.status)}
+                        </span>
                       </div>
                     </div>
 
                     {/* Rental Period */}
                     <div className="col-span-2">
                       <div className="text-sm">
-                        <div className="font-medium text-gray-800">{formatDate(request.rentalStartDate)}</div>
-                        <div className="text-xs text-gray-500">to {formatDate(request.rentalEndDate)}</div>
-                        <div className="text-xs text-green-600 font-medium">{request.totalDays} days</div>
+                        <div className="font-medium text-gray-800">
+                          {formatDate(request.rentalStartDate)}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          to {formatDate(request.rentalEndDate)}
+                        </div>
+                        <div className="text-xs text-green-600 font-medium">
+                          {request.totalDays} days
+                        </div>
                       </div>
                     </div>
 
                     {/* Owner */}
                     <div className="col-span-2">
                       <div className="text-sm">
-                        <div className="font-medium text-gray-800">{request.owner.name}</div>
+                        <div className="font-medium text-gray-800">
+                          {request.owner.name}
+                        </div>
                         <div className="flex items-center gap-1 text-xs">
                           <Shield className="w-3 h-3 text-gray-400" />
-                          <span className={`font-medium ${getSecurityScoreColor(request.owner.securityScore)}`}>
-                            {request.owner.securityScore.replace('_', ' ')}
+                          <span
+                            className={`font-medium ${getSecurityScoreColor(
+                              request.owner.securityScore,
+                            )}`}
+                          >
+                            {request.owner.securityScore.replace("_", " ")}
                           </span>
                         </div>
                       </div>
@@ -209,11 +259,13 @@ const PlacedRequests = () => {
                     <div className="col-span-2">
                       <div className="text-sm">
                         <div className="font-medium text-gray-800">
-                          {request.renterCollectionMethod === 'TERMINAL_PICKUP' ? 'Terminal Pickup' : 'Home Delivery'}
+                          {request.renterCollectionMethod === "TERMINAL_PICKUP"
+                            ? "Terminal Pickup"
+                            : "Home Delivery"}
                         </div>
                         {request.pickupPoint && (
                           <div className="text-xs text-gray-500">
-                            {request.pickupPoint.replace('_', ' ')}
+                            {request.pickupPoint.replace("_", " ")}
                           </div>
                         )}
                       </div>
@@ -225,7 +277,11 @@ const PlacedRequests = () => {
                         onClick={() => toggleRowExpansion(request.id)}
                         className="p-2 text-green-600 hover:bg-green-100 rounded-lg transition-colors"
                       >
-                        {expandedRows.has(request.id) ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                        {expandedRows.has(request.id) ? (
+                          <ChevronUp className="w-4 h-4" />
+                        ) : (
+                          <ChevronDown className="w-4 h-4" />
+                        )}
                       </button>
                     </div>
                   </div>
@@ -240,16 +296,26 @@ const PlacedRequests = () => {
                       />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between mb-2">
-                          <h3 className="font-semibold text-gray-800 text-sm truncate">{request.product.name}</h3>
+                          <h3 className="font-semibold text-gray-800 text-sm truncate">
+                            {request.product.name}
+                          </h3>
                           <button
                             onClick={() => toggleRowExpansion(request.id)}
                             className="p-1 text-green-600 hover:bg-green-100 rounded transition-colors ml-2"
                           >
-                            {expandedRows.has(request.id) ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                            {expandedRows.has(request.id) ? (
+                              <ChevronUp className="w-4 h-4" />
+                            ) : (
+                              <ChevronDown className="w-4 h-4" />
+                            )}
                           </button>
                         </div>
-                        
-                        <div className={`inline-flex items-center gap-2 px-2 py-1 rounded-full text-xs font-medium border mb-2 ${getStatusColor(request.status)}`}>
+
+                        <div
+                          className={`inline-flex items-center gap-2 px-2 py-1 rounded-full text-xs font-medium border mb-2 ${getStatusColor(
+                            request.status,
+                          )}`}
+                        >
                           {getStatusIcon(request.status)}
                           <span>{formatStatus(request.status)}</span>
                         </div>
@@ -281,11 +347,17 @@ const PlacedRequests = () => {
                           <div className="space-y-2 text-sm">
                             <div>
                               <span className="text-gray-600">Phone:</span>
-                              <span className="ml-2 font-medium">{request.renterPhoneNumber}</span>
+                              <span className="ml-2 font-medium">
+                                {request.renterPhoneNumber}
+                              </span>
                             </div>
                             <div>
-                              <span className="text-gray-600">Owner Email:</span>
-                              <span className="ml-2 font-medium">{request.owner.email}</span>
+                              <span className="text-gray-600">
+                                Owner Email:
+                              </span>
+                              <span className="ml-2 font-medium">
+                                {request.owner.email}
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -299,15 +371,23 @@ const PlacedRequests = () => {
                           <div className="space-y-2 text-sm">
                             <div>
                               <span className="text-gray-600">Start Date:</span>
-                              <span className="ml-2 font-medium">{formatDate(request.rentalStartDate)}</span>
+                              <span className="ml-2 font-medium">
+                                {formatDate(request.rentalStartDate)}
+                              </span>
                             </div>
                             <div>
                               <span className="text-gray-600">End Date:</span>
-                              <span className="ml-2 font-medium">{formatDate(request.rentalEndDate)}</span>
+                              <span className="ml-2 font-medium">
+                                {formatDate(request.rentalEndDate)}
+                              </span>
                             </div>
                             <div>
                               <span className="text-gray-600">Total Cost:</span>
-                              <span className="ml-2 font-medium text-green-600">৳{request.product.pricePerDay * request.totalDays}</span>
+                              <span className="ml-2 font-medium text-green-600">
+                                ৳
+                                {request.product.pricePerDay *
+                                  request.totalDays}
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -322,18 +402,27 @@ const PlacedRequests = () => {
                             <div>
                               <span className="text-gray-600">Method:</span>
                               <span className="ml-2 font-medium">
-                                {request.renterCollectionMethod === 'TERMINAL_PICKUP' ? 'Terminal Pickup' : 'Home Delivery'}
+                                {request.renterCollectionMethod ===
+                                "TERMINAL_PICKUP"
+                                  ? "Terminal Pickup"
+                                  : "Home Delivery"}
                               </span>
                             </div>
                             {request.pickupPoint && (
                               <div>
-                                <span className="text-gray-600">Pickup Point:</span>
-                                <span className="ml-2 font-medium">{request.pickupPoint.replace('_', ' ')}</span>
+                                <span className="text-gray-600">
+                                  Pickup Point:
+                                </span>
+                                <span className="ml-2 font-medium">
+                                  {request.pickupPoint.replace("_", " ")}
+                                </span>
                               </div>
                             )}
                             <div>
                               <span className="text-gray-600">Requested:</span>
-                              <span className="ml-2 font-medium">{formatDate(request.createdAt)}</span>
+                              <span className="ml-2 font-medium">
+                                {formatDate(request.createdAt)}
+                              </span>
                             </div>
                           </div>
                         </div>

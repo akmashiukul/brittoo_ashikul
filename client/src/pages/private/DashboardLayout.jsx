@@ -5,7 +5,7 @@ import brittoLogo from "../../assets/brittoo-logo.png";
 import { IoAnalytics, IoExit, IoHomeSharp } from "react-icons/io5";
 import { MdOutlineManageHistory, MdOutlineSpaceDashboard, MdRequestPage } from "react-icons/md";
 import useDashDrawertore from "../../stores/drawerStores/useDashDrawerStore";
-import { Menu, X } from "lucide-react";
+import { ListCheck, Menu, X } from "lucide-react";
 import { AiOutlineProduct } from "react-icons/ai";
 import { useEffect } from "react";
 import { FaShoppingCart, FaUserCog } from "react-icons/fa";
@@ -132,7 +132,22 @@ const DashboardLayout = () => {
                   }
                 }}
               >
-                <FaShoppingCart /> Placed Requests
+                <FaShoppingCart /> My Placed Requests
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/dashboard/recieved-requests"
+                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${
+                  path.includes("/recieved-requests") ? "bg-green-600 text-white" : "text-gray-700"
+                } flex items-center gap-2`}
+                onClick={() => {
+                  if (window.innerWidth <= 425) {
+                    closeDrawer();
+                  }
+                }}
+              >
+                <ListCheck size={16} /> Recieved Requests
               </Link>
             </li>
             <li>
