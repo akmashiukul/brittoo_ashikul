@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Camera, Upload, Check, X } from 'lucide-react';
 import api from '../lib/api.js';
 import useUserStore from '../stores/authStores/useUserStore.js';
+import VerifiedUser from './VerifiedUser.jsx';
 
 const VerifyUser = () => {
   const [idCardImage, setIdCardImage] = useState(null);
@@ -266,6 +267,10 @@ const VerifyUser = () => {
       setIsSubmitting(false);
     }
   };
+
+  if (currentUser?.isVerified === "VERIFIED") {
+    return <VerifiedUser currentUser={currentUser} />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">

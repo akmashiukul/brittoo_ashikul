@@ -192,6 +192,10 @@ export const createRentalRequest = async (req, res, next) => {
   }
 };
 
+export const getUserRentalRequest = async (req, res, next) => {
+  
+}
+
 export const acceptRentalRequest = async (req, res, next) => {
   try {
     const { requestId } = req.params;

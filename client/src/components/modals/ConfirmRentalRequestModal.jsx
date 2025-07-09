@@ -89,24 +89,23 @@ const ConfirmRentalRequestModal = () => {
   }
 
   const handleConfirm = async () => {
+    if (selectedMethod === "HOME_DELIVERY" && !deliveryAddress) {
+      return alert("Please enter the delivery address");
+    }
+    if (selectedMethod === "TERMINAL_PICKUP" && !pickupPoint) {
+      return alert("Please enter your nearest pickup point");
+    }
+    if (!phoneNumber) {
+      return alert("Please Enter Your phone number");
+    }
+    if (
+      !data?.rentalDetails?.product?.id ||
+      !data?.rentalDetails?.product?.owner?.id
+    ) {
+      return alert("Product or owner info not found.");
+    }
     try {
       setLoading(true);
-      if (selectedMethod === "HOME_DELIVERY" && !deliveryAddress) {
-        return alert("Please enter the delivery address");
-      }
-      if (selectedMethod === "TERMINAL_PICKUP" && !pickupPoint) {
-        return alert("Please enter your nearest pickup point");
-      }
-      if (!phoneNumber) {
-        return alert("Please Enter Your phone number");
-      }
-      if (
-        !data?.rentalDetails?.product?.id ||
-        !data?.rentalDetails?.product?.owner?.id
-      ) {
-        return alert("Product or owner info not found.");
-      }
-
       const rentalData = {
         productId: data?.rentalDetails?.product?.id,
         requesterId: currentUser.id,
@@ -156,11 +155,21 @@ const ConfirmRentalRequestModal = () => {
       });
     } catch (error) {
       console.log(error);
-      Swal.fire({
-        icon: "error",
-        title: "OOPS!",
-        text: error.response?.data?.message || "Something went wrong!",
-      });
+      if (error.response?.data?.errorType == "VERIFICATION_ERROR") {
+        Swal.fire({
+          icon: "error",
+          title: "OOPS!",
+          text: "Please verify yourself before renting something.",
+          footer:
+          '<a href="/dashboard/placed-requests" style="color: #2563eb; text-decoration: underline;">Go to my requests</a>',
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "OOPS!",
+          text: error.response?.data?.message || "Something went wrong!",
+        });
+      }
     } finally {
       setLoading(false);
       closeConfirmRentalRequestModal();

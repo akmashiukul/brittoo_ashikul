@@ -131,7 +131,7 @@ const CreditModal = () => {
   };
 
   const handleDeposit = async () => {
-    if (!selectedBcc || !selectedRCCs) {
+    if (!selectedBcc && !selectedRCCs) {
       Swal.fire({
         icon: "error",
         title: "Hey Nigga!",
