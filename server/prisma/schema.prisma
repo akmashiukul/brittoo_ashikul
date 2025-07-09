@@ -240,6 +240,7 @@ model RentalRequest {
   ownerId            String              @map("owner_id")
   bccWalletId        String?             @map("bcc_wallet_id")
   status             RentalRequestStatus @default(REQUESTED_BY_RENTER) @map("status")
+  rejectReason       String?             @map("reject_reason")
   submissionDeadline DateTime?           @map("submission_deadline") //backend
 
   rentalStartDate DateTime @map("rental_start_date")

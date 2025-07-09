@@ -15,7 +15,6 @@ import ManageItems from "./pages/private/dash-pages/ManageItems";
 import UserAnalytics from "./pages/private/dash-pages/UserAnalytics";
 import UpdateItem from "./pages/private/dash-pages/UpdateItem";
 import ProductDetails from "./components/ProductDetails";
-import RentalRequests from "./pages/private/dash-pages/RentalRequests";
 import CreditModal from "./components/modals/CreditModal";
 import BuyBccModal from "./components/modals/BuyBccModal";
 import useBuyBccModalStore from "./stores/creditModalStores/useBuyBccModalStore";
@@ -30,6 +29,7 @@ import useShowRccModalStore from "./stores/creditModalStores/useShowRccModalStor
 import ShowRccModal from "./components/modals/ShowRccModal";
 import ConfirmRentalRequestModal from "./components/modals/ConfirmRentalRequestModal";
 import Swal from "sweetalert2";
+import PlacedRequests from "./pages/private/dash-pages/PlacedRequests";
 
 const AppContent = () => {
   const location = useLocation();
@@ -109,7 +109,7 @@ const AppContent = () => {
               <Route path="overview" element={<Overview />} />
               <Route path="list-items" element={<ListItems />} />
               <Route path="manage-items" element={<ManageItems />} />
-              <Route path="placed-requests" element={<RentalRequests />} />
+              <Route path="placed-requests" element={<PlacedRequests />} />
               <Route path="user-analytics" element={<UserAnalytics />} />
               <Route path="update-item/:id" element={<UpdateItem />} />
             </Route>

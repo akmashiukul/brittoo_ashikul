@@ -129,7 +129,7 @@ const ConfirmRentalRequestModal = () => {
       };
       const token = localStorage.getItem("token");
       const res = await api.post(
-        "/api/v1/rentalRequest/createRequest",
+        "/api/v1/rental-requests/create-request",
         rentalData,
         {
           headers: {

@@ -32,7 +32,7 @@ app.use("/api/v1/products", productRoutes);
 app.use("/api/v1/credit/bcc", bccRoutes);
 app.use("/api/v1/credit/rcc", rccRoutes);
 app.use("/api/v1/users", userRoutes);
-app.use("/api/v1/rentalRequest", rentalRequestRoutes);
+app.use("/api/v1/rental-requests", rentalRequestRoutes);
 
 app.use(errorHandler);
 app.use(multerErrorHandler);

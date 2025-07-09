@@ -129,6 +129,7 @@ export const createRentalRequest = async (req, res, next) => {
           totalDays,
           renterCollectionMethod,
           renterPhoneNumber,
+          //create Submission deadline 
           deliveryAddress:
             renterCollectionMethod === "HOME_DELIVERY" ? deliveryAddress : null,
           pickupPoint:
@@ -192,172 +193,246 @@ export const createRentalRequest = async (req, res, next) => {
   }
 };
 
-export const getUserRentalRequest = async (req, res, next) => {
-  
-}
 
-export const acceptRentalRequest = async (req, res, next) => {
+
+export const getUserPlacedRequests = async (req, res) => {
   try {
-    const { requestId } = req.params;
-    const { ownerDepositMethod, ownerPhoneNumber } = req.body;  
-
-    if (!requestId) {
-      throw new CustomError("Request ID is required", 400);
-    }
-
-    // Validate deposit method and phone number
-    if (!ownerDepositMethod || !ownerPhoneNumber) {
-      throw new CustomError(
-        "Owner deposit method and phone number are required",
-        400,
-      );
-    }
-
-    // Find the rental request
-    const rentalRequest = await prisma.rentalRequest.findUnique({
-      where: { id: requestId },
-      include: {
-        product: true,
-        requester: true,
-        owner: true,
-      },
-    });
-
-    if (!rentalRequest) {
-      throw new CustomError("Rental request not found", 404);
-    }
-
-    if (rentalRequest.status !== "REQUESTED_BY_RENTER") {
-      throw new CustomError(
-        "Request is not in a state that can be accepted",
-        400,
-      );
-    }
-
-    // Check if product is still available
-    if (rentalRequest.product.isRented) {
-      throw new CustomError("Product is already rented", 400);
-    }
-
-    if (rentalRequest.product.isOnHold) {
-      throw new CustomError("Product is currently on hold", 400);
-    }
-
-    // Update the rental request
-    const updatedRequest = await prisma.rentalRequest.update({
-      where: { id: requestId },
-      data: {
-        status: "ACCEPTED_BY_OWNER",
-        ownerDepositMethod,
-        ownerPhoneNumber,
+    const userId = req.user.id;
+    
+    const placedRequests = await prisma.rentalRequest.findMany({
+      where: {
+        requesterId: userId,
+        status: {
+          in: ['REQUESTED_BY_RENTER', 'ACCEPTED_BY_OWNER', 'PRODUCT_SUBMITTED_BY_OWNER']
+        },
+        deletedAt: null
       },
       include: {
-        product: true,
-        requester: true,
-        owner: true,
+        product: {
+          select: {
+            id: true,
+            name: true,
+            productImages: true,
+            pricePerDay: true,
+            productType: true,
+            productCondition: true,
+            ownerId: true
+          }
+        },
+        owner: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phoneNumber: true,
+            securityScore: true
+          }
+        }
       },
+      orderBy: {
+        createdAt: 'desc'
+      }
     });
 
     res.status(200).json({
       success: true,
-      message: "Rental request accepted successfully",
-      data: updatedRequest,
+      data: placedRequests,
+      message: 'Placed requests fetched successfully'
     });
   } catch (error) {
-    console.error(error);
-    next(error);
+    console.error('Error fetching placed requests:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
   }
 };
 
-export const rejectRentalRequest = async (req, res, next) => {
+// Get rental requests for owner
+export const getOwnerRentalRequests = async (req, res) => {
   try {
-    const { requestId } = req.params;
-    const { rejectionReason } = req.body;
-
-    if (!requestId) {
-      throw new CustomError("Request ID is required", 400);
-    }
-
-    // Find the rental request
-    const rentalRequest = await prisma.rentalRequest.findUnique({
-      where: { id: requestId },
-      include: {
-        product: true,
-        requester: true,
-        owner: true,
-        rccUsageDetails: true,
+    const userId = req.user.id; // Owner ID from auth middleware
+    
+    const rentalRequests = await prisma.rentalRequest.findMany({
+      where: {
+        ownerId: userId,
+        status: {
+          in: ['REQUESTED_BY_RENTER', 'ACCEPTED_BY_OWNER', 'PRODUCT_SUBMITTED_BY_OWNER']
+        },
+        deletedAt: null
       },
-    });
-
-    if (!rentalRequest) {
-      throw new CustomError("Rental request not found", 404);
-    }
-
-    if (rentalRequest.status !== "REQUESTED_BY_RENTER") {
-      throw new CustomError(
-        "Request is not in a state that can be rejected",
-        400,
-      );
-    }
-
-    // Handle rejection with transaction to unlock funds
-    const result = await prisma.$transaction(async (tx) => {
-      // Update rental request status
-      const updatedRequest = await tx.rentalRequest.update({
-        where: { id: requestId },
-        data: {
-          status: "REJECTED_BY_OWNER",
+      include: {
+        product: {
+          select: {
+            id: true,
+            name: true,
+            productImages: true,
+            pricePerDay: true,
+            productType: true,
+            productCondition: true,
+            omv: true
+          }
         },
-        include: {
-          product: true,
-          requester: true,
-          owner: true,
-        },
-      });
-
-      // Unlock BCC funds if they were locked
-      if (rentalRequest.paidWithBcc && rentalRequest.usedBccAmount > 0) {
-        await tx.bccWallet.update({
-          where: { id: rentalRequest.bccWalletId },
-          data: {
-            lockedBalance: {
-              decrement: rentalRequest.usedBccAmount,
-            },
-          },
-        });
+        requester: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phoneNumber: true,
+            securityScore: true,
+            emailVerified: true,
+            isVerified: true,
+            brittooVerified: true
+          }
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
       }
-
-      // Unlock RCC funds if they were locked
-      if (
-        rentalRequest.paidWithRcc &&
-        rentalRequest.rccUsageDetails.length > 0
-      ) {
-        const unlockPromises = rentalRequest.rccUsageDetails.map(
-          async (usage) => {
-            await tx.redCacheCredit.update({
-              where: { id: usage.redCacheCreditId },
-              data: {
-                inUse: {
-                  decrement: usage.usedAmount,
-                },
-              },
-            });
-          },
-        );
-
-        await Promise.all(unlockPromises);
-      }
-
-      return updatedRequest;
     });
 
     res.status(200).json({
       success: true,
-      message: "Rental request rejected successfully",
-      data: result,
+      data: rentalRequests,
+      message: 'Rental requests fetched successfully'
     });
   } catch (error) {
-    console.error(error);
-    next(error);
+    console.error('Error fetching rental requests:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+};
+
+// Accept rental request
+export const acceptRentalRequest = async (req, res) => {
+  try {
+    const { requestId } = req.params;
+    const userId = req.user.id;
+    const { ownerDepositMethod, ownerPhoneNumber, pickupPoint } = req.body;
+
+    // Validate request exists and belongs to owner
+    const request = await prisma.rentalRequest.findFirst({
+      where: {
+        id: requestId,
+        ownerId: userId,
+        status: 'REQUESTED_BY_RENTER',
+        deletedAt: null
+      }
+    });
+
+    if (!request) {
+      return res.status(404).json({
+        success: false,
+        message: 'Rental request not found or already processed'
+      });
+    }
+
+    // Update rental request status
+    const updatedRequest = await prisma.rentalRequest.update({
+      where: { id: requestId },
+      data: {
+        status: 'ACCEPTED_BY_OWNER',
+        ownerDepositMethod,
+        ownerPhoneNumber,
+        pickupPoint,
+        submissionDeadline: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours from now
+      },
+      include: {
+        product: {
+          select: {
+            name: true,
+            productImages: true
+          }
+        },
+        requester: {
+          select: {
+            name: true,
+            email: true
+          }
+        }
+      }
+    });
+
+    res.status(200).json({
+      success: true,
+      data: updatedRequest,
+      message: 'Rental request accepted successfully'
+    });
+  } catch (error) {
+    console.error('Error accepting rental request:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+};
+
+// Reject rental request
+export const rejectRentalRequest = async (req, res) => {
+  try {
+    const { requestId } = req.params;
+    const userId = req.user.id;
+    const { rejectReason } = req.body;
+
+    if (!rejectReason || rejectReason.trim() === '') {
+      return res.status(400).json({
+        success: false,
+        message: 'Reject reason is required'
+      });
+    }
+
+    // Validate request exists and belongs to owner
+    const request = await prisma.rentalRequest.findFirst({
+      where: {
+        id: requestId,
+        ownerId: userId,
+        status: 'REQUESTED_BY_RENTER',
+        deletedAt: null
+      }
+    });
+
+    if (!request) {
+      return res.status(404).json({
+        success: false,
+        message: 'Rental request not found or already processed'
+      });
+    }
+
+    // Update rental request status
+    const updatedRequest = await prisma.rentalRequest.update({
+      where: { id: requestId },
+      data: {
+        status: 'REJECTED_BY_OWNER',
+        rejectReason: rejectReason.trim()
+      },
+      include: {
+        product: {
+          select: {
+            name: true,
+            productImages: true
+          }
+        },
+        requester: {
+          select: {
+            name: true,
+            email: true
+          }
+        }
+      }
+    });
+
+    res.status(200).json({
+      success: true,
+      data: updatedRequest,
+      message: 'Rental request rejected successfully'
+    });
+  } catch (error) {
+    console.error('Error rejecting rental request:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
   }
 };
