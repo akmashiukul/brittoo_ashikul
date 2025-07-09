@@ -161,7 +161,7 @@ const ConfirmRentalRequestModal = () => {
           title: "OOPS!",
           text: "Please verify yourself before renting something.",
           footer:
-          '<a href="/dashboard/placed-requests" style="color: #2563eb; text-decoration: underline;">Go to my requests</a>',
+          '<a href="/verify-user" style="color: #2563eb; text-decoration: underline;">Goto Verify</a>',
         });
       } else {
         Swal.fire({

@@ -3,6 +3,7 @@ import { Calendar, Clock, TrendingUp, CalendarDays, Info } from "lucide-react";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
 import { Tooltip } from "flowbite-react";
+import ProgressBarWithScale from "./ProgressBarWithScale";
 
 const DaysDisplay = ({
   numberOfDays,
@@ -45,28 +46,7 @@ const DaysDisplay = ({
             </div>
 
             <div className="hidden sm:block w-full flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <TrendingUp className="w-4 h-4 text-green-600" />
-                <span className="text-sm font-medium text-gray-700">
-                  Duration
-                </span>
-              </div>
-              <div className="bg-gray-200 rounded-full h-2">
-                <div
-                  className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full transition-all duration-500"
-                  style={{
-                    width: `${Math.min((numberOfDays / 15) * 100, 100)}%`,
-                  }}
-                ></div>
-              </div>
-              <div className="flex justify-between text-xs text-gray-500 mt-1">
-                <span>
-                  1 <span className="text-[10px] ml-0.5">(min)</span>
-                </span>
-                <span>
-                  15<span className="text-[10px] ml-0.5">(max)</span>
-                </span>
-              </div>
+              <ProgressBarWithScale numberOfDays={numberOfDays} />
             </div>
           </div>
 
@@ -79,26 +59,7 @@ const DaysDisplay = ({
           </div>
         </div>
         <div className="block mt-4 sm:hidden">
-          <div className="flex items-center gap-2 mb-1">
-            <TrendingUp className="w-4 h-4 text-green-600" />
-            <span className="text-sm font-medium text-gray-700">Duration</span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div
-              className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full transition-all duration-500"
-              style={{
-                width: `${Math.min((numberOfDays / 15) * 100, 100)}%`,
-              }}
-            ></div>
-          </div>
-          <div className="flex justify-between text-xs text-gray-500 mt-1">
-            <span>
-              1 <span className="text-[10px] ml-0.5">(min)</span>
-            </span>
-            <span>
-              15<span className="text-[10px] ml-0.5">(max)</span>
-            </span>
-          </div>
+          <ProgressBarWithScale numberOfDays={numberOfDays} />
         </div>
 
         {initial && final && (

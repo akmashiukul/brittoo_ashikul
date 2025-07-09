@@ -284,7 +284,7 @@ const VerifyUser = () => {
 
         {/* ID Card Section */}
         <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
+          <h2 className="text-lg border-b border-gray-200 pb-1 font-semibold text-gray-700 mb-4 flex items-center">
             <Upload className="mr-2" size={20} />
             Student ID Card (Front)
           </h2>
@@ -293,14 +293,14 @@ const VerifyUser = () => {
               <div className="flex gap-4 justify-center">
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className="flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="flex items-center px-4 py-2 border rounded-lg border-gray-400 text-gray-500 text-sm hover:bg-gray-200 cursor-pointer transition-all"
                 >
                   <Upload className="mr-2" size={18} />
                   Upload from Gallery
                 </button>
                 <button
                   onClick={() => startCamera('idCard')}
-                  className="flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  className="flex items-center px-4 py-2 border rounded-lg border-gray-400 text-gray-500 text-sm hover:bg-gray-200 cursor-pointer transition-all"
                 >
                   <Camera className="mr-2" size={18} />
                   Take Photo
@@ -333,7 +333,7 @@ const VerifyUser = () => {
 
         {/* Selfie Section */}
         <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
+          <h2 className="text-lg border-b border-gray-200 pb-1 font-semibold text-gray-700 mb-4 flex items-center">
             <Camera className="mr-2" size={20} />
             Selfie Photo
           </h2>
@@ -341,7 +341,7 @@ const VerifyUser = () => {
             <div className="text-center">
               <button
                 onClick={() => startCamera('selfie')}
-                className="flex items-center px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors mx-auto"
+                className="flex items-center px-4 py-2 border rounded-lg border-gray-400 text-gray-500 text-sm hover:bg-gray-200 cursor-pointer transition-all mx-auto"
               >
                 <Camera className="mr-2" size={18} />
                 Take Selfie
@@ -446,7 +446,7 @@ const VerifyUser = () => {
           <button
             onClick={handleSubmit}
             disabled={isSubmitting || !idCardImage || !selfieImage}
-            className="w-full max-w-md px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+            className="w-full max-w-md px-8 py-4 bg-gradient-to-r from-green-600 to-green-600 text-white font-semibold rounded-lg hover:from-green-700 hover:to-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
           >
             {isSubmitting ? (
               <span className="flex items-center justify-center">
@@ -492,14 +492,14 @@ const VerifyUser = () => {
         )}
 
         {/* Instructions */}
-        <div className="mt-8 bg-blue-50 p-4 rounded-lg">
-          <h3 className="font-semibold text-blue-800 mb-2">📋 Instructions:</h3>
-          <ul className="text-sm text-blue-700 space-y-1">
-            <li>• Ensure your student ID card is clearly visible and readable</li>
+        <div className="mt-8 bg-green-50 p-4 rounded-lg">
+          <h3 className="font-semibold text-green-800 mb-2">📋 Instructions:</h3>
+          <ul className="text-sm text-green-700 space-y-1">
+            <li>- Ensure your student ID card is clearly visible and readable</li>
             <li>- Take a clear selfie with good lighting</li>
-            <li>• Make sure your face is clearly visible in the selfie</li>
+            <li>- Make sure your face is clearly visible in the selfie</li>
             <li>- Files should be less than 5MB each</li>
-            <li>• Verification process takes 15 minutes</li>
+            <li>- Verification process takes 15 minutes</li>
           </ul>
         </div>
       </div>
