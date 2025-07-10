@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  acceptRentalRequest,
   createRentalRequest,
   getOwnerRentalRequests,
   getUserPlacedRequests
@@ -17,5 +18,6 @@ router.post(
 );
 router.get("/placed-requests", verifyToken, getUserPlacedRequests);
 router.get("/owner-requests", verifyToken, getOwnerRentalRequests);
+router.put("/accept/:requestId", verifyToken, verificationMiddleware, acceptRentalRequest);
 
 export default router;

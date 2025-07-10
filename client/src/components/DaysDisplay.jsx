@@ -14,7 +14,7 @@ const DaysDisplay = ({
   final,
 }) => {
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
         <div className="flex items-center gap-3">
           <CalendarDays className="w-6 h-6 text-gray-700" />
@@ -63,7 +63,7 @@ const DaysDisplay = ({
         </div>
 
         {initial && final && (
-          <div className="mt-4 p-3 bg-white rounded-md border border-gray-200">
+          <div className="mt-6 p-3 bg-white rounded-md border border-gray-200">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm">
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-green-600" />
@@ -112,7 +112,7 @@ const DaysDisplay = ({
         </div>
       </div>
 
-      <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
+      <div className="px-6 py-4 bg-gray-100 border-t border-gray-100">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm">
           <div className="text-gray-600">
             <span className="font-medium">Total Cost: </span>

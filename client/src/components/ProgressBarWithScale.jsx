@@ -1,4 +1,3 @@
-import React from "react";
 import { TrendingUp } from "lucide-react";
 
 const ProgressBarWithScale = ({ numberOfDays = 3 }) => {
@@ -8,7 +7,9 @@ const ProgressBarWithScale = ({ numberOfDays = 3 }) => {
     <div>
       <div className="flex items-center gap-2 mb-1">
         <TrendingUp className="w-4 h-4 text-green-600" />
-        <span className="text-xs font-medium text-gray-700">Duration (Days)</span>
+        <span className="text-xs font-medium text-gray-700">
+          Duration (Days)
+        </span>
       </div>
 
       <div className="relative">
@@ -35,9 +36,14 @@ const ProgressBarWithScale = ({ numberOfDays = 3 }) => {
                   day <= numberOfDays ? "bg-green-600" : "bg-gray-300"
                 }`}
               />
-              {(day === 1 || day === 5 || day === 10 || day === 15) && (
+              {(day === 1 || day === 5 || day === 10) && (
                 <span className="text-[9px] text-gray-500 mt-0.5 leading-none">
                   {day}
+                </span>
+              )}
+              {day === 15 && (
+                <span className="text-[9px] text-gray-500 mt-0.5 leading-none">
+                  {day} <span className="text-[8px] ml-0.5">(max)</span>
                 </span>
               )}
             </div>

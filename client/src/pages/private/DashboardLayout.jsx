@@ -1,20 +1,32 @@
 import Avatar from "boring-avatars";
-import { Link, Outlet, useLocation } from "react-router-dom";
+import {
+  Link,
+  Navigate,
+  Outlet,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import useUserStore from "../../stores/authStores/useUserStore";
 import brittoLogo from "../../assets/brittoo-logo.png";
 import { IoAnalytics, IoExit, IoHomeSharp } from "react-icons/io5";
-import { MdOutlineManageHistory, MdOutlineSpaceDashboard, MdRequestPage } from "react-icons/md";
+import {
+  MdOutlineManageHistory,
+  MdOutlineSpaceDashboard,
+  MdRequestPage,
+} from "react-icons/md";
 import useDashDrawertore from "../../stores/drawerStores/useDashDrawerStore";
 import { ListCheck, Menu, X } from "lucide-react";
 import { AiOutlineProduct } from "react-icons/ai";
 import { useEffect } from "react";
 import { FaShoppingCart, FaUserCog } from "react-icons/fa";
 import useShowRccModalStore from "../../stores/creditModalStores/useShowRccModalStore";
+import Swal from "sweetalert2";
 
 const DashboardLayout = () => {
-  const { currentUser } = useUserStore();
+  const { currentUser, setCurrentUser } = useUserStore();
   const location = useLocation();
   const path = location.pathname;
+  const navigate = useNavigate();
   const { isDrawerOpen, openDrawer, closeDrawer } = useDashDrawertore();
   const { isShowRccModalOpen } = useShowRccModalStore();
 
@@ -25,22 +37,48 @@ const DashboardLayout = () => {
   }, [closeDrawer, isShowRccModalOpen]);
 
   useEffect(() => {
-  const handleResize = () => {
-    if (window.innerWidth >= 768 && !isShowRccModalOpen) {
-      openDrawer();
-    } else {
-      closeDrawer();
-    }
+    const handleResize = () => {
+      if (window.innerWidth >= 768 && !isShowRccModalOpen) {
+        openDrawer();
+      } else {
+        closeDrawer();
+      }
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, [closeDrawer, isShowRccModalOpen, openDrawer]);
+
+  const handleLogOut = () => {
+    Swal.fire({
+      title: "Logging Out?",
+      text: "Your first year study group lasted longer than this session",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#dc2626",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: "Yes! Take me outta this shit",
+      cancelButtonText: "Let me rot a little longer",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setCurrentUser(null);
+        localStorage.removeItem("token");
+        localStorage.removeItem("login-dt");
+        Swal.fire({
+          title: "Session Terminated",
+          text: "Unlike your CG, this completed successfully.",
+          icon: "success",
+        });
+        setTimeout(() => {
+          navigate("/");
+        }, 500);
+      } else {
+        closeDrawer(false);
+      }
+    });
   };
-
-  handleResize();
-  window.addEventListener("resize", handleResize);
-
-  return () => window.removeEventListener("resize", handleResize);
-}, [closeDrawer, isShowRccModalOpen, openDrawer]);
-
-
-
 
   return (
     <div className="relative flex min-h-screen">
@@ -124,7 +162,9 @@ const DashboardLayout = () => {
               <Link
                 to="/dashboard/placed-requests"
                 className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${
-                  path.includes("/placed-requests") ? "bg-green-600 text-white" : "text-gray-700"
+                  path.includes("/placed-requests")
+                    ? "bg-green-600 text-white"
+                    : "text-gray-700"
                 } flex items-center gap-2`}
                 onClick={() => {
                   if (window.innerWidth <= 425) {
@@ -139,7 +179,9 @@ const DashboardLayout = () => {
               <Link
                 to="/dashboard/recieved-requests"
                 className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${
-                  path.includes("/recieved-requests") ? "bg-green-600 text-white" : "text-gray-700"
+                  path.includes("/recieved-requests")
+                    ? "bg-green-600 text-white"
+                    : "text-gray-700"
                 } flex items-center gap-2`}
                 onClick={() => {
                   if (window.innerWidth <= 425) {
@@ -152,9 +194,28 @@ const DashboardLayout = () => {
             </li>
             <li>
               <Link
+                to="/dashboard/my-credits"
+                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${
+                  path.includes("/my-credits")
+                    ? "bg-green-600 text-white"
+                    : "text-gray-700"
+                } flex items-center gap-2`}
+                onClick={() => {
+                  if (window.innerWidth <= 425) {
+                    closeDrawer();
+                  }
+                }}
+              >
+                <ListCheck size={16} /> My Credits
+              </Link>
+            </li>
+            <li>
+              <Link
                 to="/dashboard/user-analytics"
                 className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${
-                  path.includes("/user-analytics") ? "bg-green-600 text-white" : "text-gray-700"
+                  path.includes("/user-analytics")
+                    ? "bg-green-600 text-white"
+                    : "text-gray-700"
                 } flex items-center gap-2`}
                 onClick={() => {
                   if (window.innerWidth <= 425) {
@@ -183,7 +244,7 @@ const DashboardLayout = () => {
             <li>
               <button
                 className={`w-full text-left rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-red-500 hover:text-white transition-colors duration-200 text-red-600 flex items-center gap-2`}
-                onClick={closeDrawer}
+                onClick={handleLogOut}
               >
                 <IoExit /> Logout
               </button>
@@ -199,7 +260,9 @@ const DashboardLayout = () => {
             />
             <div>
               <p className="text-xs">
-                <strong className="block font-medium">{currentUser?.name}</strong>
+                <strong className="block font-medium">
+                  {currentUser?.name}
+                </strong>
                 <span>{currentUser?.email}</span>
               </p>
             </div>
@@ -222,9 +285,9 @@ const DashboardLayout = () => {
           isDrawerOpen ? "ml-0 md:ml-80 relative" : "ml-0"
         }`}
       >
-        {
-          (isDrawerOpen && window.innerWidth < 500) &&<div className="absolute bg-black/50 opacity-80 h-full w-full"></div>
-        }
+        {isDrawerOpen && window.innerWidth < 500 && (
+          <div className="absolute bg-black/50 opacity-80 h-full w-full"></div>
+        )}
         <Outlet />
       </div>
     </div>

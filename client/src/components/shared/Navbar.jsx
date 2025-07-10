@@ -1,4 +1,4 @@
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import brittoLogo from "../../assets/brittoo-logo.png";
 import { IoLogOut } from "react-icons/io5";
 import { GiHamburgerMenu } from "react-icons/gi";
@@ -17,6 +17,7 @@ const Navbar = () => {
   const { openRegModal } = useRegModalStore();
   const { openLoginModal } = useLoginModalStore();
   const { currentUser, setCurrentUser } = useUserStore();
+  const navigate = useNavigate();
 
   const handleLogOut = () => {
     Swal.fire({
@@ -39,6 +40,9 @@ const Navbar = () => {
           text: "Unlike your CG, this completed successfully.",
           icon: "success",
         });
+        setTimeout(() => {
+          navigate("/");
+        }, 500);
       } else {
         setIsUserDropDownOpen(false);
       }
@@ -130,7 +134,10 @@ const Navbar = () => {
                     My Dashboard
                   </Link>
                   {currentUser.role === "ADMIN" && (
-                    <Link to="/dashboard/admin/manage-users" className={menuClassname}>
+                    <Link
+                      to="/dashboard/admin/manage-users"
+                      className={menuClassname}
+                    >
                       Admin Dashboard
                     </Link>
                   )}

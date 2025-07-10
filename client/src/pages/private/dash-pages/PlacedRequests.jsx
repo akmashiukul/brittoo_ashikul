@@ -15,6 +15,7 @@ import {
   ChevronUp,
 } from "lucide-react";
 import api from "../../../lib/api";
+import { Link } from "react-router-dom";
 
 const PlacedRequests = () => {
   const [requests, setRequests] = useState([]);
@@ -188,8 +189,8 @@ const PlacedRequests = () => {
                   {/* Only visible in lg devices */}
                   <div className="hidden lg:grid lg:grid-cols-12 gap-4 p-6 items-center">
                     {/* Product */}
-                    <div className="col-span-3">
-                      <div className="flex items-center gap-3">
+                    <Link to={`/product-details/${request.product.id}`} className="col-span-3">
+                      <div className="flex items-center gap-3 border border-gray-50 hover:bg-gray-200 hover:p-2 hover:scale-105 transition-all hover:border-gray-200 cursor-pointer hover:rounded-lg">
                         <img
                           src={`${base_url}${request.product.productImages[0]}`}
                           alt={request.product.name}
@@ -205,7 +206,7 @@ const PlacedRequests = () => {
                           </div>
                         </div>
                       </div>
-                    </div>
+                    </Link>
 
                     {/* Status */}
                     <div className="col-span-2">
@@ -263,9 +264,9 @@ const PlacedRequests = () => {
                             ? "Terminal Pickup"
                             : "Home Delivery"}
                         </div>
-                        {request.pickupPoint && (
+                        {request.renterPickupTerminal && (
                           <div className="text-xs text-gray-500">
-                            {request.pickupPoint.replace("_", " ")}
+                            {request.renterPickupTerminal.replace("_", " ")}
                           </div>
                         )}
                       </div>
@@ -408,13 +409,13 @@ const PlacedRequests = () => {
                                   : "Home Delivery"}
                               </span>
                             </div>
-                            {request.pickupPoint && (
+                            {request.renterPickupTerminal && (
                               <div>
                                 <span className="text-gray-600">
                                   Pickup Point:
                                 </span>
                                 <span className="ml-2 font-medium">
-                                  {request.pickupPoint.replace("_", " ")}
+                                  {request.renterPickupTerminal.replace("_", " ")}
                                 </span>
                               </div>
                             )}

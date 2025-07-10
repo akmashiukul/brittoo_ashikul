@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Navbar from "./components/shared/Navbar";
 import RegisterModal from "./components/auth/RegisterModal";
@@ -34,6 +34,7 @@ import RecievedRequests from "./pages/private/dash-pages/RecievedRequests";
 
 const AppContent = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { loading, setCurrentUser } = useUserStore();
   const { isBuyBccModalOpen } = useBuyBccModalStore();
   const { isShowRccModalOpen } = useShowRccModalStore();
@@ -56,6 +57,9 @@ const AppContent = () => {
         text: "This session is expired. Login again to start renting",
         icon: "success",
       });
+      setTimeout(() => {
+        navigate('/');
+      }, 500);
     }
   }
 

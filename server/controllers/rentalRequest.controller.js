@@ -117,7 +117,8 @@ export const createRentalRequest = async (req, res, next) => {
       }
     }
 
-    const submissionDeadline = new Date(rentalStartDate.getTime() - 4 * 60 * 60 * 1000);
+    const rentalStart = new Date(rentalStartDate);
+    const submissionDeadline = new Date(rentalStart.getTime() - 4 * 60 * 60 * 1000);
 
     const result = await prisma.$transaction(async (tx) => {
       const rentalRequest = await tx.rentalRequest.create({
@@ -132,9 +133,9 @@ export const createRentalRequest = async (req, res, next) => {
           totalDays,
           renterCollectionMethod,
           renterPhoneNumber,
-          deliveryAddress:
+          renterDeliveryAddress:
             renterCollectionMethod === "HOME" ? deliveryAddress : null,
-          pickupPoint:
+          renterPickupTerminal:
             renterCollectionMethod === "BRITTOO_TERMINAL" ? pickupPoint : null,
           paidWithBcc,
           usedBccAmount: paidWithBcc ? usedBccAmount : null,
@@ -300,7 +301,6 @@ export const getOwnerRentalRequests = async (req, res, next) => {
   }
 };
 
-// Accept rental request
 export const acceptRentalRequest = async (req, res, next) => {
   try {
     const { requestId } = req.params;
