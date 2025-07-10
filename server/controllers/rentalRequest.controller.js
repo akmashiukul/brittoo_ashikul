@@ -33,10 +33,10 @@ export const createRentalRequest = async (req, res, next) => {
     if (!renterCollectionMethod || !renterPhoneNumber) {
       throw new CustomError("Missing collection method or phone number", 400);
     }
-    if (renterCollectionMethod === "HOME_DELIVERY" && !deliveryAddress) {
+    if (renterCollectionMethod === "HOME" && !deliveryAddress) {
       throw new CustomError("Delivery address required for home delivery", 400);
     }
-    if (renterCollectionMethod === "TERMINAL_PICKUP" && !pickupPoint) {
+    if (renterCollectionMethod === "BRITTOO_TERMINAL" && !pickupPoint) {
       throw new CustomError("Pickup point required for terminal pickup", 400);
     }
 
@@ -117,6 +117,8 @@ export const createRentalRequest = async (req, res, next) => {
       }
     }
 
+    const submissionDeadline = new Date(rentalStartDate.getTime() - 4 * 60 * 60 * 1000);
+
     const result = await prisma.$transaction(async (tx) => {
       const rentalRequest = await tx.rentalRequest.create({
         data: {
@@ -126,14 +128,14 @@ export const createRentalRequest = async (req, res, next) => {
           bccWalletId: paidWithBcc ? bccWalletId : null,
           rentalStartDate: new Date(rentalStartDate),
           rentalEndDate: new Date(rentalEndDate),
+          submissionDeadline,
           totalDays,
           renterCollectionMethod,
           renterPhoneNumber,
-          //create Submission deadline 
           deliveryAddress:
-            renterCollectionMethod === "HOME_DELIVERY" ? deliveryAddress : null,
+            renterCollectionMethod === "HOME" ? deliveryAddress : null,
           pickupPoint:
-            renterCollectionMethod === "TERMINAL_PICKUP" ? pickupPoint : null,
+            renterCollectionMethod === "BRITTOO_TERMINAL" ? pickupPoint : null,
           paidWithBcc,
           usedBccAmount: paidWithBcc ? usedBccAmount : null,
           paidWithRcc,
@@ -195,7 +197,7 @@ export const createRentalRequest = async (req, res, next) => {
 
 
 
-export const getUserPlacedRequests = async (req, res) => {
+export const getUserPlacedRequests = async (req, res, next) => {
   try {
     const userId = req.user.id;
     
@@ -241,14 +243,11 @@ export const getUserPlacedRequests = async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching placed requests:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error'
-    });
+    next(error);
   }
 };
 
-export const getOwnerRentalRequests = async (req, res) => {
+export const getOwnerRentalRequests = async (req, res, next) => {
   try {
     const userId = req.user.id;
     
@@ -297,21 +296,24 @@ export const getOwnerRentalRequests = async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching rental requests:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error'
-    });
+    next(error)
   }
 };
 
 // Accept rental request
-export const acceptRentalRequest = async (req, res) => {
+export const acceptRentalRequest = async (req, res, next) => {
   try {
     const { requestId } = req.params;
     const userId = req.user.id;
-    const { ownerDepositMethod, ownerPhoneNumber, pickupPoint } = req.body;
+    const { ownerSubmitMethod, ownerPhoneNumber, ownerSubmitTerminal, ownerSubmitAddress } = req.body;
 
-    // Validate request exists and belongs to owner
+    if (ownerSubmitMethod === 'HOME' && !ownerSubmitAddress) {
+      throw new CustomError("Submit address required for home deposit", 400, "MISSING_FIELDS")
+    }
+    if(ownerSubmitMethod === 'BRITTOO_TERMINAL' && !ownerSubmitTerminal) {
+      throw new CustomError("Submit terminal not provided", 400, "MISSING_FIELDS");
+    }
+
     const request = await prisma.rentalRequest.findFirst({
       where: {
         id: requestId,
@@ -322,21 +324,17 @@ export const acceptRentalRequest = async (req, res) => {
     });
 
     if (!request) {
-      return res.status(404).json({
-        success: false,
-        message: 'Rental request not found or already processed'
-      });
+      throw new CustomError("Rental request not found or already processed", 404, "NOT_FOUND");
     }
 
-    // Update rental request status
     const updatedRequest = await prisma.rentalRequest.update({
       where: { id: requestId },
       data: {
         status: 'ACCEPTED_BY_OWNER',
-        ownerDepositMethod,
+        ownerSubmitMethod,
         ownerPhoneNumber,
-        pickupPoint,
-        submissionDeadline: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours from now
+        ownerSubmitAddress: ownerSubmitMethod === 'HOME' ? ownerSubmitAddress : null,
+        ownerSubmitTerminal: ownerSubmitMethod === 'BRITTOO_TERMINAL' ? ownerSubmitTerminal : null,
       },
       include: {
         product: {

@@ -158,11 +158,6 @@ model RedCacheCredit {
   @@map("red_cache_credits")
 }
 
-enum DepositMethod {
-  HOME_DEPOSIT
-  TERMINAL_DEPOSIT
-}
-
 enum BrittoTerminal {
   CSE_1
   ADMIN_1
@@ -247,12 +242,23 @@ model RentalRequest {
   rentalEndDate   DateTime @map("rental_end_date")
   totalDays       Int      @map("total_days")
 
-  ownerDepositMethod     DepositMethod?   @map("owner_deposit_method")
-  renterCollectionMethod CollectionMethod @map("renter_collection_method")
-  ownerPhoneNumber       String?          @map("owner_phone_number")
-  renterPhoneNumber      String           @map("renter_phone_number")
-  deliveryAddress        String?          @map("delivery_address")
-  pickupPoint            BrittoTerminal?  @map("pickup_point")
+  ownerSubmitMethod      CollectionOrDepositMethod? @map("owner_submit_method")
+  renterCollectionMethod CollectionOrDepositMethod  @map("renter_collection_method")
+  ownerPhoneNumber       String?                    @map("owner_phone_number")
+  renterPhoneNumber      String                     @map("renter_phone_number")
+
+  renterDeliveryAddress String?         @map("renter_delivery_address")
+  renterPickupTerminal  BrittoTerminal? @map("pickup_terminal")
+  ownerSubmitAddress    String?         @map("owner_submit_address")
+  ownerSubmitTerminal   BrittoTerminal? @map("owner_submit_terminal")
+
+  renterReturnMethod   CollectionOrDepositMethod? @map("renter_return_method")
+  renterReturnAddress  String?                    @map("renter_return_address")
+  renterReturnTerminal BrittoTerminal?            @map("renter_return_terminal")
+
+  ownerReturnRecieveMethod   CollectionOrDepositMethod? @map("owner_return_recieve_method")
+  ownerReturnRecieveAddress  String?                    @map("owner_return_recieve_address")
+  ownerReturnRecieveTerminal BrittoTerminal?            @map("owner_return_recieve_terminal")
 
   paidWithRcc         Boolean @default(false) @map("paid_with_rcc")
   paidWithBcc         Boolean @default(false) @map("paid_with_bcc")
@@ -275,9 +281,9 @@ model RentalRequest {
   @@map("rental_requests")
 }
 
-enum CollectionMethod {
-  TERMINAL_PICKUP
-  HOME_DELIVERY
+enum CollectionOrDepositMethod {
+  BRITTOO_TERMINAL
+  HOME
 }
 
 enum RentalRequestStatus {

@@ -259,7 +259,7 @@ const PlacedRequests = () => {
                     <div className="col-span-2">
                       <div className="text-sm">
                         <div className="font-medium text-gray-800">
-                          {request.renterCollectionMethod === "TERMINAL_PICKUP"
+                          {request.renterCollectionMethod === "BRITTOO_TERMINAL"
                             ? "Terminal Pickup"
                             : "Home Delivery"}
                         </div>
@@ -403,7 +403,7 @@ const PlacedRequests = () => {
                               <span className="text-gray-600">Method:</span>
                               <span className="ml-2 font-medium">
                                 {request.renterCollectionMethod ===
-                                "TERMINAL_PICKUP"
+                                "BRITTOO_TERMINAL"
                                   ? "Terminal Pickup"
                                   : "Home Delivery"}
                               </span>

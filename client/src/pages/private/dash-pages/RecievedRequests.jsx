@@ -357,7 +357,7 @@ const RecievedRequests = () => {
                             <div className="flex justify-between">
                               <span className="text-sm text-gray-600">Collection:</span>
                               <span className="text-sm font-medium text-gray-800">
-                                {request.renterCollectionMethod === 'TERMINAL_PICKUP' ? 'Terminal Pickup' : 'Home Delivery'}
+                                {request.renterCollectionMethod === 'BRITTOO_TERMINAL' ? 'Terminal Pickup' : 'Home Delivery'}
                               </span>
                             </div>
                           </div>
@@ -411,8 +411,8 @@ const RecievedRequests = () => {
                         className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       >
                         <option value="">Select deposit method</option>
-                        <option value="HOME_DEPOSIT">Home Deposit</option>
-                        <option value="TERMINAL_DEPOSIT">Terminal Deposit</option>
+                        <option value="HOME">Home Deposit</option>
+                        <option value="BRITTOO_TERMINAL">Terminal Deposit</option>
                       </select>
                     </div>
                     <div>
@@ -427,7 +427,7 @@ const RecievedRequests = () => {
                         placeholder="Enter your phone number"
                       />
                     </div>
-                    {acceptFormData.ownerDepositMethod === 'TERMINAL_DEPOSIT' && (
+                    {acceptFormData.ownerDepositMethod === 'BRITTOO_TERMINAL' && (
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Pickup Point

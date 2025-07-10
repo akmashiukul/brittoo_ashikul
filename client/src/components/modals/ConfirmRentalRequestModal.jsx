@@ -20,7 +20,7 @@ const ConfirmRentalRequestModal = () => {
   const { currentUser } = useUserStore();
 
   const base_url = import.meta.env.VITE_BASE_URL;
-  const [selectedMethod, setSelectedMethod] = useState("TERMINAL_PICKUP");
+  const [selectedMethod, setSelectedMethod] = useState("BRITTOO_TERMINAL");
   const [pickupPoint, setPickupPoint] = useState("");
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -50,13 +50,13 @@ const ConfirmRentalRequestModal = () => {
     "bg-gray-100 text-gray-800";
   const methods = [
     {
-      id: "TERMINAL_PICKUP",
+      id: "BRITTOO_TERMINAL",
       label: "Terminal Pickup",
       icon: MapPin,
       description: "Collect from our terminal (No Charge)",
     },
     {
-      id: "HOME_DELIVERY",
+      id: "HOME",
       label: "Home Delivery",
       icon: Home,
       description: "Delivered to your address. (10TK extra charge)",
@@ -89,10 +89,10 @@ const ConfirmRentalRequestModal = () => {
   }
 
   const handleConfirm = async () => {
-    if (selectedMethod === "HOME_DELIVERY" && !deliveryAddress) {
+    if (selectedMethod === "HOME" && !deliveryAddress) {
       return alert("Please enter the delivery address");
     }
-    if (selectedMethod === "TERMINAL_PICKUP" && !pickupPoint) {
+    if (selectedMethod === "BRITTOO_TERMINAL" && !pickupPoint) {
       return alert("Please enter your nearest pickup point");
     }
     if (!phoneNumber) {
@@ -116,8 +116,8 @@ const ConfirmRentalRequestModal = () => {
         renterCollectionMethod: selectedMethod,
         renterPhoneNumber: "+880" + phoneNumber.trim(),
         deliveryAddress:
-          selectedMethod === "HOME_DELIVERY" ? deliveryAddress : null,
-        pickupPoint: selectedMethod === "TERMINAL_PICKUP" ? pickupPoint : null,
+          selectedMethod === "HOME" ? deliveryAddress : null,
+        pickupPoint: selectedMethod === "BRITTOO_TERMINAL" ? pickupPoint : null,
         paidWithBcc: !!data?.selectedBcc,
         bccWalletId: data?.bccWallet?.id,
         usedBccAmount: Number(data?.selectedBcc || 0),
@@ -404,7 +404,7 @@ const ConfirmRentalRequestModal = () => {
                   </div>
                 </label>
 
-                {selectedMethod === "HOME_DELIVERY" ? (
+                {selectedMethod === "HOME" ? (
                   <label
                     htmlFor="deliveryAddress"
                     className="flex flex-col gap-1.5 w-full"
@@ -471,7 +471,7 @@ const ConfirmRentalRequestModal = () => {
                 <h3 className="text-sm text-gray-800 ">
                   <span className="">Delivery Charge: </span>
                   <span className="font-medium">
-                    ৳{selectedMethod === "HOME_DELIVERY" ? "10" : "0"}
+                    ৳{selectedMethod === "HOME" ? "10" : "0"}
                   </span>
                 </h3>
               </div>
@@ -482,13 +482,13 @@ const ConfirmRentalRequestModal = () => {
                   {
                     conditionalCeilOrFloor(
                       pricePerDay * numberOfDays +
-                        (selectedMethod === "HOME_DELIVERY" ? 10 : 0),
+                        (selectedMethod === "HOME" ? 10 : 0),
                     ).value
                   }{" "}
                   <span className="text-[11px] font-normal ml-0.5">
                     {conditionalCeilOrFloor(
                       pricePerDay * numberOfDays +
-                        (selectedMethod === "HOME_DELIVERY" ? 10 : 0),
+                        (selectedMethod === "HOME" ? 10 : 0),
                     ).ceil
                       ? "(ceiled)"
                       : "(floored)"}
