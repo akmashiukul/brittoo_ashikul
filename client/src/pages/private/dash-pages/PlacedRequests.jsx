@@ -16,12 +16,16 @@ import {
 } from "lucide-react";
 import api from "../../../lib/api";
 import { Link } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const PlacedRequests = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [expandedRows, setExpandedRows] = useState(new Set());
+  const [cancellingRequest, setCancellingRequest] = useState(null);
+  const [cancelLoading, setCancelLoading] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
   const base_url = import.meta.env.VITE_BASE_URL;
 
   useEffect(() => {
@@ -119,6 +123,55 @@ const PlacedRequests = () => {
     });
   };
 
+  const cancelRequest = async (request) => {
+    if (!request) {
+      alert("Request not selected!");
+      return;
+    }
+    if (request.status === "CANCELLED_BY_RENTER") {
+      alert("Already Cancelled!");
+      return;
+    }
+    try {
+      setCancelLoading(true);
+      const res = await api.put(
+        `/api/v1/rental-requests/cancel/${request.id}`,
+        { cancelReason },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        },
+      );
+      if (!res.data.success) {
+        Swal.fire({
+          icon: "error",
+          title: "ERROR!",
+          text: "Something went wrong",
+        });
+      }
+
+      setRequests((prev) =>
+        prev.map((req) =>
+          req.id === cancellingRequest
+            ? { ...req, status: "CANCELLED_BY_RENTER", cancelReason }
+            : req,
+        ),
+      );
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "ERROR!",
+        text: error.response?.data?.message || "Something went wrong",
+      });
+    } finally {
+      setCancelLoading(false);
+      setTimeout(() => {
+        setCancelReason(null);
+      }, 500);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 p-4 md:p-6">
@@ -157,6 +210,47 @@ const PlacedRequests = () => {
           </p>
         </div>
 
+        {cancellingRequest && (
+          <div className="fixed inset-0 bg-black/60 bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-2xl max-w-md w-full p-6">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                  Reject Rental Request
+                </h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Reason for Rejection
+                    </label>
+                    <textarea
+                      value={cancelReason}
+                      onChange={(e) => setCancelReason(e.target.value)}
+                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      rows="4"
+                      placeholder="Please provide a reason for rejecting this request..."
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-3 mt-6">
+                  <button
+                    onClick={() => cancelRequest(cancellingRequest)}
+                    disabled={!cancelReason || cancelLoading}
+                    className="flex-1 bg-red-600 text-white py-2 px-2 text-xs cursor-pointer rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {cancelLoading ? "Cancelling..." : "Cancel Request"}
+                  </button>
+                  <button
+                    onClick={() => setCancellingRequest(null)}
+                    className="flex-1 bg-gray-600 text-white py-2 px-2 text-xs cursor-pointer rounded-lg hover:bg-gray-700 transition-colors"
+                  >
+                    Abort
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {requests.length === 0 ? (
           <div className="min-h-[70vh] flex flex-col items-center justify-center">
             <div className="text-center py-12">
@@ -189,7 +283,10 @@ const PlacedRequests = () => {
                   {/* Only visible in lg devices */}
                   <div className="hidden lg:grid lg:grid-cols-12 gap-4 p-6 items-center">
                     {/* Product */}
-                    <Link to={`/product-details/${request.product.id}`} className="col-span-3">
+                    <Link
+                      to={`/product-details/${request.product.id}`}
+                      className="col-span-3"
+                    >
                       <div className="flex items-center gap-3 border border-gray-50 hover:bg-gray-200 hover:p-2 hover:scale-105 transition-all hover:border-gray-200 cursor-pointer hover:rounded-lg">
                         <img
                           src={`${base_url}${request.product.productImages[0]}`}
@@ -415,7 +512,10 @@ const PlacedRequests = () => {
                                   Pickup Point:
                                 </span>
                                 <span className="ml-2 font-medium">
-                                  {request.renterPickupTerminal.replace("_", " ")}
+                                  {request.renterPickupTerminal.replace(
+                                    "_",
+                                    " ",
+                                  )}
                                 </span>
                               </div>
                             )}
@@ -428,7 +528,14 @@ const PlacedRequests = () => {
                           </div>
                         </div>
                       </div>
-                      <button>Cancel Request</button>
+                      {request.status != "CANCELLED_BY_RENTER" && (
+                        <button
+                          onClick={() => setCancellingRequest(request)}
+                          className="py-1 text-xs px-3 border mt-4 rounded-md border-gray-400 text-gray-500 hover:text-white hover:bg-gray-500 cursor-pointer transition-all"
+                        >
+                          Cancel Request
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>

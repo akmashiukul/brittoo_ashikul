@@ -30,6 +30,7 @@ TODO:
   6. after buying bcc show its waiting for confirmation.
   7. Create link to go to verify user page.
   8. Dynamic role update and setCurrentUser using Socket.....
+  9. dashboard->mycredits->bccTransactions-> add a link/other-similar field here for rejected credits, on click of that reject reason will be shown
 
 PROBLEMS:
   1. After is_verified changed to verified from pending doesn't reflect until user logs out and again logs in.

@@ -77,10 +77,10 @@ enum SecurityScore {
 }
 
 model BccWallet {
-  id            String @id @default(cuid()) @map("id")
-  userId        String @unique @map("user_id")
-  totalBalance  Int    @default(0) @map("total_balance")
-  lockedBalance Int    @default(0) @map("locked_balance")
+  id               String @id @default(cuid()) @map("id")
+  userId           String @unique @map("user_id")
+  availableBalance Int    @default(0) @map("availableq_balance")
+  lockedBalance    Int    @default(0) @map("locked_balance")
 
   user            User             @relation(fields: [userId], references: [id])
   bccTransactions BccTransaction[]
@@ -114,7 +114,7 @@ model BccTransaction {
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  @@map("blue_transactions")
+  @@map("bcc_transactions")
 }
 
 enum BccTransactionType {
@@ -237,7 +237,7 @@ model RentalRequest {
   status             RentalRequestStatus @default(REQUESTED_BY_RENTER) @map("status")
   rejectReason       String?             @map("reject_reason")
   cancelReason       String?             @map("cancel_reason")
-  submissionDeadline DateTime?           @map("submission_deadline") //backend
+  submissionDeadline DateTime?           @map("submission_deadline")
 
   rentalStartDate DateTime @map("rental_start_date")
   rentalEndDate   DateTime @map("rental_end_date")

@@ -1,7 +1,6 @@
 import Avatar from "boring-avatars";
 import {
   Link,
-  Navigate,
   Outlet,
   useLocation,
   useNavigate,
@@ -12,7 +11,6 @@ import { IoAnalytics, IoExit, IoHomeSharp } from "react-icons/io5";
 import {
   MdOutlineManageHistory,
   MdOutlineSpaceDashboard,
-  MdRequestPage,
 } from "react-icons/md";
 import useDashDrawertore from "../../stores/drawerStores/useDashDrawerStore";
 import { ListCheck, Menu, X } from "lucide-react";
@@ -21,6 +19,7 @@ import { useEffect } from "react";
 import { FaShoppingCart, FaUserCog } from "react-icons/fa";
 import useShowRccModalStore from "../../stores/creditModalStores/useShowRccModalStore";
 import Swal from "sweetalert2";
+import { BiCreditCard } from "react-icons/bi";
 
 const DashboardLayout = () => {
   const { currentUser, setCurrentUser } = useUserStore();
@@ -206,7 +205,7 @@ const DashboardLayout = () => {
                   }
                 }}
               >
-                <ListCheck size={16} /> My Credits
+                <BiCreditCard size={16} /> My Credits
               </Link>
             </li>
             <li>

@@ -83,7 +83,7 @@ export const createRentalRequest = async (req, res, next) => {
       if (bccWallet.userId !== requesterId) {
         throw new CustomError("BCC Wallet does not belong to requester", 403);
       }
-      const availableBalance = bccWallet.totalBalance - bccWallet.lockedBalance;
+      const availableBalance = bccWallet.availableBalance;
       if (availableBalance < usedBccAmount) {
         throw new CustomError("Insufficient BCC balance", 400);
       }
@@ -155,6 +155,9 @@ export const createRentalRequest = async (req, res, next) => {
             lockedBalance: {
               increment: usedBccAmount,
             },
+            availableBalance: {
+              decrement: usedBccAmount
+            }
           },
         });
       }
@@ -201,13 +204,6 @@ export const getUserPlacedRequests = async (req, res, next) => {
     const placedRequests = await prisma.rentalRequest.findMany({
       where: {
         requesterId: userId,
-        status: {
-          in: [
-            "REQUESTED_BY_RENTER",
-            "ACCEPTED_BY_OWNER",
-            "PRODUCT_SUBMITTED_BY_OWNER",
-          ],
-        },
         deletedAt: null,
       },
       include: {
@@ -255,13 +251,6 @@ export const getOwnerRentalRequests = async (req, res, next) => {
     const rentalRequests = await prisma.rentalRequest.findMany({
       where: {
         ownerId: userId,
-        status: {
-          in: [
-            "REQUESTED_BY_RENTER",
-            "ACCEPTED_BY_OWNER",
-            "PRODUCT_SUBMITTED_BY_OWNER",
-          ],
-        },
         deletedAt: null,
       },
       include: {
@@ -425,7 +414,7 @@ export const rejectRentalRequest = async (req, res, next) => {
           tx.bccWallet.update({
             where: { id: request.bccWalletId },
             data: {
-              totalBalance: { increment: request.usedBccAmount },
+              availableBalance: { increment: request.usedBccAmount },
               lockedBalance: { decrement: request.usedBccAmount },
             },
           }),
@@ -470,7 +459,7 @@ export const rejectRentalRequest = async (req, res, next) => {
       const [updatedRequest] = await Promise.all(updates);
       return updatedRequest;
     });
-
+    // TODO: Emit notification to renter
     res.status(200).json({
       success: true,
       data: updatedRequest,
@@ -522,7 +511,7 @@ export const cancelRentalRequest = async (req, res, next) => {
           tx.bccWallet.update({
             where: { id: request.bccWalletId },
             data: {
-              totalBalance: { increment: request.usedBccAmount },
+              availableBalance: { increment: request.usedBccAmount },
               lockedBalance: { decrement: request.usedBccAmount },
             },
           }),
@@ -568,7 +557,7 @@ export const cancelRentalRequest = async (req, res, next) => {
       const updatedRequest = results[results.length - 1];
       return updatedRequest;
     });
-
+    // TODO: Emit notification to owner
     res.status(200).json({
       success: true,
       data: updatedRequest,

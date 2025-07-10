@@ -3,21 +3,21 @@ import dotenv from "dotenv";
 import { errorHandler } from "./lib/errorHandler.js";
 import authRoutes from "./routes/auth.routes.js";
 import productRoutes from "./routes/product.routes.js";
-import cors from 'cors';
+import cors from "cors";
 import { multerErrorHandler } from "./lib/multerErrorHandler.js";
 import path from "path";
 import { fileURLToPath } from "url";
-import bccRoutes from './routes/bcc.routes.js';
-import rccRoutes from './routes/rcc.routes.js';
-import userRoutes from './routes/user.routes.js';
-import rentalRequestRoutes from './routes/rentalRequest.routes.js';
+import bccRoutes from "./routes/bcc.routes.js";
+import rccRoutes from "./routes/rcc.routes.js";
+import userRoutes from "./routes/user.routes.js";
+import creditRoutes from "./routes/credit.routes.js";
+import rentalRequestRoutes from "./routes/rentalRequest.routes.js";
 
 dotenv.config();
 const app = express();
 app.use(express.json());
-app.use(cors())
+app.use(cors());
 const PORT = process.env.PORT || 5000;
-
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -33,12 +33,12 @@ app.use("/api/v1/credit/bcc", bccRoutes);
 app.use("/api/v1/credit/rcc", rccRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/rental-requests", rentalRequestRoutes);
+app.use("/api/v1/credits", creditRoutes);
 
 app.use(errorHandler);
 app.use(multerErrorHandler);
 
-
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server is dancing on http://localhost:${PORT} \n${new Date(Date.now()).toLocaleTimeString()}
     `);
 });

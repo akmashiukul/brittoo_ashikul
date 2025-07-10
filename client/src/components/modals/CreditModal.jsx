@@ -84,7 +84,7 @@ const CreditModal = () => {
     }
   }, [currentUser?.id, isCreditModalOpen]);
 
-  const availableBcc = bccWallet?.totalBalance - bccWallet?.lockedBalance;
+  const availableBcc = bccWallet?.availableBalance;
   const totalSelectedRcc = selectedRCCs.reduce(
     (sum, selectedRcc) => sum + selectedRcc.selectedAmount,
     0,

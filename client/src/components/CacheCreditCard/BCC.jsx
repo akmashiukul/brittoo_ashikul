@@ -16,7 +16,7 @@ const BCC = ({ bccWallet, handleSelect, selectedBcc, inRRModal }) => {
             <h2 className="text-xs"> Available CC </h2>
             <p className="font-bold italic">
               {" "}
-              {bccWallet?.totalBalance - bccWallet?.lockedBalance}{" "}
+              {bccWallet?.availableBalance}{" "}
               {selectedBcc > 0 && (
                 <span className="text-red-600"> -{selectedBcc}</span>
               )}{" "}

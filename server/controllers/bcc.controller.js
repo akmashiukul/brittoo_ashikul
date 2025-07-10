@@ -30,7 +30,7 @@ export const buyBcc = async (req, res, next) => {
       wallet = await prisma.bccWallet.create({
         data: {
           userId: user.id,
-          totalBalance: 0,
+          availableBalance: 0,
           lockedBalance: 0,
         },
       });
@@ -123,7 +123,7 @@ export const acceptBCCRequest = async (req, res, next) => {
       await tx.bccWallet.update({
         where: { id: existingCredit.walletId },
         data: {
-          totalBalance: {
+          availableBalance: {
             increment: existingCredit.amount,
           },
         },
@@ -199,7 +199,7 @@ export const getUsersAvailableBcc = async (req, res, next) => {
         isWalletPresent: false,
         message: "User wallet not found",
         data: {
-          totalBalance: 0,
+          availableBalance: 0,
           lockedBalance: 0,
         },
       });
