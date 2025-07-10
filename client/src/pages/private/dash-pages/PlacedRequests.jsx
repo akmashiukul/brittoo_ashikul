@@ -428,6 +428,7 @@ const PlacedRequests = () => {
                           </div>
                         </div>
                       </div>
+                      <button>Cancel Request</button>
                     </div>
                   )}
                 </div>
