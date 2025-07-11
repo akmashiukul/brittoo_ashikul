@@ -498,6 +498,12 @@ const PlacedRequests = () => {
                           </h4>
                           <div className="space-y-2 text-sm">
                             <div>
+                              <span className="text-gray-600">Requested:</span>
+                              <span className="ml-2 font-medium">
+                                {formatDate(request.createdAt)}
+                              </span>
+                            </div>
+                            <div>
                               <span className="text-gray-600">Method:</span>
                               <span className="ml-2 font-medium">
                                 {request.renterCollectionMethod ===
@@ -519,12 +525,19 @@ const PlacedRequests = () => {
                                 </span>
                               </div>
                             )}
-                            <div>
-                              <span className="text-gray-600">Requested:</span>
-                              <span className="ml-2 font-medium">
-                                {formatDate(request.createdAt)}
-                              </span>
-                            </div>
+                            {request.renterDeliveryAddress && (
+                              <div>
+                                <span className="text-gray-600">
+                                  Delivery Address:
+                                </span>
+                                <span className="ml-2 text-xs text-black">
+                                  {request.renterDeliveryAddress.replace(
+                                    "_",
+                                    " ",
+                                  )}
+                                </span>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>

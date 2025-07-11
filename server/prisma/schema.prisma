@@ -79,7 +79,7 @@ enum SecurityScore {
 model BccWallet {
   id               String @id @default(cuid()) @map("id")
   userId           String @unique @map("user_id")
-  availableBalance Int    @default(0) @map("availableq_balance")
+  availableBalance Int    @default(0) @map("available_balance")
   lockedBalance    Int    @default(0) @map("locked_balance")
 
   user            User             @relation(fields: [userId], references: [id])
@@ -97,18 +97,20 @@ model BccTransaction {
   id              String             @id @default(cuid()) @map("id")
   userId          String             @map("user_id")
   walletId        String             @map("walllet_id")
+  rentalRequestId String?            @map("rental_request_id")
   amount          Int                @map("amount")
-  paymentGateway  PaymentGateway     @map("payment_gateway")
-  transactionId   String             @map("transaction_id")
-  numberUsedInTrx String             @map("number_used_in_trx")
+  paymentGateway  PaymentGateway?    @map("payment_gateway")
+  transactionId   String?            @map("transaction_id")
+  numberUsedInTrx String?            @map("number_used_in_trx")
   transactionType BccTransactionType @map("transaction_type")
 
   status       BccStatus? @default(PENDING) @map("status")
   refundTrxId  String?    @map("refund_trx_id")
   rejectReason String?    @map("reject_reason")
 
-  user   User      @relation(fields: [userId], references: [id])
-  wallet BccWallet @relation(fields: [walletId], references: [id])
+  user          User           @relation(fields: [userId], references: [id])
+  wallet        BccWallet      @relation(fields: [walletId], references: [id])
+  rentalRequest RentalRequest? @relation(fields: [rentalRequestId], references: [id])
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
@@ -118,10 +120,12 @@ model BccTransaction {
 }
 
 enum BccTransactionType {
-  PURCHASE
-  USAGE
-  REFUND
-  WITHDRAWAL
+  RENT_DEPOSIT
+  DEPOSIT_REFUND
+  BONUS_CREDIT
+  PURCHASE_BCC
+  MONEY_WITHDRAWAL
+  ADJUSTMENT
 }
 
 enum BccStatus {
@@ -137,12 +141,10 @@ enum PaymentGateway {
 }
 
 model RedCacheCredit {
-  id            String    @id @default(cuid()) @map("id")
-  amount        Int       @map("amount")
-  inUse         Int       @default(0) @map("in_use")
-  renterId      String?   @map("renter_id")
-  validityStart DateTime? @map("validity_start")
-  validityEnd   DateTime? @map("validity_end")
+  id       String  @id @default(cuid()) @map("id")
+  amount   Int     @map("amount")
+  inUse    Int     @default(0) @map("in_use")
+  renterId String? @map("renter_id")
 
   userId          String  @map("user_id")
   user            User    @relation(fields: [userId], references: [id])
@@ -271,10 +273,11 @@ model RentalRequest {
   owner           User                    @relation("RentalRequestsReceived", fields: [ownerId], references: [id])
   rccUsageDetails RentalRequestRccUsage[]
 
-  createdAt DateTime   @default(now()) @map("created_at")
-  updatedAt DateTime   @updatedAt @map("updated_at")
-  deletedAt DateTime?  @map("deleted_at")
-  bccWallet BccWallet? @relation(fields: [bccWalletId], references: [id])
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+  deletedAt       DateTime?        @map("deleted_at")
+  bccWallet       BccWallet?       @relation(fields: [bccWalletId], references: [id])
+  bccTransactions BccTransaction[]
 
   @@unique([productId, requesterId, status])
   @@index([ownerId, status])

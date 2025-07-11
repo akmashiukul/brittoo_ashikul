@@ -64,7 +64,7 @@ const ShowRccModal = () => {
                 <div className="text-gray-600">
                   <h3 className="text-xs"> Valid Till </h3>
                   <p className={"font-semibold text-sm"}>{
-                      rcc.validityEnd ? new Date(rcc.validityEnd).toLocaleDateString() : `--/--`
+                       `--/--`
                     }</p>
                 </div>
               </div>

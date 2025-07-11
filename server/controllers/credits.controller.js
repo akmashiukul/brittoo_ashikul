@@ -64,7 +64,7 @@ export const getUserCreditHistory = async (req, res, next) => {
       prisma.bccTransaction.findMany({
         where: {
           status: "PENDING",
-          transactionType: "PURCHASE",
+          transactionType: "PURCHASE_BCC",
           deletedAt: null,
         },
         include: {
@@ -125,7 +125,7 @@ export const getUserCreditHistory = async (req, res, next) => {
 
     const totalBccSpent = bccTransactions
       .filter(
-        (tx) => tx.transactionType === "USAGE" && tx.status === "ACCEPTED",
+        (tx) => tx.transactionType === "RENT_DEPOSIT" && tx.status === "ACCEPTED",
       )
       .reduce((sum, tx) => sum + tx.amount, 0);
 

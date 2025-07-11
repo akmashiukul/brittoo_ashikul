@@ -18,11 +18,6 @@ const MyCredits = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("overview");
-  const [expandedSections, setExpandedSections] = useState({
-    bccTransactions: false,
-    rccUsage: false,
-    rentalHistory: false,
-  });
 
   console.log("C history: --- : ", creditHistory);
 
@@ -78,13 +73,6 @@ const MyCredits = () => {
     fetchCreditHistory();
   };
 
-  const toggleSection = (section) => {
-    setExpandedSections((prev) => ({
-      ...prev,
-      [section]: !prev[section],
-    }));
-  };
-
   const getStatusColor = (status) => {
     switch (status) {
       case "ACCEPTED":
@@ -117,10 +105,6 @@ const MyCredits = () => {
       day: "numeric",
       year: "numeric",
     });
-  };
-
-  const isExpired = (endDate) => {
-    return new Date(endDate) < new Date();
   };
 
   if (loading) {
@@ -287,12 +271,12 @@ const MyCredits = () => {
       <div className="mb-6">
         <div className="border-b border-gray-200">
           <nav className="flex space-x-8">
-            {["overview", "bcc-transactions", "rcc-details", "usage"].map(
+            {["overview", "bcc-transactions", "rcc-details", "rcc-usage"].map(
               (tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`py-2 px-1 border-b-2 font-medium text-sm capitalize ${
+                  className={`py-2 px-1 border-b-2 font-medium text-sm capitalize cursor-pointer ${
                     activeTab === tab
                       ? "border-green-500 text-green-600"
                       : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
@@ -321,7 +305,7 @@ const MyCredits = () => {
               <div className="mt-4 flex flex-col sm:flex-row items-center">
                 <BCC
                   handleSelect={() => {}}
-                  bccWallet={creditHistory?.bccWallet}
+                  bccWallet={creditHistory?.bccWallet || {availableBalance: 0, lockedBalance: 0}}
                 />
               </div>
               <h3 className="mt-6 text-sm font-semibold text-center sm:text-left">
@@ -359,10 +343,7 @@ const MyCredits = () => {
                     In Use
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Validity
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
+                    Hold Status
                   </th>
                 </tr>
               </thead>
@@ -400,20 +381,14 @@ const MyCredits = () => {
                       <span className="text-sm text-gray-900">{rcc.inUse}</span>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {formatDate(rcc.validityStart)} -{" "}
-                        {formatDate(rcc.validityEnd)}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          isExpired(rcc.validityEnd)
+                          rcc.inUse > 0
                             ? "bg-red-100 text-red-800"
                             : "bg-green-100 text-green-800"
                         }`}
                       >
-                        {isExpired(rcc.validityEnd) ? "Expired" : "Active"}
+                        {rcc.inUse > 0 ? "On Hold" : "Not Hold"}
                       </span>
                     </td>
                   </tr>
@@ -472,8 +447,8 @@ const MyCredits = () => {
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap">
                         <span className="text-sm font-medium text-gray-900">
-                          {transaction.transactionType === "USAGE" ||
-                          transaction.transactionType === "WITHDRAWAL"
+                          {(transaction.transactionType === "RENT_DEPOSIT" ||
+                          transaction.transactionType === "MONEY_WITHDRAWAL")
                             ? "-"
                             : "+"}
                           {transaction.amount}
@@ -511,7 +486,7 @@ const MyCredits = () => {
       )}
 
       {/* Usage Tab */}
-      {activeTab === "usage" && (
+      {activeTab === "rcc-usage" && (
         <div className="space-y-6">
           <div className="bg-white rounded-lg shadow-sm border border-gray-200">
             <div className="p-4 border-b border-gray-200">

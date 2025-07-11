@@ -26,26 +26,30 @@ export const buyBcc = async (req, res, next) => {
       },
     });
 
-    if (!wallet) {
-      wallet = await prisma.bccWallet.create({
+    const bccTransaction = await prisma.$transaction(async (tx) => {
+      if (!wallet) {
+        wallet = await tx.bccWallet.create({
+          data: {
+            userId: user.id,
+            availableBalance: 0,
+            lockedBalance: 0,
+          },
+        });
+      }
+      const bccX = await tx.bccTransaction.create({
         data: {
           userId: user.id,
-          availableBalance: 0,
-          lockedBalance: 0,
+          walletId: wallet.id,
+          amount: parseInt(amount),
+          paymentGateway,
+          transactionId,
+          numberUsedInTrx: trxNo,
+          transactionType: "PURCHASE_BCC",
+          status: "PENDING",
         },
       });
-    }
-    const bccTransaction = await prisma.bccTransaction.create({
-      data: {
-        userId: user.id,
-        walletId: wallet.id,
-        amount: parseInt(amount),
-        paymentGateway,
-        transactionId,
-        numberUsedInTrx: trxNo,
-        transactionType: "PURCHASE",
-        status: "PENDING",
-      },
+
+      return bccX;
     });
 
     res.status(201).json({
@@ -65,7 +69,7 @@ export const getPendingCreditRequests = async (req, res, next) => {
     const pendingCredits = await prisma.bccTransaction.findMany({
       where: {
         status: "PENDING",
-        transactionType: "PURCHASE",
+        transactionType: "PURCHASE_BCC",
         deletedAt: null,
       },
       include: {
@@ -100,6 +104,7 @@ export const acceptBCCRequest = async (req, res, next) => {
       where: {
         id: creditId,
         deletedAt: null,
+        transactionType: "PURCHASE_BCC",
       },
       include: {
         wallet: true,
@@ -147,7 +152,7 @@ export const rejectBCCRequest = async (req, res, next) => {
     const { rejectReason, refundTrxId } = req.body;
 
     const existingCredit = await prisma.bccTransaction.findUnique({
-      where: { id: creditId, deletedAt: null },
+      where: { id: creditId, deletedAt: null, transactionType: "PURCHASE_BCC" },
     });
     if (!existingCredit) {
       throw new CustomError("Credit request not found", 404);
@@ -185,13 +190,13 @@ export const rejectBCCRequest = async (req, res, next) => {
 export const getUsersAvailableBcc = async (req, res, next) => {
   try {
     const { userId } = req.params;
-    console.log('hi1')
+    console.log("hi1");
 
     const wallet = await prisma.bccWallet.findUnique({
       where: { userId },
     });
 
-    console.log('hi2')
+    console.log("hi2");
 
     if (!wallet) {
       return res.status(200).json({
@@ -205,7 +210,7 @@ export const getUsersAvailableBcc = async (req, res, next) => {
       });
     }
 
-    console.log('hi3')
+    console.log("hi3");
 
     res.status(200).json({
       success: true,

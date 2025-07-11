@@ -30,8 +30,15 @@ export const createRentalRequest = async (req, res, next) => {
     if (!rentalStartDate || !rentalEndDate || !totalDays) {
       throw new CustomError("Missing rental period info", 400);
     }
-    if (!renterCollectionMethod || !renterPhoneNumber) {
-      throw new CustomError("Missing collection method or phone number", 400);
+    if (
+      !renterCollectionMethod ||
+      !renterPhoneNumber ||
+      renterPhoneNumber.trim() === ""
+    ) {
+      throw new CustomError(
+        "Missing collection method or valid phone number",
+        400,
+      );
     }
     if (renterCollectionMethod === "HOME" && !deliveryAddress) {
       throw new CustomError("Delivery address required for home delivery", 400);
@@ -40,6 +47,19 @@ export const createRentalRequest = async (req, res, next) => {
       throw new CustomError("Pickup point required for terminal pickup", 400);
     }
 
+    // Date validation
+    const now = new Date();
+    const startDate = new Date(rentalStartDate);
+    const endDate = new Date(rentalEndDate);
+
+    if (startDate <= now) {
+      throw new CustomError("Rental start date must be in the future", 400);
+    }
+    if (endDate <= startDate) {
+      throw new CustomError("Rental end date must be after start date", 400);
+    }
+
+    // Product validation
     const product = await prisma.product.findUnique({
       where: { id: productId },
       include: { owner: true },
@@ -53,11 +73,11 @@ export const createRentalRequest = async (req, res, next) => {
     if (product.isOnHold) {
       throw new CustomError("Product is currently on hold", 400);
     }
-    //TODO: Implement this in client asap
     if (requesterId === ownerId) {
       throw new CustomError("Cannot rent your own product", 400);
     }
-    // TODO: (client) Check for existing pending request
+
+    // Check for existing pending request
     const existingRequest = await prisma.rentalRequest.findFirst({
       where: {
         productId,
@@ -72,7 +92,7 @@ export const createRentalRequest = async (req, res, next) => {
       );
     }
 
-    //Validate Bcc
+    // Validate Bcc
     if (paidWithBcc) {
       const bccWallet = await prisma.bccWallet.findUnique({
         where: { id: bccWalletId },
@@ -116,10 +136,12 @@ export const createRentalRequest = async (req, res, next) => {
         }
       }
     }
+
     const rentalStart = new Date(rentalStartDate);
     const submissionDeadline = new Date(
       rentalStart.getTime() - 4 * 60 * 60 * 1000,
     );
+
     const result = await prisma.$transaction(async (tx) => {
       const rentalRequest = await tx.rentalRequest.create({
         data: {
@@ -148,7 +170,17 @@ export const createRentalRequest = async (req, res, next) => {
           owner: true,
         },
       });
+
       if (paidWithBcc && usedBccAmount > 0) {
+        await tx.bccTransaction.create({
+          data: {
+            userId: requesterId,
+            walletId: bccWalletId,
+            rentalRequestId: rentalRequest.id,
+            amount: usedBccAmount,
+            transactionType: "RENT_DEPOSIT",
+          },
+        });
         await tx.bccWallet.update({
           where: { id: bccWalletId },
           data: {
@@ -156,11 +188,12 @@ export const createRentalRequest = async (req, res, next) => {
               increment: usedBccAmount,
             },
             availableBalance: {
-              decrement: usedBccAmount
-            }
+              decrement: usedBccAmount,
+            },
           },
         });
       }
+
       if (paidWithRcc && usedRccData.length > 0) {
         for (const rccUsage of usedRccData) {
           await tx.redCacheCredit.update({
@@ -182,6 +215,7 @@ export const createRentalRequest = async (req, res, next) => {
           });
         }
       }
+
       return rentalRequest;
     });
 
@@ -304,6 +338,19 @@ export const acceptRentalRequest = async (req, res, next) => {
       ownerSubmitTerminal,
       ownerSubmitAddress,
     } = req.body;
+
+    // Validation
+    if (
+      !ownerSubmitMethod ||
+      !ownerPhoneNumber ||
+      ownerPhoneNumber.trim() === ""
+    ) {
+      throw new CustomError(
+        "Submit method and phone number are required",
+        400,
+        "MISSING_FIELDS",
+      );
+    }
     if (ownerSubmitMethod === "HOME" && !ownerSubmitAddress) {
       throw new CustomError(
         "Submit address required for home deposit",
@@ -318,6 +365,7 @@ export const acceptRentalRequest = async (req, res, next) => {
         "MISSING_FIELDS",
       );
     }
+
     const request = await prisma.rentalRequest.findFirst({
       where: {
         id: requestId,
@@ -325,7 +373,18 @@ export const acceptRentalRequest = async (req, res, next) => {
         status: "REQUESTED_BY_RENTER",
         deletedAt: null,
       },
+      include: {
+        bccTransactions: {
+          where: {
+            status: "PENDING",
+          },
+          select: {
+            id: true,
+          },
+        },
+      },
     });
+
     if (!request) {
       throw new CustomError(
         "Rental request not found or already processed",
@@ -333,32 +392,57 @@ export const acceptRentalRequest = async (req, res, next) => {
         "NOT_FOUND",
       );
     }
-    const updatedRequest = await prisma.rentalRequest.update({
-      where: { id: requestId },
-      data: {
-        status: "ACCEPTED_BY_OWNER",
-        ownerSubmitMethod,
-        ownerPhoneNumber,
-        ownerSubmitAddress:
-          ownerSubmitMethod === "HOME" ? ownerSubmitAddress : null,
-        ownerSubmitTerminal:
-          ownerSubmitMethod === "BRITTOO_TERMINAL" ? ownerSubmitTerminal : null,
-      },
-      include: {
-        product: {
-          select: {
-            name: true,
-            productImages: true,
+    if (request.paidWithBcc && request.bccTransactions.length <= 0) {
+      throw new CustomError(
+        "Used bcc but transaction unavailable",
+        404,
+        "NOT_FOUND",
+      );
+    }
+
+    const updatedRequest = await prisma.$transaction(async (tx) => {
+      const upReq = await tx.rentalRequest.update({
+        where: { id: requestId },
+        data: {
+          status: "ACCEPTED_BY_OWNER",
+          ownerSubmitMethod,
+          ownerPhoneNumber,
+          ownerSubmitAddress:
+            ownerSubmitMethod === "HOME" ? ownerSubmitAddress : null,
+          ownerSubmitTerminal:
+            ownerSubmitMethod === "BRITTOO_TERMINAL"
+              ? ownerSubmitTerminal
+              : null,
+        },
+        include: {
+          product: {
+            select: {
+              name: true,
+              productImages: true,
+            },
+          },
+          requester: {
+            select: {
+              name: true,
+              email: true,
+            },
           },
         },
-        requester: {
-          select: {
-            name: true,
-            email: true,
-          },
+      });
+      const bccTransactionId = request.bccTransactions[0].id;
+      await tx.bccTransaction.update({
+        where: {
+          id: bccTransactionId,
         },
-      },
+        data: {
+          status: "ACCEPTED",
+          rentalRequestId: requestId,
+        },
+      });
+
+      return upReq;
     });
+
     // TODO: Emit notification to renter
     res.status(200).json({
       success: true,
@@ -367,10 +451,7 @@ export const acceptRentalRequest = async (req, res, next) => {
     });
   } catch (error) {
     console.error("Error accepting rental request:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
+    next(error);
   }
 };
 
@@ -401,6 +482,7 @@ export const rejectRentalRequest = async (req, res, next) => {
           bccWallet: true,
         },
       });
+
       if (!request) {
         throw new CustomError(
           "Rental request not found or already processed",
@@ -409,6 +491,8 @@ export const rejectRentalRequest = async (req, res, next) => {
       }
 
       const updates = [];
+
+      // Handle BCC refund
       if (request.paidWithBcc && request.usedBccAmount && request.bccWalletId) {
         updates.push(
           tx.bccWallet.update({
@@ -419,20 +503,35 @@ export const rejectRentalRequest = async (req, res, next) => {
             },
           }),
         );
+        updates.push(
+          tx.bccTransaction.create({
+            data: {
+              userId: request.requesterId,
+              walletId: request.bccWalletId,
+              rentalRequestId: request.id,
+              amount: request.usedBccAmount,
+              status: "ACCEPTED",
+              transactionType: "DEPOSIT_REFUND",
+            },
+          }),
+        );
       }
+
+      // Handle RCC refund
       if (request.paidWithRcc && request.rccUsageDetails.length > 0) {
         for (const usage of request.rccUsageDetails) {
           updates.push(
             tx.redCacheCredit.update({
               where: { id: usage.redCacheCreditId },
               data: {
-                amount: { increment: usage.usedAmount },
                 inUse: { decrement: usage.usedAmount },
               },
             }),
           );
         }
       }
+
+      // Update rental request status
       updates.push(
         tx.rentalRequest.update({
           where: { id: requestId },
@@ -456,9 +555,12 @@ export const rejectRentalRequest = async (req, res, next) => {
           },
         }),
       );
-      const [updatedRequest] = await Promise.all(updates);
+
+      const results = await Promise.all(updates);
+      const updatedRequest = results[results.length - 1];
       return updatedRequest;
     });
+
     // TODO: Emit notification to renter
     res.status(200).json({
       success: true,
@@ -476,6 +578,7 @@ export const cancelRentalRequest = async (req, res, next) => {
     const { requestId } = req.params;
     const userId = req.user.id;
     const { cancelReason } = req.body;
+
     if (!cancelReason || cancelReason.trim() === "") {
       throw new CustomError("Cancel reason is required", 400, "MISSING_FIELDS");
     }
@@ -499,13 +602,17 @@ export const cancelRentalRequest = async (req, res, next) => {
           bccWallet: true,
         },
       });
+
       if (!request) {
         throw new CustomError(
           "Rental request not found or already processed",
           400,
         );
       }
+
       const updates = [];
+
+      // Handle BCC refund
       if (request.paidWithBcc && request.usedBccAmount && request.bccWalletId) {
         updates.push(
           tx.bccWallet.update({
@@ -516,20 +623,35 @@ export const cancelRentalRequest = async (req, res, next) => {
             },
           }),
         );
+        updates.push(
+          tx.bccTransaction.create({
+            data: {
+              userId: request.requesterId,
+              walletId: request.bccWalletId,
+              rentalRequestId: request.id,
+              amount: request.usedBccAmount,
+              status: "ACCEPTED",
+              transactionType: "DEPOSIT_REFUND",
+            },
+          }),
+        );
       }
+
+      // Handle RCC refund
       if (request.paidWithRcc && request.rccUsageDetails.length > 0) {
         for (const usage of request.rccUsageDetails) {
           updates.push(
             tx.redCacheCredit.update({
               where: { id: usage.redCacheCreditId },
               data: {
-                amount: { increment: usage.usedAmount },
                 inUse: { decrement: usage.usedAmount },
               },
             }),
           );
         }
       }
+
+      // Update rental request status
       updates.push(
         tx.rentalRequest.update({
           where: { id: requestId },
@@ -553,10 +675,12 @@ export const cancelRentalRequest = async (req, res, next) => {
           },
         }),
       );
+
       const results = await Promise.all(updates);
       const updatedRequest = results[results.length - 1];
       return updatedRequest;
     });
+
     // TODO: Emit notification to owner
     res.status(200).json({
       success: true,
