@@ -8,7 +8,7 @@ const ManageItemCard = ({ product, products, setProducts }) => {
     id,
     name,
     pricePerDay,
-    productType,
+    productSL,
     productCondition,
     tags,
     productImages,
@@ -96,8 +96,8 @@ const ManageItemCard = ({ product, products, setProducts }) => {
           <h3 className="text-base font-medium text-gray-900 truncate">
             {name}
           </h3>
-          <div className="text-sm text-gray-500">
-            {productType.replace("_", " ")}
+          <div className="text-sm text-gray-500 font-medium">
+            {productSL}
           </div>
           {tags && (
             <div className="flex items-center gap-2">

@@ -11,9 +11,8 @@ export const getUserOverview = async (req, res, next) => {
     });
 
     if (!user) {
-      throw new CustomError("User not found", 404, "NOT_FOUND");
+      throw new CustomError("User not found", 404, "NOT_FOUND")
     }
-
     // Get wallet information
     const wallet = await prisma.bccWallet.findUnique({
       where: { userId },
@@ -22,7 +21,6 @@ export const getUserOverview = async (req, res, next) => {
         lockedBalance: true,
       },
     });
-
     // Get rental statistics
     const [
       activeRentalsCount,
@@ -133,15 +131,14 @@ export const getUserOverview = async (req, res, next) => {
     // Add recent transactions to activity
     recentTransactions.forEach((transaction) => {
       recentActivity.push({
-        title: this.formatTransactionActivity(
+        title: formatTransactionActivity(
           transaction.transactionType,
           transaction.amount,
         ),
-        time: this.formatTimeAgo(transaction.createdAt),
+        time: formatTimeAgo(transaction.createdAt),
         type: "transaction",
       });
     });
-
     // Add recent rental activities
     [...pendingIncomingRequests, ...pendingOutgoingRequests].forEach(
       (request) => {
@@ -150,34 +147,31 @@ export const getUserOverview = async (req, res, next) => {
           title: isIncoming
             ? `New rental request for ${request.product.name}`
             : `Rental request sent for ${request.product.name}`,
-          time: this.formatTimeAgo(request.createdAt),
+          time: formatTimeAgo(request.createdAt),
           type: "rental",
         });
       },
     );
-
     // Sort activity by time and limit to 5
     recentActivity.sort((a, b) => new Date(b.time) - new Date(a.time));
     const limitedActivity = recentActivity.slice(0, 5);
-
     // Format pending requests
     const pendingRequests = [
       ...pendingIncomingRequests.map((req) => ({
         id: req.id,
         productName: req.product.name,
         type: "incoming",
-        time: this.formatTimeAgo(req.createdAt),
+        time: formatTimeAgo(req.createdAt),
         requesterName: req.requester.name,
       })),
       ...pendingOutgoingRequests.map((req) => ({
         id: req.id,
         productName: req.product.name,
         type: "outgoing",
-        time: this.formatTimeAgo(req.createdAt),
+        time: formatTimeAgo(req.createdAt),
         status: req.status,
       })),
     ];
-
     const dashboardData = {
       user,
       wallet,
@@ -193,12 +187,50 @@ export const getUserOverview = async (req, res, next) => {
 
     res.json({
       success: true,
+      message: "User dash data fetched successfully",
       data: dashboardData,
     });
   } catch (error) {
     console.error("Error fetching user dashboard overview:", error);
     next(error);
   }
+};
+
+/**
+ * Helper function to format transaction activity
+ * @param {string} transactionType
+ * @param {number} amount
+ * @returns {string}
+ */
+const formatTransactionActivity = (transactionType, amount) => {
+  const typeMap = {
+    RENT_DEPOSIT: `Rent deposit of ${amount} BCC`,
+    DEPOSIT_REFUND: `Refund of ${amount} BCC received`,
+    BONUS_CREDIT: `Bonus credit of ${amount} BCC`,
+    PURCHASE_BCC: `Purchased ${amount} BCC`,
+    MONEY_WITHDRAWAL: `Withdrew ${amount} BCC`,
+    ADJUSTMENT: `Account adjustment of ${amount} BCC`,
+  };
+  return typeMap[transactionType] || `Transaction of ${amount} BCC`;
+};
+
+/**
+ * Helper function to format time ago
+ * @param {Date} date
+ * @returns {string}
+ */
+const formatTimeAgo = (date) => {
+  const now = new Date();
+  const diffInSeconds = Math.floor((now - new Date(date)) / 1000);
+
+  if (diffInSeconds < 60) return "Just now";
+  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+  if (diffInSeconds < 2592000)
+    return `${Math.floor(diffInSeconds / 86400)}d ago`;
+  if (diffInSeconds < 31536000)
+    return `${Math.floor(diffInSeconds / 2592000)}mo ago`;
+  return `${Math.floor(diffInSeconds / 31536000)}y ago`;
 };
 
 export const getUserCreditHistory = async (req, res, next) => {

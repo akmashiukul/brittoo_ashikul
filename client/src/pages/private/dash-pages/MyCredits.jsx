@@ -134,6 +134,43 @@ const MyCredits = () => {
     }
   };
 
+  const getRentalRequestStatusColor = (status) => {
+    switch (status) {
+      case "REQUESTED_BY_RENTER":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "ACCEPTED_BY_OWNER":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "REJECTED_BY_OWNER":
+        return "bg-red-100 text-red-800 border-red-200";
+      case "PRODUCT_SUBMITTED_BY_OWNER":
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
+    }
+  };
+
+  const getRentalRequestStatusIcon = (status) => {
+    switch (status) {
+      case "REQUESTED_BY_RENTER":
+        return <Clock className="w-4 h-4" />;
+      case "ACCEPTED_BY_OWNER":
+        return <CheckCircle className="w-4 h-4" />;
+      case "REJECTED_BY_OWNER":
+        return <XCircle className="w-4 h-4" />;
+      case "PRODUCT_SUBMITTED_BY_OWNER":
+        return <Package className="w-4 h-4" />;
+      default:
+        return <AlertCircle className="w-4 h-4" />;
+    }
+  };
+
+  const formatStatus = (status) => {
+    return status
+      .replace(/_/g, " ")
+      .toLowerCase()
+      .replace(/\b\w/g, (l) => l.toUpperCase());
+  };
+
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString("en-US", {
       month: "short",
@@ -583,16 +620,25 @@ const MyCredits = () => {
                     <tr key={rental.id} className="hover:bg-gray-50">
                       <td className="px-4 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <Package className="w-4 h-4 text-gray-400 mr-2" />
-                          <div>
-                            <div className="text-sm font-medium text-gray-900">
-                              {rental.product.name}
-                            </div>
+                        <Package className="w-4 h-4 text-gray-400 mr-2" />
+                        <Link
+                          to={rental.product.id}
+                          className="p-2 border border-gray-200 rounded-lg w-full hover:scale-105 hover:bg-gray-200 hover:text-white transition-all duration-300 hover:ml-2"
+                        >
+                          <div className="text-sm font-medium text-gray-900">
+                            {rental.product.name}
+                          </div>
+                          <div className="flex items-center gap-1">
                             <div className="text-sm text-gray-500">
                               {rental.product.productSL}
                             </div>
+                            <div className="h-1 w-1 bg-gray-400 rounded-full"></div>
+                            <div className="text-xs text-gray-500">
+                              BDT {rental.product.pricePerDay}/Day
+                            </div>
                           </div>
-                        </div>
+                        </Link>
+                      </div>
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap">
                         <span className="text-sm text-gray-900">
@@ -620,9 +666,16 @@ const MyCredits = () => {
                         </div>
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                          {rental.status.replace(/_/g, " ")}
+                        <div
+                        className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium border ${getRentalRequestStatusColor(
+                          rental.status,
+                        )}`}
+                      >
+                        {getRentalRequestStatusIcon(rental.status)}
+                        <span className="hidden md:inline">
+                          {formatStatus(rental.status)}
                         </span>
+                      </div>
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">
