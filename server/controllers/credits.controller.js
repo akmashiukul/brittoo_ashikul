@@ -49,6 +49,7 @@ export const getUserCreditHistory = async (req, res, next) => {
         select: {
           id: true,
           amount: true,
+          rentalRequestId: true,
           paymentGateway: true,
           transactionId: true,
           transactionType: true,

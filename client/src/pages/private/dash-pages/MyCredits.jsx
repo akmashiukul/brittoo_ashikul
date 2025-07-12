@@ -7,11 +7,13 @@ import {
   AlertCircle,
   RefreshCw,
   AlertTriangle,
+  HashIcon,
 } from "lucide-react";
 import api from "../../../lib/api";
 import BCC from "../../../components/CacheCreditCard/BCC";
 import RCC from "../../../components/CacheCreditCard/RCC";
 import { Link } from "react-router-dom";
+import Loader from "../../../components/shared/Loader";
 
 const MyCredits = () => {
   const [creditHistory, setCreditHistory] = useState(null);
@@ -21,7 +23,7 @@ const MyCredits = () => {
 
   console.log("C history: --- : ", creditHistory);
 
-  // Fetch dashboard data from API
+  // Fetch Credits data from API
   useEffect(() => {
     const fetchCreditHistory = async () => {
       try {
@@ -32,7 +34,7 @@ const MyCredits = () => {
         });
 
         if (!response.data.success) {
-          throw new Error("Failed to fetch dashboard data");
+          throw new Error("Failed to fetch Credits data");
         }
         setCreditHistory(response.data.data);
       } catch (error) {
@@ -59,12 +61,12 @@ const MyCredits = () => {
         });
 
         if (!response.data.success) {
-          throw new Error("Failed to fetch dashboard data");
+          throw new Error("Failed to fetch Credits data");
         }
         setCreditHistory(response.data.data);
       } catch (error) {
-        console.error("Error fetching dashboard data:", error);
-        setError(error.message);
+        console.error("Error fetching Credits data:", error);
+        setError(error.response.data.message);
       } finally {
         setLoading(false);
       }
@@ -99,6 +101,39 @@ const MyCredits = () => {
     }
   };
 
+  const getTransactionTypeColor = (type) => {
+    switch (type) {
+      case "RENT_DEPOSIT":
+        return "text-blue-600";
+      case "DEPOSIT_REFUND":
+        return "text-green-600";
+      case "BONUS_CREDIT":
+        return "text-emerald-500";
+      case "PURCHASE_BCC":
+        return "text-purple-500";
+      case "MONEY_WITHDRAWAL":
+        return "text-red-500";
+      case "ADJUSTMENT":
+        return "text-yellow-500";
+      default:
+        return "text-gray-500";
+    }
+  };
+
+  const getTransactionReference = (transaction) => {
+    switch (transaction.transactionType) {
+      case "RENT_DEPOSIT":
+      case "DEPOSIT_REFUND":
+        return `RR-${transaction.rentalRequestId?.slice(0, 8) || "N/A"}`;
+      case "BONUS_CREDIT":
+        return "BONUS";
+      case "ADJUSTMENT":
+        return "MANUAL";
+      default:
+        return "—";
+    }
+  };
+
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString("en-US", {
       month: "short",
@@ -109,21 +144,17 @@ const MyCredits = () => {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto p-6 bg-gray-50 min-h-screen">
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
-        </div>
-      </div>
+      <Loader />
     );
   }
 
   if (error) {
     return (
-      <div className="max-w-7xl mx-auto p-6 bg-gray-50 min-h-screen">
+      <div className="w-full flex flex-col items-center justify-center p-6 bg-gray-50 min-h-screen">
         <div className="flex flex-col items-center justify-center h-64">
           <AlertTriangle className="w-16 h-16 text-red-500 mb-4" />
           <h2 className="text-xl font-semibold text-gray-800 mb-2">
-            Error Loading Dashboard
+            Error Loading Credits
           </h2>
           <p className="text-gray-600 mb-4 text-center">{error}</p>
           <button
@@ -140,14 +171,14 @@ const MyCredits = () => {
 
   if (!creditHistory) {
     return (
-      <div className="max-w-7xl mx-auto p-6 bg-gray-50 min-h-screen">
+      <div className="w-full justify-center items-center p-6 bg-gray-50 min-h-screen">
         <div className="flex flex-col items-center justify-center h-64">
           <Package className="w-16 h-16 text-gray-400 mb-4" />
           <h2 className="text-xl font-semibold text-gray-800 mb-2">
             No Data Available
           </h2>
           <p className="text-gray-600">
-            Unable to load dashboard data at this time.
+            Unable to load Credits data at this time.
           </p>
         </div>
       </div>
@@ -157,7 +188,7 @@ const MyCredits = () => {
   return (
     <div className="max-w-7xl mx-auto p-6 bg-gray-50 min-h-screen">
       <div className="mb-8">
-        <div className="flex justify-between items-center border-b border-gray-200 pb-3">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-gray-200 pb-3">
           <div>
             <h1 className="text-3xl font-bold text-gray-800 mb-2">
               Credits Dashboard
@@ -270,7 +301,7 @@ const MyCredits = () => {
       {/* Tab Navigation */}
       <div className="mb-6">
         <div className="border-b border-gray-200">
-          <nav className="flex space-x-8">
+          <nav className="flex space-x-4 justify-center sm:justify-start sm:space-x-8">
             {["overview", "bcc-transactions", "rcc-details", "rcc-usage"].map(
               (tab) => (
                 <button
@@ -305,7 +336,12 @@ const MyCredits = () => {
               <div className="mt-4 flex flex-col sm:flex-row items-center">
                 <BCC
                   handleSelect={() => {}}
-                  bccWallet={creditHistory?.bccWallet || {availableBalance: 0, lockedBalance: 0}}
+                  bccWallet={
+                    creditHistory?.bccWallet || {
+                      availableBalance: 0,
+                      lockedBalance: 0,
+                    }
+                  }
                 />
               </div>
               <h3 className="mt-6 text-sm font-semibold text-center sm:text-left">
@@ -437,26 +473,50 @@ const MyCredits = () => {
                     <tr key={transaction.id} className="hover:bg-gray-50">
                       <td className="px-4 py-4 whitespace-nowrap">
                         <span className="text-sm font-mono text-gray-900">
-                          {transaction.transactionId || transaction.id}
+                          {["PURCHASE_BCC", "MONEY_WITHDRAWAL"].includes(
+                            transaction.transactionType,
+                          ) ? (
+                            <span className="flex items-center gap-0.5 uppercase text-teal-600">
+                              <HashIcon size={14} />
+                              {transaction.transactionId}
+                            </span>
+                          ) : transaction.rentalRequestId ? (
+                            <Link to={'/dashboard/placed-requests'} className="uppercase text-purple-600 border py-0.5 px-3 rounded-lg border-purple-100 hover:bg-purple-500 hover:text-white transition-all">
+                              {getTransactionReference(transaction)}
+                            </Link>
+                          ) : (
+                            <Link to={'/dashboard/placed-requests'} className="uppercase text-gray-600 border py-0.5 px-3 rounded-lg border-gray-100 hover:bg-gray-500 hover:text-white transition-all">RR-PENDING</Link>
+                          )}
                         </span>
                       </td>
+
                       <td className="px-4 py-4 whitespace-nowrap">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 ${getTransactionTypeColor(
+                            transaction.transactionType,
+                          )}`}
+                        >
                           {transaction.transactionType}
                         </span>
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap">
                         <span className="text-sm font-medium text-gray-900">
-                          {(transaction.transactionType === "RENT_DEPOSIT" ||
-                          transaction.transactionType === "MONEY_WITHDRAWAL")
+                          {transaction.transactionType === "RENT_DEPOSIT" ||
+                          transaction.transactionType === "MONEY_WITHDRAWAL"
                             ? "-"
                             : "+"}
                           {transaction.amount}
                         </span>
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap">
-                        <span className="text-sm text-gray-900">
-                          {transaction.paymentGateway || "N/A"}
+                        <span
+                          className={`text-sm ${
+                            transaction.paymentGateway
+                              ? "text-gray-900"
+                              : "text-green-600"
+                          }`}
+                        >
+                          {transaction.paymentGateway || "BR_CIRC"}
                         </span>
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap">

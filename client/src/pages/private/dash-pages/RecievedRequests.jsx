@@ -16,6 +16,7 @@ import {
 import api from "../../../lib/api";
 import { Link } from "react-router-dom";
 import Swal from 'sweetalert2';
+import Loader from "../../../components/shared/Loader";
 
 const RecievedRequests = () => {
   const [requests, setRequests] = useState([]);
@@ -134,7 +135,6 @@ const RecievedRequests = () => {
             : req,
         ),
       );
-
       // Show success notification
       
       closeModal();
@@ -227,21 +227,14 @@ const RecievedRequests = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 p-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-            <p className="text-green-600 mt-4">Loading rental requests...</p>
-          </div>
-        </div>
-      </div>
+      <Loader />
     );
   }
 
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 p-6">
-        <div className="max-w-7xl mx-auto">
+        <div className="flex h-screen w-full justify-center items-center">
           <div className="text-center py-12">
             <XCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
             <p className="text-red-600 text-lg">{error}</p>

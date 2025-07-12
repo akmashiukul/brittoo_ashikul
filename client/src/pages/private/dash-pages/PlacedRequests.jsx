@@ -17,6 +17,7 @@ import {
 import api from "../../../lib/api";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
+import Loader from "../../../components/shared/Loader";
 
 const PlacedRequests = () => {
   const [requests, setRequests] = useState([]);
@@ -174,21 +175,14 @@ const PlacedRequests = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 p-4 md:p-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-            <p className="text-green-600 mt-4">Loading your requests...</p>
-          </div>
-        </div>
-      </div>
+      <Loader />
     );
   }
 
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 p-4 md:p-6">
-        <div className="max-w-7xl mx-auto">
+        <div className="w-full flex h-screen justify-center items-center">
           <div className="text-center py-12">
             <XCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
             <p className="text-red-600 text-lg">{error}</p>
@@ -387,11 +381,13 @@ const PlacedRequests = () => {
                   {/* Mobile Card */}
                   <div className="lg:hidden p-4">
                     <div className="flex items-start gap-3">
-                      <img
-                        src={`${base_url}${request.product.productImages[0]}`}
-                        alt={request.product.name}
-                        className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
-                      />
+                      <Link to={`/product-details/${request.product.id}`}>
+                        <img
+                          src={`${base_url}${request.product.productImages[0]}`}
+                          alt={request.product.name}
+                          className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
+                        />
+                      </Link>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between mb-2">
                           <h3 className="font-semibold text-gray-800 text-sm truncate">
