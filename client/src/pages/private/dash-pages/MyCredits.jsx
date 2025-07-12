@@ -27,7 +27,7 @@ const MyCredits = () => {
   useEffect(() => {
     const fetchCreditHistory = async () => {
       try {
-        const response = await api.get("/api/v1/credits/user/credit-history", {
+        const response = await api.get("/api/v1/user-dashboard/credits/credit-history", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
@@ -54,7 +54,7 @@ const MyCredits = () => {
     // Re-run the fetch effect
     const fetchCreditHistory = async () => {
       try {
-        const response = await api.get("/api/v1/credits/user/credit-history", {
+        const response = await api.get("/api/v1/user-dashboard/credits/credit-history", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },

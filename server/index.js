@@ -10,8 +10,8 @@ import { fileURLToPath } from "url";
 import bccRoutes from "./routes/bcc.routes.js";
 import rccRoutes from "./routes/rcc.routes.js";
 import userRoutes from "./routes/user.routes.js";
-import creditRoutes from "./routes/credit.routes.js";
 import rentalRequestRoutes from "./routes/rentalRequest.routes.js";
+import userDashboardRoutes from "./routes/userDashboard.routes.js";
 
 dotenv.config();
 const app = express();
@@ -33,7 +33,7 @@ app.use("/api/v1/credit/bcc", bccRoutes);
 app.use("/api/v1/credit/rcc", rccRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/rental-requests", rentalRequestRoutes);
-app.use("/api/v1/credits", creditRoutes);
+app.use("/api/v1/user-dashboard", userDashboardRoutes);
 
 app.use(errorHandler);
 app.use(multerErrorHandler);
