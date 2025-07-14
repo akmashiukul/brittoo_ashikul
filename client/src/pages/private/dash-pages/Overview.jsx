@@ -260,56 +260,19 @@ const Overview = () => {
             </h2>
           </div>
 
-          <div className="space-y-3">
-            <button className="w-full bg-green-50 hover:bg-green-100 text-green-700 py-3 px-4 rounded-lg transition-colors text-sm font-medium">
+          <div className="flex flex-col gap-3 text-center">
+            <Link to={'/dashboard/list-items'} className="w-full bg-green-50 hover:bg-green-100 text-green-700 py-3 px-4 rounded-lg transition-colors text-sm font-medium">
               List New Product
-            </button>
-            <button className="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 py-3 px-4 rounded-lg transition-colors text-sm font-medium">
+            </Link>
+            <Link to={'/browse'} className="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 py-3 px-4 rounded-lg transition-colors text-sm font-medium">
               Browse Products
-            </button>
-            <button className="w-full bg-purple-50 hover:bg-purple-100 text-purple-700 py-3 px-4 rounded-lg transition-colors text-sm font-medium">
-              Add BCC Credits
-            </button>
+            </Link>
+            <Link to={'/buy-credits'} className="w-full bg-purple-50 hover:bg-purple-100 text-purple-700 py-3 px-4 rounded-lg transition-colors text-sm font-medium">
+              Buy Credits
+            </Link>
           </div>
         </div>
       </div>
-
-      {/* Rental Requests Summary */}
-      {userData.pendingRequests.length > 0 && (
-        <div className="mt-6 bg-white rounded-lg border border-gray-200/70 p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <AlertCircle className="w-5 h-5 text-yellow-600" />
-            <h2 className="text-lg font-semibold text-gray-900">
-              Pending Requests
-            </h2>
-            <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
-              {userData.pendingRequests.length} pending
-            </span>
-          </div>
-
-          <div className="space-y-3">
-            {userData.pendingRequests.slice(0, 3).map((request) => (
-              <Link
-                to={'/dashboard/placed-requests'}
-                key={request.id}
-                className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg border border-transparent  hover:border-yellow-200 hover:scale-y-105 transition-all duration-300"
-              >
-                <div>
-                  <p className="text-sm font-medium text-gray-900">
-                    {request.productName}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {request.type === "incoming"
-                      ? "Incoming request"
-                      : "Outgoing request"}
-                  </p>
-                </div>
-                <span className="text-xs text-gray-500">{request.time}</span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 };
