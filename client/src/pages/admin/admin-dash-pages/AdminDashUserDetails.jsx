@@ -20,6 +20,7 @@ import {
 import api from "../../../lib/api";
 import UserCreditDetails from "./UserCreditDetails";
 import UserPlacedRequests from "./UserPlacedRequests";
+import UserRecievedRequests from "./UserRecievedRequests";
 
 const AdminDashUserDetails = () => {
   const { userId } = useParams();
@@ -631,7 +632,7 @@ const AdminDashUserDetails = () => {
               <UserPlacedRequests userId={userId} />
               </div>}
             {activeTab === "recieved-requests" && <div>
-              
+              <UserRecievedRequests userId={userId} />
               </div>}
 
             {activeTab === "credits" && (

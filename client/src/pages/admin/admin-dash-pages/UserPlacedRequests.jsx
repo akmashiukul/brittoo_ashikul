@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import {
   Clock,
-  User,
   Calendar,
   MapPin,
   Phone,
@@ -16,7 +15,6 @@ import {
 } from "lucide-react";
 import api from "../../../lib/api";
 import { Link } from "react-router-dom";
-import Swal from "sweetalert2";
 import Loader from "../../../components/shared/Loader";
 
 const UserPlacedRequests = ({ userId }) => {
