@@ -105,10 +105,21 @@ export const getUserDetails = async (req, res) => {
         deletedAt: null,
       },
       include: {
-        blueCacheCredits: {
-          orderBy: { createdAt: 'desc'}
+        bccWallet: {
+          include: {
+            bccTransactions: {
+              orderBy: { createdAt: 'desc' },
+              take: 20, // Get recent transactions
+            },
+          },
         },
-        redCacheCredits: true,
+        bccTransactions: {
+          orderBy: { createdAt: 'desc' },
+          take: 10,
+        },
+        redCacheCredits: {
+          orderBy: { createdAt: 'desc' },
+        },
         rentedOutProducts: {
           where: { deletedAt: null },
           select: {
@@ -201,28 +212,51 @@ export const getUserDetails = async (req, res) => {
       throw new CustomError("User not found", 404);
     }
 
+    // Calculate wallet and credit summary
+    const walletSummary = {
+      availableBalance: user.bccWallet?.availableBalance || 0,
+      lockedBalance: user.bccWallet?.lockedBalance || 0,
+      totalBalance: (user.bccWallet?.availableBalance || 0) + (user.bccWallet?.lockedBalance || 0),
+    };
+
     const creditSummary = {
-      totalBlueCredits: user.blueCacheCredits.reduce(
-        (sum, c) => sum + c.amount,
-        0,
-      ),
       totalRedCredits: user.redCacheCredits.reduce(
         (sum, c) => sum + c.amount,
         0,
       ),
-      pendingBCC: user.blueCacheCredits
-        .filter((c) => !c.isActive && !c.isRejected)
-        .reduce((sum, c) => sum + c.amount, 0),
-      rejectedBCC: user.blueCacheCredits
-        .filter((c) => c.isRejected)
-        .reduce((sum, c) => sum + c.amount, 0),
+      totalRedCreditsInUse: user.redCacheCredits.reduce(
+        (sum, c) => sum + c.inUse,
+        0,
+      ),
+      availableRedCredits: user.redCacheCredits.reduce(
+        (sum, c) => sum + (c.amount - c.inUse),
+        0,
+      ),
+    };
+
+    // Calculate BCC transaction summary
+    const bccTransactionSummary = {
+      totalDeposits: user.bccTransactions
+        .filter((t) => t.transactionType === "PURCHASE_BCC" && t.status === "ACCEPTED")
+        .reduce((sum, t) => sum + t.amount, 0),
+      totalWithdrawals: user.bccTransactions
+        .filter((t) => t.transactionType === "MONEY_WITHDRAWAL" && t.status === "ACCEPTED")
+        .reduce((sum, t) => sum + t.amount, 0),
+      pendingTransactions: user.bccTransactions
+        .filter((t) => t.status === "PENDING")
+        .reduce((sum, t) => sum + t.amount, 0),
+      rejectedTransactions: user.bccTransactions
+        .filter((t) => t.status === "REJECTED")
+        .reduce((sum, t) => sum + t.amount, 0),
     };
 
     res.json({
       success: true,
       data: {
         user,
+        walletSummary,
         creditSummary,
+        bccTransactionSummary,
         stats: {
           totalProductsRented: user.rentedOutProducts.length,
           totalProductsBorrowed: user.borrowedProducts.length,
