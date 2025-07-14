@@ -6,6 +6,6 @@ const router = express.Router();
 
 router.get('/', verifyToken, adminMiddleware, getAllUsers);
 router.get('/:userId', verifyToken, adminMiddleware, getUserDetails);
-router.get('/admin/credit-history', verifyToken, adminMiddleware, getUserCreditHistory);
+router.get('/admin/credit-history/:userId', verifyToken, adminMiddleware, getUserCreditHistory);
 
 export default router;

@@ -32,6 +32,7 @@ import Swal from "sweetalert2";
 import PlacedRequests from "./pages/private/dash-pages/PlacedRequests";
 import RecievedRequests from "./pages/private/dash-pages/RecievedRequests";
 import MyCredits from "./pages/private/dash-pages/MyCredits";
+import AdminDashUserDetails from "./pages/admin/admin-dash-pages/AdminDashUserDetails";
 
 const AppContent = () => {
   const location = useLocation();
@@ -106,6 +107,7 @@ const AppContent = () => {
               <Route path="blue-cc-requests" element={<BlueCCRequests />} />
               <Route path="admin-overview" element={<AdminOverview />} />
               <Route path="manage-users" element={<ManageUsers />} />
+              <Route path="user-details/:userId" element={<AdminDashUserDetails />} />
             </Route>
           </Route>
 

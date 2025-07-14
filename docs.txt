@@ -36,6 +36,8 @@ PROBLEMS:
   1. After is_verified changed to verified from pending doesn't reflect until user logs out and again logs in.
   2. If more than 15 days selected during rental show message.
 
+FEATURES_LATER:
+  1. Users total earning, spent etc.
 
   Get SSL:
     1. Stop the Nginx at docker:

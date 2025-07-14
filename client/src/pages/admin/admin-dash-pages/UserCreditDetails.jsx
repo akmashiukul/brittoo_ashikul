@@ -12,12 +12,11 @@ import {
 import api from "../../../lib/api";
 import BCC from "../../../components/CacheCreditCard/BCC";
 import RCC from "../../../components/CacheCreditCard/RCC";
-import { Link, useParams } from "react-router-dom";
 import Loader from "../../../components/shared/Loader";
+import { Link } from "react-router-dom";
 
-const MyCredits = () => {
+const UserCreditDetails = ({userId}) => {
   const [creditHistory, setCreditHistory] = useState(null);
-  const { userId } = useParams();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("overview");
@@ -227,11 +226,8 @@ const MyCredits = () => {
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-gray-200 pb-3">
           <div>
             <h1 className="text-3xl font-bold text-gray-800 mb-2">
-              Credits Dashboard
+              User Credits Details
             </h1>
-            <p className="text-gray-600">
-              Manage your Blue Cache Credits and Red Cache Credits
-            </p>
           </div>
           <button
             onClick={refetchData}
@@ -694,4 +690,4 @@ const MyCredits = () => {
   );
 };
 
-export default MyCredits;
+export default UserCreditDetails;

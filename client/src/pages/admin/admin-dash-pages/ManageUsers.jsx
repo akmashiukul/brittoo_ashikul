@@ -1,230 +1,225 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
+  Search,
+  User,
+  Users,
   Eye,
-  ShieldCheck,
   CheckCircle,
   XCircle,
-  User,
   Clock,
+  AlertTriangle,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
-import UserDetails from "./UserDetails";
 import api from "../../../lib/api";
-import Swal from "sweetalert2";
-
+import { Link } from "react-router-dom";
 
 const ManageUsers = () => {
   const [users, setUsers] = useState([]);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState("ALL");
-
-  useEffect(() => {
-    const fetchAllUsers = async () => {
-      setLoading(true);
-      const token = localStorage.getItem("token");
-      try {
-        const res = await api.get("/api/v1/users", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!res.data.success) {
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: res.data.message || "Something went wrong",
-          });
-          return null;
-        }
-
-        setUsers(res.data.data.users);
-        setSummary(res.data.data.summary);
-      } catch (error) {
-        console.error("Err In fetching users: ", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAllUsers();
-  }, []);
-
-  const filteredUsers = users.filter((user) => {
-    const matchesSearch =
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.roll.toLowerCase().includes(searchTerm.toLowerCase());
-
-    if (filterStatus === "ALL") return matchesSearch;
-    if (filterStatus === "VERIFIED")
-      return matchesSearch && user.isVerified === "VERIFIED";
-    if (filterStatus === "PENDING")
-      return matchesSearch && user.isVerified === "PENDING";
-    if (filterStatus === "SUSPENDED") return matchesSearch && user.isSuspended;
-
-    return matchesSearch;
+  const [summary, setSummary] = useState({});
+  const [pagination, setPagination] = useState({});
+  const [filters, setFilters] = useState({
+    search: "",
+    status: "ALL",
+    page: 1,
+    limit: 10,
+    sortBy: "createdAt",
+    sortOrder: "desc",
   });
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "VERIFIED":
-        return "text-green-600 bg-green-100";
-      case "PENDING":
-        return "text-yellow-600 bg-yellow-100";
-      case "UNVERIFIED":
-        return "text-red-600 bg-red-100";
-      default:
-        return "text-gray-600 bg-gray-100";
+  // Fetch users data
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get("/api/v1/users", {
+        params: filters,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      setUsers(response.data.data.users);
+      setSummary(response.data.data.summary);
+      setPagination(response.data.data.pagination);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const getSecurityScoreColor = (score) => {
-    switch (score) {
-      case "VERY_HIGH":
-        return "text-green-700 bg-green-200";
-      case "HIGH":
-        return "text-green-600 bg-green-100";
-      case "MID":
-        return "text-yellow-600 bg-yellow-100";
-      case "LOW":
-        return "text-orange-600 bg-orange-100";
-      case "VERY_LOW":
-        return "text-red-600 bg-red-100";
-      default:
-        return "text-gray-600 bg-gray-100";
-    }
+  useEffect(() => {
+    fetchUsers();
+  }, [filters]);
+
+  const handleFilterChange = (key, value) => {
+    setFilters((prev) => ({
+      ...prev,
+      [key]: value,
+      page: key !== "page" ? 1 : value,
+    }));
   };
 
-  if (selectedUser) {
+  const getStatusBadge = (status) => {
+    const badges = {
+      VERIFIED: { color: "bg-green-100 text-green-800", icon: CheckCircle },
+      PENDING: { color: "bg-yellow-100 text-yellow-800", icon: Clock },
+      UNVERIFIED: { color: "bg-gray-100 text-gray-800", icon: XCircle },
+      SUSPENDED: { color: "bg-red-100 text-red-800", icon: AlertTriangle },
+    };
+
+    const badge = badges[status] || badges.UNVERIFIED;
+    const Icon = badge.icon;
+
     return (
-      <UserDetails user={selectedUser} onBack={() => setSelectedUser(null)} />
+      <span
+        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${badge.color}`}
+      >
+        <Icon className="w-3 h-3 mr-1" />
+        {status}
+      </span>
     );
-  }
+  };
+
+  const StatCard = ({ title, value, icon: Icon, color }) => (
+    <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm font-medium text-gray-600">{title}</p>
+          <p className="text-2xl font-semibold text-gray-900">{value}</p>
+        </div>
+        <div className={`p-3 rounded-full ${color}`}>
+          <Icon className="w-6 h-6 text-white" />
+        </div>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto p-6">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             User Management
           </h1>
-          <p className="text-gray-600">
-            Manage and monitor all registered users
-          </p>
+          <p className="text-gray-600">Manage and monitor all platform users</p>
         </div>
 
-        {/* Summary Stats */}
-        <div className="mt-8 mb-6 grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center">
-              <User className="h-8 w-8 text-green-600" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total Users</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {summary?.totalUsers}
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center">
-              <CheckCircle className="h-8 w-8 text-green-600" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Verified</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {summary?.verified}
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center">
-              <Clock className="h-8 w-8 text-yellow-600" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Pending</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {summary?.pending}
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center">
-              <ShieldCheck className="h-8 w-8 text-blue-600" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">
-                  Brittoo Verified
-                </p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {summary?.brittooVerified}
-                </p>
-              </div>
-            </div>
-          </div>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <StatCard
+            title="Total Users"
+            value={summary.totalUsers || 0}
+            icon={Users}
+            color="bg-green-500"
+          />
+          <StatCard
+            title="Verified Users"
+            value={summary.verified || 0}
+            icon={CheckCircle}
+            color="bg-green-600"
+          />
+          <StatCard
+            title="Pending Verification"
+            value={summary.pending || 0}
+            icon={Clock}
+            color="bg-yellow-500"
+          />
+          <StatCard
+            title="Suspended Users"
+            value={summary.suspended || 0}
+            icon={AlertTriangle}
+            color="bg-red-500"
+          />
         </div>
 
-        {/* Filters and Search */}
+        {/* Filters */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
-              <input
-                type="text"
-                placeholder="Search by name, email, or roll number..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+              <div className="relative">
+                <Search className="w-5 h-5 absolute left-3 top-3 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search users..."
+                  value={filters.search}
+                  onChange={(e) => handleFilterChange("search", e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                />
+              </div>
             </div>
-            <select
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-            >
-              <option value="ALL">All Users</option>
-              <option value="VERIFIED">Verified</option>
-              <option value="PENDING">Pending</option>
-              <option value="SUSPENDED">Suspended</option>
-            </select>
+            <div className="flex gap-4">
+              <select
+                value={filters.status}
+                onChange={(e) => handleFilterChange("status", e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              >
+                <option value="ALL">All Status</option>
+                <option value="VERIFIED">Verified</option>
+                <option value="PENDING">Pending</option>
+                <option value="UNVERIFIED">Unverified</option>
+                <option value="SUSPENDED">Suspended</option>
+              </select>
+              <select
+                value={filters.limit}
+                onChange={(e) => handleFilterChange("limit", e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              >
+                <option value="10">10 per page</option>
+                <option value="25">25 per page</option>
+                <option value="50">50 per page</option>
+              </select>
+            </div>
           </div>
         </div>
 
         {/* Users Table */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          {loading ? (
-            <div className="p-8 text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto"></div>
-              <p className="mt-4 text-gray-600">Loading users...</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    User
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Role
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Joined
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {loading ? (
                   <tr>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      User
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Security Score
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Verification
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Join Date
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
+                    <td
+                      colSpan="5"
+                      className="px-6 py-4 text-center text-gray-500"
+                    >
+                      <div className="flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-500"></div>
+                        <span className="ml-2">Loading...</span>
+                      </div>
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredUsers.map((user) => (
+                ) : users.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan="5"
+                      className="px-6 py-4 text-center text-gray-500"
+                    >
+                      No users found
+                    </td>
+                  </tr>
+                ) : (
+                  users.map((user) => (
                     <tr key={user.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
@@ -234,81 +229,125 @@ const ManageUsers = () => {
                             </div>
                           </div>
                           <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900 flex items-center">
+                            <div className="text-sm font-medium text-gray-900">
                               {user.name}
-                              {user.brittooVerified && (
-                                <ShieldCheck className="h-4 w-4 text-blue-500 ml-1" />
-                              )}
                             </div>
                             <div className="text-sm text-gray-500">
                               {user.email}
                             </div>
-                            <div className="text-xs text-gray-400">
-                              {user.roll}
-                            </div>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
-                            user.isVerified,
-                          )}`}
-                        >
-                          {user.isVerified}
-                        </span>
-                        {user.isSuspended && (
-                          <div className="mt-1">
-                            <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-600">
-                              SUSPENDED
-                            </span>
-                          </div>
-                        )}
+                        {getStatusBadge(user.isVerified)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getSecurityScoreColor(
-                            user.securityScore,
-                          )}`}
-                        >
-                          {user.securityScore}
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          {user.role}
                         </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        <div className="flex items-center space-x-2">
-                          {user.emailVerified ? (
-                            <CheckCircle className="h-4 w-4 text-green-500" />
-                          ) : (
-                            <XCircle className="h-4 w-4 text-red-500" />
-                          )}
-                          <span className="text-xs">Email</span>
-                        </div>
-                        <div className="flex items-center space-x-2 mt-1">
-                          {user.selfie !== "absent" &&
-                          user.idCardFront !== "absent" ? (
-                            <CheckCircle className="h-4 w-4 text-green-500" />
-                          ) : (
-                            <XCircle className="h-4 w-4 text-red-500" />
-                          )}
-                          <span className="text-xs">Documents</span>
-                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {new Date(user.createdAt).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button
-                          onClick={() => setSelectedUser(user)}
-                          className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md text-xs font-medium flex items-center space-x-1 transition-colors"
+                        <Link to={`/dashboard/admin/user-details/${user.id}`}
+                          className="flex items-center text-[10px] border bg-green-500 text-white border-green-500 rounded-sm py-0.5 px-3 w-fit hover:bg-green-600"
                         >
-                          <Eye className="h-3 w-3" />
-                          <span>View Details</span>
-                        </button>
+                          <Eye className="w-4 h-4 mr-1" />
+                          View Details
+                        </Link>
                       </td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pagination */}
+          {pagination.totalPages > 1 && (
+            <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+              <div className="flex items-center justify-between">
+                <div className="flex-1 flex justify-between sm:hidden">
+                  <button
+                    onClick={() =>
+                      handleFilterChange("page", pagination.currentPage - 1)
+                    }
+                    disabled={pagination.currentPage === 1}
+                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    onClick={() =>
+                      handleFilterChange("page", pagination.currentPage + 1)
+                    }
+                    disabled={pagination.currentPage === pagination.totalPages}
+                    className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Next
+                  </button>
+                </div>
+                <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-sm text-gray-700">
+                      Showing{" "}
+                      <span className="font-medium">
+                        {(pagination.currentPage - 1) * pagination.limit + 1}
+                      </span>{" "}
+                      to{" "}
+                      <span className="font-medium">
+                        {Math.min(
+                          pagination.currentPage * pagination.limit,
+                          pagination.totalUsers,
+                        )}
+                      </span>{" "}
+                      of{" "}
+                      <span className="font-medium">
+                        {pagination.totalUsers}
+                      </span>{" "}
+                      results
+                    </p>
+                  </div>
+                  <div>
+                    <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                      <button
+                        onClick={() =>
+                          handleFilterChange("page", pagination.currentPage - 1)
+                        }
+                        disabled={pagination.currentPage === 1}
+                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <ChevronLeft className="h-5 w-5" />
+                      </button>
+                      {[...Array(pagination.totalPages)].map((_, i) => (
+                        <button
+                          key={i + 1}
+                          onClick={() => handleFilterChange("page", i + 1)}
+                          className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                            pagination.currentPage === i + 1
+                              ? "z-10 bg-green-50 border-green-500 text-green-600"
+                              : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
+                          }`}
+                        >
+                          {i + 1}
+                        </button>
+                      ))}
+                      <button
+                        onClick={() =>
+                          handleFilterChange("page", pagination.currentPage + 1)
+                        }
+                        disabled={
+                          pagination.currentPage === pagination.totalPages
+                        }
+                        className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <ChevronRight className="h-5 w-5" />
+                      </button>
+                    </nav>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </div>

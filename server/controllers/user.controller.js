@@ -109,16 +109,43 @@ export const getUserDetails = async (req, res) => {
           include: {
             bccTransactions: {
               orderBy: { createdAt: 'desc' },
-              take: 20, // Get recent transactions
+              take: 50,
             },
           },
         },
         bccTransactions: {
           orderBy: { createdAt: 'desc' },
-          take: 10,
+          take: 50,
         },
         redCacheCredits: {
           orderBy: { createdAt: 'desc' },
+          include: {
+            sourceProduct: {
+              select: {
+                id: true,
+                name: true,
+                productType: true,
+              },
+            },
+            rentalRequestUsages: {
+              include: {
+                rentalRequest: {
+                  select: {
+                    id: true,
+                    status: true,
+                    rentalStartDate: true,
+                    rentalEndDate: true,
+                    product: {
+                      select: {
+                        name: true,
+                        productType: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
         rentedOutProducts: {
           where: { deletedAt: null },
@@ -129,7 +156,10 @@ export const getUserDetails = async (req, res) => {
             productCondition: true,
             pricePerDay: true,
             isOnHold: true,
+            isRented: true,
+            isBrittooVerified: true,
             createdAt: true,
+            updatedAt: true,
             renters: {
               select: {
                 id: true,
@@ -162,12 +192,27 @@ export const getUserDetails = async (req, res) => {
             id: true,
             status: true,
             submissionDeadline: true,
+            rentalStartDate: true,
+            rentalEndDate: true,
+            totalDays: true,
+            usedBccAmount: true,
+            paidWithRcc: true,
+            paidWithBcc: true,
             createdAt: true,
+            updatedAt: true,
             product: {
               select: {
                 id: true,
                 name: true,
                 productType: true,
+                pricePerDay: true,
+                owner: {
+                  select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                  },
+                },
               },
             },
             owner: {
@@ -179,19 +224,27 @@ export const getUserDetails = async (req, res) => {
             },
           },
           orderBy: { createdAt: "desc" },
-          take: 10,
+          take: 50,
         },
         rentalRequestsReceived: {
           select: {
             id: true,
             status: true,
             submissionDeadline: true,
+            rentalStartDate: true,
+            rentalEndDate: true,
+            totalDays: true,
+            usedBccAmount: true,
+            paidWithRcc: true,
+            paidWithBcc: true,
             createdAt: true,
+            updatedAt: true,
             product: {
               select: {
                 id: true,
                 name: true,
                 productType: true,
+                pricePerDay: true,
               },
             },
             requester: {
@@ -203,7 +256,7 @@ export const getUserDetails = async (req, res) => {
             },
           },
           orderBy: { createdAt: "desc" },
-          take: 10,
+          take: 50,
         },
       },
     });
@@ -250,6 +303,41 @@ export const getUserDetails = async (req, res) => {
         .reduce((sum, t) => sum + t.amount, 0),
     };
 
+    // Calculate rental statistics
+    const rentalStats = {
+      totalRentalsCompleted: user.rentalRequestsMade.filter(
+        (r) => r.status === "PRODUCT_RETURNED_TO_OWNER"
+      ).length,
+      totalRentalsActive: user.rentalRequestsMade.filter(
+        (r) => ["PRODUCT_COLLECTED_BY_RENTER", "PRODUCT_SUBMITTED_BY_OWNER"].includes(r.status)
+      ).length,
+      totalRentalsCancelled: user.rentalRequestsMade.filter(
+        (r) => ["CANCELLED_BY_RENTER", "REJECTED_BY_OWNER", "REJECTED_FROM_BRITTOO"].includes(r.status)
+      ).length,
+      totalEarnings: user.rentalRequestsReceived
+        .filter((r) => r.status === "PRODUCT_RETURNED_TO_OWNER")
+        .reduce((sum, r) => sum + (r.totalDays * (r.product.pricePerDay || 0)), 0),
+      totalSpent: user.rentalRequestsMade
+        .filter((r) => r.status === "PRODUCT_RETURNED_TO_OWNER")
+        .reduce((sum, r) => sum + (r.totalDays * (r.product.pricePerDay || 0)), 0),
+    };
+
+    // Location info
+    const locationInfo = {
+      hasLocation: !!(user.latitude && user.longitude),
+      latitude: user.latitude ? parseFloat(user.latitude) : null,
+      longitude: user.longitude ? parseFloat(user.longitude) : null,
+      ipAddress: user.ipAddress,
+    };
+
+    // Document verification status
+    const documentStatus = {
+      hasSelfie: !!user.selfie,
+      hasIdCardFront: !!user.idCardFront,
+      hasIdCardBack: !!user.idCardBack,
+      documentsComplete: !!(user.selfie && user.idCardFront),
+    };
+
     res.json({
       success: true,
       data: {
@@ -257,6 +345,9 @@ export const getUserDetails = async (req, res) => {
         walletSummary,
         creditSummary,
         bccTransactionSummary,
+        rentalStats,
+        locationInfo,
+        documentStatus,
         stats: {
           totalProductsRented: user.rentedOutProducts.length,
           totalProductsBorrowed: user.borrowedProducts.length,
@@ -275,9 +366,140 @@ export const getUserDetails = async (req, res) => {
   }
 };
 
+// Verify User Controller
+export const verifyUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { 
+      verificationStatus, 
+      brittooVerified, 
+      securityScore, 
+      adminNote 
+    } = req.body;
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+        deletedAt: null,
+      },
+    });
+
+    if (!user) {
+      throw new CustomError("User not found", 404);
+    }
+
+    const updateData = {};
+    
+    if (verificationStatus) {
+      updateData.isVerified = verificationStatus;
+    }
+    
+    if (brittooVerified !== undefined) {
+      updateData.brittooVerified = brittooVerified;
+    }
+    
+    if (securityScore) {
+      updateData.securityScore = securityScore;
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: updateData,
+    });
+
+    console.log(`User ${userId} verification updated by admin:`, {
+      verificationStatus,
+      brittooVerified,
+      securityScore,
+      adminNote,
+      timestamp: new Date(),
+    });
+
+    res.json({
+      success: true,
+      message: "User verification status updated successfully",
+      data: {
+        user: updatedUser,
+      },
+    });
+  } catch (error) {
+    console.error("Verify user error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update user verification status",
+      error: error.message,
+    });
+  }
+};
+
+// Suspend User Controller
+export const suspendUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { 
+      isSuspended, 
+      suspensionReason, 
+      suspensionDuration 
+    } = req.body;
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+        deletedAt: null,
+      },
+    });
+
+    if (!user) {
+      throw new CustomError("User not found", 404);
+    }
+
+    const updateData = {
+      isSuspended,
+    };
+
+    if (isSuspended) {
+      updateData.suspensionCount = user.suspensionCount + 1;
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: updateData,
+    });
+
+    // Log the suspension action
+    console.log(`User ${userId} suspension updated by admin:`, {
+      isSuspended,
+      suspensionReason,
+      suspensionDuration,
+      previousSuspensionCount: user.suspensionCount,
+      newSuspensionCount: updatedUser.suspensionCount,
+      timestamp: new Date(),
+    });
+
+    res.json({
+      success: true,
+      message: isSuspended 
+        ? "User suspended successfully" 
+        : "User suspension lifted successfully",
+      data: {
+        user: updatedUser,
+      },
+    });
+  } catch (error) {
+    console.error("Suspend user error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update user suspension status",
+      error: error.message,
+    });
+  }
+};
+
+
+
 export const getUserCreditHistory = async (req, res, next) => {
   try {
-    const userId = req.params;
+    const {userId} = req.params;
 
     const [
       bccWallet,
