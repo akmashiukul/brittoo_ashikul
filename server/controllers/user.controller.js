@@ -274,3 +274,212 @@ export const getUserDetails = async (req, res) => {
     });
   }
 };
+
+export const getUserCreditHistory = async (req, res, next) => {
+  try {
+    const userId = req.params;
+
+    const [
+      bccWallet,
+      redCacheCredits,
+      bccTransactions,
+      pendingBccRequests,
+      rentalHistory,
+    ] = await Promise.all([
+      prisma.bccWallet.findUnique({
+        where: { userId },
+        select: {
+          id: true,
+          availableBalance: true,
+          lockedBalance: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      }),
+      prisma.redCacheCredit.findMany({
+        where: {
+          userId,
+          deletedAt: null,
+        },
+        include: {
+          sourceProduct: {
+            select: {
+              id: true,
+              name: true,
+              productSL: true,
+              productImages: true,
+              pricePerDay: true,
+            },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.bccTransaction.findMany({
+        where: {
+          userId,
+          deletedAt: null,
+        },
+        select: {
+          id: true,
+          amount: true,
+          rentalRequestId: true,
+          paymentGateway: true,
+          transactionId: true,
+          transactionType: true,
+          status: true,
+          refundTrxId: true,
+          rejectReason: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+        orderBy: { createdAt: "desc" },
+        take: 50,
+      }),
+      prisma.bccTransaction.findMany({
+        where: {
+          status: "PENDING",
+          transactionType: "PURCHASE_BCC",
+          deletedAt: null,
+        },
+        include: {
+          user: {
+            select: safeAuthUserSelect,
+          },
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      }),
+      prisma.rentalRequest.findMany({
+        where: {
+          requesterId: userId,
+          deletedAt: null,
+        },
+        include: {
+          product: {
+            select: {
+              id: true,
+              name: true,
+              pricePerDay: true,
+              productSL: true,
+              productImages: true,
+            },
+          },
+          rccUsageDetails: {
+            include: {
+              redCacheCredit: {
+                include: {
+                  sourceProduct: {
+                    select: {
+                      id: true,
+                      name: true,
+                      productSL: true,
+                      pricePerDay: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+        take: 20,
+      }),
+    ]);
+
+    const totalRccAmount = redCacheCredits.reduce(
+      (sum, rcc) => sum + rcc.amount,
+      0,
+    );
+    const totalRccInUse = redCacheCredits.reduce(
+      (sum, rcc) => sum + rcc.inUse,
+      0,
+    );
+    const availableRccAmount = totalRccAmount - totalRccInUse;
+
+    const totalBccSpent = bccTransactions
+      .filter(
+        (tx) =>
+          tx.transactionType === "RENT_DEPOSIT" && tx.status === "ACCEPTED",
+      )
+      .reduce((sum, tx) => sum + tx.amount, 0);
+
+    const totalBccPurchased = bccTransactions
+      .filter(
+        (tx) => tx.transactionType === "PURCHASE" && tx.status === "ACCEPTED",
+      )
+      .reduce((sum, tx) => sum + tx.amount, 0);
+
+    const completedRentals = rentalHistory.filter(
+      (rental) => rental.status === "PRODUCT_RETURNED_TO_OWNER",
+    ).length;
+
+    const totalRentalsValue = rentalHistory.reduce(
+      (sum, rental) => sum + (rental.usedBccAmount || 0),
+      0,
+    );
+
+    const rccUsageByProduct = {};
+    rentalHistory.forEach((rental) => {
+      rental.rccUsageDetails.forEach((usage) => {
+        const productId = usage.redCacheCredit.sourceProduct.id;
+        const productName = usage.redCacheCredit.sourceProduct.name;
+
+        if (!rccUsageByProduct[productId]) {
+          rccUsageByProduct[productId] = {
+            productName,
+            totalUsed: 0,
+            usageCount: 0,
+          };
+        }
+
+        rccUsageByProduct[productId].totalUsed += usage.usedAmount;
+        rccUsageByProduct[productId].usageCount += 1;
+      });
+    });
+
+    const dashboardData = {
+      bccWallet,
+      redCacheCredits,
+      bccTransactions,
+      rentalHistory,
+      summary: {
+        bcc: {
+          lockedBalance: bccWallet?.lockedBalance || 0,
+          availableBalance: bccWallet?.availableBalance,
+          totalPurchased: totalBccPurchased,
+          totalSpent: totalBccSpent,
+          pendingBccRequests,
+          totalPendingBcc: pendingBccRequests.reduce(
+            (sum, bcc) => sum + bcc.amount,
+            0,
+          ),
+        },
+        rcc: {
+          totalAmount: totalRccAmount,
+          totalInUse: totalRccInUse,
+          availableAmount: availableRccAmount,
+          totalCredits: redCacheCredits.length,
+          usageByProduct: rccUsageByProduct,
+        },
+        rentals: {
+          totalRentals: rentalHistory.length,
+          completedRentals,
+          totalValue: totalRentalsValue,
+          averageRentalValue:
+            rentalHistory.length > 0
+              ? totalRentalsValue / rentalHistory.length
+              : 0,
+        },
+      },
+    };
+
+    res.status(200).json({
+      success: true,
+      data: dashboardData,
+    });
+  } catch (error) {
+    console.error("Error fetching credit history:", error);
+    next(error);
+  }
+};

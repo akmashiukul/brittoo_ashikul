@@ -12,11 +12,12 @@ import {
 import api from "../../../lib/api";
 import BCC from "../../../components/CacheCreditCard/BCC";
 import RCC from "../../../components/CacheCreditCard/RCC";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Loader from "../../../components/shared/Loader";
 
 const MyCredits = () => {
   const [creditHistory, setCreditHistory] = useState(null);
+  const { userId } = useParams();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("overview");
@@ -25,7 +26,7 @@ const MyCredits = () => {
   useEffect(() => {
     const fetchCreditHistory = async () => {
       try {
-        const response = await api.get("/api/v1/user-dashboard/credits/credit-history", {
+        const response = await api.get(`/api/v1/users/admin/credit-history/${userId}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
@@ -44,7 +45,7 @@ const MyCredits = () => {
     };
 
     fetchCreditHistory();
-  }, []);
+  }, [userId]);
 
   const refetchData = () => {
     setLoading(true);
@@ -52,7 +53,7 @@ const MyCredits = () => {
     // Re-run the fetch effect
     const fetchCreditHistory = async () => {
       try {
-        const response = await api.get("/api/v1/user-dashboard/credits/credit-history", {
+        const response = await api.get(`/api/v1/users/admin/credit-history/${userId}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },

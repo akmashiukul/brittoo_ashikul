@@ -116,6 +116,56 @@ const ManageUsers = () => {
           </p>
         </div>
 
+        {/* Summary Stats */}
+        <div className="mt-8 mb-6 grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center">
+              <User className="h-8 w-8 text-green-600" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Total Users</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {summary?.totalUsers}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center">
+              <CheckCircle className="h-8 w-8 text-green-600" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Verified</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {summary?.verified}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center">
+              <Clock className="h-8 w-8 text-yellow-600" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Pending</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {summary?.pending}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center">
+              <ShieldCheck className="h-8 w-8 text-blue-600" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">
+                  Brittoo Verified
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {summary?.brittooVerified}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Filters and Search */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
           <div className="flex flex-col md:flex-row gap-4">
@@ -261,56 +311,6 @@ const ManageUsers = () => {
               </table>
             </div>
           )}
-        </div>
-
-        {/* Summary Stats */}
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center">
-              <User className="h-8 w-8 text-green-600" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total Users</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {summary?.totalUsers}
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center">
-              <CheckCircle className="h-8 w-8 text-green-600" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Verified</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {summary?.verified}
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center">
-              <Clock className="h-8 w-8 text-yellow-600" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Pending</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {summary?.pending}
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center">
-              <ShieldCheck className="h-8 w-8 text-blue-600" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">
-                  Brittoo Verified
-                </p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {summary?.brittooVerified}
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
