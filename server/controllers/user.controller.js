@@ -706,7 +706,7 @@ export const getUserCreditHistory = async (req, res, next) => {
   }
 };
 
-export const getUserPlacedRequests = async (req, res, next) => {
+export const getUserPlacedRequestsAdmin = async (req, res, next) => {
   try {
     const { userId } = req.params;
     const placedRequests = await prisma.rentalRequest.findMany({
@@ -752,7 +752,7 @@ export const getUserPlacedRequests = async (req, res, next) => {
   }
 };
 
-export const getUserRecievedRequests = async (req, res, next) => {
+export const getUserRecievedRequestsAdmin = async (req, res, next) => {
   try {
     const { userId } = req.params;
     const rentalRequests = await prisma.rentalRequest.findMany({

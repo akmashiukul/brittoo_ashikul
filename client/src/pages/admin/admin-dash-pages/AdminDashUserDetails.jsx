@@ -15,9 +15,11 @@ import {
   Wallet,
   Package,
   Star,
+  BoxIcon,
 } from "lucide-react";
 import api from "../../../lib/api";
 import UserCreditDetails from "./UserCreditDetails";
+import UserPlacedRequests from "./UserPlacedRequests";
 
 const AdminDashUserDetails = () => {
   const { userId } = useParams();
@@ -138,7 +140,8 @@ const AdminDashUserDetails = () => {
     { id: "overview", label: "Overview", icon: User },
     { id: "documents", label: "Documents", icon: FileText },
     { id: "security", label: "Security", icon: Shield },
-    { id: "rentals", label: "Rental History", icon: History },
+    { id: "placed-requests", label: "Placed Requests", icon: History },
+    { id: "recieved-requests", label: "Recieved Requests", icon: BoxIcon },
     { id: "credits", label: "Credit History", icon: CreditCard },
   ];
 
@@ -168,7 +171,6 @@ const AdminDashUserDetails = () => {
     user,
     walletSummary,
     creditSummary,
-    rentalStats,
     locationInfo,
     documentStatus,
     stats,
@@ -625,7 +627,12 @@ const AdminDashUserDetails = () => {
               </div>
             )}
 
-            {activeTab === "rentals" && <div></div>}
+            {activeTab === "placed-requests" && <div>
+              <UserPlacedRequests userId={userId} />
+              </div>}
+            {activeTab === "recieved-requests" && <div>
+              
+              </div>}
 
             {activeTab === "credits" && (
               <div>
