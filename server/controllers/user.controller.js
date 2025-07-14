@@ -95,6 +95,7 @@ export const getAllUsers = async (req, res, next) => {
   }
 };
 
+
 export const getUserDetails = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -366,7 +367,7 @@ export const getUserDetails = async (req, res) => {
   }
 };
 
-// Verify User Controller
+
 export const verifyUser = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -432,7 +433,7 @@ export const verifyUser = async (req, res) => {
   }
 };
 
-// Suspend User Controller
+
 export const suspendUser = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -494,7 +495,6 @@ export const suspendUser = async (req, res) => {
     });
   }
 };
-
 
 
 export const getUserCreditHistory = async (req, res, next) => {
@@ -702,6 +702,101 @@ export const getUserCreditHistory = async (req, res, next) => {
     });
   } catch (error) {
     console.error("Error fetching credit history:", error);
+    next(error);
+  }
+};
+
+export const getUserPlacedRequests = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const placedRequests = await prisma.rentalRequest.findMany({
+      where: {
+        requesterId: userId,
+        deletedAt: null,
+      },
+      include: {
+        product: {
+          select: {
+            id: true,
+            name: true,
+            productImages: true,
+            pricePerDay: true,
+            productType: true,
+            productCondition: true,
+            ownerId: true,
+          },
+        },
+        owner: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phoneNumber: true,
+            securityScore: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      data: placedRequests,
+      message: "Placed requests fetched successfully",
+    });
+  } catch (error) {
+    console.error("Error fetching placed requests:", error);
+    next(error);
+  }
+};
+
+export const getUserRecievedRequests = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const rentalRequests = await prisma.rentalRequest.findMany({
+      where: {
+        ownerId: userId,
+        deletedAt: null,
+      },
+      include: {
+        product: {
+          select: {
+            id: true,
+            name: true,
+            productImages: true,
+            pricePerDay: true,
+            productType: true,
+            productCondition: true,
+            omv: true,
+          },
+        },
+        requester: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phoneNumber: true,
+            securityScore: true,
+            emailVerified: true,
+            isVerified: true,
+            brittooVerified: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      data: rentalRequests,
+      message: "Rental requests fetched successfully",
+    });
+  } catch (error) {
+    console.error("Error fetching rental requests:", error);
     next(error);
   }
 };

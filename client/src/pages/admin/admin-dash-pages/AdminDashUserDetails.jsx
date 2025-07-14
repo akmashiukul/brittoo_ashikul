@@ -8,23 +8,13 @@ import {
   FileText,
   History,
   CreditCard,
-  Clock,
   CheckCircle,
   XCircle,
-  AlertTriangle,
-  Eye,
   UserCheck,
   UserX,
   Wallet,
-  TrendingUp,
-  TrendingDown,
-  Calendar,
   Package,
   Star,
-  Phone,
-  Mail,
-  Home,
-  Globe,
 } from "lucide-react";
 import api from "../../../lib/api";
 import UserCreditDetails from "./UserCreditDetails";
@@ -117,14 +107,30 @@ const AdminDashUserDetails = () => {
         return "text-gray-600 bg-gray-100";
     }
   };
+  const getSecurityScorePercentage = (score) => {
+    switch (score) {
+      case "VERY_HIGH":
+        return 1;
+      case "HIGH":
+        return 0.8;
+      case "MID":
+        return 0.7;
+      case "LOW":
+        return 0.5;
+      case "VERY_LOW":
+        return 0.3;
+      default:
+        return 0.2;
+    }
+  };
 
   const getVerificationScore = () => {
     if (!userData) return 0;
     let score = 0;
     if (userData.documentStatus.hasSelfie) score += 35;
     if (userData.documentStatus.hasIdCardFront) score += 40;
-    if (userData.locationInfo.hasLocation) score += 15;
-    if (userData.user.phoneVerified) score += 10;
+    if (userData.locationInfo.hasLocation) score += 25;
+    score = score * getSecurityScorePercentage(userData.user.securityScore);
     return score;
   };
 
@@ -268,9 +274,16 @@ const AdminDashUserDetails = () => {
               <Shield className="h-8 w-8 text-purple-600" />
               <div>
                 <p className="text-sm text-gray-600">Security Score</p>
-                <p className="text-xl font-bold text-gray-900">
+                <span className="text-xl font-bold">
                   {getVerificationScore()}%
-                </p>
+                  <span
+                    className={`text-sm ml-2 ${getSecurityScoreColor(
+                      user.securityScore,
+                    )}`}
+                  >
+                    ({user.securityScore})
+                  </span>
+                </span>
               </div>
             </div>
           </div>
@@ -513,8 +526,15 @@ const AdminDashUserDetails = () => {
                     <span className="text-lg font-medium">
                       Overall Security Score
                     </span>
-                    <span className="text-2xl font-bold text-green-600">
+                    <span className="text-2xl font-bold">
                       {getVerificationScore()}%
+                      <span
+                        className={`text-sm ml-2 ${getSecurityScoreColor(
+                          user.securityScore,
+                        )}`}
+                      >
+                        ({user.securityScore})
+                      </span>
                     </span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
@@ -605,11 +625,7 @@ const AdminDashUserDetails = () => {
               </div>
             )}
 
-            {activeTab === "rentals" && (
-              <div>
-
-              </div>
-            )}
+            {activeTab === "rentals" && <div></div>}
 
             {activeTab === "credits" && (
               <div>
