@@ -95,7 +95,6 @@ export const getAllUsers = async (req, res, next) => {
   }
 };
 
-
 export const getUserDetails = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -109,17 +108,17 @@ export const getUserDetails = async (req, res) => {
         bccWallet: {
           include: {
             bccTransactions: {
-              orderBy: { createdAt: 'desc' },
+              orderBy: { createdAt: "desc" },
               take: 50,
             },
           },
         },
         bccTransactions: {
-          orderBy: { createdAt: 'desc' },
+          orderBy: { createdAt: "desc" },
           take: 50,
         },
         redCacheCredits: {
-          orderBy: { createdAt: 'desc' },
+          orderBy: { createdAt: "desc" },
           include: {
             sourceProduct: {
               select: {
@@ -270,7 +269,9 @@ export const getUserDetails = async (req, res) => {
     const walletSummary = {
       availableBalance: user.bccWallet?.availableBalance || 0,
       lockedBalance: user.bccWallet?.lockedBalance || 0,
-      totalBalance: (user.bccWallet?.availableBalance || 0) + (user.bccWallet?.lockedBalance || 0),
+      totalBalance:
+        (user.bccWallet?.availableBalance || 0) +
+        (user.bccWallet?.lockedBalance || 0),
     };
 
     const creditSummary = {
@@ -291,10 +292,16 @@ export const getUserDetails = async (req, res) => {
     // Calculate BCC transaction summary
     const bccTransactionSummary = {
       totalDeposits: user.bccTransactions
-        .filter((t) => t.transactionType === "PURCHASE_BCC" && t.status === "ACCEPTED")
+        .filter(
+          (t) =>
+            t.transactionType === "PURCHASE_BCC" && t.status === "ACCEPTED",
+        )
         .reduce((sum, t) => sum + t.amount, 0),
       totalWithdrawals: user.bccTransactions
-        .filter((t) => t.transactionType === "MONEY_WITHDRAWAL" && t.status === "ACCEPTED")
+        .filter(
+          (t) =>
+            t.transactionType === "MONEY_WITHDRAWAL" && t.status === "ACCEPTED",
+        )
         .reduce((sum, t) => sum + t.amount, 0),
       pendingTransactions: user.bccTransactions
         .filter((t) => t.status === "PENDING")
@@ -307,20 +314,32 @@ export const getUserDetails = async (req, res) => {
     // Calculate rental statistics
     const rentalStats = {
       totalRentalsCompleted: user.rentalRequestsMade.filter(
-        (r) => r.status === "PRODUCT_RETURNED_TO_OWNER"
+        (r) => r.status === "PRODUCT_RETURNED_TO_OWNER",
       ).length,
-      totalRentalsActive: user.rentalRequestsMade.filter(
-        (r) => ["PRODUCT_COLLECTED_BY_RENTER", "PRODUCT_SUBMITTED_BY_OWNER"].includes(r.status)
+      totalRentalsActive: user.rentalRequestsMade.filter((r) =>
+        ["PRODUCT_COLLECTED_BY_RENTER", "PRODUCT_SUBMITTED_BY_OWNER"].includes(
+          r.status,
+        ),
       ).length,
-      totalRentalsCancelled: user.rentalRequestsMade.filter(
-        (r) => ["CANCELLED_BY_RENTER", "REJECTED_BY_OWNER", "REJECTED_FROM_BRITTOO"].includes(r.status)
+      totalRentalsCancelled: user.rentalRequestsMade.filter((r) =>
+        [
+          "CANCELLED_BY_RENTER",
+          "REJECTED_BY_OWNER",
+          "REJECTED_FROM_BRITTOO",
+        ].includes(r.status),
       ).length,
       totalEarnings: user.rentalRequestsReceived
         .filter((r) => r.status === "PRODUCT_RETURNED_TO_OWNER")
-        .reduce((sum, r) => sum + (r.totalDays * (r.product.pricePerDay || 0)), 0),
+        .reduce(
+          (sum, r) => sum + r.totalDays * (r.product.pricePerDay || 0),
+          0,
+        ),
       totalSpent: user.rentalRequestsMade
         .filter((r) => r.status === "PRODUCT_RETURNED_TO_OWNER")
-        .reduce((sum, r) => sum + (r.totalDays * (r.product.pricePerDay || 0)), 0),
+        .reduce(
+          (sum, r) => sum + r.totalDays * (r.product.pricePerDay || 0),
+          0,
+        ),
     };
 
     // Location info
@@ -367,55 +386,27 @@ export const getUserDetails = async (req, res) => {
   }
 };
 
-
-export const verifyUser = async (req, res) => {
+export const verifyUser = async (req, res, next) => {
   try {
     const { userId } = req.params;
-    const { 
-      verificationStatus, 
-      brittooVerified, 
-      securityScore, 
-      adminNote 
-    } = req.body;
-
     const user = await prisma.user.findUnique({
       where: {
         id: userId,
         deletedAt: null,
       },
     });
-
     if (!user) {
       throw new CustomError("User not found", 404);
     }
-
-    const updateData = {};
-    
-    if (verificationStatus) {
-      updateData.isVerified = verificationStatus;
+    if (user.isVerified === "VERIFIED") {
+      throw new CustomError("User is already verified", 400);
     }
-    
-    if (brittooVerified !== undefined) {
-      updateData.brittooVerified = brittooVerified;
-    }
-    
-    if (securityScore) {
-      updateData.securityScore = securityScore;
-    }
-
     const updatedUser = await prisma.user.update({
       where: { id: userId },
-      data: updateData,
+      data: {
+        isVerified: "VERIFIED",
+      },
     });
-
-    console.log(`User ${userId} verification updated by admin:`, {
-      verificationStatus,
-      brittooVerified,
-      securityScore,
-      adminNote,
-      timestamp: new Date(),
-    });
-
     res.json({
       success: true,
       message: "User verification status updated successfully",
@@ -425,23 +416,13 @@ export const verifyUser = async (req, res) => {
     });
   } catch (error) {
     console.error("Verify user error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to update user verification status",
-      error: error.message,
-    });
+    next(error);
   }
 };
 
-
-export const suspendUser = async (req, res) => {
+export const suspendUser = async (req, res, next) => {
   try {
     const { userId } = req.params;
-    const { 
-      isSuspended, 
-      suspensionReason, 
-      suspensionDuration 
-    } = req.body;
 
     const user = await prisma.user.findUnique({
       where: {
@@ -449,57 +430,40 @@ export const suspendUser = async (req, res) => {
         deletedAt: null,
       },
     });
-
     if (!user) {
       throw new CustomError("User not found", 404);
     }
-
-    const updateData = {
-      isSuspended,
-    };
-
-    if (isSuspended) {
-      updateData.suspensionCount = user.suspensionCount + 1;
+    let updatedUser;
+    if (user.isSuspended) {
+      updatedUser = await prisma.user.update({
+        data: {
+          suspensionCount: user.suspensionCount + 1,
+        },
+      });
+    } else {
+      updatedUser = await prisma.user.update({
+        where: { id: userId },
+        data: {
+          isSuspended: true,
+          suspensionCount: 1,
+        },
+      });
     }
-
-    const updatedUser = await prisma.user.update({
-      where: { id: userId },
-      data: updateData,
-    });
-
-    // Log the suspension action
-    console.log(`User ${userId} suspension updated by admin:`, {
-      isSuspended,
-      suspensionReason,
-      suspensionDuration,
-      previousSuspensionCount: user.suspensionCount,
-      newSuspensionCount: updatedUser.suspensionCount,
-      timestamp: new Date(),
-    });
 
     res.json({
       success: true,
-      message: isSuspended 
-        ? "User suspended successfully" 
-        : "User suspension lifted successfully",
-      data: {
-        user: updatedUser,
-      },
+      message: "User suspended successfully",
+      data: updatedUser,
     });
   } catch (error) {
     console.error("Suspend user error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to update user suspension status",
-      error: error.message,
-    });
+    next(error);
   }
 };
 
-
 export const getUserCreditHistory = async (req, res, next) => {
   try {
-    const {userId} = req.params;
+    const { userId } = req.params;
 
     const [
       bccWallet,

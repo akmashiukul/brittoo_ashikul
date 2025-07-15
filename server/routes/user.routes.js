@@ -7,6 +7,8 @@ import {
   getUserDetails,
   getUserPlacedRequestsAdmin,
   getUserRecievedRequestsAdmin,
+  suspendUser,
+  verifyUser,
 } from "../controllers/user.controller.js";
 const router = express.Router();
 
@@ -24,6 +26,15 @@ router.get(
   adminMiddleware,
   getUserPlacedRequestsAdmin,
 );
-router.get("/recieved-requests/:userId", verifyToken, adminMiddleware, getUserRecievedRequestsAdmin);
+router.get(
+  "/recieved-requests/:userId",
+  verifyToken,
+  adminMiddleware,
+  getUserRecievedRequestsAdmin,
+);
+
+// User states controlls
+router.put("/verify/:userId", verifyToken, adminMiddleware, verifyUser);
+router.put("/suspend/:userId", verifyToken, adminMiddleware, suspendUser);
 
 export default router;

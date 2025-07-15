@@ -152,6 +152,13 @@ const PlacedRequests = () => {
         });
       }
 
+      Swal.fire({
+        icon: 'success',
+        title: "Success",
+        text: "request cancelled successfully"
+      });
+      setCancellingRequest(null);
+
       setRequests((prev) =>
         prev.map((req) =>
           req.id === cancellingRequest

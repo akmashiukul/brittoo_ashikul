@@ -280,7 +280,6 @@ model RentalRequest {
   bccWallet       BccWallet?       @relation(fields: [bccWalletId], references: [id])
   bccTransactions BccTransaction[]
 
-  @@unique([productId, requesterId, status])
   @@index([ownerId, status])
   @@index([productId, status])
   @@map("rental_requests")

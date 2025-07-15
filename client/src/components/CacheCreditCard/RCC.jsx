@@ -8,7 +8,7 @@ const RCC = ({ rcc, handleSelect, selectedRCCs, inRRModal = false }) => {
       className={`text-black w-[185px]  p-3 rounded-xl hover:scale-105 cursor-pointer transition duration-300 shadow-md ${
         selectedRcc && !inRRModal
           ? "bg-red-100 border-[2px] border-red-700"
-          : "bg-gradient-to-r from-red-400 to-red-100"
+          : "bg-gradient-to-l from-red-400 to-red-100"
       }`}
     >
       <div className="flex justify-between">

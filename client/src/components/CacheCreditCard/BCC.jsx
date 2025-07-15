@@ -7,7 +7,7 @@ const BCC = ({ bccWallet, handleSelect, selectedBcc, inRRModal }) => {
       className={`text-black w-[185px]  p-3 rounded-xl hover:scale-105 cursor-pointer transition duration-300 shadow-md ${
         selectedBcc > 0 && !inRRModal
           ? "bg-blue-100 border-[3px] border-blue-700"
-          : "bg-gradient-to-r from-blue-400 to-blue-100"
+          : "bg-gradient-to-l from-blue-400 to-blue-100"
       }`}
     >
       <div>
