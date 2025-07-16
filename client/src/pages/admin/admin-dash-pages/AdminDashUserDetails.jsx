@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import axios from "axios";
 import {
   User,
   MapPin,
@@ -21,6 +20,8 @@ import api from "../../../lib/api";
 import UserCreditDetails from "./UserCreditDetails";
 import UserPlacedRequests from "./UserPlacedRequests";
 import UserRecievedRequests from "./UserRecievedRequests";
+import Loader from "../../../components/shared/Loader";
+import Swal from "sweetalert2";
 
 const AdminDashUserDetails = () => {
   const { userId } = useParams();
@@ -36,6 +37,7 @@ const AdminDashUserDetails = () => {
 
   const fetchUserDetails = async () => {
     try {
+      setLoading(true);
       const response = await api.get(`/api/v1/users/${userId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -52,11 +54,19 @@ const AdminDashUserDetails = () => {
   const handleVerifyUser = async () => {
     setActionLoading(true);
     try {
-      await api.put(`/api/v1/users/${userId}/verify`, {
+      const response = await api.put(`/api/v1/users/verify/${userId}`, {}, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
+      if (!response.data.success) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Error in verifying user."
+        });
+        return;
+      }
       fetchUserDetails();
     } catch (error) {
       console.error("Error verifying user:", error);
@@ -68,11 +78,19 @@ const AdminDashUserDetails = () => {
   const handleSuspendUser = async () => {
     setActionLoading(true);
     try {
-      await axios.put(`/api/v1/users/${userId}/suspend`, {
+      const response = await api.put(`/api/v1/users/suspend/${userId}`, {}, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
+      if (!response.data.success) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Error in suspending user."
+        });
+        return;
+      }
       fetchUserDetails();
     } catch (error) {
       console.error("Error suspending user:", error);
@@ -148,12 +166,7 @@ const AdminDashUserDetails = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading user details...</p>
-        </div>
-      </div>
+      <Loader />
     );
   }
 
@@ -191,48 +204,46 @@ const AdminDashUserDetails = () => {
           </Link>
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center">
-                <User className="h-8 w-8 text-green-600" />
+              <div className="h-14 w-14 rounded-full bg-green-100 flex items-center justify-center">
+                <User className="h-6 w-6 text-green-600" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 flex items-center">
+                <h1 className="text-2xl font-bold text-gray-900 flex items-center">
                   {user.name}
                   {user.brittooVerified && (
                     <ShieldCheck className="h-6 w-6 text-blue-500 ml-2" />
                   )}
                 </h1>
-                <p className="text-gray-600">
+                <p className="text-gray-600 text-sm">
                   {user.email} • {user.roll}
                 </p>
               </div>
             </div>
             <div className="flex space-x-3">
-              {user.isVerified === "PENDING" && (
+              {user.isVerified !== "VERIFIED" && (
                 <button
                   onClick={handleVerifyUser}
                   disabled={actionLoading}
-                  className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+                  className="flex items-center space-x-2 px-4 py-2 text-xs cursor-pointer hover:shadow-sm bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
                 >
                   <UserCheck className="h-4 w-4" />
                   <span>Verify User</span>
                 </button>
               )}
-              {!user.brittooVerified && (
-                <div className="flex space-x-3">
-                  <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center space-x-2">
-                    <Shield className="h-4 w-4" />
-                    <span>Brittoo Verify</span>
-                  </button>
-                  <button
-                    onClick={handleSuspendUser}
-                    disabled={actionLoading}
-                    className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
-                  >
-                    <UserX className="h-4 w-4" />
-                    <span>Suspend User</span>
-                  </button>
-                </div>
-              )}
+              <div className="flex space-x-3">
+                <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-xs cursor-pointer hover:shadow-sm rounded-lg flex items-center space-x-2">
+                  <Shield className="h-4 w-4" />
+                  <span>Brittoo Verify</span>
+                </button>
+                <button
+                  onClick={handleSuspendUser}
+                  disabled={actionLoading}
+                  className="flex items-center space-x-2 px-4 py-2 text-xs cursor-pointer hover:shadow-sm bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
+                >
+                  <UserX className="h-4 w-4" />
+                  <span>Suspend User</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -244,7 +255,7 @@ const AdminDashUserDetails = () => {
               <Wallet className="h-8 w-8 text-green-600" />
               <div>
                 <p className="text-sm text-gray-600">Total Balance</p>
-                <p className="text-xl font-bold text-gray-900">
+                <p className="text-xl font-bold text-gray-600 mt-0.5">
                   {walletSummary.totalBalance} BCC
                 </p>
               </div>
@@ -255,7 +266,7 @@ const AdminDashUserDetails = () => {
               <Star className="h-8 w-8 text-yellow-600" />
               <div>
                 <p className="text-sm text-gray-600">Red Credits</p>
-                <p className="text-xl font-bold text-gray-900">
+                <p className="text-xl font-bold text-gray-600 mt-0.5">
                   {creditSummary.availableRedCredits}
                 </p>
               </div>
@@ -266,7 +277,7 @@ const AdminDashUserDetails = () => {
               <Package className="h-8 w-8 text-blue-600" />
               <div>
                 <p className="text-sm text-gray-600">Products Rented</p>
-                <p className="text-xl font-bold text-gray-900">
+                <p className="text-xl font-bold text-gray-600 mt-0.5">
                   {stats.totalProductsRented}
                 </p>
               </div>
@@ -277,7 +288,7 @@ const AdminDashUserDetails = () => {
               <Shield className="h-8 w-8 text-purple-600" />
               <div>
                 <p className="text-sm text-gray-600">Security Score</p>
-                <span className="text-xl font-bold">
+                <span className="text-xl font-bold text-gray-600 mt-0.5">
                   {getVerificationScore()}%
                   <span
                     className={`text-sm ml-2 ${getSecurityScoreColor(
@@ -326,11 +337,11 @@ const AdminDashUserDetails = () => {
                     User Information
                   </h3>
                   <div className="space-y-3">
-                    <div className="flex justify-between">
+                    <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Role:</span>
                       <span className="font-medium">{user.role}</span>
                     </div>
-                    <div className="flex justify-between">
+                    <div className="flex justify-between text-sm">
                       <span className="text-gray-600">
                         Verification Status:
                       </span>
@@ -342,7 +353,7 @@ const AdminDashUserDetails = () => {
                         {user.isVerified}
                       </span>
                     </div>
-                    <div className="flex justify-between">
+                    <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Security Score:</span>
                       <span
                         className={`px-2 py-1 text-xs font-semibold rounded-full ${getSecurityScoreColor(
@@ -352,7 +363,7 @@ const AdminDashUserDetails = () => {
                         {user.securityScore}
                       </span>
                     </div>
-                    <div className="flex justify-between">
+                    <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Email Verified:</span>
                       <span
                         className={
@@ -362,7 +373,7 @@ const AdminDashUserDetails = () => {
                         {user.emailVerified ? "Yes" : "No"}
                       </span>
                     </div>
-                    <div className="flex justify-between">
+                    <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Brittoo Verified:</span>
                       <span
                         className={
@@ -374,7 +385,7 @@ const AdminDashUserDetails = () => {
                         {user.brittooVerified ? "Yes" : "No"}
                       </span>
                     </div>
-                    <div className="flex justify-between">
+                    <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Account Status:</span>
                       <span
                         className={
@@ -384,7 +395,7 @@ const AdminDashUserDetails = () => {
                         {user.isSuspended ? "Suspended" : "Active"}
                       </span>
                     </div>
-                    <div className="flex justify-between">
+                    <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Join Date:</span>
                       <span className="font-medium">
                         {new Date(user.createdAt).toLocaleDateString()}
@@ -400,19 +411,19 @@ const AdminDashUserDetails = () => {
                     Location & Network
                   </h3>
                   <div className="space-y-3">
-                    <div className="flex justify-between">
+                    <div className="flex justify-between text-sm">
                       <span className="text-gray-600">IP Address:</span>
                       <span className="font-mono text-sm">
                         {user.ipAddress || "N/A"}
                       </span>
                     </div>
-                    <div className="flex justify-between">
+                    <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Latitude:</span>
                       <span className="font-mono text-sm">
                         {user.latitude || "N/A"}
                       </span>
                     </div>
-                    <div className="flex justify-between">
+                    <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Longitude:</span>
                       <span className="font-mono text-sm">
                         {user.longitude || "N/A"}
@@ -628,12 +639,16 @@ const AdminDashUserDetails = () => {
               </div>
             )}
 
-            {activeTab === "placed-requests" && <div>
-              <UserPlacedRequests userId={userId} />
-              </div>}
-            {activeTab === "recieved-requests" && <div>
-              <UserRecievedRequests userId={userId} />
-              </div>}
+            {activeTab === "placed-requests" && (
+              <div>
+                <UserPlacedRequests userId={userId} />
+              </div>
+            )}
+            {activeTab === "recieved-requests" && (
+              <div>
+                <UserRecievedRequests userId={userId} />
+              </div>
+            )}
 
             {activeTab === "credits" && (
               <div>

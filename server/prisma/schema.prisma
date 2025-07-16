@@ -31,9 +31,10 @@ model User {
   otpSentCount    Int       @default(0) @map("otp_sent_count")
   lastOtpSentDate DateTime? @map("last_otp_sent_date")
 
-  securityScore   SecurityScore @default(MID) @map("security_score")
-  isSuspended     Boolean       @default(false) @map("is_suspended")
-  suspensionCount Int           @default(0) @map("suspension_count")
+  securityScore     SecurityScore @default(MID) @map("security_score")
+  isSuspended       Boolean       @default(false) @map("is_suspended")
+  suspensionCount   Int           @default(0) @map("suspension_count")
+  suspensionReasons String[]      @default([]) @map("suspension_reason")
 
   bccTransactions BccTransaction[]
   bccWallet       BccWallet?
@@ -54,6 +55,10 @@ model User {
   @@unique([phoneNumber, deletedAt])
   @@index([latitude, longitude])
   @@map("users")
+}
+
+model SuspensionReason {
+  id String @id @default(cuid()) @map("id")
 }
 
 enum VerifyStatus {

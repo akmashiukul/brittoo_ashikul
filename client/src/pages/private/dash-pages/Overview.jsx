@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import {Link}  from 'react-router-dom'
+import { Link } from "react-router-dom";
 import {
   User,
   Shield,
@@ -165,11 +165,20 @@ const Overview = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* User Profile Card */}
         <div className="bg-white rounded-lg border border-gray-200/70 p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <User className="w-5 h-5 text-green-600" />
-            <h2 className="text-lg font-semibold text-gray-900">
-              Profile Status
-            </h2>
+          <div className="flex items-center justify-between gap-2 mb-8">
+            <div className="flex items-center gap-3">
+              <User className="w-5 h-5 text-green-600" />
+              <h2 className="text-lg font-semibold text-gray-900">
+                Profile Status
+              </h2>
+            </div>
+            {userData?.user.isVerified === "UNVERIFIED" && (
+              <Link to={"/verify-user"}>
+                <p className="text-green-500 underline text-sm">
+                  Verify yourself
+                </p>
+              </Link>
+            )}
           </div>
 
           <div className="space-y-4">
@@ -186,23 +195,11 @@ const Overview = () => {
             </div>
 
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Account Status</span>
+              <span className="text-sm text-gray-600">Verification Status</span>
               <div className="flex items-center gap-2">
                 {getVerificationBadge(userData.user.isVerified)}
                 <span className="text-sm font-medium capitalize">
                   {userData.user.isVerified.toLowerCase()}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Brittoo Verified</span>
-              <div className="flex items-center gap-2">
-                {getVerificationBadge(
-                  userData.user.brittooVerified ? "VERIFIED" : "UNVERIFIED",
-                )}
-                <span className="text-sm font-medium">
-                  {userData.user.brittooVerified ? "Verified" : "Unverified"}
                 </span>
               </div>
             </div>
@@ -215,6 +212,12 @@ const Overview = () => {
                 )}`}
               >
                 {userData.user.securityScore.replace("_", " ")}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Suspension Count</span>
+              <span className={`px-2 py-1 rounded-full text-xs font-medium`}>
+                {userData.user.suspensionCount}
               </span>
             </div>
           </div>
@@ -261,13 +264,22 @@ const Overview = () => {
           </div>
 
           <div className="flex flex-col gap-3 text-center">
-            <Link to={'/dashboard/list-items'} className="w-full bg-green-50 hover:bg-green-100 text-green-700 py-3 px-4 rounded-lg transition-colors text-sm font-medium">
+            <Link
+              to={"/dashboard/list-items"}
+              className="w-full bg-green-50 hover:bg-green-100 text-green-700 py-3 px-4 rounded-lg transition-colors text-sm font-medium"
+            >
               List New Product
             </Link>
-            <Link to={'/browse'} className="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 py-3 px-4 rounded-lg transition-colors text-sm font-medium">
+            <Link
+              to={"/browse"}
+              className="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 py-3 px-4 rounded-lg transition-colors text-sm font-medium"
+            >
               Browse Products
             </Link>
-            <Link to={'/buy-credits'} className="w-full bg-purple-50 hover:bg-purple-100 text-purple-700 py-3 px-4 rounded-lg transition-colors text-sm font-medium">
+            <Link
+              to={"/buy-credits"}
+              className="w-full bg-purple-50 hover:bg-purple-100 text-purple-700 py-3 px-4 rounded-lg transition-colors text-sm font-medium"
+            >
               Buy Credits
             </Link>
           </div>

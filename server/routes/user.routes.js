@@ -33,7 +33,7 @@ router.get(
   getUserRecievedRequestsAdmin,
 );
 
-// User states controlls
+// User states controll
 router.put("/verify/:userId", verifyToken, adminMiddleware, verifyUser);
 router.put("/suspend/:userId", verifyToken, adminMiddleware, suspendUser);
 
