@@ -56,7 +56,10 @@ export const createWithdrawalRequest = async (req, res, next) => {
     res.status(201).json({
       success: true,
       message: "Withdrawal request placed successfully. Waiting for approval.",
-      data: result.withdrawalRequest,
+      data: {
+        updatedWallet: result.updatedWallet,
+        withdrawalRequest: result.withdrawalRequest
+      },
     });
   } catch (error) {
     console.error("Error in createWithdrawalRequest controller: ", error);

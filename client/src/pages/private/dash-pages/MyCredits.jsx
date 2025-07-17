@@ -379,10 +379,19 @@ const MyCredits = () => {
                 <button
                   onClick={() =>
                     openRequestWithdrawalModal(
-                      creditHistory?.bccWallet || {
-                        availableBalance: 0,
-                        lockedBalance: 0,
-                      },
+                      creditHistory?.bccWallet
+                        ? {
+                            bccWallet: creditHistory.bccWallet,
+                            setCreditHistory,
+                            creditHistory
+                          }
+                        : {
+                            bccWallet: {
+                              availableBalance: 0,
+                              lockedBalance: 0,
+                            },
+                            setCreditHistory,
+                          },
                     )
                   }
                   className="py-1 px-3 md:py-2 md:px-4 text-xs md:text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 hover:shadow-md cursor-pointer flex gap-1 items-center"

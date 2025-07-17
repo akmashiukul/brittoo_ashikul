@@ -12,12 +12,14 @@ const RequestWithdrawalModal = () => {
   const {
     isRequestWithdrawalModalOpen,
     closeRequestWithdrawalModal,
-    bccWallet,
+    bccWalletData,
   } = useRequestWithdrawalModalStore();
   const [loading, setLoading] = useState(false);
   const [withdrawalAmount, setWithdrawalAmount] = useState(0);
   const [paymentGateway, setPaymentGateway] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+
+  const { creditHistory, setCreditHistory } = bccWalletData || {};
 
   const handleWithdrawalSubmit = async (e) => {
     e.preventDefault();
@@ -29,7 +31,7 @@ const RequestWithdrawalModal = () => {
       });
       return;
     }
-    if (withdrawalAmount > bccWallet.availableBalance) {
+    if (withdrawalAmount > bccWalletData?.bccWallet?.availableBalance) {
       Swal.fire({
         icon: "warning",
         title: "Hey Niggaa!!",
@@ -50,7 +52,7 @@ const RequestWithdrawalModal = () => {
       const res = await api.post(
         "/api/v1/withdrawal-requests/request",
         {
-          walletId: bccWallet.id,
+          walletId: bccWalletData.bccWallet.id,
           withdrawalAmount,
           paymentGateway,
           phoneNumber,
@@ -68,6 +70,7 @@ const RequestWithdrawalModal = () => {
           text: "Error in creating requests",
         });
       }
+      setCreditHistory({ ...creditHistory, bccWallet: res.data.data.updatedWallet})
       Swal.fire({
         icon: "success",
         title: "Success",
@@ -75,6 +78,9 @@ const RequestWithdrawalModal = () => {
           res.data.message ||
           "Request placed successfully. It takes 1-2 hours to process request.",
       });
+      setTimeout(() => {
+        closeRequestWithdrawalModal();
+      }, 500)
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
       Swal.fire({
@@ -87,7 +93,7 @@ const RequestWithdrawalModal = () => {
     }
   };
 
-  if (!isRequestWithdrawalModalOpen) {
+  if (!isRequestWithdrawalModalOpen || !bccWalletData) {
     return null;
   }
 
@@ -130,7 +136,7 @@ const RequestWithdrawalModal = () => {
               <div className="mt-4 flex flex-col sm:flex-row items-center">
                 <BCC
                   handleSelect={() => {}}
-                  bccWallet={bccWallet}
+                  bccWallet={bccWalletData.bccWallet}
                   selectedBcc={0}
                 />
               </div>
