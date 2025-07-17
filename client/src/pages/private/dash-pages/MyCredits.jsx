@@ -16,6 +16,7 @@ import { Link } from "react-router-dom";
 import Loader from "../../../components/shared/Loader";
 import { BiMoneyWithdraw } from "react-icons/bi";
 import useRequestWithdrawalModalStore from "../../../stores/creditModalStores/useRequestWithdrawalModalStore";
+import MyWithdrawalRequests from "../../admin/admin-dash-pages/MyWithdrawalRequests";
 
 const MyCredits = () => {
   const [creditHistory, setCreditHistory] = useState(null);
@@ -344,7 +345,7 @@ const MyCredits = () => {
       <div className="mb-6">
         <div className="border-b border-gray-200">
           <nav className="flex space-x-4 justify-center sm:justify-start sm:space-x-8">
-            {["overview", "bcc-transactions", "rcc-details", "rcc-usage"].map(
+            {["overview", "bcc-transactions", "withdrawal-requests", "rcc-details", "rcc-usage"].map(
               (tab) => (
                 <button
                   key={tab}
@@ -500,6 +501,14 @@ const MyCredits = () => {
           </div>
         </div>
       )}
+
+      {
+        activeTab === "withdrawal-requests" && (
+          <div>
+            <MyWithdrawalRequests />
+          </div>
+        )
+      }
 
       {/* Transactions Tab */}
       {activeTab === "bcc-transactions" && (

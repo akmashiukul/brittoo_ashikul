@@ -1,5 +1,5 @@
 import express from "express";
-import { createWithdrawalRequest } from "../controllers/withdrawalRequest.controller.js";
+import { createWithdrawalRequest, getUsersWithdrawalRequests } from "../controllers/withdrawalRequest.controller.js";
 import { verifyToken } from "../middlewares/authMiddleware.js";
 import { verificationMiddleware } from "../middlewares/verificationMiddleware.js";
 
@@ -10,6 +10,12 @@ router.post(
   verifyToken,
   verificationMiddleware,
   createWithdrawalRequest,
+);
+router.get(
+  "/",
+  verifyToken,
+  verificationMiddleware,
+  getUsersWithdrawalRequests,
 );
 
 export default router;

@@ -39,7 +39,7 @@ export const createWithdrawalRequest = async (req, res, next) => {
             walletId,
             withdrawalAmount: parseInt(withdrawalAmount),
             paymentGateway,
-            phoneNumber,
+            phoneNumber: "+880" + phoneNumber,
           },
         }),
         tx.bccWallet.update({
@@ -58,11 +58,36 @@ export const createWithdrawalRequest = async (req, res, next) => {
       message: "Withdrawal request placed successfully. Waiting for approval.",
       data: {
         updatedWallet: result.updatedWallet,
-        withdrawalRequest: result.withdrawalRequest
+        withdrawalRequest: result.withdrawalRequest,
       },
     });
   } catch (error) {
     console.error("Error in createWithdrawalRequest controller: ", error);
+    next(error);
+  }
+};
+
+export const getUsersWithdrawalRequests = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    if (!userId) {
+      throw new CustomError("User id not provided", 400);
+    }
+    const usersWithdrawalRequests = await prisma.withdrawalRequest.findMany({
+      where: {
+        userId,
+      },
+      include: {
+        wallet: true,
+      },
+    });
+    res.status(201).json({
+      success: true,
+      message: "Withdrawal requests fetched successfully",
+      data: usersWithdrawalRequests,
+    });
+  } catch (error) {
+    console.error("Error in getUsersWithdrawalRequests controller: ", error);
     next(error);
   }
 };

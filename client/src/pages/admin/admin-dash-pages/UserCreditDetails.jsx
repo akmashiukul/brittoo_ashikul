@@ -379,7 +379,7 @@ const UserCreditDetails = ({userId}) => {
               <h3 className="mt-6 text-sm font-semibold text-center sm:text-left">
                 🔴Available Red Cache Credits
               </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8 mt-2 justify-self-center sm:justify-self-start">
+              <div className="flex flex-wrap items-center gap-4 md:gap-8 mt-2 justify-self-center sm:justify-self-start">
                 {creditHistory?.redCacheCredits?.map((credit) => (
                   <RCC handleSelect={() => {}} key={credit.id} rcc={credit} />
                 ))}

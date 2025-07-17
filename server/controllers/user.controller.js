@@ -473,14 +473,7 @@ export const getUserCreditHistory = async (req, res, next) => {
       rentalHistory,
     ] = await Promise.all([
       prisma.bccWallet.findUnique({
-        where: { userId },
-        select: {
-          id: true,
-          availableBalance: true,
-          lockedBalance: true,
-          createdAt: true,
-          updatedAt: true,
-        },
+        where: { userId }
       }),
       prisma.redCacheCredit.findMany({
         where: {
