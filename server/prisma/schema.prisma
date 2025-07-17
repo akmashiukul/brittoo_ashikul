@@ -158,7 +158,6 @@ model WithdrawalRequest {
   phoneNumber      String           @map("phone_number")
   status           WithdrawalStatus @default(PENDING) @map("status")
   rejectReason     String?          @map("reject_reason")
-  transactionId    String?          @map("transaction_id")
 
   user           User            @relation(fields: [userId], references: [id])
   wallet         BccWallet       @relation(fields: [walletId], references: [id])

@@ -1,7 +1,14 @@
 import express from "express";
-import { createWithdrawalRequest, getMyWithdrawalRequests } from "../controllers/withdrawalRequest.controller.js";
+import {
+  completeWithdrawalRequest,
+  createWithdrawalRequest,
+  getAllWithdrawalRequests,
+  getMyWithdrawalRequests,
+  rejectWithdrawalRequest,
+} from "../controllers/withdrawalRequest.controller.js";
 import { verifyToken } from "../middlewares/authMiddleware.js";
 import { verificationMiddleware } from "../middlewares/verificationMiddleware.js";
+import { adminMiddleware } from "../middlewares/adminMiddleware.js";
 
 const router = express.Router();
 
@@ -11,11 +18,22 @@ router.post(
   verificationMiddleware,
   createWithdrawalRequest,
 );
-router.get(
-  "/",
+router.get("/", verifyToken, verificationMiddleware, getMyWithdrawalRequests);
+
+
+// Admin only
+router.get("/admin", verifyToken, adminMiddleware, getAllWithdrawalRequests);
+router.put(
+  "/:requestId/complete",
   verifyToken,
-  verificationMiddleware,
-  getMyWithdrawalRequests,
+  adminMiddleware,
+  completeWithdrawalRequest,
+);
+router.put(
+  "/:requestId/reject",
+  verifyToken,
+  adminMiddleware,
+  rejectWithdrawalRequest,
 );
 
 export default router;

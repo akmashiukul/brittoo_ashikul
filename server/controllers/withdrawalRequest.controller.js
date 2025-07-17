@@ -132,3 +132,111 @@ export const getAllWithdrawalRequests = async (req, res, next) => {
     next(error);
   }
 };
+
+export const completeWithdrawalRequest = async (req, res, next) => {
+  try {
+    const { requestId } = req.params;
+    const { transactionId, numberUsedInTrx } = req.body;
+
+    const withdrawalRequest = await prisma.withdrawalRequest.findUnique({
+      where: { id },
+      include: { wallet: true },
+    });
+    if (!withdrawalRequest) {
+      throw new CustomError("Withdrawal request not found", 400);
+    }
+    if (withdrawalRequest.status !== "PENDING") {
+      throw new CustomError("Withdrawal request is not pending", 400);
+    }
+    const [updatedRequest] = await prisma.$transaction([
+      prisma.withdrawalRequest.update({
+        where: { id },
+        data: {
+          status: "COMPLETED",
+          updatedAt: new Date(),
+        },
+      }),
+      // Create BCC transaction
+      prisma.bccTransaction.create({
+        data: {
+          userId: withdrawalRequest.userId,
+          walletId: withdrawalRequest.walletId,
+          amount: withdrawalRequest.withdrawalAmount,
+          paymentGateway: withdrawalRequest.paymentGateway,
+          transactionId,
+          numberUsedInTrx,
+          transactionType: "MONEY_WITHDRAWAL",
+          status: "ACCEPTED",
+        },
+      }),
+
+      // Update wallet
+      prisma.bccWallet.update({
+        where: { id: withdrawalRequest.walletId },
+        data: {
+          requestedForWithdrawal: {
+            decrement: withdrawalRequest.withdrawalAmount,
+          },
+          updatedAt: new Date(),
+        },
+      }),
+    ]);
+
+    res.status(201).json({
+      success: true,
+      message: "Withdrawal request completed successfully",
+      data: updatedRequest,
+    });
+  } catch (error) {
+    console.error("error in complete withdraw req controller: ", error);
+    next(error);
+  }
+};
+
+export const rejectWithdrawalRequest = async (req, res) => {
+  try {
+    const { requestId } = req.params;
+    const { rejectReason } = req.body;
+    const withdrawalRequest = await prisma.withdrawalRequest.findUnique({
+      where: { id },
+    });
+    if (!withdrawalRequest) {
+      throw new CustomError("Withdrawal request not found", 400);
+    }
+    if (withdrawalRequest.status !== "PENDING") {
+      throw new CustomError("Withdrawal request is not pending", 400);
+    }
+
+    const [updatedRequest] = await prisma.$transaction([
+      prisma.withdrawalRequest.update({
+        where: { id },
+        data: {
+          status: "REJECTED",
+          rejectReason,
+          updatedAt: new Date(),
+        },
+      }),
+      prisma.bccWallet.update({
+        where: { id: withdrawalRequest.walletId },
+        data: {
+          requestedForWithdrawal: {
+            decrement: withdrawalRequest.withdrawalAmount,
+          },
+          availableBalance: {
+            increment: withdrawalRequest.withdrawalAmount,
+          },
+          updatedAt: new Date(),
+        },
+      }),
+    ]);
+
+    res.status(200).json({
+      success: true,
+      message: "Withdrawal request rejected successfully",
+      data: updatedRequest,
+    });
+  } catch (error) {
+    console.error("error in complete reject req controller: ", error);
+    next(error);
+  }
+};
