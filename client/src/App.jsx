@@ -33,6 +33,8 @@ import PlacedRequests from "./pages/private/dash-pages/PlacedRequests";
 import RecievedRequests from "./pages/private/dash-pages/RecievedRequests";
 import MyCredits from "./pages/private/dash-pages/MyCredits";
 import AdminDashUserDetails from "./pages/admin/admin-dash-pages/AdminDashUserDetails";
+import WithdrawalRequests from "./pages/admin/admin-dash-pages/WithdrawalRequests";
+import RequestWithdrawalModal from "./components/modals/RequestWithdrawalModal";
 
 const AppContent = () => {
   const location = useLocation();
@@ -87,6 +89,7 @@ const AppContent = () => {
       {/* Credit Modals */}
       <CreditModal />
       <ConfirmRentalRequestModal />
+      <RequestWithdrawalModal />
 
       {isBuyBccModalOpen && <BuyBccModal />}
       {isShowRccModalOpen && <ShowRccModal />}
@@ -108,6 +111,7 @@ const AppContent = () => {
               <Route path="admin-overview" element={<AdminOverview />} />
               <Route path="manage-users" element={<ManageUsers />} />
               <Route path="user-details/:userId" element={<AdminDashUserDetails />} />
+              <Route path="withdrawal-requests" element={<WithdrawalRequests />} />
             </Route>
           </Route>
 

@@ -10,6 +10,7 @@ import {
   AlertTriangle,
   ChevronLeft,
   ChevronRight,
+  LucideShieldUser,
 } from "lucide-react";
 import api from "../../../lib/api";
 import { Link } from "react-router-dom";
@@ -242,15 +243,18 @@ const ManageUsers = () => {
                         {getStatusBadge(user.isVerified)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                          {user.role}
-                        </span>
+                          {user.role === "ADMIN" ? <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-500 flex gap-1 items-center w-fit">
+                              {user.role} <LucideShieldUser size={16} />
+                            </span> : (
+                              <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">{user.role}</span>
+                            )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {new Date(user.createdAt).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <Link to={`/dashboard/admin/user-details/${user.id}`}
+                        <Link
+                          to={`/dashboard/admin/user-details/${user.id}`}
                           className="flex items-center text-[10px] border bg-green-500 text-white border-green-500 rounded-sm py-0.5 px-3 w-fit hover:bg-green-600"
                         >
                           <Eye className="w-4 h-4 mr-1" />

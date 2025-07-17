@@ -14,22 +14,28 @@ import BCC from "../../../components/CacheCreditCard/BCC";
 import RCC from "../../../components/CacheCreditCard/RCC";
 import { Link } from "react-router-dom";
 import Loader from "../../../components/shared/Loader";
+import { BiMoneyWithdraw } from "react-icons/bi";
+import useRequestWithdrawalModalStore from "../../../stores/creditModalStores/useRequestWithdrawalModalStore";
 
 const MyCredits = () => {
   const [creditHistory, setCreditHistory] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("overview");
+  const { openRequestWithdrawalModal } = useRequestWithdrawalModalStore();
 
   // Fetch Credits data from API
   useEffect(() => {
     const fetchCreditHistory = async () => {
       try {
-        const response = await api.get("/api/v1/user-dashboard/credits/credit-history", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+        const response = await api.get(
+          "/api/v1/user-dashboard/credits/credit-history",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
           },
-        });
+        );
 
         if (!response.data.success) {
           throw new Error("Failed to fetch Credits data");
@@ -52,11 +58,14 @@ const MyCredits = () => {
     // Re-run the fetch effect
     const fetchCreditHistory = async () => {
       try {
-        const response = await api.get("/api/v1/user-dashboard/credits/credit-history", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+        const response = await api.get(
+          "/api/v1/user-dashboard/credits/credit-history",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
           },
-        });
+        );
 
         if (!response.data.success) {
           throw new Error("Failed to fetch Credits data");
@@ -103,7 +112,7 @@ const MyCredits = () => {
     switch (type) {
       case "RENT_DEPOSIT":
         return "text-blue-600";
-      case "DEPOSIT_REFUND":
+      case "DEPOSIT_WITHDRAWAL":
         return "text-green-600";
       case "BONUS_CREDIT":
         return "text-emerald-500";
@@ -121,7 +130,7 @@ const MyCredits = () => {
   const getTransactionReference = (transaction) => {
     switch (transaction.transactionType) {
       case "RENT_DEPOSIT":
-      case "DEPOSIT_REFUND":
+      case "DEPOSIT_WITHDRAWAL":
         return `RR-${transaction.rentalRequestId?.slice(0, 8) || "N/A"}`;
       case "BONUS_CREDIT":
         return "BONUS";
@@ -178,9 +187,7 @@ const MyCredits = () => {
   };
 
   if (loading) {
-    return (
-      <Loader />
-    );
+    return <Loader />;
   }
 
   if (error) {
@@ -365,9 +372,24 @@ const MyCredits = () => {
           {/* Credit Cards */}
           <div className="flex-1 overflow-y-auto pb-4">
             <div className="px-3 md:px-5 mt-2">
-              <h3 className="mt-1 text-sm font-semibold text-center sm:text-left">
-                🔵Available Blue Cache Credits
-              </h3>
+              <div className="flex justify-between items-center">
+                <h3 className="mt-1 text-sm font-semibold text-center sm:text-left">
+                  🔵Available Blue Cache Credits
+                </h3>
+                <button
+                  onClick={() =>
+                    openRequestWithdrawalModal(
+                      creditHistory?.bccWallet || {
+                        availableBalance: 0,
+                        lockedBalance: 0,
+                      },
+                    )
+                  }
+                  className="py-1 px-3 md:py-2 md:px-4 text-xs md:text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 hover:shadow-md cursor-pointer flex gap-1 items-center"
+                >
+                  <span>Withdraw Money</span> <BiMoneyWithdraw />{" "}
+                </button>
+              </div>
               <div className="mt-4 flex flex-col sm:flex-row items-center">
                 <BCC
                   handleSelect={() => {}}
@@ -516,11 +538,19 @@ const MyCredits = () => {
                               {transaction.transactionId}
                             </span>
                           ) : transaction.rentalRequestId ? (
-                            <Link to={'/dashboard/placed-requests'} className="uppercase text-purple-600 border py-0.5 px-3 rounded-lg border-purple-100 hover:bg-purple-500 hover:text-white transition-all">
+                            <Link
+                              to={"/dashboard/placed-requests"}
+                              className="uppercase text-purple-600 border py-0.5 px-3 rounded-lg border-purple-100 hover:bg-purple-500 hover:text-white transition-all"
+                            >
                               {getTransactionReference(transaction)}
                             </Link>
                           ) : (
-                            <Link to={'/dashboard/placed-requests'} className="uppercase text-gray-600 border py-0.5 px-3 rounded-lg border-gray-100 hover:bg-gray-500 hover:text-white transition-all">RR-PENDING</Link>
+                            <Link
+                              to={"/dashboard/placed-requests"}
+                              className="uppercase text-gray-600 border py-0.5 px-3 rounded-lg border-gray-100 hover:bg-gray-500 hover:text-white transition-all"
+                            >
+                              RR-PENDING
+                            </Link>
                           )}
                         </span>
                       </td>
@@ -618,25 +648,25 @@ const MyCredits = () => {
                     <tr key={rental.id} className="hover:bg-gray-50">
                       <td className="px-4 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                        <Package className="w-4 h-4 text-gray-400 mr-2" />
-                        <Link
-                          to={rental.product.id}
-                          className="p-2 border border-gray-200 rounded-lg w-full hover:scale-105 hover:bg-gray-200 hover:text-white transition-all duration-300 hover:ml-2"
-                        >
-                          <div className="text-sm font-medium text-gray-900">
-                            {rental.product.name}
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <div className="text-sm text-gray-500">
-                              {rental.product.productSL}
+                          <Package className="w-4 h-4 text-gray-400 mr-2" />
+                          <Link
+                            to={rental.product.id}
+                            className="p-2 border border-gray-200 rounded-lg w-full hover:scale-105 hover:bg-gray-200 hover:text-white transition-all duration-300 hover:ml-2"
+                          >
+                            <div className="text-sm font-medium text-gray-900">
+                              {rental.product.name}
                             </div>
-                            <div className="h-1 w-1 bg-gray-400 rounded-full"></div>
-                            <div className="text-xs text-gray-500">
-                              BDT {rental.product.pricePerDay}/Day
+                            <div className="flex items-center gap-1">
+                              <div className="text-sm text-gray-500">
+                                {rental.product.productSL}
+                              </div>
+                              <div className="h-1 w-1 bg-gray-400 rounded-full"></div>
+                              <div className="text-xs text-gray-500">
+                                BDT {rental.product.pricePerDay}/Day
+                              </div>
                             </div>
-                          </div>
-                        </Link>
-                      </div>
+                          </Link>
+                        </div>
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap">
                         <span className="text-sm text-gray-900">
@@ -665,15 +695,15 @@ const MyCredits = () => {
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap">
                         <div
-                        className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium border ${getRentalRequestStatusColor(
-                          rental.status,
-                        )}`}
-                      >
-                        {getRentalRequestStatusIcon(rental.status)}
-                        <span className="hidden md:inline">
-                          {formatStatus(rental.status)}
-                        </span>
-                      </div>
+                          className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium border ${getRentalRequestStatusColor(
+                            rental.status,
+                          )}`}
+                        >
+                          {getRentalRequestStatusIcon(rental.status)}
+                          <span className="hidden md:inline">
+                            {formatStatus(rental.status)}
+                          </span>
+                        </div>
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">

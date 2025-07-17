@@ -9,6 +9,8 @@ import { MdOutlineSpaceDashboard } from "react-icons/md";
 import useDashDrawertore from "../../stores/drawerStores/useDashDrawerStore";
 import { Menu, Users, X } from "lucide-react";
 import { useEffect } from "react";
+import { FaMoneyBillTransfer } from "react-icons/fa6";
+import { GiReceiveMoney } from "react-icons/gi";
 
 const AdminDashboardLayout = () => {
   const { currentUser } = useUserStore();
@@ -97,9 +99,9 @@ const AdminDashboardLayout = () => {
             </li>
             <li>
               <Link
-                to="/dashboard/admin/gray-cc-requests"
+                to="/dashboard/admin/withdrawal-requests"
                 className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${
-                  path.includes("/gray-cc-requests")
+                  path.includes("/withdrawal-requests")
                     ? "bg-green-600 text-white"
                     : "text-gray-700"
                 } flex items-center gap-2`}
@@ -109,7 +111,7 @@ const AdminDashboardLayout = () => {
                   }
                 }}
               >
-                <PiCreditCardDuotone /> Gray CC Requests
+                <GiReceiveMoney /> Withdrawal Requests
               </Link>
             </li>
             <li>

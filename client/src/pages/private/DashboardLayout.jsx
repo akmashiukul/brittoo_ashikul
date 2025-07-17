@@ -20,6 +20,7 @@ import { FaShoppingCart, FaUserCog } from "react-icons/fa";
 import useShowRccModalStore from "../../stores/creditModalStores/useShowRccModalStore";
 import Swal from "sweetalert2";
 import { BiCreditCard } from "react-icons/bi";
+import useRequestWithdrawalStore from "../../stores/creditModalStores/useRequestWithdrawalModalStore";
 
 const DashboardLayout = () => {
   const { currentUser, setCurrentUser } = useUserStore();
@@ -28,16 +29,17 @@ const DashboardLayout = () => {
   const navigate = useNavigate();
   const { isDrawerOpen, openDrawer, closeDrawer } = useDashDrawertore();
   const { isShowRccModalOpen } = useShowRccModalStore();
+  const { isRequestWithdrawalModalOpen } = useRequestWithdrawalStore();
 
   useEffect(() => {
-    if (isShowRccModalOpen) {
+    if (isShowRccModalOpen || isRequestWithdrawalModalOpen) {
       closeDrawer();
     }
-  }, [closeDrawer, isShowRccModalOpen]);
+  }, [closeDrawer, isRequestWithdrawalModalOpen, isShowRccModalOpen]);
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 768 && !isShowRccModalOpen) {
+      if (window.innerWidth >= 768 && !isShowRccModalOpen && !isRequestWithdrawalModalOpen) {
         openDrawer();
       } else {
         closeDrawer();
@@ -48,7 +50,7 @@ const DashboardLayout = () => {
     window.addEventListener("resize", handleResize);
 
     return () => window.removeEventListener("resize", handleResize);
-  }, [closeDrawer, isShowRccModalOpen, openDrawer]);
+  }, [closeDrawer, isShowRccModalOpen, isRequestWithdrawalModalOpen, openDrawer]);
 
   const handleLogOut = () => {
     Swal.fire({

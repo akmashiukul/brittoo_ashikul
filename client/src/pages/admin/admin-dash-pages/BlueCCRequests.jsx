@@ -123,7 +123,7 @@ const BlueCCRequests = () => {
       <div style="padding: 0 10px; box-sizing: border-box;">
         <div style="margin-bottom: 15px;">
           <label style="display: block; text-align: left; font-weight: 500; margin-bottom: 8px; color: #374151;" for="swal-input1">
-            Refund Transaction ID
+            Withdrawal Transaction ID
           </label>
           <input 
             id="swal-input1" 
@@ -168,7 +168,7 @@ const BlueCCRequests = () => {
         const res = await api.put(
           `/api/v1/credit/bcc/reject/${creditId}`,
           {
-            refundTrxId: formValues[0],
+            withdrawalTrxId: formValues[0],
             rejectReason: formValues[1],
           },
           {
