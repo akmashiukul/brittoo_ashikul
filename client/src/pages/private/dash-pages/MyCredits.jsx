@@ -18,7 +18,6 @@ import { BiMoneyWithdraw } from "react-icons/bi";
 import useRequestWithdrawalModalStore from "../../../stores/creditModalStores/useRequestWithdrawalModalStore";
 import MyWithdrawalRequests from "./MyWithdrawalRequests";
 
-
 const MyCredits = () => {
   const [creditHistory, setCreditHistory] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -130,7 +129,8 @@ const MyCredits = () => {
   const getTransactionReference = (transaction) => {
     switch (transaction.transactionType) {
       case "RENT_DEPOSIT":
-      case "DEPOSIT_WITHDRAWAL":
+        return `RR-${transaction.rentalRequestId?.slice(0, 8) || "N/A"}`;
+      case "DEPOSIT_REFUND":
         return `RR-${transaction.rentalRequestId?.slice(0, 8) || "N/A"}`;
       case "BONUS_CREDIT":
         return "BONUS";
@@ -275,7 +275,9 @@ const MyCredits = () => {
               <Package className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
             </div>
             <div className="ml-3 sm:ml-4">
-              <p className="text-xs sm:text-sm font-medium text-gray-600">Available RCC</p>
+              <p className="text-xs sm:text-sm font-medium text-gray-600">
+                Available RCC
+              </p>
               <p className="text-xl sm:text-2xl font-bold text-gray-900">
                 {creditHistory?.summary?.rcc?.availableAmount || 0}
               </p>
@@ -289,7 +291,9 @@ const MyCredits = () => {
               <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
             </div>
             <div className="ml-3 sm:ml-4">
-              <p className="text-xs sm:text-sm font-medium text-gray-600">Total Rentals</p>
+              <p className="text-xs sm:text-sm font-medium text-gray-600">
+                Total Rentals
+              </p>
               <p className="text-xl sm:text-2xl font-bold text-gray-900">
                 {creditHistory?.summary?.rentals?.totalRentals || 0}
               </p>
@@ -318,7 +322,9 @@ const MyCredits = () => {
               <Package className="w-5 h-5 sm:w-6 sm:h-6 text-red-200" />
             </div>
             <div className="ml-3 sm:ml-4">
-              <p className="text-xs sm:text-sm font-medium text-gray-600">In Use RCC</p>
+              <p className="text-xs sm:text-sm font-medium text-gray-600">
+                In Use RCC
+              </p>
               <p className="text-xl sm:text-2xl font-bold text-gray-900">
                 {creditHistory?.summary?.rcc?.totalInUse || 0}
               </p>
@@ -331,7 +337,9 @@ const MyCredits = () => {
               <Package className="w-5 h-5 sm:w-6 sm:h-6 text-blue-200" />
             </div>
             <div className="ml-3 sm:ml-4">
-              <p className="text-xs sm:text-sm font-medium text-gray-600">In Use BCC</p>
+              <p className="text-xs sm:text-sm font-medium text-gray-600">
+                In Use BCC
+              </p>
               <p className="text-xl sm:text-2xl font-bold text-gray-900">
                 {creditHistory?.summary?.bcc?.lockedBalance || 0}
               </p>
@@ -344,24 +352,28 @@ const MyCredits = () => {
       <div className="mb-4 sm:mb-6">
         <div className="border-b border-gray-200">
           <nav className="flex flex-wrap gap-2 sm:gap-4 justify-center sm:justify-start">
-            {["overview", "bcc-transactions", "withdrawal-requests", "rcc-details", "rcc-usage"].map(
-              (tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`py-2 px-2 sm:px-3 border-b-2 font-medium text-xs sm:text-sm capitalize cursor-pointer ${
-                    activeTab === tab
-                      ? "border-green-500 text-green-600"
-                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                  }`}
-                >
-                  {tab
-                    .replace("-", " ")
-                    .replace("rcc", "RCC")
-                    .replace("bcc", "BCC")}
-                </button>
-              ),
-            )}
+            {[
+              "overview",
+              "bcc-transactions",
+              "withdrawal-requests",
+              "rcc-details",
+              "rcc-usage",
+            ].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`py-2 px-2 sm:px-3 border-b-2 font-medium text-xs sm:text-sm capitalize cursor-pointer ${
+                  activeTab === tab
+                    ? "border-green-500 text-green-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
+              >
+                {tab
+                  .replace("-", " ")
+                  .replace("rcc", "RCC")
+                  .replace("bcc", "BCC")}
+              </button>
+            ))}
           </nav>
         </div>
       </div>
@@ -382,7 +394,7 @@ const MyCredits = () => {
                         ? {
                             bccWallet: creditHistory.bccWallet,
                             setCreditHistory,
-                            creditHistory
+                            creditHistory,
                           }
                         : {
                             bccWallet: {
@@ -430,7 +442,10 @@ const MyCredits = () => {
               Red Cache Credits Details
             </h3>
           </div>
-          <div className="overflow-x-auto" style={{ overflowX: "auto", touchAction: "pan-x" }}>
+          <div
+            className="overflow-x-auto"
+            style={{ overflowX: "auto", touchAction: "pan-x" }}
+          >
             <table className="w-full min-w-[320px] sm:min-w-[480px] md:min-w-[640px]">
               <thead className="bg-gray-50">
                 <tr>
@@ -479,7 +494,9 @@ const MyCredits = () => {
                       </span>
                     </td>
                     <td className="px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap hidden sm:table-cell">
-                      <span className="text-xs sm:text-sm text-gray-900">{rcc.inUse}</span>
+                      <span className="text-xs sm:text-sm text-gray-900">
+                        {rcc.inUse}
+                      </span>
                     </td>
                     <td className="px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap hidden sm:table-cell">
                       <span
@@ -515,7 +532,10 @@ const MyCredits = () => {
                 BCC Transaction History
               </h3>
             </div>
-            <div className="overflow-x-auto" style={{ overflowX: "auto", touchAction: "pan-x" }}>
+            <div
+              className="overflow-x-auto"
+              style={{ overflowX: "auto", touchAction: "pan-x" }}
+            >
               <table className="w-full min-w-[320px] sm:min-w-[480px] md:min-w-[640px]">
                 <thead className="bg-gray-50">
                   <tr>
@@ -542,43 +562,44 @@ const MyCredits = () => {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {creditHistory?.bccTransactions?.map((transaction) => (
                     <tr key={transaction.id} className="hover:bg-gray-50">
-                      <td className="px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap">
-                        <span className="text-xs sm:text-sm font-mono text-gray-900">
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <span className="text-sm font-mono text-gray-900">
                           {["PURCHASE_BCC", "MONEY_WITHDRAWAL"].includes(
                             transaction.transactionType,
                           ) ? (
                             <span className="flex items-center gap-0.5 uppercase text-teal-600">
-                              <HashIcon size={12} />
+                              <HashIcon size={14} />
                               {transaction.transactionId}
                             </span>
                           ) : transaction.rentalRequestId ? (
                             <Link
                               to={"/dashboard/placed-requests"}
-                              className="uppercase text-purple-600 border py-0.5 px-2 sm:px-3 rounded-lg border-purple-100 hover:bg-purple-500 hover:text-white transition-all"
+                              className="uppercase text-purple-600 border py-0.5 px-3 rounded-lg border-purple-100 hover:bg-purple-500 hover:text-white transition-all"
                             >
                               {getTransactionReference(transaction)}
                             </Link>
                           ) : (
                             <Link
                               to={"/dashboard/placed-requests"}
-                              className="uppercase text-gray-600 border py-0.5 px-2 sm:px-3 rounded-lg border-gray-100 hover:bg-gray-500 hover:text-white transition-all"
+                              className="uppercase text-gray-600 border py-0.5 px-3 rounded-lg border-gray-100 hover:bg-gray-500 hover:text-white transition-all"
                             >
                               RR-PENDING
                             </Link>
                           )}
                         </span>
                       </td>
-                      <td className="px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap">
+
+                      <td className="px-4 py-4 whitespace-nowrap">
                         <span
-                          className={`inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 ${getTransactionTypeColor(
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 ${getTransactionTypeColor(
                             transaction.transactionType,
                           )}`}
                         >
                           {transaction.transactionType}
                         </span>
                       </td>
-                      <td className="px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap">
-                        <span className="text-xs sm:text-sm font-medium text-gray-900">
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <span className="text-sm font-medium text-gray-900">
                           {transaction.transactionType === "RENT_DEPOSIT" ||
                           transaction.transactionType === "MONEY_WITHDRAWAL"
                             ? "-"
@@ -586,9 +607,9 @@ const MyCredits = () => {
                           {transaction.amount}
                         </span>
                       </td>
-                      <td className="px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap hidden sm:table-cell">
+                      <td className="px-4 py-4 whitespace-nowrap">
                         <span
-                          className={`text-xs sm:text-sm ${
+                          className={`text-sm ${
                             transaction.paymentGateway
                               ? "text-gray-900"
                               : "text-green-600"
@@ -597,11 +618,11 @@ const MyCredits = () => {
                           {transaction.paymentGateway || "BR_CIRC"}
                         </span>
                       </td>
-                      <td className="px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap hidden sm:table-cell">
+                      <td className="px-4 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           {getStatusIcon(transaction.status)}
                           <span
-                            className={`ml-2 text-xs sm:text-sm ${getStatusColor(
+                            className={`ml-2 text-sm ${getStatusColor(
                               transaction.status,
                             )}`}
                           >
@@ -609,8 +630,8 @@ const MyCredits = () => {
                           </span>
                         </div>
                       </td>
-                      <td className="px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap hidden sm:table-cell">
-                        <span className="text-xs sm:text-sm text-gray-900">
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <span className="text-sm text-gray-900">
                           {formatDate(transaction.createdAt)}
                         </span>
                       </td>
@@ -632,7 +653,10 @@ const MyCredits = () => {
                 Credit Usage in Rentals
               </h3>
             </div>
-            <div className="overflow-x-auto" style={{ overflowX: "auto", touchAction: "pan-x" }}>
+            <div
+              className="overflow-x-auto"
+              style={{ overflowX: "auto", touchAction: "pan-x" }}
+            >
               <table className="w-full min-w-[320px] sm:min-w-[480px] md:min-w-[640px]">
                 <thead className="bg-gray-50">
                   <tr>
@@ -699,7 +723,8 @@ const MyCredits = () => {
                                 {usage.usedAmount}
                               </span>
                               <span className="text-gray-500 ml-1 text-xs">
-                                (from {usage.redCacheCredit.sourceProduct.productSL})
+                                (from{" "}
+                                {usage.redCacheCredit.sourceProduct.productSL})
                               </span>
                             </div>
                           ))}

@@ -5,16 +5,19 @@ import {
   CheckCircle,
   Clock,
   XCircle,
+  Info,
+  X,
 } from "lucide-react";
 import api from "../../../lib/api";
 import Swal from "sweetalert2";
 import Loader from "../../../components/shared/Loader";
 
-const UserWithdrawalRequests = ({userId}) => {
+const UserWithdrawalRequests = ({ userId }) => {
   const [withdrawalRequests, setWithdrawalRequests] = useState([]);
   const [filteredRequests, setFilteredRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("ALL");
+  const [showRejectReason, setShowRejectReason] = useState("");
 
   useEffect(() => {
     fetchWithdrawalRequests();
@@ -200,13 +203,18 @@ const UserWithdrawalRequests = ({userId}) => {
           {filteredRequests.length === 0 ? (
             <div className="p-6 sm:p-8 text-center text-gray-500">
               <AlertCircle className="w-10 sm:w-12 h-10 sm:h-12 mx-auto mb-4 text-gray-400" />
-              <p className="text-base sm:text-lg">No withdrawal requests found</p>
+              <p className="text-base sm:text-lg">
+                No withdrawal requests found
+              </p>
               <p className="text-xs sm:text-sm mt-1">
                 Your withdrawal requests will appear here once you make them.
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto" style={{ overflowX: "auto", touchAction: "pan-x" }}>
+            <div
+              className="overflow-x-auto"
+              style={{ overflowX: "auto", touchAction: "pan-x" }}
+            >
               <table className="w-full min-w-[320px] sm:min-w-[480px] md:min-w-[640px]">
                 <thead className="bg-gray-50">
                   <tr>
@@ -251,6 +259,16 @@ const UserWithdrawalRequests = ({userId}) => {
                           <span className={getStatusBadge(request.status)}>
                             {request.status}
                           </span>
+                          {request.status === "REJECTED" && (
+                            <Info
+                              onClick={() =>
+                                setShowRejectReason(request.rejectReason)
+                              }
+                              className="cursor-pointer hover:scale-105 hover:shadow-md rounded-full"
+                              color="blue"
+                              size={15}
+                            />
+                          )}
                         </div>
                       </td>
                       <td className="px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap hidden sm:table-cell">
@@ -266,6 +284,24 @@ const UserWithdrawalRequests = ({userId}) => {
           )}
         </div>
       </div>
+      {showRejectReason && (
+        <div className="fixed inset-0 bg-black/40 bg-opacity-30 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg w-full max-w-md">
+            <div className="flex items-start justify-between">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                Reject Reason
+              </h2>
+              <X
+                size={18}
+                color="red"
+                className="hover:scale-105 cursor-pointer"
+                onClick={() => setShowRejectReason("")}
+              />
+            </div>
+            <p className="text-sm text-gray-600">{showRejectReason}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

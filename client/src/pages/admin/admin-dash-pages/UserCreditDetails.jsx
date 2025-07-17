@@ -122,6 +122,7 @@ const UserCreditDetails = ({userId}) => {
   const getTransactionReference = (transaction) => {
     switch (transaction.transactionType) {
       case "RENT_DEPOSIT":
+        return `RR-${transaction.rentalRequestId?.slice(0, 8) || "N/A"}`;
       case "DEPOSIT_REFUND":
         return `RR-${transaction.rentalRequestId?.slice(0, 8) || "N/A"}`;
       case "BONUS_CREDIT":

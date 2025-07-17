@@ -506,7 +506,6 @@ export const getUserCreditHistory = async (req, res, next) => {
           transactionId: true,
           transactionType: true,
           status: true,
-          refundTrxId: true,
           rejectReason: true,
           createdAt: true,
           updatedAt: true,
