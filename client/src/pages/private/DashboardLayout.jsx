@@ -39,7 +39,7 @@ const DashboardLayout = () => {
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 768 && !isShowRccModalOpen && !isRequestWithdrawalModalOpen) {
+      if (window.innerWidth >= 992 && !isShowRccModalOpen && !isRequestWithdrawalModalOpen) {
         openDrawer();
       } else {
         closeDrawer();
