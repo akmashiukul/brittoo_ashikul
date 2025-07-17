@@ -16,10 +16,8 @@ import { Link } from "react-router-dom";
 import Loader from "../../../components/shared/Loader";
 import { BiMoneyWithdraw } from "react-icons/bi";
 import useRequestWithdrawalModalStore from "../../../stores/creditModalStores/useRequestWithdrawalModalStore";
-import MyWithdrawalRequests from "../../admin/admin-dash-pages/MyWithdrawalRequests";
+import MyWithdrawalRequests from "./MyWithdrawalRequests";
 
-// Add this meta tag in your HTML head to prevent orientation changes
-// <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 const MyCredits = () => {
   const [creditHistory, setCreditHistory] = useState(null);

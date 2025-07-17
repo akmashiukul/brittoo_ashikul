@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import {
   RefreshCw,
-  Eye,
   AlertCircle,
   CheckCircle,
   Clock,
@@ -54,11 +53,10 @@ const MyWithdrawalRequests = () => {
       setFilteredRequests(res.data.data);
     } catch (err) {
       console.error("Error fetching withdrawal requests:", err);
-      console.error("Error fetching dashboard data:", err);
       Swal.fire({
         icon: "error",
         title: "OOPS!!",
-        text: err.response.data.message || "Something went wrong!",
+        text: err.response?.data?.message || "Something went wrong!",
       });
     } finally {
       setLoading(false);
@@ -79,7 +77,7 @@ const MyWithdrawalRequests = () => {
   };
 
   const getStatusBadge = (status) => {
-    const baseClasses = "px-3 py-1 rounded-full text-xs font-medium";
+    const baseClasses = "px-2 sm:px-3 py-0.5 rounded-full text-xs font-medium";
     switch (status) {
       case "PENDING":
         return `${baseClasses} bg-yellow-100 text-yellow-800`;
@@ -105,23 +103,24 @@ const MyWithdrawalRequests = () => {
   if (loading) {
     return <Loader />;
   }
+
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
+      <div className="max-w-full mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
+        <div className="mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
                 My Withdrawal Requests
               </h1>
-              <p className="text-gray-600 mt-1">
+              <p className="text-gray-600 mt-1 text-sm sm:text-base">
                 Track your withdrawal requests and their status
               </p>
             </div>
             <button
               onClick={fetchWithdrawalRequests}
-              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm sm:text-base mt-4 sm:mt-0"
             >
               <RefreshCw className="w-4 h-4" />
               Refresh
@@ -130,15 +129,15 @@ const MyWithdrawalRequests = () => {
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-          <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mt-6 sm:mt-8">
+          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
             <div className="flex items-center">
-              <div className="p-3 bg-yellow-100 rounded-full">
-                <Clock className="w-6 h-6 text-yellow-600" />
+              <div className="p-2 sm:p-3 bg-yellow-100 rounded-full">
+                <Clock className="w-5 sm:w-6 h-5 sm:h-6 text-yellow-600" />
               </div>
-              <div className="ml-4">
-                <p className="text-sm text-gray-600">Pending</p>
-                <p className="text-2xl font-bold text-gray-900">
+              <div className="ml-3 sm:ml-4">
+                <p className="text-xs sm:text-sm text-gray-600">Pending</p>
+                <p className="text-xl sm:text-2xl font-bold text-gray-900">
                   {
                     withdrawalRequests.filter((r) => r.status === "PENDING")
                       .length
@@ -148,14 +147,14 @@ const MyWithdrawalRequests = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
             <div className="flex items-center">
-              <div className="p-3 bg-green-100 rounded-full">
-                <CheckCircle className="w-6 h-6 text-green-600" />
+              <div className="p-2 sm:p-3 bg-green-100 rounded-full">
+                <CheckCircle className="w-5 sm:w-6 h-5 sm:h-6 text-green-600" />
               </div>
-              <div className="ml-4">
-                <p className="text-sm text-gray-600">Completed</p>
-                <p className="text-2xl font-bold text-gray-900">
+              <div className="ml-3 sm:ml-4">
+                <p className="text-xs sm:text-sm text-gray-600">Completed</p>
+                <p className="text-xl sm:text-2xl font-bold text-gray-900">
                   {
                     withdrawalRequests.filter((r) => r.status === "COMPLETED")
                       .length
@@ -165,14 +164,14 @@ const MyWithdrawalRequests = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
             <div className="flex items-center">
-              <div className="p-3 bg-red-100 rounded-full">
-                <XCircle className="w-6 h-6 text-red-600" />
+              <div className="p-2 sm:p-3 bg-red-100 rounded-full">
+                <XCircle className="w-5 sm:w-6 h-5 sm:h-6 text-red-600" />
               </div>
-              <div className="ml-4">
-                <p className="text-sm text-gray-600">Rejected</p>
-                <p className="text-2xl font-bold text-gray-900">
+              <div className="ml-3 sm:ml-4">
+                <p className="text-xs sm:text-sm text-gray-600">Rejected</p>
+                <p className="text-xl sm:text-2xl font-bold text-gray-900">
                   {
                     withdrawalRequests.filter((r) => r.status === "REJECTED")
                       .length
@@ -182,45 +181,48 @@ const MyWithdrawalRequests = () => {
             </div>
           </div>
         </div>
-        <div className="mt-6">
+
+        {/* Filter Dropdown */}
+        <div className="mt-4 sm:mt-6">
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            className="px-6 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            className="px-4 sm:px-6 py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent w-full sm:w-auto"
           >
             <option value="ALL">All Status</option>
             <option value="COMPLETED">Completed</option>
             <option value="PENDING">Pending</option>
           </select>
         </div>
+
         {/* Table */}
         <div className="bg-white rounded-lg shadow-sm overflow-hidden mt-4">
           {filteredRequests.length === 0 ? (
-            <div className="p-8 text-center text-gray-500">
-              <AlertCircle className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-              <p className="text-lg">No withdrawal requests found</p>
-              <p className="text-sm mt-1">
+            <div className="p-6 sm:p-8 text-center text-gray-500">
+              <AlertCircle className="w-10 sm:w-12 h-10 sm:h-12 mx-auto mb-4 text-gray-400" />
+              <p className="text-base sm:text-lg">No withdrawal requests found</p>
+              <p className="text-xs sm:text-sm mt-1">
                 Your withdrawal requests will appear here once you make them.
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
+            <div className="overflow-x-auto" style={{ overflowX: "auto", touchAction: "pan-x" }}>
+              <table className="w-full min-w-[320px] sm:min-w-[480px] md:min-w-[640px]">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Amount
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Payment Gateway
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
                       Phone Number
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
                       Requested At
                     </th>
                   </tr>
@@ -228,31 +230,31 @@ const MyWithdrawalRequests = () => {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {filteredRequests.map((request) => (
                     <tr key={request.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-semibold text-gray-900">
+                      <td className="px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap">
+                        <div className="text-xs sm:text-sm font-semibold text-gray-900">
                           {request.withdrawalAmount}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
+                      <td className="px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap">
+                        <div className="text-xs sm:text-sm text-gray-900">
                           {request.paymentGateway}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
+                      <td className="px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap hidden sm:table-cell">
+                        <div className="text-xs sm:text-sm text-gray-900">
                           {request.phoneNumber}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-2">
+                      <td className="px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap">
+                        <div className="flex items-center gap-1 sm:gap-2">
                           {getStatusIcon(request.status)}
                           <span className={getStatusBadge(request.status)}>
                             {request.status}
                           </span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
+                      <td className="px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap hidden sm:table-cell">
+                        <div className="text-xs sm:text-sm text-gray-900">
                           {formatDate(request.createdAt)}
                         </div>
                       </td>
