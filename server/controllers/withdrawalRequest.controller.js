@@ -67,7 +67,7 @@ export const createWithdrawalRequest = async (req, res, next) => {
   }
 };
 
-export const getUsersWithdrawalRequests = async (req, res, next) => {
+export const getMyWithdrawalRequests = async (req, res, next) => {
   try {
     const userId = req.user.id;
     if (!userId) {

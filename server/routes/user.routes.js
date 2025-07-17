@@ -7,6 +7,7 @@ import {
   getUserDetails,
   getUserPlacedRequestsAdmin,
   getUserRecievedRequestsAdmin,
+  getUserWithdrawalRequests,
   suspendUser,
   verifyUser,
 } from "../controllers/user.controller.js";
@@ -31,6 +32,13 @@ router.get(
   verifyToken,
   adminMiddleware,
   getUserRecievedRequestsAdmin,
+);
+
+router.get(
+  "/withdrawal-requests/:userId",
+  verifyToken,
+  adminMiddleware,
+  getUserWithdrawalRequests,
 );
 
 // User states controll

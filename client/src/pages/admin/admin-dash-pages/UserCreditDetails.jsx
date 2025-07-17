@@ -14,6 +14,7 @@ import BCC from "../../../components/CacheCreditCard/BCC";
 import RCC from "../../../components/CacheCreditCard/RCC";
 import Loader from "../../../components/shared/Loader";
 import { Link } from "react-router-dom";
+import UserWithdrawalRequests from "./UserWithdrawalRequests";
 
 const UserCreditDetails = ({userId}) => {
   const [creditHistory, setCreditHistory] = useState(null);
@@ -334,7 +335,7 @@ const UserCreditDetails = ({userId}) => {
       <div className="mb-6">
         <div className="border-b border-gray-200">
           <nav className="flex space-x-4 justify-center sm:justify-start sm:space-x-8">
-            {["overview", "bcc-transactions", "rcc-details", "rcc-usage"].map(
+            {["overview", "bcc-transactions", "withdrawal-requests", "rcc-details", "rcc-usage"].map(
               (tab) => (
                 <button
                   key={tab}
@@ -576,6 +577,15 @@ const UserCreditDetails = ({userId}) => {
           </div>
         </div>
       )}
+
+      {
+        activeTab === "withdrawal-requests" &&
+        (
+          <div>
+            <UserWithdrawalRequests userId={userId} />
+          </div>
+        )
+      }
 
       {/* Usage Tab */}
       {activeTab === "rcc-usage" && (

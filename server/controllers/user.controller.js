@@ -757,3 +757,28 @@ export const getUserRecievedRequestsAdmin = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getUserWithdrawalRequests = async (req, res, next) => {
+  try {
+    const {userId} = req.params;
+    if (!userId) {
+      throw new CustomError("User id not provided", 400);
+    }
+    const usersWithdrawalRequests = await prisma.withdrawalRequest.findMany({
+      where: {
+        userId,
+      },
+      include: {
+        wallet: true,
+      },
+    });
+    res.status(201).json({
+      success: true,
+      message: "Withdrawal requests fetched successfully",
+      data: usersWithdrawalRequests,
+    });
+  } catch (error) {
+    console.error("Error in getUsersWithdrawalRequests controller: ", error);
+    next(error);
+  }
+};
