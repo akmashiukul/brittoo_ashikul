@@ -83,10 +83,11 @@ enum SecurityScore {
 }
 
 model BccWallet {
-  id               String @id @default(cuid()) @map("id")
-  userId           String @unique @map("user_id")
-  availableBalance Int    @default(0) @map("available_balance")
-  lockedBalance    Int    @default(0) @map("locked_balance")
+  id                     String @id @default(cuid()) @map("id")
+  userId                 String @unique @map("user_id")
+  availableBalance       Int    @default(0) @map("available_balance")
+  lockedBalance          Int    @default(0) @map("locked_balance")
+  requestedForWithdrawal Int    @default(0) @map("requested_for_withdrawal")
 
   user            User             @relation(fields: [userId], references: [id])
   bccTransactions BccTransaction[]

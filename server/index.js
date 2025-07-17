@@ -12,6 +12,7 @@ import rccRoutes from "./routes/rcc.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import rentalRequestRoutes from "./routes/rentalRequest.routes.js";
 import userDashboardRoutes from "./routes/userDashboard.routes.js";
+import withdrawalRequestRoutes from './routes/withdrawalRequest.routes.js';
 
 dotenv.config();
 const app = express();
@@ -34,6 +35,7 @@ app.use("/api/v1/credit/rcc", rccRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/rental-requests", rentalRequestRoutes);
 app.use("/api/v1/user-dashboard", userDashboardRoutes);
+app.use("/api/v1/withdrawal-requests", withdrawalRequestRoutes);
 
 app.use(errorHandler);
 app.use(multerErrorHandler);

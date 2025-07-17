@@ -2,7 +2,6 @@ import { useState } from "react";
 import useBuyBccModalStore from "../../stores/creditModalStores/useBuyBccModalStore";
 import bkash from "../../assets/logos/bkash.png";
 import nagad from "../../assets/logos/nagad.svg";
-import rocket from "../../assets/logos/rocket.png";
 import api from "../../lib/api";
 import Swal from "sweetalert2";
 import { X } from "lucide-react";
@@ -108,7 +107,7 @@ const BuyBccModal = () => {
                   Select Gateway
                 </h4>
                 <div className="flex items-center gap-4 mt-2">
-                  {["bkash", "rocket", "nagad"].map((method) => (
+                  {["bkash", "nagad"].map((method) => (
                     <label
                       key={method}
                       className="cursor-pointer bg-gray-100 shadow-md hover:scale-105 transition duration-300 hover:bg-blue-200"
@@ -124,8 +123,6 @@ const BuyBccModal = () => {
                         src={
                           method === "bkash"
                             ? bkash
-                            : method === "rocket"
-                            ? rocket
                             : nagad
                         }
                         alt={method}

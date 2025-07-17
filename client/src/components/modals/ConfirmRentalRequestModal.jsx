@@ -396,6 +396,8 @@ const ConfirmRentalRequestModal = () => {
                     <input
                       type="tel"
                       required
+                      value={phoneNumber}
+                      maxLength={10}
                       id="phone"
                       className="w-full px-2 py-2 md:py-3 md:px-4 focus:outline-none text-xs md:text-sm rounded-r-md"
                       placeholder="1XXXXXXXXX"
