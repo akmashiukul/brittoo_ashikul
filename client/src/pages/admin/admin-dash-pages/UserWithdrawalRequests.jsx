@@ -18,7 +18,7 @@ const UserWithdrawalRequests = ({userId}) => {
 
   useEffect(() => {
     fetchWithdrawalRequests();
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     if (filter === "PENDING") {

@@ -91,3 +91,44 @@ export const getMyWithdrawalRequests = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getAllWithdrawalRequests = async (req, res, next) => {
+  try {
+    const { page = "1", limit = "10", status, phoneNumber } = req.query;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    const where = {};
+    if (status) where.status = status;
+    if (phoneNumber) where.phoneNumber = { contains: phoneNumber };
+
+    const [withdrawalRequests, total] = await Promise.all([
+      prisma.withdrawalRequest.findMany({
+        where,
+        skip,
+        take: parseInt(limit),
+        include: {
+          user: { select: { name: true, email: true } },
+          wallet: true,
+          bccTransaction: true,
+        },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.withdrawalRequest.count({ where }),
+    ]);
+
+    res.status(200).json({
+      success: true,
+      message: "Withdrawal requests fetched successfully",
+      data: withdrawalRequests,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        totalPages: Math.ceil(total / parseInt(limit)),
+      },
+    });
+  } catch (error) {
+    console.error("Error in getUsersWithdrawalRequests controller: ", error);
+    next(error);
+  }
+};

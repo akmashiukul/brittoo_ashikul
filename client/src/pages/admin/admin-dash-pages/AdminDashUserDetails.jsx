@@ -252,9 +252,9 @@ const AdminDashUserDetails = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <div className="bg-white p-4 rounded-lg">
             <div className="flex items-center space-x-3">
-              <Wallet className="h-8 w-8 text-green-600" />
+              <Wallet className="h-8 w-8 text-blue-400" />
               <div>
-                <p className="text-sm text-gray-600">Total Balance</p>
+                <p className="text-sm text-gray-600">Blue Credits</p>
                 <p className="text-xl font-bold text-gray-600 mt-0.5">
                   {walletSummary.totalBalance} BCC
                 </p>
@@ -263,7 +263,7 @@ const AdminDashUserDetails = () => {
           </div>
           <div className="bg-white p-4 rounded-lg">
             <div className="flex items-center space-x-3">
-              <Star className="h-8 w-8 text-yellow-600" />
+              <CreditCard className="h-8 w-8 text-red-400" />
               <div>
                 <p className="text-sm text-gray-600">Red Credits</p>
                 <p className="text-xl font-bold text-gray-600 mt-0.5">
@@ -313,7 +313,7 @@ const AdminDashUserDetails = () => {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center space-x-2 py-4 px-2 border-b-2 font-medium text-sm ${
+                    className={`flex cursor-pointer items-center space-x-2 py-4 px-2 border-b-2 font-medium text-sm ${
                       activeTab === tab.id
                         ? "border-green-500 text-green-600"
                         : "border-transparent text-gray-500 hover:text-gray-700"
@@ -386,13 +386,13 @@ const AdminDashUserDetails = () => {
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Account Status:</span>
+                      <span className="text-gray-600">Suspension Count:</span>
                       <span
                         className={
                           user.isSuspended ? "text-red-600" : "text-green-600"
                         }
                       >
-                        {user.isSuspended ? "Suspended" : "Active"}
+                        {user.suspensionCount}
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
