@@ -14,6 +14,7 @@ const RequestWithdrawalModal = () => {
     closeRequestWithdrawalModal,
     bccWallet,
   } = useRequestWithdrawalModalStore();
+  const [loading, setLoading] = useState(false);
   const [withdrawalAmount, setWithdrawalAmount] = useState(0);
   const [paymentGateway, setPaymentGateway] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -24,7 +25,7 @@ const RequestWithdrawalModal = () => {
       Swal.fire({
         icon: "warning",
         title: "Hey Niggaa!!",
-        text: "Please select payment gateway"
+        text: "Please select payment gateway",
       });
       return;
     }
@@ -32,7 +33,7 @@ const RequestWithdrawalModal = () => {
       Swal.fire({
         icon: "warning",
         title: "Hey Niggaa!!",
-        text: "You don't have enough available balance"
+        text: "You don't have enough available balance",
       });
       return;
     }
@@ -40,11 +41,50 @@ const RequestWithdrawalModal = () => {
       Swal.fire({
         icon: "warning",
         title: "Hey Niggaa!!",
-        text: "Amount must be greater than zero"
+        text: "Amount must be greater than zero",
       });
       return;
     }
-    const res = await api.post('/')
+    try {
+      setLoading(true);
+      const res = await api.post(
+        "/api/v1/withdrawal-requests/request",
+        {
+          walletId: bccWallet.id,
+          withdrawalAmount,
+          paymentGateway,
+          phoneNumber,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        },
+      );
+      if (!res.data.success) {
+        Swal.fire({
+          icon: "error",
+          title: "OOPS!!",
+          text: "Error in creating requests",
+        });
+      }
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text:
+          res.data.message ||
+          "Request placed successfully. It takes 1-2 hours to process request.",
+      });
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+      Swal.fire({
+        icon: "error",
+        title: "OOPS!!",
+        text: error.response.data.message || "Something went wrong!",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!isRequestWithdrawalModalOpen) {
@@ -118,7 +158,7 @@ const RequestWithdrawalModal = () => {
                   Select Gateway
                 </h4>
                 <div className="flex items-center gap-4 mt-2">
-                  {["bkash", "nagad"].map((method) => (
+                  {["BKASH", "NAGAD"].map((method) => (
                     <label
                       key={method}
                       className="cursor-pointer bg-gray-100 shadow-md hover:scale-105 transition duration-300 hover:bg-blue-200"
@@ -131,7 +171,7 @@ const RequestWithdrawalModal = () => {
                         onChange={() => setPaymentGateway(method)}
                       />
                       <img
-                        src={method === "bkash" ? bkash : nagad}
+                        src={method === "BKASH" ? bkash : nagad}
                         alt={method}
                         className="w-14 h-9 p-1 object-contain border-2 border-gray-500 peer-checked:border-blue-500 peer-checked:bg-blue-200 rounded"
                       />
@@ -170,9 +210,12 @@ const RequestWithdrawalModal = () => {
               </div>
               <button
                 type="submit"
-                className="w-full bg-green-600 text-white mt-4 py-1 md:py-2 text-xs md:text-sm rounded-lg hover:bg-green-700 hover:shadow-md cursor-pointer"
+                disabled={loading}
+                className={`w-full ${loading ? "bg-gray-600 text-white" : "bg-green-600 hover:bg-green-700 text-white"} mt-4 py-1 md:py-2 text-xs md:text-sm rounded-lg hover:shadow-md cursor-pointer`}
               >
-                Request Withdrawal
+                {
+                  loading ? "Processing..." : "Request Withdrawal"
+                }
               </button>
             </form>
           </div>

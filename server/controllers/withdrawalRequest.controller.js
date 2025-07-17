@@ -19,53 +19,44 @@ export const createWithdrawalRequest = async (req, res, next) => {
         400,
       );
     }
-    if (withdrawalAmount <= 0) {
+    if (parseInt(withdrawalAmount) <= 0) {
       throw new CustomError("Amount must be greater than zero", 400);
     }
-    const wallet = await prisma.bccWallet.findUnique({
-      where: {
-        userId: user.id,
-        id: walletId,
-        deletedAt: null,
-      },
+    const result = await prisma.$transaction(async (tx) => {
+      const wallet = await tx.bccWallet.findUnique({
+        where: { userId, id: walletId, deletedAt: null },
+      });
+      if (!wallet) {
+        throw new CustomError("User wallet not found", 404);
+      }
+      if (parseInt(withdrawalAmount) > wallet.availableBalance) {
+        throw new CustomError("Not enough available balance", 400);
+      }
+      const [withdrawalRequest, updatedWallet] = await Promise.all([
+        tx.withdrawalRequest.create({
+          data: {
+            userId,
+            walletId,
+            withdrawalAmount: parseInt(withdrawalAmount),
+            paymentGateway,
+            phoneNumber,
+          },
+        }),
+        tx.bccWallet.update({
+          where: { id: wallet.id, deletedAt: null, userId },
+          data: {
+            requestedForWithdrawal: { increment: parseInt(withdrawalAmount) },
+            availableBalance: { decrement: parseInt(withdrawalAmount) },
+          },
+        }),
+      ]);
+      return { withdrawalRequest, updatedWallet };
     });
-    if (!wallet) {
-      throw new CustomError("User wallet not found", 404);
-    }
-    if (withdrawalAmount > wallet.availableBalance) {
-      throw new CustomError("Not enough available balance", 400);
-    }
-    const [withdrawalRequest] = await Promise.all([
-      prisma.withdrawalRequest.create({
-        data: {
-          userId,
-          walletId,
-          withdrawalAmount,
-          paymentGateway,
-          phoneNumber,
-        },
-      }),
-      prisma.bccWallet.update({
-        where: {
-          id: wallet.id,
-          deletedAt: null,
-          userId,
-        },
-        data: {
-          requestedForWithdrawal: {
-            increment: withdrawalAmount,
-          },
-          availableBalance: {
-            decrement: withdrawalAmount,
-          },
-        },
-      }),
-    ]);
 
     res.status(201).json({
       success: true,
       message: "Withdrawal request placed successfully. Waiting for approval.",
-      data: withdrawalRequest,
+      data: result.withdrawalRequest,
     });
   } catch (error) {
     console.error("Error in createWithdrawalRequest controller: ", error);

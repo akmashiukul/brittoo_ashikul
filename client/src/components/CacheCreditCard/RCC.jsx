@@ -1,41 +1,85 @@
 import rccLogo from "../../assets/logos/rcc-logo.png";
 
-const RCC = ({ rcc, handleSelect, selectedRCCs, inRRModal = false }) => {
+const RCC = ({
+  rcc,
+  handleSelect,
+  selectedRCCs,
+  inRRModal = false,
+  inCreditModal = false,
+}) => {
   const selectedRcc = selectedRCCs?.find((r) => r.rcc.id === rcc.id);
+
   return (
     <div
       onClick={() => handleSelect(rcc)}
-      className={`text-black w-[185px]  p-3 rounded-xl hover:scale-105 cursor-pointer transition duration-300 shadow-md ${
+      className={`relative w-[280px] h-[170px] rounded-2xl ${
+        inCreditModal &&
+        "cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-2xl"
+      } overflow-hidden ${
         selectedRcc && !inRRModal
-          ? "bg-red-100 border-[2px] border-red-700"
-          : "bg-gradient-to-l from-red-400 to-red-100"
+          ? "bg-gradient-to-br from-red-600 via-red-700 to-red-800 ring-4 ring-green-200 shadow-xl"
+          : "bg-gradient-to-br from-red-600 via-red-400 to-red-600 shadow-lg"
       }`}
     >
-      <div className="flex justify-between">
+      <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-transparent rounded-2xl" />
+
+      <div className="absolute top-5 left-6 right-6 flex justify-between items-center">
         <div>
-          <h2 className="text-xs"> CC Amount </h2>
-          <p className="text-base font-bold italic">
-            {" "}
-            {rcc.amount - rcc.inUse}{" "}
+          <h3 className="text-white/70 text-xs font-medium tracking-wider uppercase">
+            RED CACHE CREDIT
+          </h3>
+          <div className="text-white text-lg font-bold tracking-wide mt-1">
+            {rcc.amount - rcc.inUse || "0.00"}
             {selectedRcc && (
-              <span className="text-red-600">
-                {" "}
+              <span className="text-red-300 text-sm ml-2">
                 -{selectedRcc.selectedAmount}
               </span>
-            )}{" "}
-          </p>
+            )}
+          </div>
         </div>
-        <img src={rccLogo} alt="fav" className="w-8 h-8" />
+        <img
+          src={rccLogo}
+          alt="RCC Logo"
+          className="h-10 w-10 opacity-90 filter drop-shadow-sm"
+        />
       </div>
 
-      <div className="mt-2">
-        <h3 className="text-xs"> In Use </h3>
-        <p className="font-medium uppercase italic text-sm text-gray-600">
-          {rcc.inUse}
-          {selectedRcc && (
-            <span className="text-green-600"> +{selectedRcc.selectedAmount}</span>
-          )}{" "}
-        </p>
+      <div className="absolute top-20 left-6 right-6">
+        <div className="flex space-x-2">
+          <div className="w-8 h-1 bg-white/30 rounded-full" />
+          <div className="w-8 h-1 bg-white/30 rounded-full" />
+          <div className="w-8 h-1 bg-white/30 rounded-full" />
+          <div className="w-8 h-1 bg-white/30 rounded-full" />
+        </div>
+      </div>
+
+      <div className="absolute bottom-5 left-6 right-6">
+        <div className="flex justify-between items-end">
+          <div className="space-y-3">
+            <div>
+              <div className="text-white/60 text-xs font-medium tracking-wide uppercase">
+                In Use
+              </div>
+              <div className="text-white text-sm font-semibold">
+                {rcc.inUse || "0.00"}
+                {selectedRcc && (
+                  <span className="text-emerald-300 text-xs ml-2">
+                    +{selectedRcc.selectedAmount}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="text-right">
+            <div className="text-white/60 text-xs font-medium tracking-wide uppercase">
+              REF Product SL
+            </div>
+            <div className="text-white text-sm font-semibold">
+              {rcc.sourceProduct.productSL || "DEMOID123"}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

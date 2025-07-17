@@ -214,6 +214,7 @@ const CreditModal = () => {
                     handleSelect={handleBccSelect}
                     bccWallet={bccWallet}
                     selectedBcc={selectedBcc}
+                    inCreditModal={true}
                   />
               </div>
               <h3 className="mt-6 text-sm font-semibold text-center sm:text-left">
@@ -226,6 +227,7 @@ const CreditModal = () => {
                     key={credit.id}
                     rcc={credit}
                     selectedRCCs={selectedRCCs}
+                    inCreditModal={true}
                   />
                 ))}
               </div>
