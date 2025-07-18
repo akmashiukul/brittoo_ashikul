@@ -1,4 +1,10 @@
-import { BrowserRouter, Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import Home from "./pages/Home";
 import Navbar from "./components/shared/Navbar";
 import RegisterModal from "./components/auth/RegisterModal";
@@ -36,6 +42,7 @@ import AdminDashUserDetails from "./pages/admin/admin-dash-pages/AdminDashUserDe
 import WithdrawalRequests from "./pages/admin/admin-dash-pages/WithdrawalRequests";
 import RequestWithdrawalModal from "./components/modals/RequestWithdrawalModal";
 import ManageRentalRequestsAdmin from "./pages/admin/admin-dash-pages/ManageRentalRequestsAdmin";
+import { useState } from "react";
 
 const AppContent = () => {
   const location = useLocation();
@@ -49,10 +56,8 @@ const AppContent = () => {
   if (token && loginDtStr) {
     const loginDT = new Date(loginDtStr);
     const now = new Date();
-
     const diff = now - loginDT;
     const diffInDays = diff / (1000 * 60 * 60 * 24);
-
     if (diffInDays >= 2) {
       setCurrentUser(null);
       localStorage.removeItem("token");
@@ -63,10 +68,13 @@ const AppContent = () => {
         icon: "success",
       });
       setTimeout(() => {
-        navigate('/');
+        navigate("/");
       }, 500);
     }
   }
+
+  const [search, setSearch] = useState("");
+  const [productType, setProductType] = useState("");
 
   const noNavbarRoutes = [
     "/dashboard",
@@ -74,7 +82,6 @@ const AppContent = () => {
     "/verify-user",
     "/dashboard/admin",
   ];
-
   const hideNavbar = noNavbarRoutes.some((path) =>
     location.pathname.startsWith(path),
   );
@@ -97,13 +104,28 @@ const AppContent = () => {
 
       <div className="overflow-x-hidden">
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route
+            path="/"
+            element={
+              <Home setProductType={setProductType} setSearch={setSearch} />
+            }
+          />
           <Route path="/test" element={<Test />} />
           <Route path="/verify-otp" element={<VerifyOTP />} />
           <Route path="/verify-user" element={<VerifyUser />} />
           <Route path="/product-details/:id" element={<ProductDetails />} />
           <Route path="/buy-credits" element={<BuyCredits />} />
-          <Route path="/browse" element={<AllProducts />} />
+          <Route
+            path="/browse"
+            element={
+              <AllProducts
+                productType={productType}
+                setProductType={setProductType}
+                search={search}
+                setSearch={setSearch}
+              />
+            }
+          />
 
           {/* Admin Routes */}
           <Route element={<AdminRoute />}>
@@ -111,9 +133,18 @@ const AppContent = () => {
               <Route path="blue-cc-requests" element={<BlueCCRequests />} />
               <Route path="admin-overview" element={<AdminOverview />} />
               <Route path="manage-users" element={<ManageUsers />} />
-              <Route path="user-details/:userId" element={<AdminDashUserDetails />} />
-              <Route path="withdrawal-requests" element={<WithdrawalRequests />} />
-              <Route path="manage-rental-requests" element={<ManageRentalRequestsAdmin />} />
+              <Route
+                path="user-details/:userId"
+                element={<AdminDashUserDetails />}
+              />
+              <Route
+                path="withdrawal-requests"
+                element={<WithdrawalRequests />}
+              />
+              <Route
+                path="manage-rental-requests"
+                element={<ManageRentalRequestsAdmin />}
+              />
             </Route>
           </Route>
 

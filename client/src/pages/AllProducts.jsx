@@ -10,14 +10,14 @@ import {
 import api from "../lib/api";
 import ProductCard from "../components/ProductCard";
 
-const AllProducts = () => {
+const AllProducts = ({productType, setProductType, search, setSearch}) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   // Filter states
-  const [search, setSearch] = useState("");
-  const [productType, setProductType] = useState("");
+  // const [search, setSearch] = useState("");
+  // const [productType, setProductType] = useState("");
   const [productCondition, setProductCondition] = useState("");
   const [productAge, setProductAge] = useState("");
   const [isFilterOpen, setIsFilterOpen] = useState(false);

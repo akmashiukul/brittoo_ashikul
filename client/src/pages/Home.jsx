@@ -1,14 +1,11 @@
-import Banner from "../components/HomePage/Banner"
-import useUserStore from "../stores/authStores/useUserStore";
+import Banner from "../components/HomePage/Banner";
 
-const Home = () => {
-  const { currentUser } = useUserStore();
-  console.log(currentUser)
+const Home = ({ setProductType, setSearch }) => {
   return (
     <div>
-      <Banner />
+      <Banner setProductType={setProductType} setSearch={setSearch}/>
     </div>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;
