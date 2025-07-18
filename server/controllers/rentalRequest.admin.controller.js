@@ -1,5 +1,6 @@
 import prisma from "../config/prisma.js";
 import { CustomError } from "../lib/customError.js";
+import { safeAuthUserSelect } from "../lib/prismaSelects.js";
 
 export const getAllRentalRequests = async (req, res, next) => {
   try {
@@ -32,8 +33,8 @@ export const getAllRentalRequests = async (req, res, next) => {
         take: limit,
         include: {
           product: true,
-          owner: { select: { name: true, phoneNumber: true, email: true } },
-          requester: { select: { name: true, phoneNumber: true, email: true } },
+          owner: { select: safeAuthUserSelect },
+          requester: { select: safeAuthUserSelect },
           bccWallet: true,
           bccTransactions: true,
           rccUsageDetails: { include: { redCacheCredit: true } },
@@ -82,8 +83,8 @@ export const updateRentalRequestStatus = async (req, res, next) => {
       data: { status },
       include: {
         product: true,
-        owner: { select: { name: true, phoneNumber: true, email: true } },
-        requester: { select: { name: true, phoneNumber: true, email: true } },
+        owner: { select: safeAuthUserSelect },
+        requester: { select: safeAuthUserSelect },
       },
     });
 
@@ -120,8 +121,8 @@ export const rejectRentalRequestAdmin = async (req, res, next) => {
       },
       include: {
         product: true,
-        owner: { select: { name: true, phoneNumber: true, email: true } },
-        requester: { select: { name: true, phoneNumber: true, email: true } },
+        owner: { select: safeAuthUserSelect },
+        requester: { select: safeAuthUserSelect },
       },
     });
 

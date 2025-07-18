@@ -7,7 +7,7 @@ import { BiSolidCreditCardAlt } from "react-icons/bi";
 import { PiCreditCardDuotone } from "react-icons/pi";
 import { MdOutlineSpaceDashboard } from "react-icons/md";
 import useDashDrawertore from "../../stores/drawerStores/useDashDrawerStore";
-import { Menu, Users, X } from "lucide-react";
+import { BoxIcon, Menu, Users, X } from "lucide-react";
 import { useEffect } from "react";
 import { FaMoneyBillTransfer } from "react-icons/fa6";
 import { GiReceiveMoney } from "react-icons/gi";
@@ -78,6 +78,23 @@ const AdminDashboardLayout = () => {
                 }}
               >
                 <MdOutlineSpaceDashboard /> Overview
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/dashboard/admin/manage-rental-requests"
+                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${
+                  path.includes("/manage-rental-requests")
+                    ? "bg-green-600 text-white"
+                    : "text-gray-700"
+                } flex items-center gap-2`}
+                onClick={() => {
+                  if (window.innerWidth <= 425) {
+                    closeDrawer();
+                  }
+                }}
+              >
+                <BoxIcon size={14} /> Manage Rental Requests
               </Link>
             </li>
             <li>

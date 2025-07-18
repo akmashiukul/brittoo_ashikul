@@ -35,6 +35,7 @@ import MyCredits from "./pages/private/dash-pages/MyCredits";
 import AdminDashUserDetails from "./pages/admin/admin-dash-pages/AdminDashUserDetails";
 import WithdrawalRequests from "./pages/admin/admin-dash-pages/WithdrawalRequests";
 import RequestWithdrawalModal from "./components/modals/RequestWithdrawalModal";
+import ManageRentalRequestsAdmin from "./pages/admin/admin-dash-pages/ManageRentalRequestsAdmin";
 
 const AppContent = () => {
   const location = useLocation();
@@ -112,6 +113,7 @@ const AppContent = () => {
               <Route path="manage-users" element={<ManageUsers />} />
               <Route path="user-details/:userId" element={<AdminDashUserDetails />} />
               <Route path="withdrawal-requests" element={<WithdrawalRequests />} />
+              <Route path="manage-rental-requests" element={<ManageRentalRequestsAdmin />} />
             </Route>
           </Route>
 
