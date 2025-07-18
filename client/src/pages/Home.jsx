@@ -1,4 +1,5 @@
 import Banner from "../components/HomePage/Banner";
+import HowBrittooWorks from "../components/HomePage/HowBrittooWorks";
 import RecentListings from "../components/HomePage/RecentListings";
 
 const Home = ({ setProductType, setSearch }) => {
@@ -6,6 +7,7 @@ const Home = ({ setProductType, setSearch }) => {
     <div>
       <Banner setProductType={setProductType} setSearch={setSearch}/>
       <RecentListings />
+      <HowBrittooWorks />
     </div>
   );
 };

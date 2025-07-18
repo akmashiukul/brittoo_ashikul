@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import api from "../../lib/api";
 import { Loader, Package } from "lucide-react";
 import ProductCard from "../ProductCard";
+import { Link } from "react-router-dom";
 
 const RecentListings = () => {
   const [products, setProducts] = useState([]);
@@ -58,13 +59,14 @@ const RecentListings = () => {
       <div className="flex flex-col items-center text-center">
         <h1 className="text-3xl font-bold text-gray-900">Recent Listings</h1>
         <p className="text-gray-500 mt-1 text-sm">
-          Discover newly listed items available for rent, handpicked from trusted users.
+          Discover newly listed items available for rent, handpicked from
+          trusted users.
         </p>
       </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(9)].map((_, i) => (
+            {[...Array(8)].map((_, i) => (
               <div
                 key={i}
                 className="bg-white rounded-lg border border-gray-200 p-6 animate-pulse"
@@ -93,6 +95,14 @@ const RecentListings = () => {
             </div>
           </>
         )}
+        <div className="flex justify-center">
+          <Link
+            to={"/browse"}
+            className="cursor-pointer bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 text-xs rounded font-medium border border-gray-300 flex items-center justify-center"
+          >
+            View All
+          </Link>
+        </div>
       </div>
     </div>
   );
