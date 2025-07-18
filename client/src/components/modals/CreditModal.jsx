@@ -13,8 +13,6 @@ import useConfirmRentalRequestModalStore from "../../stores/creditModalStores/us
 const CreditModal = () => {
   const { closeCreditModal, isCreditModalOpen, data } = useCreditModalStore();
   const { openConfirmRentalRequestModal } = useConfirmRentalRequestModalStore();
-
-  console.log(data);
   const { currentUser } = useUserStore();
   const [bccWallet, setBccWallet] = useState(0);
   const [rcc, setRcc] = useState([]);

@@ -42,16 +42,18 @@ import AdminDashUserDetails from "./pages/admin/admin-dash-pages/AdminDashUserDe
 import WithdrawalRequests from "./pages/admin/admin-dash-pages/WithdrawalRequests";
 import RequestWithdrawalModal from "./components/modals/RequestWithdrawalModal";
 import ManageRentalRequestsAdmin from "./pages/admin/admin-dash-pages/ManageRentalRequestsAdmin";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Footer from "./components/shared/Footer";
+import api from "./lib/api";
 
 const AppContent = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { loading, setCurrentUser } = useUserStore();
+  const { loading, setCurrentUser, setLoading } = useUserStore();
   const { isBuyBccModalOpen } = useBuyBccModalStore();
   const { isShowRccModalOpen } = useShowRccModalStore();
 
+  // Terminate session if JWT expires
   const loginDtStr = localStorage.getItem("login-dt");
   const token = localStorage.getItem("token");
   if (token && loginDtStr) {
@@ -73,6 +75,57 @@ const AppContent = () => {
       }, 500);
     }
   }
+
+  // Fetch fresh user data on initial app load
+  useEffect(() => {
+    const hasFetchedUser = localStorage.getItem("hasFetchedUser");
+
+    const getCurrentUser = async () => {
+      if (token && !hasFetchedUser) {
+        try {
+          setLoading(true);
+          const res = await api.get("/api/v1/auth/get-current-user", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          if (!res.data.success) {
+            setCurrentUser(null);
+            localStorage.removeItem("token");
+            localStorage.removeItem("login-dt");
+            Swal.fire({
+              title: "Session Terminated",
+              text: "This session is expired. Login again to start renting",
+              icon: "success",
+            });
+            setTimeout(() => {
+              navigate("/");
+            }, 500);
+            return;
+          }
+          setCurrentUser(res.data.data);
+          localStorage.setItem("hasFetchedUser", "true");
+        } catch (error) {
+          console.error("Error fetching current user:", error);
+          Swal.fire({
+            title: "Error",
+            text: "Failed to fetch user data. Please try logging in again.",
+            icon: "error",
+          });
+          setCurrentUser(null);
+          localStorage.removeItem("token");
+          localStorage.removeItem("login-dt");
+          navigate("/");
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setLoading(false);
+      }
+    };
+
+    getCurrentUser();
+  }, [navigate, setCurrentUser, setLoading, token]);
 
   const [search, setSearch] = useState("");
   const [productType, setProductType] = useState("");

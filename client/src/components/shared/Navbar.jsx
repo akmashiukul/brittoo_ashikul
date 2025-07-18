@@ -2,12 +2,14 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import brittoLogo from "../../assets/brittoo-logo.png";
 import { IoLogOut } from "react-icons/io5";
 import { GiHamburgerMenu } from "react-icons/gi";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Avatar from "boring-avatars";
 import Swal from "sweetalert2";
 import useRegModalStore from "../../stores/authStores/useRegModalStore";
 import useLoginModalStore from "../../stores/authStores/useLoginModalStore";
 import useUserStore from "../../stores/authStores/useUserStore";
+import api from "../../lib/api";
+import { Coins, CreditCard } from "lucide-react";
 
 const Navbar = () => {
   const menuClassname =
@@ -17,7 +19,33 @@ const Navbar = () => {
   const { openRegModal } = useRegModalStore();
   const { openLoginModal } = useLoginModalStore();
   const { currentUser, setCurrentUser } = useUserStore();
+  const [totalCredits, setTotalCredits] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchUserTotalCredits = async () => {
+      try {
+        const res = await api.get("/api/v1/users/total-credits", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        if (!res.data.success) {
+          setTotalCredits({
+            totalAvailableBcc: 0,
+            totalAvailableRcc: 0,
+          });
+          return;
+        }
+        setTotalCredits(res.data.data);
+      } catch (error) {
+        console.log("Error in fetching user total credits: ", error);
+      }
+    };
+    if (currentUser) {
+      fetchUserTotalCredits();
+    }
+  }, [currentUser]);
 
   const handleLogOut = () => {
     Swal.fire({
@@ -63,7 +91,7 @@ const Navbar = () => {
             </Link>
           </div>
 
-          <div className="md:flex md:items-center md:gap-12">
+          <div className="md:flex md:items-center md:gap-6">
             <nav className="hidden md:block">
               <div className="flex items-center gap-6 text-sm">
                 <NavLink
@@ -85,29 +113,60 @@ const Navbar = () => {
                   Buy Credits
                 </NavLink>
                 <NavLink
-                  to="/faq"
+                  to="/dashboard/overview"
                   className="text-gray-600 text-[16px] cursor-pointer hover:text-green-500"
                 >
-                  FAQ
-                </NavLink>
-                <NavLink
-                  to="/contact"
-                  className="text-gray-600 text-[16px] cursor-pointer hover:text-green-500"
-                >
-                  Contact
+                  Dashboard
                 </NavLink>
               </div>
             </nav>
 
             {currentUser ? (
-              <Avatar
-                name={currentUser.email}
-                colors={["#482344", "#2b5166", "#429867", "#fab243", "#e02130"]}
-                variant="beam"
-                size={35}
-                className="cursor-pointer mr-2 md:mr-0"
-                onClick={() => setIsUserDropDownOpen((prevState) => !prevState)}
-              />
+              <div className="flex items-center gap-3 sm:gap-6 mr-2.5 sm:mr-0">
+                <div className="flex items-center gap-2 md:gap-4 bg-gray-50 rounded-full px-3 py-1.5 border border-gray-200">
+                  {/* BCC */}
+                  <div className="flex items-center gap-1">
+                    <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                      <Coins className="w-3 h-3 text-blue-600" />
+                    </div>
+                    <span className="text-sm font-medium text-blue-600 hidden sm:inline">
+                      {totalCredits?.totalAvailableBcc || 0}
+                    </span>
+                    <span className="text-xs font-medium text-blue-600 sm:hidden">
+                      {totalCredits?.totalAvailableBcc || 0}
+                    </span>
+                  </div>
+
+                  {/* RCC */}
+                  <div className="flex items-center gap-1">
+                    <div className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center">
+                      <CreditCard className="w-3 h-3 text-red-600" />
+                    </div>
+                    <span className="text-sm font-medium text-red-600 hidden sm:inline">
+                      {totalCredits?.totalAvailableRcc || 0}
+                    </span>
+                    <span className="text-xs font-medium text-red-600 sm:hidden">
+                      {totalCredits?.totalAvailableRcc || 0}
+                    </span>
+                  </div>
+                </div>
+                <Avatar
+                  name={currentUser.email}
+                  colors={[
+                    "#482344",
+                    "#2b5166",
+                    "#429867",
+                    "#fab243",
+                    "#e02130",
+                  ]}
+                  variant="beam"
+                  size={35}
+                  className="cursor-pointer"
+                  onClick={() =>
+                    setIsUserDropDownOpen((prevState) => !prevState)
+                  }
+                />
+              </div>
             ) : (
               <div className="flex gap-4">
                 <button

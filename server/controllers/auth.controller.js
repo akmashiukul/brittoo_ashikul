@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { Resend } from "resend";
 import { isValidRuetEmail } from "../lib/emailValidator.js";
 import jwt from "jsonwebtoken";
+import { safeAuthUserSelect } from "../lib/prismaSelects.js";
 const resend = new Resend(`${process.env.RESEND_API_KEY}`);
 
 export const register = async (req, res, next) => {
@@ -329,33 +330,28 @@ export const login = async (req, res, next) => {
   }
 };
 
-export const checkPassword = async (req, res, next) => {
+export const getCurrentUser = async (req, res, next) => {
   try {
-    const { password } = req.body;
+    const userId = req.user.id;
     const loggedInUser = await prisma.user.findUnique({
       where: {
-        email: req.user.email,
+        id: userId,
       },
+      select: safeAuthUserSelect
     });
     if (!loggedInUser) {
       throw new CustomError(
-        "You are not allowed to perform this operation",
+        "User not currently Logged In.",
         403,
       );
-    }
-    const isPasswordValid = await bcrypt.compare(
-      password,
-      loggedInUser.password,
-    );
-    if (!isPasswordValid) {
-      throw new CustomError("Invalid password", 401);
     }
     return res.status(200).json({
       success: true,
       message: "Authentication Successfull",
+      data: loggedInUser
     });
   } catch (error) {
-    console.error("error in passcheck", error);
+    console.error("error in getting current user controller", error);
     next(error);
   }
 };

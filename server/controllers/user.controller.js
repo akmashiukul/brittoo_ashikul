@@ -461,6 +461,7 @@ export const suspendUser = async (req, res, next) => {
   }
 };
 
+//admin dash data
 export const getUserCreditHistory = async (req, res, next) => {
   try {
     const { userId } = req.params;
@@ -473,7 +474,7 @@ export const getUserCreditHistory = async (req, res, next) => {
       rentalHistory,
     ] = await Promise.all([
       prisma.bccWallet.findUnique({
-        where: { userId }
+        where: { userId },
       }),
       prisma.redCacheCredit.findMany({
         where: {
@@ -759,7 +760,7 @@ export const getUserRecievedRequestsAdmin = async (req, res, next) => {
 
 export const getUserWithdrawalRequests = async (req, res, next) => {
   try {
-    const {userId} = req.params;
+    const { userId } = req.params;
     if (!userId) {
       throw new CustomError("User id not provided", 400);
     }
@@ -778,6 +779,41 @@ export const getUserWithdrawalRequests = async (req, res, next) => {
     });
   } catch (error) {
     console.error("Error in getUsersWithdrawalRequests controller: ", error);
+    next(error);
+  }
+};
+
+//user nav data
+export const getUserTotalCredits = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+
+    const [bccWallet, redCacheCredits] = await Promise.all([
+      prisma.bccWallet.findUnique({
+        where: { userId },
+      }),
+      prisma.redCacheCredit.findMany({
+        where: {
+          userId,
+          deletedAt: null,
+        },
+      }),
+    ]);
+    const totalAvailableRcc = redCacheCredits.reduce(
+      (sum, rcc) => sum + (rcc.amount - rcc.inUse),
+      0,
+    );
+    const dashboardData = {
+      totalAvailableBcc: bccWallet.availableBalance,
+      totalAvailableRcc,
+    };
+
+    res.status(200).json({
+      success: true,
+      data: dashboardData,
+    });
+  } catch (error) {
+    console.error("Error fetching credit history:", error);
     next(error);
   }
 };

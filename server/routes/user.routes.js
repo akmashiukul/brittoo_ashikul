@@ -7,6 +7,7 @@ import {
   getUserDetails,
   getUserPlacedRequestsAdmin,
   getUserRecievedRequestsAdmin,
+  getUserTotalCredits,
   getUserWithdrawalRequests,
   suspendUser,
   verifyUser,
@@ -14,6 +15,7 @@ import {
 const router = express.Router();
 
 router.get("/", verifyToken, adminMiddleware, getAllUsers);
+router.get("/total-credits", verifyToken, getUserTotalCredits);
 router.get("/:userId", verifyToken, adminMiddleware, getUserDetails);
 router.get(
   "/admin/credit-history/:userId",
@@ -40,6 +42,7 @@ router.get(
   adminMiddleware,
   getUserWithdrawalRequests,
 );
+
 
 // User states controll
 router.put("/verify/:userId", verifyToken, adminMiddleware, verifyUser);
