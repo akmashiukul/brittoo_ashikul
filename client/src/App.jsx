@@ -43,6 +43,7 @@ import WithdrawalRequests from "./pages/admin/admin-dash-pages/WithdrawalRequest
 import RequestWithdrawalModal from "./components/modals/RequestWithdrawalModal";
 import ManageRentalRequestsAdmin from "./pages/admin/admin-dash-pages/ManageRentalRequestsAdmin";
 import { useState } from "react";
+import Footer from "./components/shared/Footer";
 
 const AppContent = () => {
   const location = useLocation();
@@ -163,6 +164,7 @@ const AppContent = () => {
           </Route>
         </Routes>
       </div>
+      {!loading && !hideNavbar && <Footer />}
     </>
   );
 };
