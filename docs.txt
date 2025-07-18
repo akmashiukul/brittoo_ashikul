@@ -28,6 +28,8 @@ TODO:
   7. Create link to go to verify user page.
   8. Dynamic role update and setCurrentUser using Socket.....
   9. dashboard->mycredits->bccTransactions-> add a link/other-similar field here for rejected credits, on click of that reject reason will be shown
+  10. Change JWT expiry 
+  11. add rate limiter to others and redis cache.
 
 PROBLEMS:
   1. After is_verified changed to verified from pending doesn't reflect until user logs out and again logs in.

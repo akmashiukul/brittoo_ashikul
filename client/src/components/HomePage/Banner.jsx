@@ -1,6 +1,6 @@
 import { IoSearchCircle } from "react-icons/io5";
 import { FaArrowRightLong } from "react-icons/fa6";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Banner = ({ setProductType, setSearch }) => {
   const navigate = useNavigate();
@@ -18,12 +18,12 @@ const Banner = ({ setProductType, setSearch }) => {
           cash. Join the circular economy today.
         </p>
         <div className="text-xs md:text-base flex flex-col md:flex-row items-center gap-4 mt-8">
-          <button className="py-2 border border-green-600 bg-green-600 rounded-lg text-white cursor-pointer hover:bg-green-700 hover:border-green-700 px-6">
+          <Link to={'/browse'} className="py-2 border border-green-600 bg-green-600 rounded-lg text-white cursor-pointer hover:bg-green-700 hover:border-green-700 px-6">
             Find Items to Rent
-          </button>
-          <button className="text-xs md:text-base border py-2 border-green-500 hover:text-gray-500 text-green-500 hover:bg-green-100 rounded-lg cursor-pointer bg-transparent px-6">
+          </Link>
+          <Link to={'/dashboard/list-items'} className="text-xs md:text-base border py-2 border-green-500 hover:text-gray-500 text-green-500 hover:bg-green-100 rounded-lg cursor-pointer bg-transparent px-6">
             List Your Items
-          </button>
+          </Link>
         </div>
         <div className="relative mt-8">
           <input
@@ -42,7 +42,6 @@ const Banner = ({ setProductType, setSearch }) => {
           </button>
         </div>
         <div className="w-full overflow-x-auto scrollbar-hide relative mt-8">
-          <FaArrowRightLong className="justify-self-end text-green-500 fixed right-0 -translate-y-5 md:hidden text-sm" />
           <ul className="flex gap-4 whitespace-nowrap px-2 md:justify-center justify-start">
             <li
               className={tagClassNames}
