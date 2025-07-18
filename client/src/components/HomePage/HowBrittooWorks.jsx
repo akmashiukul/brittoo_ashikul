@@ -3,15 +3,15 @@ import { CheckCircle, Plus, CreditCard, Shield } from "lucide-react";
 const Step = ({ number, title, description, isLast = false }) => (
   <div className="flex group">
     <div className="flex flex-col items-center mr-6">
-      <div className="flex items-center justify-center rounded-full bg-emerald-500 text-white w-10 h-10 font-semibold text-sm shadow-lg transition-all duration-300 group-hover:bg-emerald-600 group-hover:scale-110">
+      <div className="flex items-center justify-center rounded-full bg-green-500 text-white w-10 h-10 font-semibold text-sm shadow-lg transition-all duration-300 group-hover:bg-green-600 group-hover:scale-110">
         {number}
       </div>
       {!isLast && (
-        <div className="h-8 w-0.5 bg-gradient-to-b from-emerald-500 to-emerald-200 mt-2"></div>
+        <div className="h-8 w-0.5 bg-gradient-to-b from-green-500 to-green-200 mt-2"></div>
       )}
     </div>
     <div className="flex-1">
-      <h3 className="font-semibold mb-1 text-gray-800 group-hover:text-emerald-600 transition-colors duration-300">
+      <h3 className="font-semibold mb-1 text-gray-800 group-hover:text-green-600 transition-colors duration-300">
         {title}
       </h3>
       <p className="text-gray-600 text-sm">{description}</p>
@@ -21,7 +21,7 @@ const Step = ({ number, title, description, isLast = false }) => (
 
 const HowBrittooWorks = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br to-white mt-6">
+    <div className="min-h-screen bg-white mt-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         {/* Header */}
         <div className="text-center mb-12 flex flex-col items-center">
@@ -40,8 +40,8 @@ const HowBrittooWorks = () => {
           {/* Renting Items */}
           <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-100 flex flex-col justify-between">
             <div className="flex items-center mb-8">
-              <div className="bg-emerald-100 p-2 rounded-xl mr-4">
-                <CreditCard className="h-6 w-6 text-emerald-600" />
+              <div className="bg-green-100 p-2 rounded-xl mr-4">
+                <CreditCard className="h-6 w-6 text-green-600" />
               </div>
               <h3 className="text-xl font-bold text-gray-900">Renting Items</h3>
             </div>
@@ -70,10 +70,10 @@ const HowBrittooWorks = () => {
               />
             </div>
 
-            <div className="mt-8 p-4 bg-emerald-50 rounded-xl border border-emerald-200">
+            <div className="mt-8 p-4 bg-green-50 rounded-xl border border-green-200">
               <div className="flex items-start space-x-3">
-                <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-emerald-700">
+                <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-green-700">
                   <span className="font-semibold">Safety First:</span> All
                   rentals are covered by our damage waiver system to protect
                   both parties.
@@ -85,8 +85,8 @@ const HowBrittooWorks = () => {
           {/* Listing Items */}
           <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-100 flex flex-col justify-between">
             <div className="flex items-center mb-8">
-              <div className="bg-emerald-200 p-3 rounded-xl mr-4">
-                <Plus className="h-6 w-6 text-emerald-600" />
+              <div className="bg-green-200 p-3 rounded-xl mr-4">
+                <Plus className="h-6 w-6 text-green-600" />
               </div>
               <h3 className="text-xl font-bold text-gray-900">
                 Listing Your Items
@@ -117,10 +117,10 @@ const HowBrittooWorks = () => {
               />
             </div>
 
-            <div className="mt-8 p-4 bg-emerald-50 rounded-xl border border-emerald-200">
+            <div className="mt-8 p-4 bg-green-50 rounded-xl border border-green-200">
               <div className="flex items-start space-x-3">
-                <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-emerald-700">
+                <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-green-700">
                   <span className="font-semibold">Build Trust:</span> Higher
                   trust levels unlock better opportunities and features on the
                   platform.
@@ -144,8 +144,8 @@ const HowBrittooWorks = () => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center group">
-              <div className="bg-emerald-100 p-4 inline-block rounded-2xl mb-3 group-hover:bg-emerald-200 transition-colors duration-300">
-                <Plus className="w-8 h-8 text-emerald-600" />
+              <div className="bg-green-100 p-4 inline-block rounded-2xl mb-3 group-hover:bg-green-200 transition-colors duration-300">
+                <Plus className="w-8 h-8 text-green-600" />
               </div>
               <h4 className="font-semibold mb-3 text-gray-900">
                 Earn Credits
@@ -157,8 +157,8 @@ const HowBrittooWorks = () => {
             </div>
 
             <div className="text-center group">
-              <div className="bg-emerald-100 p-4 inline-block rounded-2xl mb-3 group-hover:bg-emerald-200 transition-colors duration-300">
-                <CreditCard className="w-8 h-8 text-emerald-600" />
+              <div className="bg-green-100 p-4 inline-block rounded-2xl mb-3 group-hover:bg-green-200 transition-colors duration-300">
+                <CreditCard className="w-8 h-8 text-green-600" />
               </div>
               <h4 className="font-semibold mb-3 text-gray-900">
                 Spend Credits
@@ -169,8 +169,8 @@ const HowBrittooWorks = () => {
             </div>
 
             <div className="text-center group">
-              <div className="bg-emerald-100 p-4 inline-block rounded-2xl mb-3 group-hover:bg-emerald-200 transition-colors duration-300">
-                <Shield className="w-8 h-8 text-emerald-600" />
+              <div className="bg-green-100 p-4 inline-block rounded-2xl mb-3 group-hover:bg-green-200 transition-colors duration-300">
+                <Shield className="w-8 h-8 text-green-600" />
               </div>
               <h4 className="font-semibold mb-3 text-gray-900">
                 Gain Trust
