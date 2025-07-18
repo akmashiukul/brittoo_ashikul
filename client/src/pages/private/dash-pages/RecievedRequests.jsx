@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import api from "../../../lib/api";
 import { Link } from "react-router-dom";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 import Loader from "../../../components/shared/Loader";
 
 const RecievedRequests = () => {
@@ -86,15 +86,15 @@ const RecievedRequests = () => {
       Swal.fire({
         icon: "success",
         title: "Success",
-        text: "Request accepted successfully!"
-      })
+        text: "Request accepted successfully!",
+      });
       closeModal();
     } catch (err) {
       Swal.fire({
         icon: "error",
         title: "ERROR!",
-        text: err.response?.data?.message || "Something went wrong"
-      })
+        text: err.response?.data?.message || "Something went wrong",
+      });
     } finally {
       setProcessingRequest(null);
     }
@@ -104,8 +104,8 @@ const RecievedRequests = () => {
     if (!rejectReason.trim()) {
       Swal.fire({
         icon: "warning",
-        text: "Please provide a reason for rejection"
-      })
+        text: "Please provide a reason for rejection",
+      });
       return;
     }
 
@@ -136,20 +136,18 @@ const RecievedRequests = () => {
         ),
       );
       // Show success notification
-      
+
       closeModal();
     } catch (err) {
       Swal.fire({
         icon: "error",
         title: "ERROR!",
-        text: err.response?.data?.message || "Something went wrong"
+        text: err.response?.data?.message || "Something went wrong",
       });
     } finally {
       setProcessingRequest(null);
     }
   };
-
-
 
   const openModal = (type, request) => {
     setModalType(type);
@@ -226,9 +224,7 @@ const RecievedRequests = () => {
   };
 
   if (loading) {
-    return (
-      <Loader />
-    );
+    return <Loader />;
   }
 
   if (error) {
@@ -499,7 +495,7 @@ const RecievedRequests = () => {
                             ownerSubmitMethod: e.target.value,
                           })
                         }
-                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        className="w-full px-2 py-2 md:py-3 md:px-4  border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       >
                         <option value="">Select deposit method</option>
                         <option value="HOME">Home Deposit</option>
@@ -508,25 +504,41 @@ const RecievedRequests = () => {
                         </option>
                       </select>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Your Phone Number
-                      </label>
-                      <input
-                        type="tel"
-                        value={acceptFormData.ownerPhoneNumber}
-                        onChange={(e) =>
-                          setAcceptFormData({
-                            ...acceptFormData,
-                            ownerPhoneNumber: e.target.value,
-                          })
-                        }
-                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                        placeholder="Enter your phone number"
-                      />
-                    </div>
-                    {acceptFormData.ownerSubmitMethod ===
-                    "BRITTOO_TERMINAL" ? (
+                    <label
+                      htmlFor="phone"
+                      className="flex flex-col gap-1.5 w-full mt-4"
+                    >
+                      <span className="text-sm font-medium text-gray-700">
+                        Phone Number
+                      </span>
+                      <div className="flex items-center border bg-white border-gray-300 rounded-md w-full focus-within:border-gray-400">
+                        <span className="flex items-center gap-1 px-3 text-xs md:text-sm text-gray-600 bg-gray-100 border-r border-gray-300 rounded-l-md">
+                          <img
+                            src="https://flagcdn.com/w40/bd.png"
+                            alt="BD Flag"
+                            className="w-5 h-4 object-cover"
+                          />
+                          +880
+                        </span>
+
+                        <input
+                          type="tel"
+                          required
+                          value={acceptFormData.ownerPhoneNumber}
+                          onChange={(e) =>
+                            setAcceptFormData({
+                              ...acceptFormData,
+                              ownerPhoneNumber: e.target.value,
+                            })
+                          }
+                          maxLength={10}
+                          id="phone"
+                          className="w-full px-2 py-2 md:py-3 md:px-4 focus:outline-none text-xs md:text-sm rounded-r-md"
+                          placeholder="1XXXXXXXXX"
+                        />
+                      </div>
+                    </label>
+                    {acceptFormData.ownerSubmitMethod === "BRITTOO_TERMINAL" ? (
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Pickup Point
@@ -539,7 +551,7 @@ const RecievedRequests = () => {
                               ownerSubmitTerminal: e.target.value,
                             })
                           }
-                          className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                          className="w-full px-2 py-2 md:py-3 md:px-4  border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                         >
                           <option value="">Select pickup point</option>
                           <option value="CSE_1">CSE Building</option>
@@ -562,7 +574,7 @@ const RecievedRequests = () => {
                             onChange={(e) =>
                               setAcceptFormData({
                                 ...acceptFormData,
-                                ownerSubmitAddress: e.target.value
+                                ownerSubmitAddress: e.target.value,
                               })
                             }
                             className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"

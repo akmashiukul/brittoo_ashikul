@@ -404,7 +404,7 @@ const RentalRequestsDashboard = () => {
                           <div>
                             <span className="text-gray-600">Owner Phone:</span>
                             <span className="ml-2 font-medium">
-                              {request.owner.phoneNumber}
+                              {request.ownerPhoneNumber}
                             </span>
                           </div>
                           <div>

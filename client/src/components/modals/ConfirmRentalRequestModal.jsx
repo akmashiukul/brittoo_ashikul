@@ -504,7 +504,7 @@ const ConfirmRentalRequestModal = () => {
               <h2 className="text-lg font-medium text-gray-900 mb-2">
                 Selected Credits
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
                 {data?.selectedRCCs?.map((selectedRcc) => (
                   <RCC
                     handleSelect={() => {}}

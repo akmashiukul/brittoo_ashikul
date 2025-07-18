@@ -406,7 +406,7 @@ export const acceptRentalRequest = async (req, res, next) => {
         data: {
           status: "ACCEPTED_BY_OWNER",
           ownerSubmitMethod,
-          ownerPhoneNumber,
+          ownerPhoneNumber: "+880" + ownerPhoneNumber,
           ownerSubmitAddress:
             ownerSubmitMethod === "HOME" ? ownerSubmitAddress : null,
           ownerSubmitTerminal:

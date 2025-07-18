@@ -8,6 +8,9 @@ export const getUsersAvailableRcc = async (req, res, next) => {
         userId,
         deletedAt: null,
       },
+      include: {
+        sourceProduct: true
+      },
       orderBy: {
         createdAt: 'desc'
       }
