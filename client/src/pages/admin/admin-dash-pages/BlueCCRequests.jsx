@@ -339,7 +339,7 @@ const BlueCCRequests = () => {
                         <div className="space-y-1">
                           <div className="flex items-center space-x-1 text-xs text-gray-500">
                             <span>
-                              {request.trxNo}
+                              {request.numberUsedInTrx}
                             </span>
                           </div>
                         </div>

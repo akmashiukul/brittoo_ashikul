@@ -47,18 +47,6 @@ export const createRentalRequest = async (req, res, next) => {
       throw new CustomError("Pickup point required for terminal pickup", 400);
     }
 
-    // Date validation
-    const now = new Date();
-    const startDate = new Date(rentalStartDate);
-    const endDate = new Date(rentalEndDate);
-
-    if (startDate <= now) {
-      throw new CustomError("Rental start date must be in the future", 400);
-    }
-    if (endDate <= startDate) {
-      throw new CustomError("Rental end date must be after start date", 400);
-    }
-
     // Product validation
     const product = await prisma.product.findUnique({
       where: { id: productId },

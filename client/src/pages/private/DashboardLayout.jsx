@@ -67,6 +67,7 @@ const DashboardLayout = () => {
         setCurrentUser(null);
         localStorage.removeItem("token");
         localStorage.removeItem("login-dt");
+        sessionStorage.removeItem("hasFetchedUser");
         Swal.fire({
           title: "Session Terminated",
           text: "Unlike your CG, this completed successfully.",

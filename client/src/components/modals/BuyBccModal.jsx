@@ -149,23 +149,37 @@ const BuyBccModal = () => {
                   required
                 />
               </div>
-              <div>
-                <label
-                  htmlFor="trxNo"
-                  className="block mb-2 text-xs md:text-sm font-medium text-gray-900"
-                >
-                  Phone Number (Used For Transaction)
-                </label>
-                <input
-                  type="text"
-                  name="trxNo"
-                  id="trxNo"
-                  value={trxNo}
-                  onChange={(e) => setTrxNo(e.target.value)}
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-xs md:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 md:p-2.5"
-                  required
-                />
-              </div>
+
+              <label
+                htmlFor="trxNo"
+                className="flex flex-col gap-1.5 w-full mt-4"
+              >
+                <span className="text-sm font-medium text-gray-700">
+                  Phone Number
+                </span>
+                <div className="flex items-center border bg-white border-gray-300 rounded-md w-full focus-within:border-gray-400">
+                  <span className="flex items-center gap-1 px-3 text-xs md:text-sm text-gray-600 bg-gray-100 border-r border-gray-300 rounded-l-md">
+                    <img
+                      src="https://flagcdn.com/w40/bd.png"
+                      alt="BD Flag"
+                      className="w-5 h-4 object-cover"
+                    />
+                    +880
+                  </span>
+
+                  <input
+                    type="text"
+                    name="trxNo"
+                    id="trxNo"
+                    required
+                    value={trxNo}
+                    maxLength={10}
+                    className="w-full px-2 py-2 md:py-3 md:px-4 focus:outline-none text-xs md:text-sm rounded-r-md"
+                    placeholder="1XXXXXXXXX"
+                    onChange={(e) => setTrxNo(e.target.value)}
+                  />
+                </div>
+              </label>
               <div>
                 <label
                   htmlFor="trxId"

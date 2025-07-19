@@ -43,7 +43,7 @@ export const buyBcc = async (req, res, next) => {
           amount: parseInt(amount),
           paymentGateway,
           transactionId,
-          numberUsedInTrx: trxNo,
+          numberUsedInTrx: "+880" + trxNo,
           transactionType: "PURCHASE_BCC",
           status: "PENDING",
         },

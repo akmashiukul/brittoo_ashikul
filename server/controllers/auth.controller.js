@@ -225,10 +225,7 @@ export const verifyOTP = async (req, res, next) => {
     const token = jwt.sign(
       {
         id: user.id,
-        email: user.email,
-        role: user.role,
-        isVerified: user.isVerified,
-        isSuspended: user.isSuspended,
+        email: user.email
       },
       process.env.JWT_SECRET,
       { expiresIn: "2d" },
@@ -308,9 +305,6 @@ export const login = async (req, res, next) => {
       {
         id: user.id,
         email: user.email,
-        role: user.role,
-        isVerified: user.isVerified,
-        isSuspended: user.isSuspended,
       },
       process.env.JWT_SECRET,
       { expiresIn: "2d" },
@@ -345,10 +339,17 @@ export const getCurrentUser = async (req, res, next) => {
         403,
       );
     }
+    if (loggedInUser.isVerified !== req.user.isVerified) {
+      return res.status(200).json({
+      success: true,
+      staleData: true,
+    });
+    }
     return res.status(200).json({
       success: true,
+      staleData: false,
       message: "Authentication Successfull",
-      data: loggedInUser
+      data: loggedInUser,
     });
   } catch (error) {
     console.error("error in getting current user controller", error);

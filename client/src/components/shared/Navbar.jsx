@@ -62,6 +62,7 @@ const Navbar = () => {
         setCurrentUser(null);
         localStorage.removeItem("token");
         localStorage.removeItem("login-dt");
+        sessionStorage.removeItem("hasFetchedUser");
         setIsUserDropDownOpen(false);
         Swal.fire({
           title: "Session Terminated",

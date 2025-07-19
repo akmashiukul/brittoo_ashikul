@@ -1,8 +1,16 @@
+import prisma from "../config/prisma.js";
 import { CustomError } from "../lib/customError.js";
 
-export const verificationMiddleware = (req, res, next) => {
+export const verificationMiddleware = async (req, res, next) => {
   try {
-    if(req.user?.isVerified !== "VERIFIED") {
+    const userId = req.user.id;
+    const loggedInUser = await prisma.user.findUnique({
+      where: {
+        id: userId,
+        deletedAt: null,
+      }
+    })
+    if (loggedInUser.isVerified !== "VERIFIED") {
       throw new CustomError("Access denied! Only verified users can perform this operation", 403, "VERIFICATION_ERROR");
     }
     next();

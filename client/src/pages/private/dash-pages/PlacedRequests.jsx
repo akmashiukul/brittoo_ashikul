@@ -486,8 +486,8 @@ const PlacedRequests = () => {
                               <span className="text-gray-600">Total Cost:</span>
                               <span className="ml-2 font-medium text-green-600">
                                 ৳
-                                {request.product.pricePerDay *
-                                  request.totalDays}
+                                {(request.product.pricePerDay *
+                                  request.totalDays).toFixed(2)}
                               </span>
                             </div>
                           </div>

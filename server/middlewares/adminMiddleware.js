@@ -1,9 +1,17 @@
 import { CustomError } from "../lib/customError.js";
+import prisma from "../config/prisma.js";
 
-export const adminMiddleware = (req, res, next) => {
+export const adminMiddleware = async (req, res, next) => {
   try {
-    if(req.user?.role !== "ADMIN") {
-      throw new CustomError("Access denied, Admin only", 403);
+    const userId = req.user.id;
+    const loggedInUser = await prisma.user.findUnique({
+      where: {
+        id: userId,
+        deletedAt: null,
+      }
+    })
+    if (loggedInUser.role !== "ADMIN") {
+      throw new CustomError("Access denied, Admin only", 403, "ADMIN_VERIFICATION_ERROR");
     }
     next();
   } catch (error) {

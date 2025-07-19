@@ -804,7 +804,7 @@ export const getUserTotalCredits = async (req, res, next) => {
       0,
     );
     const dashboardData = {
-      totalAvailableBcc: bccWallet.availableBalance,
+      totalAvailableBcc: bccWallet?.availableBalance || 0,
       totalAvailableRcc,
     };
 
