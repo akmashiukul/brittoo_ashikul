@@ -33,7 +33,7 @@ const ProductDetails = () => {
 
   const { openCreditModal } = useCreditModalStore();
 
-  ///console.log(`${base_url}${product?.productImages[0]}`);
+  ///console.log(`${product?.productImages[0]}`);
 
   useEffect(() => {
     if (initial && final) {
@@ -135,7 +135,7 @@ const ProductDetails = () => {
                 <div key={image}>
                   <img
                     className="w-full h-[150px] md:h-[350px] object-contain"
-                    src={`${base_url}${image}`}
+                    src={`${image}`}
                   />
                 </div>
               ))}

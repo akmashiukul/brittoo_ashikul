@@ -222,7 +222,7 @@ const ConfirmRentalRequestModal = () => {
           <div className="overflow-y-auto">
             <div className="mt-6 mx-4 flex gap-4 items-start border-b border-gray-200 pb-4">
               <img
-                src={`${base_url}${data?.rentalDetails?.product?.productImages[0]}`}
+                src={`${data?.rentalDetails?.product?.productImages[0]}`}
                 alt="image"
                 className="w-24 h-24 object-cover"
               />

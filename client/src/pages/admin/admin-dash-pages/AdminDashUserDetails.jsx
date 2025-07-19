@@ -478,7 +478,7 @@ const AdminDashUserDetails = () => {
                     {documentStatus.hasSelfie && (
                       <div className="aspect-square rounded-lg flex items-center justify-center">
                         <img
-                          src={`${base_url}${user.selfie}`}
+                          src={`${user.selfie}`}
                           alt="Selfie"
                           className="max-w-full max-h-full rounded-lg"
                         />
@@ -498,7 +498,7 @@ const AdminDashUserDetails = () => {
                     {documentStatus.hasIdCardFront && (
                       <div className="aspect-video rounded-lg flex items-center justify-center">
                         <img
-                          src={`${base_url}${user.idCardFront}`}
+                          src={`${user.idCardFront}`}
                           alt="ID Front"
                           className="max-w-full max-h-full rounded-lg"
                         />
@@ -518,7 +518,7 @@ const AdminDashUserDetails = () => {
                     {documentStatus.hasIdCardBack && (
                       <div className="aspect-video rounded-lg flex items-center justify-center">
                         <img
-                          src={`${base_url}${user.idCardBack}`}
+                          src={`${user.idCardBack}`}
                           alt="ID Back"
                           className="max-w-full max-h-full rounded-lg"
                         />

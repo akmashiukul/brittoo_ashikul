@@ -22,6 +22,7 @@ Prod:
 
 
 TODO:
+  3. Cant delete product if it's related to RCC and in use. 
   4. Set diff price for ACADEMIC_BOOK category.
   5. while buying bcc if not all field selected the error should be more precise .like please select the payment_gateway.
   6. after buying bcc show its waiting for confirmation.
