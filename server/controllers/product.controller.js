@@ -1,16 +1,10 @@
+import { v2 as cloudinary } from "cloudinary";
 import { uploadToCloudinary } from "../config/cloudinary.js";
 import prisma from "../config/prisma.js";
 import redisClient from "../config/redis.js";
 import { calculatePricePerDay } from "../lib/calculatePrice.js";
 import { calculateSecondHandPrice } from "../lib/calculateSecondHandPrice.js";
 import { CustomError } from "../lib/customError.js";
-
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const productUploadsDir = path.join(__dirname, "../uploads/products");
 
 export const createProduct = async (req, res, next) => {
   try {
