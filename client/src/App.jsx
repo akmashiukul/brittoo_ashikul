@@ -42,7 +42,7 @@ import AdminDashUserDetails from "./pages/admin/admin-dash-pages/AdminDashUserDe
 import WithdrawalRequests from "./pages/admin/admin-dash-pages/WithdrawalRequests";
 import RequestWithdrawalModal from "./components/modals/RequestWithdrawalModal";
 import ManageRentalRequestsAdmin from "./pages/admin/admin-dash-pages/ManageRentalRequestsAdmin";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Footer from "./components/shared/Footer";
 
 const AppContent = () => {
@@ -57,6 +57,12 @@ const AppContent = () => {
   // Terminate session if JWT expires
   const loginDtStr = localStorage.getItem("login-dt");
   const token = localStorage.getItem("token");
+  useEffect(() => {
+    if (!token) {
+      setCurrentUser(null);
+      localStorage.clear();
+    }
+  }, [setCurrentUser, token])
   if (token && loginDtStr) {
     const loginDT = new Date(loginDtStr);
     const now = new Date();

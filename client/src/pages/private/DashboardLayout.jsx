@@ -273,13 +273,13 @@ const DashboardLayout = () => {
       </div>
 
       <button
-        className={`fixed bottom-4 left-4 z-50 p-3 md:p-3 rounded-full shadow-md hover:shadow-2xl transition-all duration-300 group cursor-pointer bg-gray-100 border border-gray-200 ${
+        className={`fixed bottom-4 left-4 z-50 p-3 md:p-3 rounded-full shadow-md hover:shadow-2xl transition-all duration-300 group cursor-pointer bg-green-200 border border-gray-200 ${
           isDrawerOpen ? "opacity-0 pointer-events-none" : "opacity-100"
         }`}
         aria-label="Open drawer"
         onClick={openDrawer}
       >
-        <Menu className="w-6 h-6 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-180 text-green-600" />
+        <Menu className="w-6 h-6 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-180 text-green-700" />
       </button>
 
       <div

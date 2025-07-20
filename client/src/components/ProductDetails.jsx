@@ -22,7 +22,6 @@ const ProductDetails = () => {
   const [price, setPrice] = useState(0);
   const { currentUser } = useUserStore();
   const { id } = useParams();
-  const base_url = import.meta.env.VITE_BASE_URL;
   const { calculatePricePerDay } = usePriceCalculate();
   const [range, setRange] = useState({
     from: undefined,
@@ -101,21 +100,31 @@ const ProductDetails = () => {
   };
 
   const requestRental = async () => {
+    if (!currentUser) {
+      Swal.fire({
+        icon: "error",
+        title: "You Can't Rent!",
+        text: "You Need to Login First to Rent Something",
+      });
+      return;
+    }
+    if (product?.ownerId === currentUser?.id) {
+      Swal.fire({
+        icon: "error",
+        title: "Hey Nigga!",
+        text: "You can't rent your own product",
+      });
+      return;
+    }
     if (!initial) {
-      return Swal.fire({
+      Swal.fire({
         imageUrl: calendarImage,
         imageWidth: 190,
         imageHeight: 180,
         imageAlt: "Custom image",
         title: "Select date/range you wanna rent for",
       });
-    }
-    if (!currentUser) {
-      return Swal.fire({
-        icon: "error",
-        title: "You Can't Rent!",
-        text: "You Need to Login First to Rent Something",
-      });
+      return;
     }
     openCreditModal({ initial, final, product, setProduct });
   };
