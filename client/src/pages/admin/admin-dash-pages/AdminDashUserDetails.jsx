@@ -29,7 +29,6 @@ const AdminDashUserDetails = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
   const [actionLoading, setActionLoading] = useState(false);
-  const base_url = import.meta.env.VITE_BASE_URL;
 
   useEffect(() => {
     fetchUserDetails();

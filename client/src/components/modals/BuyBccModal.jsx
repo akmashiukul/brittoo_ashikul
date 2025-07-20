@@ -42,8 +42,8 @@ const BuyBccModal = () => {
 
       Swal.fire({
         icon: "success",
-        title: "Success!",
-        text: response.data.message || "Purchase Successfull. Waiting for verification."
+        title: "Purchase Successfull.",
+        text: response.data.message || "Waiting for verification. It takes 20-30 mins for verification"
       });
       closeBuyBccModal();
     } catch (error) {

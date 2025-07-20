@@ -19,7 +19,6 @@ const ConfirmRentalRequestModal = () => {
   const { closeCreditModal } = useCreditModalStore();
   const { currentUser } = useUserStore();
 
-  const base_url = import.meta.env.VITE_BASE_URL;
   const [selectedMethod, setSelectedMethod] = useState("BRITTOO_TERMINAL");
   const [pickupPoint, setPickupPoint] = useState("");
   const [deliveryAddress, setDeliveryAddress] = useState("");

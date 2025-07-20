@@ -23,8 +23,6 @@ const UserRecievedRequests = ({ userId }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const baseUrl = import.meta.env.VITE_BASE_URL;
-
   useEffect(() => {
     const fetchRentalRequests = async () => {
       try {

@@ -22,7 +22,6 @@ const UserPlacedRequests = ({ userId }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [expandedRows, setExpandedRows] = useState(new Set());
-  const base_url = import.meta.env.VITE_BASE_URL;
 
   useEffect(() => {
     const fetchPlacedRequests = async () => {

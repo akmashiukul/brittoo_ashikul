@@ -17,17 +17,12 @@ Prod:
 
 
 --------TEST_TODO VVII:--------
-  1. check one more registration if image path /uploads/... is save to db or not;
   2. check if one can place rental request on a already requested product.
 
 
 TODO:
-  3. Cant delete product if it's related to RCC and in use. 
   4. Set diff price for ACADEMIC_BOOK category.
-  5. while buying bcc if not all field selected the error should be more precise .like please select the payment_gateway.
-  6. after buying bcc show its waiting for confirmation.
-  7. Create link to go to verify user page.
-  8. Dynamic role update and setCurrentUser using Socket.....
+
   9. dashboard->mycredits->bccTransactions-> add a link/other-similar field here for rejected credits, on click of that reject reason will be shown
   10. Change JWT expiry 
   11. add rate limiter to others and redis cache.

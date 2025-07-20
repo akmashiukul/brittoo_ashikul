@@ -29,8 +29,6 @@ const RentalRequestsDashboard = () => {
   const [loading, setLoading] = useState(false);
   const [expandedRows, setExpandedRows] = useState(new Set());
 
-  const baseUrl = import.meta.env.VITE_BASE_URL;
-
   const fetchRentalRequests = async (page = 1) => {
     setLoading(true);
     try {

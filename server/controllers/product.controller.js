@@ -347,12 +347,11 @@ export const deleteProduct = async (req, res, next) => {
         rentalRequests: {
           where: {
             status: {
-              notIn: [
-                'REQUESTED_BY_RENTER',
-                'ACCEPTED_BY_OWNER',
-                'PRODUCT_SUBMITTED_BY_OWNER',
-                'PRODUCT_COLLECTED_BY_RENTER',
-                'PRODUCT_RETURNED_BY_RENTER',
+              in: [
+                "ACCEPTED_BY_OWNER",
+                "PRODUCT_SUBMITTED_BY_OWNER",
+                "PRODUCT_COLLECTED_BY_RENTER",
+                "PRODUCT_RETURNED_BY_RENTER",
               ]
             }
           }
@@ -360,7 +359,7 @@ export const deleteProduct = async (req, res, next) => {
       }
     });
 
-    if(!product) {
+    if (!product) {
       throw new CustomError("Product not found or you don't have permission to delete this product", 404);
     }
 

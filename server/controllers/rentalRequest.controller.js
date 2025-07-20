@@ -50,12 +50,29 @@ export const createRentalRequest = async (req, res, next) => {
     // Product validation
     const product = await prisma.product.findUnique({
       where: { id: productId },
-      include: { owner: true },
+      include: {
+        owner: true,
+        rentalRequests: {
+          where: {
+            status: {
+              in: [
+                "ACCEPTED_BY_OWNER",
+                "PRODUCT_SUBMITTED_BY_OWNER",
+                "PRODUCT_COLLECTED_BY_RENTER",
+                "PRODUCT_RETURNED_BY_RENTER",
+              ]
+            }
+          }
+        }
+      },
     });
     if (!product) {
       throw new CustomError("Product not found", 404);
     }
     if (product.isRented) {
+      throw new CustomError("Product is already rented", 400);
+    }
+    if (product.rentalRequests.length > 0) {
       throw new CustomError("Product is already rented", 400);
     }
     if (product.isOnHold) {

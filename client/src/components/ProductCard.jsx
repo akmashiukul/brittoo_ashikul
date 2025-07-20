@@ -11,9 +11,6 @@ const ProductCard = ({ product }) => {
     tags,
     productImages,
   } = product;
-
-  const base_url = import.meta.env.VITE_BASE_URL;
-
   const conditionColor =
     {
       NEW: "bg-green-200 text-green-800",
