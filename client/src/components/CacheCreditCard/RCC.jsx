@@ -12,7 +12,7 @@ const RCC = ({
   return (
     <div
       onClick={() => handleSelect(rcc)}
-      className={`relative w-[280px] h-[170px] rounded-2xl ${
+      className={`relative w-[250px] h-[150px] rounded-2xl ${
         inCreditModal &&
         "cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-2xl"
       } overflow-hidden ${
@@ -46,10 +46,9 @@ const RCC = ({
 
       <div className="absolute top-20 left-6 right-6">
         <div className="flex space-x-2">
-          <div className="w-8 h-1 bg-white/30 rounded-full" />
-          <div className="w-8 h-1 bg-white/30 rounded-full" />
-          <div className="w-8 h-1 bg-white/30 rounded-full" />
-          <div className="w-8 h-1 bg-white/30 rounded-full" />
+          <div className="w-6 h-0.5 bg-white/30 rounded-full" />
+          <div className="w-6 h-0.5 bg-white/30 rounded-full" />
+          <div className="w-6 h-0.5 bg-white/30 rounded-full" />
         </div>
       </div>
 

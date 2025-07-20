@@ -169,6 +169,7 @@ export const getProducts = async (req, res, next) => {
             securityScore: true,
             brittooVerified: true,
             suspensionCount: true,
+            isVerified: true,
             _count: {
               select: {
                 rentedOutProducts: true,
@@ -340,7 +341,22 @@ export const deleteProduct = async (req, res, next) => {
       throw new CustomError("Unauthorized: No user authenticated", 401);
     }
     const product = await prisma.product.findUniqueOrThrow({
-      where: { id },
+      where: { id, deletedAt: null },
+      include: {
+        rentalRequests: {
+          where: {
+            status: {
+              in: [
+                'REQUESTED_BY_RENTER',
+                'ACCEPTED_BY_OWNER',
+                'PRODUCT_SUBMITTED_BY_OWNER',
+                'PRODUCT_COLLECTED_BY_RENTER',
+                'PRODUCT_RETURNED_BY_RENTER',
+              ]
+            }
+          }
+        },
+      }
     });
 
     if (product.ownerId !== req.user.id && req.user.role !== "ADMIN") {
@@ -349,23 +365,37 @@ export const deleteProduct = async (req, res, next) => {
         403,
       );
     }
-
     const refRcc = await prisma.redCacheCredit.findFirst({
       where: {
         sourceProductId: product.id
       }
     });
-
     if (refRcc.inUse > 0) {
       throw new CustomError("Can't delete product. Red Credit referencing this product is in use.", 400);
     }
+    if (product.rentalRequests.length > 0) {
+      throw new CustomError("Cannot delete product with active rental requests. Please handle pending requests first.", 400);
+    }
+    if (product.isOnHold) {
+      throw new CustomError("Cannot delete product that is currently on hold", 400);
+    }
 
-    await prisma.product.update({
-      where: { id },
-      data: {
-        deletedAt: new Date(),
-      },
-    });
+    await prisma.$transaction(async (tx) => {
+      await tx.product.update({
+        where: { id },
+        data: {
+          deletedAt: new Date(),
+        },
+      });
+      await tx.redCacheCredit.update({
+        where: {
+          sourceProductId: product.id
+        },
+        data: {
+          deletedAt: new Date()
+        }
+      });
+    })
 
     const keys = await redisClient.keys("products:*");
     if (keys.length > 0) {

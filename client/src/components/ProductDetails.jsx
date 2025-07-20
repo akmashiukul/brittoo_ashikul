@@ -33,6 +33,7 @@ const ProductDetails = () => {
   const { openCreditModal } = useCreditModalStore();
 
   ///console.log(`${product?.productImages[0]}`);
+  console.log(product)
 
   useEffect(() => {
     if (initial && final) {
@@ -239,6 +240,14 @@ const ProductDetails = () => {
                     </strong>
                     <p className="text-gray-500 mt-1 italic">
                       {product.owner.email}
+                    </p>
+                    <p className="text-xs text-gray-600 mt-1 flex gap-2">
+                      <span className="font-medium">Verification Status: </span>
+                      <span className={`text-xs`}>
+                        {
+                          product.owner.isVerified !== "VERIFIED" ? ( <span className="flex items-center gap-0.5 text-red-500">Not Verified <XCircle size={12} /> </span> ) : (<span className="flex items-center gap-0.5 text-green-500">Verified <CheckCircle size={12} /></span>)
+                        }
+                      </span>
                     </p>
                     <p className="text-xs text-gray-600 mt-3">
                       <span className="font-medium">Security Score: </span>

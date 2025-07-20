@@ -179,7 +179,7 @@ const CreditModal = () => {
                 Deposit Cache Credit
               </h3>
               <p className="text-xs text-gray-600">
-                No worries nigga! you'll get this back after you return the
+                No worries darling! you'll get this back after you return the
                 product
               </p>
               <CCDisplay
