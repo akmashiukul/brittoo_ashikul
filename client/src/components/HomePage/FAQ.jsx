@@ -44,15 +44,13 @@ const AccordionItem = ({ question, answer, isOpen, onToggle }) => (
         {question}
       </span>
       <ChevronDown
-        className={`h-5 w-5 text-green-600 transition-transform duration-300 flex-shrink-0 ${
-          isOpen ? "rotate-180" : ""
-        }`}
+        className={`h-5 w-5 text-green-600 transition-transform duration-300 flex-shrink-0 ${isOpen ? "rotate-180" : ""
+          }`}
       />
     </button>
     <div
-      className={`overflow-hidden transition-all duration-300 ease-in-out ${
-        isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
-      }`}
+      className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+        }`}
     >
       <div className="px-6 pb-5 pt-1">
         <p className="text-gray-600 text-xs leading-relaxed border-l-4 border-green-100 pl-4">
@@ -121,9 +119,12 @@ const FAQ = () => {
               We're here to help! Our support team is ready to assist you with
               any questions or concerns.
             </p>
-            <button className="bg-green-500 hover:bg-green-600 text-white text-sm px-6 py-2 rounded-md font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
-              Contact Support
-            </button>
+            <a href="mailto:aagalib2323@gmail.com?subject=I%20Have%20A%20Question" target="_blank"
+              rel="noopener noreferrer">
+              <button className="bg-green-500 hover:bg-green-600 text-white text-sm px-6 py-2 rounded-md font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                Contact Support
+              </button>
+            </a>
           </div>
         </div>
       </div>

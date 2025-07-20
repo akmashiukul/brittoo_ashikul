@@ -58,11 +58,6 @@ const Footer = () => {
                 icon={FaGithub}
               />
               <DeveloperLink
-                href="https://portfolio-galib.web.app/"
-                text="Portfolio"
-                icon={User2}
-              />
-              <DeveloperLink
                 href="https://www.facebook.com/galib.rcc.23"
                 text="Facebook"
                 icon={FaFacebook}
@@ -93,7 +88,7 @@ const Footer = () => {
               <ContactItem icon={MapPin} text="RUET, Rajshahi, Bangladesh" />
             </div>
             {/* Newsletter Signup */}
-            <div className="mt-8">
+            <div className="mt-8 hidden md:block">
               <h5 className="font-semibold mb-3 text-white">Stay Updated</h5>
               <div className="flex">
                 <input

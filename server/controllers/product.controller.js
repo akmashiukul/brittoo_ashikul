@@ -354,6 +354,16 @@ export const deleteProduct = async (req, res, next) => {
       );
     }
 
+    const refRcc = await prisma.redCacheCredit.findFirst({
+      where: {
+        sourceProductId: product.id
+      }
+    });
+
+    if (refRcc.inUse > 0) {
+      throw new CustomError("Can't delete product. Red Credit referencing this product is in use.", 400);
+    }
+
     await prisma.product.update({
       where: { id },
       data: {

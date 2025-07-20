@@ -1,5 +1,6 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import brittoLogo from "../../assets/brittoo-logo.png";
+import brittoFav from "../../assets/brittoofav.png";
 import { IoLogOut } from "react-icons/io5";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { useEffect, useState } from "react";
@@ -13,7 +14,7 @@ import { Coins, CreditCard } from "lucide-react";
 
 const Navbar = () => {
   const menuClassname =
-    "block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700";
+    "block rounded-lg px-4 py-2 text-xs md:text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700";
   const [isUserDropDownOpen, setIsUserDropDownOpen] = useState(false);
   const [isHamMenuOpen, setIsHamMenuOpen] = useState(false);
   const { openRegModal } = useRegModalStore();
@@ -86,7 +87,12 @@ const Navbar = () => {
             <Link to={"/"}>
               <img
                 src={brittoLogo}
-                className="h-8 md:h-10 object-contain"
+                className="h-8 md:h-10 object-contain hidden md:block"
+                alt="Britto"
+              />
+              <img
+                src={brittoFav}
+                className="h-8 md:h-10 object-contain block md:hidden"
                 alt="Britto"
               />
             </Link>
@@ -124,10 +130,10 @@ const Navbar = () => {
 
             {currentUser ? (
               <div className="flex items-center gap-3 sm:gap-6 mr-2.5 sm:mr-0">
-                <div className="flex items-center gap-2 md:gap-4 bg-gray-50 rounded-full px-3 py-1.5 border border-gray-200">
+                <div className="flex items-center gap-2 md:gap-4 bg-gray-50 rounded-full px-3 py-2 border border-gray-200">
                   {/* BCC */}
                   <div className="flex items-center gap-1">
-                    <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                    <div className="sm:w-6 sm:h-6 w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center">
                       <Coins className="w-3 h-3 text-blue-600" />
                     </div>
                     <span className="text-sm font-medium text-blue-600 hidden sm:inline">
@@ -140,7 +146,7 @@ const Navbar = () => {
 
                   {/* RCC */}
                   <div className="flex items-center gap-1">
-                    <div className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center">
+                    <div className="sm:w-6 sm:h-6 w-4 h-4 bg-red-100 rounded-full flex items-center justify-center">
                       <CreditCard className="w-3 h-3 text-red-600" />
                     </div>
                     <span className="text-sm font-medium text-red-600 hidden sm:inline">
@@ -151,22 +157,52 @@ const Navbar = () => {
                     </span>
                   </div>
                 </div>
-                <Avatar
-                  name={currentUser.email}
-                  colors={[
-                    "#482344",
-                    "#2b5166",
-                    "#429867",
-                    "#fab243",
-                    "#e02130",
-                  ]}
-                  variant="beam"
-                  size={35}
-                  className="cursor-pointer"
-                  onClick={() =>
-                    setIsUserDropDownOpen((prevState) => !prevState)
-                  }
-                />
+                <div className="relative">
+                  <Avatar
+                    name={currentUser.email}
+                    colors={[
+                      "#482344",
+                      "#2b5166",
+                      "#429867",
+                      "#fab243",
+                      "#e02130",
+                    ]}
+                    variant="beam"
+                    size={35}
+                    className="cursor-pointer"
+                    onClick={() =>
+                      setIsUserDropDownOpen((prevState) => !prevState)
+                    }
+                  />
+                  {isUserDropDownOpen && (
+                    <div
+                      className="absolute end-0 z-20 mt-0.5 w-48 divide-gray-100 rounded-md border border-gray-100 bg-white shadow-lg overflow-x-hidden top-10 lg:-left-3"
+                    >
+                      <div className="p-2">
+                        <Link to="/dashboard/overview" className={menuClassname}>
+                          My Dashboard
+                        </Link>
+                        {currentUser.role === "ADMIN" && (
+                          <Link
+                            to="/dashboard/admin/manage-users"
+                            className={menuClassname}
+                          >
+                            Admin Dashboard
+                          </Link>
+                        )}
+                      </div>
+                      {currentUser && (
+                        <button
+                          className="flex w-full items-center gap-2 rounded-lg px-4 py-2 text-sm text-red-700 hover:bg-red-50 cursor-pointer mb-2 mx-2"
+                          onClick={handleLogOut}
+                        >
+                          <IoLogOut size={20} />
+                          Logout
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             ) : (
               <div className="flex gap-4">
@@ -184,37 +220,8 @@ const Navbar = () => {
                 </button>
               </div>
             )}
-            {isUserDropDownOpen && (
-              <div
-                className="absolute end-0 z-20 mt-0.5 w-48 divide-gray-100 rounded-md border border-gray-100 bg-white shadow-lg top-14 right-1.5
-               overflow-x-hidden"
-              >
-                <div className="p-2">
-                  <Link to="/dashboard/overview" className={menuClassname}>
-                    My Dashboard
-                  </Link>
-                  {currentUser.role === "ADMIN" && (
-                    <Link
-                      to="/dashboard/admin/manage-users"
-                      className={menuClassname}
-                    >
-                      Admin Dashboard
-                    </Link>
-                  )}
-                </div>
-                {currentUser && (
-                  <button
-                    className="flex w-full items-center gap-2 rounded-lg px-4 py-2 text-sm text-red-700 hover:bg-red-50 cursor-pointer mb-2 mx-2"
-                    onClick={handleLogOut}
-                  >
-                    <IoLogOut size={20} />
-                    Logout
-                  </button>
-                )}
-              </div>
-            )}
             {isHamMenuOpen && (
-              <div className="absolute end-0 z-10 mt-0.5 w-56 divide-gray-100 rounded-md border border-gray-100 bg-white shadow-lg top-14 overflow-x-hidden">
+              <div className="absolute end-0 z-10 mt-0.5 w-40 divide-gray-100 rounded-md border border-gray-100 bg-white shadow-lg top-12 overflow-x-hidden right-2">
                 <div className="p-2">
                   <NavLink to="/" className={menuClassname}>
                     Home

@@ -184,7 +184,7 @@ model RedCacheCredit {
 
   userId          String  @map("user_id")
   user            User    @relation(fields: [userId], references: [id])
-  sourceProductId String  @map("source_product_id")
+  sourceProductId String  @unique @map("source_product_id")
   sourceProduct   Product @relation(fields: [sourceProductId], references: [id])
 
   rentalRequestUsages RentalRequestRccUsage[]
@@ -232,7 +232,7 @@ model Product {
   owner   User   @relation("ProductsRentedOut", fields: [ownerId], references: [id], onDelete: Cascade)
   renters User[] @relation("ProductsBorrowed")
 
-  redCacheCredits RedCacheCredit[]
+  redCacheCredits RedCacheCredit?
   rentalRequests  RentalRequest[]
 
   createdAt DateTime  @default(now()) @map("created_at")

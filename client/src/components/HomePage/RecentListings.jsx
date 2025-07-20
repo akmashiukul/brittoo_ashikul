@@ -95,7 +95,7 @@ const RecentListings = () => {
             </div>
           </>
         )}
-        <div className="flex justify-center">
+        <div className="flex justify-center mt-2">
           <Link
             to={"/browse"}
             className="cursor-pointer bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 text-xs rounded font-medium border border-gray-300 flex items-center justify-center"
