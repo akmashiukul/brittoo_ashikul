@@ -240,12 +240,13 @@ const RegisterModal = () => {
                     className="ms-2 text-xs font-medium text-gray-900"
                   >
                     I have read and agree to the{" "}
-                    <Link
-                      to="/terms&conditions"
+                    <a
+                      href="/terms-and-conditions"
+                      target="_blank" rel="noopener noreferrer"
                       className="text-green-600 underline dark:text-green-500"
                     >
                       terms and conditions.
-                    </Link>
+                    </a>
                   </label>
                 </div>
               </div>

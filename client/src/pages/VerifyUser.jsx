@@ -263,7 +263,7 @@ const VerifyUser = () => {
           ...currentUser,
           is_verified: "PENDING",
         });
-        setTimeout(() => navigate("/"), 1000);
+        setTimeout(() => navigate("/"), 500);
       } else {
         setMessage(
           `❌ ${

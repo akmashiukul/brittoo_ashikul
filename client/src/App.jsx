@@ -45,6 +45,7 @@ import ManageRentalRequestsAdmin from "./pages/admin/admin-dash-pages/ManageRent
 import { useEffect, useState } from "react";
 import Footer from "./components/shared/Footer";
 import Loader from "./components/shared/Loader";
+import TermsAndConditions from "./pages/TermsAndConditions";
 
 const AppContent = () => {
   const location = useLocation();
@@ -54,16 +55,6 @@ const AppContent = () => {
   const { isShowRccModalOpen } = useShowRccModalStore();
   const [search, setSearch] = useState("");
   const [productType, setProductType] = useState("");
-  const [initialLoading, setInitialLoading] = useState(true);
-  const initLoading = sessionStorage.getItem("init-loading");
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setInitialLoading(false);
-      sessionStorage.setItem("init-loading", "true");
-    }, 4000);
-
-    return () => clearTimeout(timer);
-  }, []);
 
   // Terminate session if JWT expires
   const loginDtStr = localStorage.getItem("login-dt");
@@ -104,10 +95,6 @@ const AppContent = () => {
     location.pathname.startsWith(path),
   );
 
-  if (initialLoading && !initLoading) {
-    return <Loader />
-  }
-
   return (
     <>
       {!loading && !hideNavbar && <Navbar />}
@@ -133,6 +120,7 @@ const AppContent = () => {
             }
           />
           <Route path="/test" element={<Test />} />
+          <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
           <Route path="/verify-otp" element={<VerifyOTP />} />
           <Route path="/verify-user" element={<VerifyUser />} />
           <Route path="/product-details/:id" element={<ProductDetails />} />
