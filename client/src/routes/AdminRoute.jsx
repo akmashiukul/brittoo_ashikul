@@ -1,50 +1,79 @@
 import Loader from "../components/shared/Loader";
-
 import { Navigate, Outlet, useNavigate } from "react-router-dom";
 import useUserStore from "../stores/authStores/useUserStore";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import api from "../lib/api";
 
 const AdminRoute = () => {
   const { currentUser, loading } = useUserStore();
-  const [loggedInUser, setLoggedInUser] = useState(null);
-  const [adminLoading, setAdminLoading] = useState(false);
+  const [userDetails, setUserDetails] = useState(null);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const abortControllerRef = useRef(null);
 
   useEffect(() => {
-    const loggedInUser = async () => {
+    if (!currentUser) {
+      return;
+    }
+    const fetchUserDetails = async () => {
       try {
-        setAdminLoading(true);
+        setIsVerifying(true);
+        setError(null);
+        abortControllerRef.current = new AbortController();
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/");
+          return;
+        }
         const res = await api.get("/api/v1/auth/get-current-user", {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`
-          }
+            Authorization: `Bearer ${token}`
+          },
+          signal: abortControllerRef.current.signal
         });
         if (!res.data.success) {
-          alert("Something went wrong");
+          setError("Failed to verify admin status");
           navigate("/");
+          return;
         }
-        setLoggedInUser(res.data.data);
+        setUserDetails(res.data.data);
       } catch (error) {
-        console.log(error);
-        setAdminLoading(false);
+        if (error.name === 'AbortError') {
+          return;
+        }
+        console.error("Admin verification error:", error);
+        setError("Authentication failed");
+        localStorage.removeItem("token");
+        navigate("/");
       } finally {
-        setAdminLoading(false);
+        setIsVerifying(false);
       }
-    }
-    if (currentUser) {
-      loggedInUser();
-    }
+    };
+    fetchUserDetails();
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
   }, [currentUser, navigate]);
 
-  if (loading || adminLoading) {
+  if (loading || isVerifying) {
     return <Loader />;
   }
-  if (loggedInUser && loggedInUser.role === "ADMIN") {
-    return <Outlet />;
+
+  if (!currentUser) {
+    return <Navigate to="/" replace />;
   }
 
-  return <Navigate to={"/"} replace />;
+  if (error) {
+    return <Navigate to="/" replace />;
+  }
+
+  if (userDetails?.role === "ADMIN") {
+    return <Outlet />;
+  }
+  return <Navigate to="/" replace />;
 };
 
 export default AdminRoute;
