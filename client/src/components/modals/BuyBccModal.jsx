@@ -15,8 +15,6 @@ const BuyBccModal = () => {
   const [trxId, setTrxId] = useState("");
   const [loading, setLoading] = useState(false);
 
-  console.log(amount, '\n', trxId, '\n', paymentMethod)
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!paymentMethod || !amount || !trxId) {
@@ -50,7 +48,15 @@ const BuyBccModal = () => {
       closeBuyBccModal();
     } catch (error) {
       console.error("BCC purchase error:", error);
-      alert(error.response?.data?.message || "Something went wrong");
+      if (error.response?.data?.errorType === "VERIFICATION_ERROR") {
+        Swal.fire({
+          icon: "error",
+          title: "Verfiy yourself first!",
+          text: error.response?.data?.message || "Something went wrong",
+          footer:
+          '<a href="/verify-user" style="color: #2563eb; text-decoration: underline;">Verify Now</a>'
+        });
+      } else alert(error.response?.data?.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -93,7 +99,7 @@ const BuyBccModal = () => {
               📋 Instructions :
             </h3>
             <ul className="text-xs md:text-sm text-blue-700 space-y-1 text-left">
-              <li>• Do Send Money (Not Payment)</li>
+              <li>• Send Money (Not Payment)</li>
               <li>• Number: <strong>+8801772967677</strong></li>
               <li>• Add Your roll at reference</li>
               <li>• Select the gateway and Enter you sent amount</li>

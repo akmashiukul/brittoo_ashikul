@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Camera, Upload, Check, X, Loader, Loader2 } from "lucide-react";
+import { Camera, Upload, Check, X, Loader2 } from "lucide-react";
 import api from "../lib/api.js";
 import useUserStore from "../stores/authStores/useUserStore.js";
 import VerifiedUser from "./VerifiedUser.jsx";
 import Swal from "sweetalert2";
+import Loader from "../components/shared/Loader.jsx";
+import VerificationPending from "./VerifiactionPending.jsx";
 
 const VerifyUser = () => {
   const [idCardImage, setIdCardImage] = useState(null);
@@ -17,12 +19,13 @@ const VerifyUser = () => {
   const [message, setMessage] = useState("");
   const [cameraReady, setCameraReady] = useState(false);
   const [captureType, setCaptureType] = useState(null);
+  const [loggedInUser, setLoggedInUser] = useState(null);
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
-  const { currentUser, setCurrentUser } = useUserStore();
+  const { currentUser, setCurrentUser, loading, setLoading } = useUserStore();
 
   useEffect(() => {
     if (!currentUser || !currentUser.email) {
@@ -282,7 +285,40 @@ const VerifyUser = () => {
     }
   };
 
-  if (currentUser?.isVerified === "VERIFIED") {
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      try {
+        setLoading(true);
+        const res = await api.get("/api/v1/auth/get-current-user", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
+        });
+        if (!res.data.success) {
+          alert("Something went wrong");
+          navigate("/");
+        }
+        setLoggedInUser(res.data.data);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    if (currentUser) {
+      getCurrentUser();
+    }
+  }, [currentUser, navigate, setCurrentUser, setLoading]);
+
+  if (loading) {
+    return <Loader />
+  }
+
+  if (loggedInUser?.isVerified === "PENDING") {
+    return <VerificationPending />
+  }
+
+  if (loggedInUser?.isVerified === "VERIFIED") {
     return <VerifiedUser currentUser={currentUser} />;
   }
 

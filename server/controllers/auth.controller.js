@@ -116,8 +116,8 @@ export const resendOTP = async (req, res, next) => {
     if (currentOtpCount >= 30) {
       const timeUntilReset = user.lastOtpSentDate
         ? new Date(
-            new Date(user.lastOtpSentDate).getTime() + 24 * 60 * 60 * 1000,
-          )
+          new Date(user.lastOtpSentDate).getTime() + 24 * 60 * 60 * 1000,
+        )
         : new Date();
 
       const hoursLeft = Math.ceil((timeUntilReset - now) / (60 * 60 * 1000));
@@ -339,15 +339,8 @@ export const getCurrentUser = async (req, res, next) => {
         403,
       );
     }
-    if (loggedInUser.isVerified !== req.user.isVerified) {
-      return res.status(200).json({
-      success: true,
-      staleData: true,
-    });
-    }
     return res.status(200).json({
       success: true,
-      staleData: false,
       message: "Authentication Successfull",
       data: loggedInUser,
     });

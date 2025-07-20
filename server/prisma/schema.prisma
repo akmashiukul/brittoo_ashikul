@@ -66,6 +66,8 @@ enum VerifyStatus {
   UNVERIFIED
   VERIFIED
   PENDING
+  REJECTED
+  BLOCKED
 }
 
 enum Role {
