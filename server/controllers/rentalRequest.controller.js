@@ -104,6 +104,7 @@ export const createRentalRequest = async (req, res, next) => {
         where: {
           id: { in: rccIds },
           userId: requesterId,
+          deletedAt: null
         },
       });
       if (rccCredits.length !== rccIds.length) {
@@ -187,6 +188,7 @@ export const createRentalRequest = async (req, res, next) => {
           await tx.redCacheCredit.update({
             where: {
               id: rccUsage.rccId,
+              deletedAt: null
             },
             data: {
               inUse: {
@@ -519,7 +521,7 @@ export const rejectRentalRequest = async (req, res, next) => {
         for (const usage of request.rccUsageDetails) {
           updates.push(
             tx.redCacheCredit.update({
-              where: { id: usage.redCacheCreditId },
+              where: { id: usage.redCacheCreditId, deletedAt: null },
               data: {
                 inUse: { decrement: usage.usedAmount },
               },
@@ -593,7 +595,7 @@ export const cancelRentalRequest = async (req, res, next) => {
         include: {
           rccUsageDetails: {
             include: {
-              redCacheCredit: true,
+              redCacheCredit: true
             },
           },
           bccWallet: true,
@@ -639,7 +641,7 @@ export const cancelRentalRequest = async (req, res, next) => {
         for (const usage of request.rccUsageDetails) {
           updates.push(
             tx.redCacheCredit.update({
-              where: { id: usage.redCacheCreditId },
+              where: { id: usage.redCacheCreditId, deletedAt: null },
               data: {
                 inUse: { decrement: usage.usedAmount },
               },

@@ -14,8 +14,6 @@ const ManageItemCard = ({ product, products, setProducts }) => {
     productImages,
   } = product;
 
-  const base_url = import.meta.env.VITE_BASE_URL;
-
   const handleDelete = async () => {
     Swal.fire({
       title: "Are you sure?",
@@ -46,6 +44,11 @@ const ManageItemCard = ({ product, products, setProducts }) => {
           });
         } catch (error) {
           console.error("Error deleting product:", error);
+          Swal.fire({
+            title: "Error!",
+            icon: "error",
+            text: error?.response?.data?.message || "Something went wrong! Maybe credit in use."
+          });
         }
       }
     });
@@ -122,13 +125,14 @@ const ManageItemCard = ({ product, products, setProducts }) => {
         </div>
 
         <div className="px-4 pb-4 flex space-x-2">
-          <Link
+          {/* //TODO: update also rcc with it */}
+          {/* <Link
             to={`/dashboard/update-item/${id}`}
             className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 py-1.5 text-xs rounded font-medium border border-gray-300 flex items-center cursor-pointer justify-center space-x-1"
           >
             <Edit3 className="w-4 h-4" />
             <span>Edit</span>
-          </Link>
+          </Link> */}
           <button
             onClick={handleDelete}
             className="flex-1 cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-800 py-1.5 text-xs rounded font-medium border border-gray-300 flex items-center justify-center space-x-1"

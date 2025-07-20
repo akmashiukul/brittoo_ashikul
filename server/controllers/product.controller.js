@@ -213,6 +213,7 @@ export const getProducts = async (req, res, next) => {
   }
 };
 
+//TODO: update also rcc with it
 export const updateProduct = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -346,7 +347,7 @@ export const deleteProduct = async (req, res, next) => {
         rentalRequests: {
           where: {
             status: {
-              in: [
+              notIn: [
                 'REQUESTED_BY_RENTER',
                 'ACCEPTED_BY_OWNER',
                 'PRODUCT_SUBMITTED_BY_OWNER',
@@ -359,6 +360,10 @@ export const deleteProduct = async (req, res, next) => {
       }
     });
 
+    if(!product) {
+      throw new CustomError("Product not found or you don't have permission to delete this product", 404);
+    }
+
     if (product.ownerId !== req.user.id && req.user.role !== "ADMIN") {
       throw new CustomError(
         "Unauthorized: You can only delete your own products",
@@ -367,7 +372,8 @@ export const deleteProduct = async (req, res, next) => {
     }
     const refRcc = await prisma.redCacheCredit.findFirst({
       where: {
-        sourceProductId: product.id
+        sourceProductId: product.id,
+        deletedAt: null
       }
     });
     if (refRcc.inUse > 0) {
@@ -381,19 +387,13 @@ export const deleteProduct = async (req, res, next) => {
     }
 
     await prisma.$transaction(async (tx) => {
-      await tx.product.update({
-        where: { id },
-        data: {
-          deletedAt: new Date(),
-        },
-      });
-      await tx.redCacheCredit.update({
+      await tx.redCacheCredit.delete({
         where: {
           sourceProductId: product.id
         },
-        data: {
-          deletedAt: new Date()
-        }
+      });
+      await tx.product.delete({
+        where: { id },
       });
     })
 

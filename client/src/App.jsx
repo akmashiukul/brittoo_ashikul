@@ -168,7 +168,8 @@ const AppContent = () => {
               <Route path="my-credits" element={<MyCredits />} />
               <Route path="recieved-requests" element={<RecievedRequests />} />
               <Route path="user-analytics" element={<UserAnalytics />} />
-              <Route path="update-item/:id" element={<UpdateItem />} />
+              {/* //TODO: update also rcc with it */}
+              {/* <Route path="update-item/:id" element={<UpdateItem />} /> */}
             </Route>
           </Route>
         </Routes>

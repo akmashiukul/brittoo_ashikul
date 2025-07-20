@@ -25,7 +25,6 @@ const ManageItems = () => {
         });
 
         setProducts(response.data.products || []);
-        console.log(response.data.products);
       } catch (err) {
         setError(err.response?.data?.message || err.message);
         Swal.fire({
