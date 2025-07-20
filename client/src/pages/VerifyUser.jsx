@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Camera, Upload, Check, X } from "lucide-react";
+import { Camera, Upload, Check, X, Loader, Loader2 } from "lucide-react";
 import api from "../lib/api.js";
 import useUserStore from "../stores/authStores/useUserStore.js";
 import VerifiedUser from "./VerifiedUser.jsx";
@@ -299,13 +299,13 @@ const VerifyUser = () => {
 
         {/* ID Card Section */}
         <div className="mb-8">
-          <h2 className="text-lg border-b border-gray-200 pb-1 font-semibold text-gray-700 mb-4 flex items-center">
+          <h2 className="text-sm md:text-lg border-b border-gray-200 pb-1 font-semibold text-gray-700 mb-4 flex items-center">
             <Upload className="mr-2" size={20} />
             Student ID Card (Front)
           </h2>
           {!idCardPreview ? (
             <div className="space-y-4">
-              <div className="flex gap-4 justify-center">
+              <div className="flex flex-col md:flex-row items-center gap-4 justify-center">
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   className="flex items-center px-4 py-2 border rounded-lg border-gray-400 text-gray-500 text-sm hover:bg-gray-200 cursor-pointer transition-all"
@@ -348,7 +348,7 @@ const VerifyUser = () => {
 
         {/* Selfie Section */}
         <div className="mb-8">
-          <h2 className="text-lg border-b border-gray-200 pb-1 font-semibold text-gray-700 mb-4 flex items-center">
+          <h2 className="text-sm md:text-lg border-b border-gray-200 pb-1 font-semibold text-gray-700 mb-4 flex items-center">
             <Camera className="mr-2" size={20} />
             Selfie Photo
           </h2>
@@ -441,18 +441,18 @@ const VerifyUser = () => {
                     )}
                   </div>
                 </div>
-                <div className="flex justify-center gap-4">
+                <div className="flex flex-col md:flex-row justify-center gap-4">
                   <button
                     onClick={capturePhoto}
                     disabled={!cameraReady}
-                    className="flex items-center px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-semibold"
+                    className="flex items-center px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-semibold text-xs md:text-sm"
                   >
                     <Check className="mr-2" size={18} />
                     Capture Photo
                   </button>
                   <button
                     onClick={stopCamera}
-                    className="flex items-center px-8 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-semibold"
+                    className="flex items-center px-8 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-semibold text-xs md:text-sm"
                   >
                     <X className="mr-2" size={18} />
                     Cancel
@@ -468,7 +468,7 @@ const VerifyUser = () => {
           <button
             onClick={handleSubmit}
             disabled={isSubmitting || !idCardImage || !selfieImage}
-            className="w-full max-w-md px-8 py-4 bg-gradient-to-r from-green-600 to-green-600 text-white font-semibold rounded-lg hover:from-green-700 hover:to-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+            className="w-full max-w-md text-sm md:text-base px-4 md:px-8 py-3 bg-gradient-to-r from-green-600 to-green-600 text-white font-semibold rounded-lg hover:from-green-700 hover:to-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
           >
             {isSubmitting ? (
               <span className="flex items-center justify-center">
@@ -499,6 +499,14 @@ const VerifyUser = () => {
             )}
           </button>
         </div>
+        {
+          isSubmitting && (
+            <div className="mt-3 flex items-center justify-center gap-1 text-teal-600">
+              <Loader2 size={12} className="animate-spin" />
+              <p className="text-xs text-center">Please do not close the browser.</p>
+            </div>
+          )
+        }
 
         {/* Message Display */}
         {message && (
