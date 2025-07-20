@@ -25,7 +25,8 @@ const VerifyUser = () => {
   const canvasRef = useRef(null);
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
-  const { currentUser, setCurrentUser, loading, setLoading } = useUserStore();
+  const { currentUser, setCurrentUser } = useUserStore();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!currentUser || !currentUser.email) {
@@ -301,6 +302,7 @@ const VerifyUser = () => {
         setLoggedInUser(res.data.data);
       } catch (error) {
         console.log(error);
+        setLoading(false);
       } finally {
         setLoading(false);
       }

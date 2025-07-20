@@ -48,7 +48,7 @@ import Footer from "./components/shared/Footer";
 const AppContent = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { loading, setCurrentUser, setLoading } = useUserStore();
+  const { loading, setCurrentUser } = useUserStore();
   const { isBuyBccModalOpen } = useBuyBccModalStore();
   const { isShowRccModalOpen } = useShowRccModalStore();
   const [search, setSearch] = useState("");
