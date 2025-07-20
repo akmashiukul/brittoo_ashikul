@@ -44,6 +44,7 @@ import RequestWithdrawalModal from "./components/modals/RequestWithdrawalModal";
 import ManageRentalRequestsAdmin from "./pages/admin/admin-dash-pages/ManageRentalRequestsAdmin";
 import { useEffect, useState } from "react";
 import Footer from "./components/shared/Footer";
+import Loader from "./components/shared/Loader";
 
 const AppContent = () => {
   const location = useLocation();
@@ -53,6 +54,16 @@ const AppContent = () => {
   const { isShowRccModalOpen } = useShowRccModalStore();
   const [search, setSearch] = useState("");
   const [productType, setProductType] = useState("");
+  const [initialLoading, setInitialLoading] = useState(true);
+  const initLoading = sessionStorage.getItem("init-loading");
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setInitialLoading(false);
+      sessionStorage.setItem("init-loading", "true");
+    }, 4000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // Terminate session if JWT expires
   const loginDtStr = localStorage.getItem("login-dt");
@@ -92,6 +103,10 @@ const AppContent = () => {
   const hideNavbar = noNavbarRoutes.some((path) =>
     location.pathname.startsWith(path),
   );
+
+  if (initialLoading && !initLoading) {
+    return <Loader />
+  }
 
   return (
     <>
