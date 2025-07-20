@@ -115,7 +115,7 @@ const Footer = () => {
               </p>
               <div className="flex items-center text-gray-400 text-sm">
                 <span>Made with</span>
-                <Heart className="h-4 w-4 mx-1 text-red-500" />
+                <Heart className="h-4 w-4 mx-1 text-green-500" />
                 <span>for sustainable communities</span>
               </div>
             </div>

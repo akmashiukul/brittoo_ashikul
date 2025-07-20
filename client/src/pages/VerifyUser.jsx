@@ -20,13 +20,13 @@ const VerifyUser = () => {
   const [cameraReady, setCameraReady] = useState(false);
   const [captureType, setCaptureType] = useState(null);
   const [loggedInUser, setLoggedInUser] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
   const { currentUser, setCurrentUser } = useUserStore();
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!currentUser || !currentUser.email) {
@@ -287,7 +287,7 @@ const VerifyUser = () => {
   };
 
   useEffect(() => {
-    const getCurrentUser = async () => {
+    const getLoggedInUser = async () => {
       try {
         setLoading(true);
         const res = await api.get("/api/v1/auth/get-current-user", {
@@ -308,7 +308,7 @@ const VerifyUser = () => {
       }
     }
     if (currentUser) {
-      getCurrentUser();
+      getLoggedInUser();
     }
   }, [currentUser, navigate, setCurrentUser, setLoading]);
 
