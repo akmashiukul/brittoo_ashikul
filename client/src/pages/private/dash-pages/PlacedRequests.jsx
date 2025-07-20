@@ -27,7 +27,6 @@ const PlacedRequests = () => {
   const [cancellingRequest, setCancellingRequest] = useState(null);
   const [cancelLoading, setCancelLoading] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
-  const base_url = import.meta.env.VITE_BASE_URL;
 
   useEffect(() => {
     fetchPlacedRequests();

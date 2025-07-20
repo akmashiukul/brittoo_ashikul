@@ -73,25 +73,103 @@ export const updateRentalRequestStatus = async (req, res, next) => {
       "PRODUCT_RETURNED_BY_RENTER",
       "PRODUCT_RETURNED_TO_OWNER",
     ];
-
     if (!validStatuses.includes(status)) {
       throw new CustomError("Invalid status value", 400);
     }
 
-    const rentalRequest = await prisma.rentalRequest.update({
-      where: { id: requestId },
-      data: { status },
+    const rentalReq = await prisma.rentalRequest.findUnique({
+      where: {
+        id: requestId,
+        deletedAt: null
+      },
       include: {
-        product: true,
-        owner: { select: safeAuthUserSelect },
-        requester: { select: safeAuthUserSelect },
+        rccUsageDetails: {
+          include: {
+            redCacheCredit: true,
+          },
+        },
+        bccWallet: true,
       },
     });
+    if (!rentalReq) {
+      throw new CustomError("Request not found", 404);
+    }
 
+    let updatedRequest;
+    if (status === "PRODUCT_RETURNED_BY_RENTER") {
+      updatedRequest = await prisma.$transaction(async (tx) => {
+        const updates = [];
+        // Handle BCC refund
+        if (rentalReq.paidWithBcc && rentalReq.usedBccAmount && rentalReq.bccWalletId) {
+          updates.push(
+            tx.bccWallet.update({
+              where: { id: rentalReq.bccWalletId },
+              data: {
+                availableBalance: { increment: rentalReq.usedBccAmount },
+                lockedBalance: { decrement: rentalReq.usedBccAmount },
+              },
+            }),
+          );
+          updates.push(
+            tx.bccTransaction.create({
+              data: {
+                userId: rentalReq.requesterId,
+                walletId: rentalReq.bccWalletId,
+                rentalRequestId: rentalReq.id,
+                amount: rentalReq.usedBccAmount,
+                status: "ACCEPTED",
+                transactionType: "DEPOSIT_REFUND",
+              },
+            }),
+          );
+        }
+        // Handle RCC refund
+        if (rentalReq.paidWithRcc && rentalReq.rccUsageDetails.length > 0) {
+          for (const usage of rentalReq.rccUsageDetails) {
+            updates.push(
+              tx.redCacheCredit.update({
+                where: { id: usage.redCacheCreditId, deletedAt: null },
+                data: {
+                  inUse: { decrement: usage.usedAmount },
+                },
+              }),
+            );
+          }
+        }
+        // Update rental request status
+        updates.push(
+          tx.rentalRequest.update({
+            where: { id: requestId },
+            data: {
+              status: status,
+            },
+            include: {
+              product: true,
+              owner: { select: safeAuthUserSelect },
+              requester: { select: safeAuthUserSelect },
+            },
+          }),
+        );
+
+        const results = await Promise.all(updates);
+        const updatedRequest = results[results.length - 1];
+        return updatedRequest;
+      });
+    } else {
+      updatedRequest = await prisma.rentalRequest.update({
+        where: { id: requestId },
+        data: { status },
+        include: {
+          product: true,
+          owner: { select: safeAuthUserSelect },
+          requester: { select: safeAuthUserSelect },
+        },
+      });
+    }
     res.status(200).json({
       success: true,
       message: "Udated rental request status",
-      data: rentalRequest,
+      data: updatedRequest,
     });
   } catch (error) {
     console.error(error);
@@ -113,23 +191,90 @@ export const rejectRentalRequestAdmin = async (req, res, next) => {
       return res.status(400).json({ error: "Reject reason is required" });
     }
 
-    const rentalRequest = await prisma.rentalRequest.update({
-      where: { id: requestId },
-      data: {
-        status: "REJECTED_FROM_BRITTOO",
-        brittooRejectReason: brittooRejectReason.trim(),
+    const rentalReq = await prisma.rentalRequest.findUnique({
+      where: {
+        id: requestId,
+        deletedAt: null
       },
       include: {
-        product: true,
-        owner: { select: safeAuthUserSelect },
-        requester: { select: safeAuthUserSelect },
+        rccUsageDetails: {
+          include: {
+            redCacheCredit: true,
+          },
+        },
+        bccWallet: true,
       },
     });
+    if (!rentalReq) {
+      throw new CustomError("Request not found", 404);
+    }
+
+    const updatedRequest = await prisma.$transaction(async (tx) => {
+      const updates = [];
+
+      // Handle BCC refund
+      if (rentalReq.paidWithBcc && rentalReq.usedBccAmount && rentalReq.bccWalletId) {
+        updates.push(
+          tx.bccWallet.update({
+            where: { id: rentalReq.bccWalletId },
+            data: {
+              availableBalance: { increment: rentalReq.usedBccAmount },
+              lockedBalance: { decrement: rentalReq.usedBccAmount },
+            },
+          }),
+        );
+        updates.push(
+          tx.bccTransaction.create({
+            data: {
+              userId: rentalReq.requesterId,
+              walletId: rentalReq.bccWalletId,
+              rentalRequestId: rentalReq.id,
+              amount: rentalReq.usedBccAmount,
+              status: "ACCEPTED",
+              transactionType: "DEPOSIT_REFUND",
+            },
+          }),
+        );
+      }
+      // Handle RCC refund
+      if (rentalReq.paidWithRcc && rentalReq.rccUsageDetails.length > 0) {
+        for (const usage of rentalReq.rccUsageDetails) {
+          updates.push(
+            tx.redCacheCredit.update({
+              where: { id: usage.redCacheCreditId, deletedAt: null },
+              data: {
+                inUse: { decrement: usage.usedAmount },
+              },
+            }),
+          );
+        }
+      }
+      // Update rental request status
+      updates.push(
+        tx.rentalRequest.update({
+          where: { id: requestId },
+          data: {
+            status: "REJECTED_FROM_BRITTOO",
+            brittooRejectReason: brittooRejectReason
+          },
+          include: {
+            product: true,
+            owner: { select: safeAuthUserSelect },
+            requester: { select: safeAuthUserSelect },
+          },
+        }),
+      );
+
+      const results = await Promise.all(updates);
+      const updatedRequest = results[results.length - 1];
+      return updatedRequest;
+    });
+
 
     res.status(200).json({
       success: true,
       message: "Rejected rental request by brittoo",
-      data: rentalRequest,
+      data: updatedRequest,
     });
   } catch (error) {
     console.error(error);

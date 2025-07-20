@@ -233,7 +233,7 @@ const RentalRequestsDashboard = () => {
                       <img
                         src={
                           request.product.productImages[0]
-                            ? `${baseUrl}${request.product.productImages[0]}`
+                            ? `${request.product.productImages[0]}`
                             : "https://via.placeholder.com/48"
                         }
                         alt={request.product.name}
@@ -334,7 +334,7 @@ const RentalRequestsDashboard = () => {
                       <img
                         src={
                           request.product.productImages[0]
-                            ? `${baseUrl}${request.product.productImages[0]}`
+                            ? `${request.product.productImages[0]}`
                             : "https://via.placeholder.com/64"
                         }
                         alt={request.product.name}

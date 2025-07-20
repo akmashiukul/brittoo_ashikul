@@ -111,23 +111,17 @@ const RecievedRequests = () => {
 
     setProcessingRequest(selectedRequest.id);
     try {
-      const response = await fetch(
-        `/api/rental-requests/reject/${selectedRequest.id}`,
+      const response = await api.put(
+        `/api/v1/rental-requests/reject/${selectedRequest.id}`, { rejectReason },
         {
-          method: "PUT",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-          body: JSON.stringify({ rejectReason }),
         },
       );
-
-      if (!response.ok) {
+      if (!response.data.success) {
         throw new Error("Failed to reject request");
       }
-
-      // Update the request in the state
       setRequests((prev) =>
         prev.map((req) =>
           req.id === selectedRequest.id
@@ -135,15 +129,18 @@ const RecievedRequests = () => {
             : req,
         ),
       );
-      // Show success notification
-
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: "Request rejected successfully!",
+      });
       closeModal();
     } catch (err) {
-      Swal.fire({
-        icon: "error",
-        title: "ERROR!",
-        text: err.response?.data?.message || "Something went wrong",
-      });
+        Swal.fire({
+          icon: "error",
+          title: "ERROR!",
+          text: err.response?.data?.message || "Something went wrong",
+        });
     } finally {
       setProcessingRequest(null);
     }
@@ -284,7 +281,7 @@ const RecievedRequests = () => {
                       className="lg:w-48 h-48 rounded-xl overflow-hidden flex-shrink-0 border border-gray-300 hover:p-2 hover:shadow-md hover:scale-105 cursor-pointer transition-all duration-300"
                     >
                       <img
-                        src={`${baseUrl}${request.product.productImages[0]}`}
+                        src={`${request.product.productImages[0]}`}
                         alt={request.product.name}
                         className="w-full h-full object-cover"
                       />
@@ -294,10 +291,10 @@ const RecievedRequests = () => {
                     <div className="flex-1">
                       <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-4">
                         <div>
-                          <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                          <h3 className="font-semibold text-gray-800 mb-2">
                             {request.product.name}
                           </h3>
-                          <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
+                          <div className="flex items-center gap-4 text-xs text-gray-600 mb-3">
                             <div className="flex items-center gap-1">
                               <DollarSign className="w-4 h-4" />
                               <span>৳{request.product.pricePerDay}/day</span>
@@ -315,7 +312,7 @@ const RecievedRequests = () => {
 
                         {/* Status Badge */}
                         <div
-                          className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(
+                          className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs border ${getStatusColor(
                             request.status,
                           )}`}
                         >
@@ -327,7 +324,7 @@ const RecievedRequests = () => {
                       {/* Renter Information */}
                       <div className="grid md:grid-cols-2 gap-6 mb-6">
                         <div className="bg-green-50 rounded-xl p-4">
-                          <div className="flex items-center gap-2 text-sm text-green-700 mb-3">
+                          <div className="flex items-center gap-2 text-xs text-green-700 mb-3">
                             <User className="w-4 h-4" />
                             <span className="font-medium">
                               Renter Information
@@ -335,10 +332,10 @@ const RecievedRequests = () => {
                           </div>
                           <div className="space-y-2">
                             <div>
-                              <p className="font-medium text-gray-800">
+                              <p className="font-medium text-sm mb-1 text-gray-800">
                                 {request.requester.name}
                               </p>
-                              <p className="text-sm text-gray-600">
+                              <p className="text-xs text-gray-600">
                                 {request.requester.email}
                               </p>
                             </div>
@@ -351,7 +348,7 @@ const RecievedRequests = () => {
                             <div className="flex items-center gap-2">
                               <Shield className="w-4 h-4 text-gray-400" />
                               <span
-                                className={`text-sm font-medium px-2 py-1 rounded ${getSecurityScoreColor(
+                                className={`text-xs font-medium px-2 py-1 rounded ${getSecurityScoreColor(
                                   request.requester.securityScore,
                                 )}`}
                               >
@@ -384,40 +381,40 @@ const RecievedRequests = () => {
 
                         {/* Rental Details */}
                         <div className="bg-blue-50 rounded-xl p-4">
-                          <div className="flex items-center gap-2 text-sm text-blue-700 mb-3">
+                          <div className="flex items-center gap-2 text-xs text-blue-700 mb-3">
                             <Calendar className="w-4 h-4" />
                             <span className="font-medium">Rental Details</span>
                           </div>
                           <div className="space-y-2">
                             <div className="flex justify-between">
-                              <span className="text-sm text-gray-600">
+                              <span className="text-xs text-gray-600">
                                 Start Date:
                               </span>
-                              <span className="text-sm font-medium text-gray-800">
+                              <span className="text-xs font-medium text-gray-800">
                                 {formatDate(request.rentalStartDate)}
                               </span>
                             </div>
                             <div className="flex justify-between">
-                              <span className="text-sm text-gray-600">
+                              <span className="text-xs text-gray-600">
                                 End Date:
                               </span>
-                              <span className="text-sm font-medium text-gray-800">
+                              <span className="text-xs font-medium text-gray-800">
                                 {formatDate(request.rentalEndDate)}
                               </span>
                             </div>
                             <div className="flex justify-between">
-                              <span className="text-sm text-gray-600">
+                              <span className="text-xs text-gray-600">
                                 Duration:
                               </span>
-                              <span className="text-sm font-medium text-gray-800">
+                              <span className="text-xs font-medium text-gray-800">
                                 {request.totalDays} days
                               </span>
                             </div>
                             <div className="flex justify-between">
-                              <span className="text-sm text-gray-600">
+                              <span className="text-xs text-gray-600">
                                 Total Amount:
                               </span>
-                              <span className="text-sm font-medium text-green-600">
+                              <span className="text-xs font-medium text-green-600">
                                 ৳
                                 {(
                                   request.product.pricePerDay *
@@ -426,12 +423,12 @@ const RecievedRequests = () => {
                               </span>
                             </div>
                             <div className="flex justify-between">
-                              <span className="text-sm text-gray-600">
+                              <span className="text-xs text-gray-600">
                                 Collection:
                               </span>
-                              <span className="text-sm font-medium text-gray-800">
+                              <span className="text-xs font-medium text-gray-800">
                                 {request.renterCollectionMethod ===
-                                "BRITTOO_TERMINAL"
+                                  "BRITTOO_TERMINAL"
                                   ? "Terminal Pickup"
                                   : "Home Delivery"}
                               </span>
@@ -484,7 +481,7 @@ const RecievedRequests = () => {
                   </h3>
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-xs font-medium text-gray-700 mb-2">
                         Deposit Method
                       </label>
                       <select
@@ -508,11 +505,11 @@ const RecievedRequests = () => {
                       htmlFor="phone"
                       className="flex flex-col gap-1.5 w-full mt-4"
                     >
-                      <span className="text-sm font-medium text-gray-700">
+                      <span className="text-xs font-medium text-gray-700">
                         Phone Number
                       </span>
                       <div className="flex items-center border bg-white border-gray-300 rounded-md w-full focus-within:border-gray-400">
-                        <span className="flex items-center gap-1 px-3 text-xs md:text-sm text-gray-600 bg-gray-100 border-r border-gray-300 rounded-l-md">
+                        <span className="flex items-center gap-1 px-3 text-xs md:text-xs text-gray-600 bg-gray-100 border-r border-gray-300 rounded-l-md">
                           <img
                             src="https://flagcdn.com/w40/bd.png"
                             alt="BD Flag"
@@ -533,14 +530,14 @@ const RecievedRequests = () => {
                           }
                           maxLength={10}
                           id="phone"
-                          className="w-full px-2 py-2 md:py-3 md:px-4 focus:outline-none text-xs md:text-sm rounded-r-md"
+                          className="w-full px-2 py-2 md:py-3 md:px-4 focus:outline-none text-xs md:text-xs rounded-r-md"
                           placeholder="1XXXXXXXXX"
                         />
                       </div>
                     </label>
                     {acceptFormData.ownerSubmitMethod === "BRITTOO_TERMINAL" ? (
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-xs font-medium text-gray-700 mb-2">
                           Pickup Point
                         </label>
                         <select
@@ -566,7 +563,7 @@ const RecievedRequests = () => {
                     ) : (
                       acceptFormData.ownerSubmitMethod === "HOME" && (
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text-xs font-medium text-gray-700 mb-2">
                             Deposit Address
                           </label>
                           <textarea
@@ -579,7 +576,7 @@ const RecievedRequests = () => {
                             }
                             className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                             rows="4"
-                            placeholder="Please provide a reason for rejecting this request..."
+                            placeholder="Please provide your deposit address here..."
                           />
                         </div>
                       )
@@ -611,7 +608,7 @@ const RecievedRequests = () => {
                   </h3>
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-xs font-medium text-gray-700 mb-2">
                         Reason for Rejection
                       </label>
                       <textarea

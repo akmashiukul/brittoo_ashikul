@@ -428,16 +428,18 @@ export const acceptRentalRequest = async (req, res, next) => {
           },
         },
       });
-      const bccTransactionId = request.bccTransactions[0].id;
-      await tx.bccTransaction.update({
-        where: {
-          id: bccTransactionId,
-        },
-        data: {
-          status: "ACCEPTED",
-          rentalRequestId: requestId,
-        },
-      });
+      if (request.paidWithBcc) {
+        const bccTransactionId = request.bccTransactions[0].id;
+        await tx.bccTransaction.update({
+          where: {
+            id: bccTransactionId,
+          },
+          data: {
+            status: "ACCEPTED",
+            rentalRequestId: requestId,
+          },
+        });
+      }
 
       return upReq;
     });
