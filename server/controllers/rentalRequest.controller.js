@@ -1,5 +1,7 @@
+import { Resend } from "resend";
 import prisma from "../config/prisma.js";
 import { CustomError } from "../lib/customError.js";
+const resend = new Resend(`${process.env.RESEND_API_KEY}`);
 
 export const createRentalRequest = async (req, res, next) => {
   try {
@@ -236,6 +238,27 @@ export const createRentalRequest = async (req, res, next) => {
     });
 
     // TODO: emit notification to owner
+    await resend.emails.send({
+      from: "Brittoo <verify@brittoo.xyz>",
+      to: result.owner.email,
+      subject: `Congratulations! You have recieved a request.`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f4f7f6;">
+          <div style="text-align: center; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+            <h2 style="color: #2e7d32; font-size: 24px; margin-bottom: 20px;">Congratulations! You've Received a Request!</h2>
+            <p style="color: #374151; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
+              A new rental request is waiting for your review. Please take a moment to accept or respond to the request.
+            </p>
+            <a href="${process.env.CLIENT_BASE_URL}/dashboard/recieved-requests" style="display: inline-block; padding: 12px 24px; background-color: #4caf50; color: #ffffff; text-decoration: none; font-weight: bold; border-radius: 5px; margin: 20px 0;">
+              View Received Requests
+            </a>
+            <p style="color: #374151; font-size: 14px; line-height: 1.5;">
+              If you have any questions, feel free to contact our support team.
+            </p>
+          </div>
+        </div>
+      `,
+    });
     res.status(201).json({
       success: true,
       message: "Rental request created successfully",
@@ -462,6 +485,31 @@ export const acceptRentalRequest = async (req, res, next) => {
     });
 
     // TODO: Emit notification to renter
+    await resend.emails.send({
+      from: "Brittoo <verify@brittoo.xyz>",
+      to: updatedRequest.requester.email,
+      subject: `Your Rental Request Has been accepted.`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f4f7f6;">
+          <div style="text-align: center; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+            <h2 style="color: #2e7d32; font-size: 24px; margin-bottom: 20px;">Rental Request Accepted!</h2>
+            <p style="color: #374151; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
+              Your rental request has been successfully accepted. A member of the Brittoo team will contact you soon with further details.
+            </p>
+            <p style="color: #374151; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
+              Please have patience as we process your request.
+            </p>
+            <a href="${process.env.CLIENT_BASE_URL}/dashboard/placed-requests" style="display: inline-block; padding: 12px 24px; background-color: #4caf50; color: #ffffff; text-decoration: none; font-weight: bold; border-radius: 5px; margin: 20px 0;">
+              View Your Requests
+            </a>
+            <p style="color: #374151; font-size: 14px; line-height: 1.5;">
+              If you have any questions, feel free to reach out to our support team.
+            </p>
+          </div>
+        </div>
+      `,
+    });
+
     res.status(200).json({
       success: true,
       data: updatedRequest,

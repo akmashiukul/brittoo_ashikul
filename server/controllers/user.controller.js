@@ -1,6 +1,8 @@
+import { Resend } from "resend";
 import prisma from "../config/prisma.js";
 import { CustomError } from "../lib/customError.js";
 import { safeAuthUserSelect } from "../lib/prismaSelects.js";
+const resend = new Resend(`${process.env.RESEND_API_KEY}`);
 
 export const getAllUsers = async (req, res, next) => {
   try {
@@ -20,12 +22,12 @@ export const getAllUsers = async (req, res, next) => {
         { deletedAt: null },
         search
           ? {
-              OR: [
-                { name: { contains: search, mode: "insensitive" } },
-                { email: { contains: search, mode: "insensitive" } },
-                { roll: { contains: search, mode: "insensitive" } },
-              ],
-            }
+            OR: [
+              { name: { contains: search, mode: "insensitive" } },
+              { email: { contains: search, mode: "insensitive" } },
+              { roll: { contains: search, mode: "insensitive" } },
+            ],
+          }
           : {},
 
         status === "VERIFIED"
@@ -407,6 +409,30 @@ export const verifyUser = async (req, res, next) => {
         isVerified: "VERIFIED",
       },
     });
+
+    //send email
+    await resend.emails.send({
+      from: "Brittoo <verify@brittoo.xyz>",
+      to: user.email,
+      subject: "Congratulations! Your are verified from Brittoo.",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f4f7f6;">
+          <div style="text-align: center; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+            <h2 style="color: #2e7d32; font-size: 24px; margin-bottom: 20px;">You're Verified!</h2>
+            <p style="color: #374151; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
+              Your Brittoo account has been successfully verified. You're all set to explore your dashboard.
+            </p>
+            <a href="${process.env.CLIENT_BASE_URL}/dashboard/overview" style="display: inline-block; padding: 12px 24px; background-color: #4caf50; color: #ffffff; text-decoration: none; font-weight: bold; border-radius: 5px; margin: 20px 0;">
+              Go to Dashboard
+            </a>
+            <p style="color: #374151; font-size: 14px; line-height: 1.5;">
+              If you have any questions, feel free to contact our support team.
+            </p>
+          </div>
+      </div>
+      `,
+    });
+
     res.json({
       success: true,
       message: "User verification status updated successfully",

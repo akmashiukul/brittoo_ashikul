@@ -76,19 +76,6 @@ const ListItems = () => {
         });
         return;
       }
-
-      // Show cache credit
-      await setRcc(res.data.rcc);
-      openShowRccModal();
-      
-    } catch (error) {
-      console.error("Error in Listing Item:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Something went wrong",
-        text: error.response?.data?.message || error.message,
-      });
-    } finally {
       setFormData({
         name: "",
         productType: "",
@@ -99,6 +86,18 @@ const ListItems = () => {
         productDescription: "",
         isForSale: false
       });
+      // Show cache credit
+      await setRcc(res.data.rcc);
+      openShowRccModal();
+
+    } catch (error) {
+      console.error("Error in Listing Item:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Something went wrong",
+        text: error.response?.data?.message || error.message,
+      });
+    } finally {
       setSelectedImages([]);
       setLoading(false);
     }
