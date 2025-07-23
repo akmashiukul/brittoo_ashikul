@@ -232,11 +232,11 @@ const Navbar = () => {
                   <NavLink to="/buy-credits" className={menuClassname}>
                     Buy Credits
                   </NavLink>
-                  <NavLink to="/faq" className={menuClassname}>
-                    FAQ
-                  </NavLink>
-                  <NavLink to="/contact" className={menuClassname}>
-                    Contact
+                  <NavLink
+                    to="/dashboard/overview"
+                    className={menuClassname}
+                  >
+                    Dashboard
                   </NavLink>
                 </div>
               </div>

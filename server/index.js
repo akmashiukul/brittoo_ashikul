@@ -5,8 +5,6 @@ import authRoutes from "./routes/auth.routes.js";
 import productRoutes from "./routes/product.routes.js";
 import cors from "cors";
 import { multerErrorHandler } from "./lib/multerErrorHandler.js";
-import path from "path";
-import { fileURLToPath } from "url";
 import bccRoutes from "./routes/bcc.routes.js";
 import rccRoutes from "./routes/rcc.routes.js";
 import userRoutes from "./routes/user.routes.js";
@@ -19,11 +17,9 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 app.use(cors());
+app.set('trust proxy', true);
 const PORT = process.env.PORT || 5000;
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 //routes
 app.get("/", (req, res) => {
