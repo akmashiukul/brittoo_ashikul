@@ -65,6 +65,7 @@ const ListItems = () => {
       const res = await api.post("/api/v1/products", formDataToSend, {
         headers: {
           Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
         },
       });
 
