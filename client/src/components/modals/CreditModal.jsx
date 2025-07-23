@@ -9,6 +9,7 @@ import RCC from "../CacheCreditCard/RCC";
 import CCDisplay from "../CacheCreditCard/CCDisplay";
 import Swal from "sweetalert2";
 import useConfirmRentalRequestModalStore from "../../stores/creditModalStores/useConfirmRentalRequestModalStore";
+import { Link } from "react-router-dom";
 
 const CreditModal = () => {
   const { closeCreditModal, isCreditModalOpen, data } = useCreditModalStore();
@@ -232,7 +233,7 @@ const CreditModal = () => {
               <div className="mt-6 text-center">
                 <Link
                   to="/buy-credits"
-                  className="text-sm text-green-600 hover:text-green-700 underline"
+                  className="text-sm text-green-600 hover:text-green-700 underline font-semibold"
                 >
                   Need more credits? Buy here
                 </Link>

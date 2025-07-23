@@ -81,10 +81,6 @@ export const resendOTP = async (req, res, next) => {
       throw new CustomError("Email is required", 400);
     }
 
-    if (!isValidRuetEmail(email)) {
-      throw new CustomError("The Email is not a valid student mail", 401);
-    }
-
     const user = await prisma.user.findUnique({
       where: { email },
     });
@@ -251,9 +247,6 @@ export const login = async (req, res, next) => {
     if (!email || !password) {
       throw new CustomError("Email and password are required", 400);
     }
-    if (!isValidRuetEmail(email)) {
-      throw new CustomError("The email is not a valid student email", 401);
-    }
     const user = await prisma.user.findFirst({
       where: {
         email: email,
@@ -353,9 +346,6 @@ export const getCurrentUser = async (req, res, next) => {
 export const generatePasswordResetToken = async (req, res, next) => {
   const { email } = req.body;
   try {
-    if (!isValidRuetEmail(email)) {
-      throw new CustomError("The Email is not a valid student mail", 401);
-    }
     const user = await prisma.user.findUnique({
       where: { email },
     });
