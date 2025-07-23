@@ -28,7 +28,7 @@ const ResetPasswordModal = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      const res = await api.post("/api/v1/auth/reset-password", formData);
+      const res = await api.post("/api/v1/auth/forgot-password", formData);
       if (!res.data.success) {
         closeResetPasswordModal();
         Swal.fire({

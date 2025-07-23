@@ -502,7 +502,7 @@ export const resetPasswordWithToken = async (req, res, next) => {
       throw new CustomError("Reset link has expired. Please request a new one.", 400);
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
     await prisma.$transaction(async (tx) => {
       await tx.user.update({
         where: { id: resetToken.userId },

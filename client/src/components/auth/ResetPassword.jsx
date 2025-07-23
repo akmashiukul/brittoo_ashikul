@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Eye, EyeOff, Lock, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import useLoginModalStore from '../../stores/authStores/useLoginModalStore';
 import api from '../../lib/api';
@@ -15,17 +16,19 @@ const ResetPassword = () => {
   const [error, setError] = useState('');
   const [token, setToken] = useState('');
   const { openLoginModal } = useLoginModalStore();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   // Extract token from URL on component mount
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const tokenParam = urlParams.get('token');
+    const tokenParam = searchParams.get('token');
     if (tokenParam) {
       setToken(tokenParam);
     } else {
       setError('Invalid reset link. Please check your email for the correct link.');
     }
-  }, []);
+  }, [searchParams]);
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -66,7 +69,7 @@ const ResetPassword = () => {
       if (response.data.success) {
         setSuccess(true);
         setTimeout(() => {
-          window.location.href = '/';
+          navigate('/');
           openLoginModal();
         }, 2000);
       } else {
@@ -94,12 +97,6 @@ const ResetPassword = () => {
             <p className="text-gray-600 mb-6">
               Your password has been successfully updated. You will be redirected to the login shortly.
             </p>
-            <button
-              onClick={() => openLoginModal()}
-              className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2.5 px-4 rounded-lg transition-colors"
-            >
-              Go to Login
-            </button>
           </div>
         </div>
       </div>
@@ -202,7 +199,7 @@ const ResetPassword = () => {
             <button
               type="submit"
               disabled={loading || !token}
-              className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2"
+              className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2 cursor-pointer"
             >
               {loading ? (
                 <>
@@ -214,18 +211,6 @@ const ResetPassword = () => {
               )}
             </button>
           </form>
-
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
-              Remember your password?{' '}
-              <a
-                href="/login"
-                className="text-green-600 hover:text-green-700 font-medium"
-              >
-                Back to Login
-              </a>
-            </p>
-          </div>
         </div>
       </div>
     </div>
