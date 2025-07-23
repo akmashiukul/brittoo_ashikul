@@ -42,7 +42,7 @@ const ProductCard = ({ product }) => {
           <img
             src={`${baseUrl}${productImages[0]}`}
             alt={name}
-            className="w-full h-full object-contain group-hover:scale-110 transition duration-400 group-hover:translate-x-2"
+            className="w-full h-full object-cover group-hover:scale-110 transition duration-400 group-hover:translate-x-2"
           />
           <div className="absolute top-2 left-2">
             <div

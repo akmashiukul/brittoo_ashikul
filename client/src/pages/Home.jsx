@@ -5,7 +5,7 @@ import RecentListings from "../components/HomePage/RecentListings";
 
 const Home = ({ setProductType, setSearch }) => {
   return (
-    <div>
+    <div className="bg-white">
       <Banner setProductType={setProductType} setSearch={setSearch}/>
       <RecentListings />
       <HowBrittooWorks />
