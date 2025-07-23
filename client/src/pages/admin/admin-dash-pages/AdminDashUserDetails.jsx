@@ -29,6 +29,7 @@ const AdminDashUserDetails = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
   const [actionLoading, setActionLoading] = useState(false);
+  const baseUrl = import.meta.env.VITE_BASE_URL;
 
   useEffect(() => {
     fetchUserDetails();
@@ -477,7 +478,7 @@ const AdminDashUserDetails = () => {
                     {documentStatus.hasSelfie && (
                       <div className="aspect-square rounded-lg flex items-center justify-center">
                         <img
-                          src={`${user.selfie}`}
+                          src={`${baseUrl}${user.selfie}`}
                           alt="Selfie"
                           className="max-w-full max-h-full rounded-lg"
                         />
@@ -497,7 +498,7 @@ const AdminDashUserDetails = () => {
                     {documentStatus.hasIdCardFront && (
                       <div className="aspect-video rounded-lg flex items-center justify-center">
                         <img
-                          src={`${user.idCardFront}`}
+                          src={`${baseUrl}${user.idCardFront}`}
                           alt="ID Front"
                           className="max-w-full max-h-full rounded-lg"
                         />
@@ -517,7 +518,7 @@ const AdminDashUserDetails = () => {
                     {documentStatus.hasIdCardBack && (
                       <div className="aspect-video rounded-lg flex items-center justify-center">
                         <img
-                          src={`${user.idCardBack}`}
+                          src={`${baseUrl}${user.idCardBack}`}
                           alt="ID Back"
                           className="max-w-full max-h-full rounded-lg"
                         />

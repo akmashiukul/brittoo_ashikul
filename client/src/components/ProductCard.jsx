@@ -11,6 +11,9 @@ const ProductCard = ({ product }) => {
     tags,
     productImages,
   } = product;
+
+  const baseUrl = import.meta.env.VITE_BASE_URL;
+
   const conditionColor =
     {
       NEW: "bg-green-200 text-green-800",
@@ -37,7 +40,7 @@ const ProductCard = ({ product }) => {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="relative h-40 overflow-hidden">
           <img
-            src={`${productImages[0]}`}
+            src={`${baseUrl}${productImages[0]}`}
             alt={name}
             className="w-full h-full object-contain group-hover:scale-110 transition duration-400 group-hover:translate-x-2"
           />

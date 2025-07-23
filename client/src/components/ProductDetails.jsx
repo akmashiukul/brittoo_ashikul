@@ -22,6 +22,9 @@ const ProductDetails = () => {
   const [price, setPrice] = useState(0);
   const { currentUser } = useUserStore();
   const { id } = useParams();
+
+  const baseUrl = import.meta.env.VITE_BASE_URL;
+
   const { calculatePricePerDay } = usePriceCalculate();
   const [range, setRange] = useState({
     from: undefined,
@@ -145,7 +148,7 @@ const ProductDetails = () => {
                 <div key={image}>
                   <img
                     className="w-full h-[150px] md:h-[350px] object-contain"
-                    src={`${image}`}
+                    src={`${baseUrl}${image}`}
                   />
                 </div>
               ))}

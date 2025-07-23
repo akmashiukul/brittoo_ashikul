@@ -1,69 +1,67 @@
+import fs from "fs";
+import path from "path";
 import prisma from "../config/prisma.js";
+import { uploadsDirPath } from "../middlewares/uploadMiddleware.js";
 import jwt from 'jsonwebtoken';
-import { CustomError } from "../lib/customError.js";
-import { v2 as cloudinary } from "cloudinary";
-import { uploadToCloudinary } from "../config/cloudinary.js";
 
-export const verifyUser = async (req, res, next) => {
+export const verifyUser = async (req, res) => {
   try {
     const { email } = req.body;
     if (!email) {
-      throw new CustomError("Email is required", 400);
+      return res
+        .status(400)
+        .json({ success: false, message: "Email is required" });
     }
-
     if (!req.files || !req.files.idCard || !req.files.selfie) {
-      throw new CustomError("Both ID card and selfie images are required", 400);
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "Both ID card and selfie images are required",
+        });
     }
-
     const idCardFile = req.files.idCard[0];
     const selfieFile = req.files.selfie[0];
 
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-      throw new CustomError("User not found", 404);
+      fs.unlinkSync(idCardFile.path);
+      fs.unlinkSync(selfieFile.path);
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
-
     if (user.isVerified === "VERIFIED") {
-      throw new CustomError("User is already verified", 400);
+      fs.unlinkSync(idCardFile.path);
+      fs.unlinkSync(selfieFile.path);
+      return res
+        .status(400)
+        .json({ success: false, message: "User is already verified" });
     }
-
     if (user.isVerified === "PENDING") {
-      throw new CustomError("You have already requested for verification", 400);
+      fs.unlinkSync(idCardFile.path);
+      fs.unlinkSync(selfieFile.path);
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "You have already requested for verification",
+        });
     }
-    // Delete old images from Cloudinary if they exist
     if (user.idCardFront && user.idCardFront !== "absent") {
-      const publicId = user.idCardFront.split("/").slice(-2).join("/").split(".")[0];
-      try {
-        await cloudinary.uploader.destroy(publicId);
-        console.log(`Deleted ID card from Cloudinary: ${publicId}`);
-      } catch (err) {
-        console.error(`Error deleting ID card ${publicId}:`, err);
-      }
+      const oldIdCardPath = path.join(uploadsDirPath, user.idCardFront);
+      if (fs.existsSync(oldIdCardPath)) fs.unlinkSync(oldIdCardPath);
     }
-
     if (user.selfie && user.selfie !== "absent") {
-      const publicId = user.selfie.split("/").slice(-2).join("/").split(".")[0];
-      try {
-        await cloudinary.uploader.destroy(publicId);
-        console.log(`Deleted selfie from Cloudinary: ${publicId}`);
-      } catch (err) {
-        console.error(`Error deleting selfie ${publicId}:`, err);
-      }
-    }
-
-    // Upload new images to Cloudinary
-    const idCardUrl = await uploadToCloudinary(idCardFile);
-    const selfieUrl = await uploadToCloudinary(selfieFile);
-
-    if (!idCardUrl || !selfieUrl) {
-      throw new CustomError("Failed to upload one or more images", 400);
+      const oldSelfiePath = path.join(uploadsDirPath, user.selfie);
+      if (fs.existsSync(oldSelfiePath)) fs.unlinkSync(oldSelfiePath);
     }
 
     const updatedUser = await prisma.user.update({
       where: { email },
       data: {
-        idCardFront: idCardUrl,
-        selfie: selfieUrl,
+        idCardFront: `/uploads/${idCardFile.filename}`,
+        selfie: `/uploads/${selfieFile.filename}`,
         isVerified: "PENDING",
       },
     });
@@ -73,35 +71,45 @@ export const verifyUser = async (req, res, next) => {
         id: user.id,
         email: user.email,
         role: user.role,
-        isVerified: updatedUser.isVerified,
+        isVerified: user.isVerified,
         isSuspended: user.isSuspended,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "10d" },
+      { expiresIn: "2d" },
     );
-
     const { password: _, otp: __, otpExpiry: ___, ...safeUser } = updatedUser;
 
     res.status(200).json({
       success: true,
       user: safeUser,
       token,
-      message: "Verification documents uploaded successfully. Your submission is now under review.",
+      message:
+        "Verification documents uploaded successfully. Your submission is now under review.",
     });
   } catch (error) {
     console.error("Verification error:", error);
-    if (error instanceof CustomError) {
-      return res.status(error.statusCode).json({ success: false, message: error.message });
-    }
-    if (error.code === "LIMIT_FILE_SIZE") {
-      return res.status(400).json({
-        success: false,
-        message: "File size too large. Maximum size is 5MB per file.",
+    if (req.files) {
+      ["idCard", "selfie"].forEach((field) => {
+        if (req.files[field]) {
+          req.files[field].forEach((file) => {
+            if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+          });
+        }
       });
     }
-    res.status(500).json({
-      success: false,
-      message: "Internal server error. Please try again later.",
-    });
+    if (error.code === "LIMIT_FILE_SIZE") {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "File size too large. Maximum size is 5MB per file.",
+        });
+    }
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Internal server error. Please try again later.",
+      });
   }
 };

@@ -29,6 +29,8 @@ const RentalRequestsDashboard = () => {
   const [loading, setLoading] = useState(false);
   const [expandedRows, setExpandedRows] = useState(new Set());
 
+  const baseUrl = import.meta.env.VITE_BASE_URL;
+
   const fetchRentalRequests = async (page = 1) => {
     setLoading(true);
     try {
@@ -231,7 +233,7 @@ const RentalRequestsDashboard = () => {
                       <img
                         src={
                           request.product.productImages[0]
-                            ? `${request.product.productImages[0]}`
+                            ? `${baseUrl}${request.product.productImages[0]}`
                             : "https://via.placeholder.com/48"
                         }
                         alt={request.product.name}
@@ -332,7 +334,7 @@ const RentalRequestsDashboard = () => {
                       <img
                         src={
                           request.product.productImages[0]
-                            ? `${request.product.productImages[0]}`
+                            ? `${baseUrl}${request.product.productImages[0]}`
                             : "https://via.placeholder.com/64"
                         }
                         alt={request.product.name}

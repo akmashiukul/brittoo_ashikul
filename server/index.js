@@ -5,6 +5,9 @@ import authRoutes from "./routes/auth.routes.js";
 import productRoutes from "./routes/product.routes.js";
 import cors from "cors";
 import { multerErrorHandler } from "./lib/multerErrorHandler.js";
+import path from "path";
+import { fileURLToPath } from "url";
+
 import bccRoutes from "./routes/bcc.routes.js";
 import rccRoutes from "./routes/rcc.routes.js";
 import userRoutes from "./routes/user.routes.js";
@@ -20,6 +23,10 @@ app.use(cors());
 app.set("trust proxy", 1);
 const PORT = process.env.PORT || 5000;
 
+//File Handlers
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 //routes
 app.get("/", (req, res) => {

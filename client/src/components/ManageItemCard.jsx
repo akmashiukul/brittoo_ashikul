@@ -14,6 +14,8 @@ const ManageItemCard = ({ product, products, setProducts }) => {
     productImages,
   } = product;
 
+  const baseUrl = import.meta.env.VITE_BASE_URL;
+
   const handleDelete = async () => {
     Swal.fire({
       title: "Are you sure?",
@@ -77,7 +79,7 @@ const ManageItemCard = ({ product, products, setProducts }) => {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="relative h-40 overflow-hidden">
           <img
-            src={`${productImages[0]}`}
+            src={`${baseUrl}${productImages[0]}`}
             alt={name}
             className="w-full h-full object-cover group-hover:scale-110 transition duration-400 group-hover:translate-x-2"
           />

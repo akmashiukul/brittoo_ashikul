@@ -14,6 +14,9 @@ export const uploadToCloudinary = async (file) => {
     if (!file || !file.buffer) {
       throw new Error("No file buffer provided");
     }
+    if (file.size > 5 * 1024 * 1024) {
+      throw new Error("File size exceeds 5MB limit");
+    }
 
     // Convert buffer to base64
     const base64String = file.buffer.toString("base64");
