@@ -47,6 +47,7 @@ import Footer from "./components/shared/Footer";
 import Loader from "./components/shared/Loader";
 import TermsAndConditions from "./pages/TermsAndConditions";
 import ResetPasswordModal from "./components/auth/ResetPasswordModal";
+import ResetPassword from "./components/auth/ResetPassword";
 
 const AppContent = () => {
   const location = useLocation();
@@ -91,6 +92,7 @@ const AppContent = () => {
     "/verify-otp",
     "/verify-user",
     "/dashboard/admin",
+    "/reset-password",
   ];
   const hideNavbar = noNavbarRoutes.some((path) =>
     location.pathname.startsWith(path),
@@ -127,6 +129,7 @@ const AppContent = () => {
           <Route path="/verify-user" element={<VerifyUser />} />
           <Route path="/product-details/:id" element={<ProductDetails />} />
           <Route path="/buy-credits" element={<BuyCredits />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route
             path="/browse"
             element={
