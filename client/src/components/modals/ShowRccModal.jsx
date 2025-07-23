@@ -28,7 +28,7 @@ const ShowRccModal = () => {
                 Congratulations!!
               </h3>
               <p className="text-gray-500 text-sm mt-3">
-                You have recieved a{" "}
+                You have received a{" "}
                 <span className="text-red-500 font-semibold">
                   Red Cache Credit
                 </span>{" "}

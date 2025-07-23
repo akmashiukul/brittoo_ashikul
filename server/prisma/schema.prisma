@@ -312,9 +312,9 @@ model RentalRequest {
   renterReturnAddress  String?                    @map("renter_return_address")
   renterReturnTerminal BrittoTerminal?            @map("renter_return_terminal")
 
-  ownerReturnRecieveMethod   CollectionOrDepositMethod? @map("owner_return_recieve_method")
-  ownerReturnRecieveAddress  String?                    @map("owner_return_recieve_address")
-  ownerReturnRecieveTerminal BrittoTerminal?            @map("owner_return_recieve_terminal")
+  ownerReturnReceiveMethod   CollectionOrDepositMethod? @map("owner_return_receive_method")
+  ownerReturnReceiveAddress  String?                    @map("owner_return_receive_address")
+  ownerReturnReceiveTerminal BrittoTerminal?            @map("owner_return_receive_terminal")
 
   paidWithRcc         Boolean @default(false) @map("paid_with_rcc")
   paidWithBcc         Boolean @default(false) @map("paid_with_bcc")

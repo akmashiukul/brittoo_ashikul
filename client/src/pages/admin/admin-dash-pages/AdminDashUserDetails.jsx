@@ -19,7 +19,7 @@ import {
 import api from "../../../lib/api";
 import UserCreditDetails from "./UserCreditDetails";
 import UserPlacedRequests from "./UserPlacedRequests";
-import UserRecievedRequests from "./UserRecievedRequests";
+import UserReceivedRequests from "./UserReceivedRequests";
 import Loader from "../../../components/shared/Loader";
 import Swal from "sweetalert2";
 
@@ -159,7 +159,7 @@ const AdminDashUserDetails = () => {
     { id: "documents", label: "Documents", icon: FileText },
     { id: "security", label: "Security", icon: Shield },
     { id: "placed-requests", label: "Placed Requests", icon: History },
-    { id: "recieved-requests", label: "Recieved Requests", icon: BoxIcon },
+    { id: "received-requests", label: "Received Requests", icon: BoxIcon },
     { id: "credits", label: "Credit History", icon: CreditCard },
   ];
 
@@ -643,9 +643,9 @@ const AdminDashUserDetails = () => {
                 <UserPlacedRequests userId={userId} />
               </div>
             )}
-            {activeTab === "recieved-requests" && (
+            {activeTab === "received-requests" && (
               <div>
-                <UserRecievedRequests userId={userId} />
+                <UserReceivedRequests userId={userId} />
               </div>
             )}
 

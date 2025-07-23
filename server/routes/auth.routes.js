@@ -4,7 +4,6 @@ import { loginLimiter, verifyOtpLimiter } from '../middlewares/rateLimiters.js';
 import { uploadMiddleware } from '../middlewares/uploadMiddleware.js';
 import { verifyUser } from '../controllers/verification.controller.js';
 import { verifyToken } from '../middlewares/authMiddleware.js';
-import { verificationMiddleware } from '../middlewares/verificationMiddleware.js';
 
 const router = express.Router();
 

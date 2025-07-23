@@ -179,9 +179,9 @@ const DashboardLayout = () => {
             </li>
             <li>
               <Link
-                to="/dashboard/recieved-requests"
+                to="/dashboard/received-requests"
                 className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${
-                  path.includes("/recieved-requests")
+                  path.includes("/received-requests")
                     ? "bg-green-600 text-white"
                     : "text-gray-700"
                 } flex items-center gap-2`}
@@ -191,7 +191,7 @@ const DashboardLayout = () => {
                   }
                 }}
               >
-                <ListCheck size={16} /> Recieved Requests
+                <ListCheck size={16} /> Received Requests
               </Link>
             </li>
             <li>

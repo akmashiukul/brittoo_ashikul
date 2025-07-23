@@ -18,7 +18,7 @@ import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import Loader from "../../../components/shared/Loader";
 
-const UserRecievedRequests = ({ userId }) => {
+const UserReceivedRequests = ({ userId }) => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -26,7 +26,7 @@ const UserRecievedRequests = ({ userId }) => {
   useEffect(() => {
     const fetchRentalRequests = async () => {
       try {
-        const res = await api.get(`/api/v1/users/recieved-requests/${userId}`, {
+        const res = await api.get(`/api/v1/users/received-requests/${userId}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
@@ -121,7 +121,7 @@ const UserRecievedRequests = ({ userId }) => {
                 No Requests Found
               </h3>
               <p className="text-green-600">
-                This User haven't recieved any rental requests yet.
+                This User haven't received any rental requests yet.
               </p>
             </div>
           </div>
@@ -307,4 +307,4 @@ const UserRecievedRequests = ({ userId }) => {
   );
 };
 
-export default UserRecievedRequests;
+export default UserReceivedRequests;

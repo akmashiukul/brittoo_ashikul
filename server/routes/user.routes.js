@@ -6,7 +6,7 @@ import {
   getUserCreditHistory,
   getUserDetails,
   getUserPlacedRequestsAdmin,
-  getUserRecievedRequestsAdmin,
+  getUserReceivedRequestsAdmin,
   getUserTotalCredits,
   getUserWithdrawalRequests,
   suspendUser,
@@ -30,10 +30,10 @@ router.get(
   getUserPlacedRequestsAdmin,
 );
 router.get(
-  "/recieved-requests/:userId",
+  "/received-requests/:userId",
   verifyToken,
   adminMiddleware,
-  getUserRecievedRequestsAdmin,
+  getUserReceivedRequestsAdmin,
 );
 
 router.get(

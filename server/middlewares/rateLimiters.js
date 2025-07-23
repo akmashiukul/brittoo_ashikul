@@ -2,7 +2,7 @@ import { rateLimit } from 'express-rate-limit'
 
 export const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, 
-  max: 20, 
+  max: 5, 
   message: {
     success: false,
     message: 'Too many login attempts, please try again after 15 minutes',
@@ -24,7 +24,7 @@ export const registerLimiter = rateLimit({
 
 export const verifyOtpLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 10,
+  max: 5,
   message: {
     success: false,
     message: 'Too many OTP verification attempts, please try again after 15 minutes',

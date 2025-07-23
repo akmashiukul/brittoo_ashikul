@@ -241,7 +241,7 @@ export const createRentalRequest = async (req, res, next) => {
     await resend.emails.send({
       from: "Brittoo <verify@brittoo.xyz>",
       to: result.owner.email,
-      subject: `Congratulations! You have recieved a request.`,
+      subject: `Congratulations! You have received a request.`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f4f7f6;">
           <div style="text-align: center; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
@@ -249,7 +249,7 @@ export const createRentalRequest = async (req, res, next) => {
             <p style="color: #374151; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
               A new rental request is waiting for your review. Please take a moment to accept or respond to the request.
             </p>
-            <a href="${process.env.CLIENT_BASE_URL}/dashboard/recieved-requests" style="display: inline-block; padding: 12px 24px; background-color: #4caf50; color: #ffffff; text-decoration: none; font-weight: bold; border-radius: 5px; margin: 20px 0;">
+            <a href="${process.env.CLIENT_BASE_URL}/dashboard/received-requests" style="display: inline-block; padding: 12px 24px; background-color: #4caf50; color: #ffffff; text-decoration: none; font-weight: bold; border-radius: 5px; margin: 20px 0;">
               View Received Requests
             </a>
             <p style="color: #374151; font-size: 14px; line-height: 1.5;">
@@ -484,9 +484,9 @@ export const acceptRentalRequest = async (req, res, next) => {
       return upReq;
     });
 
-    // TODO: Emit notification to renter
+    //Emit notification to renter
     await resend.emails.send({
-      from: "Brittoo <verify@brittoo.xyz>",
+      from: "Brittoo <notifications@brittoo.xyz>",
       to: updatedRequest.requester.email,
       subject: `Your Rental Request Has been accepted.`,
       html: `
@@ -627,7 +627,31 @@ export const rejectRentalRequest = async (req, res, next) => {
       return updatedRequest;
     });
 
-    // TODO: Emit notification to renter
+    await resend.emails.send({
+      from: "Brittoo <notifications@brittoo.xyz>",
+      to: updatedRequest.requester.email,
+      subject: `Your Rental Request Has Been Rejected`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f4f7f6;">
+          <div style="text-align: center; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+            <h2 style="color: #d32f2f; font-size: 24px; margin-bottom: 20px;">Rental Request Rejected</h2>
+            <p style="color: #374151; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
+              We're sorry, but your rental request could not be accepted at this time. For more details, please review your request or contact our support team.
+            </p>
+            <p style="color: #374151; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
+              You can submit a new request or explore other available options.
+            </p>
+            <a href="${process.env.CLIENT_BASE_URL}/dashboard/placed-requests" style="display: inline-block; padding: 12px 24px; background-color: #4caf50; color: #ffffff; text-decoration: none; font-weight: bold; border-radius: 5px; margin: 20px 0;">
+              View Your Requests
+            </a>
+            <p style="color: #374151; font-size: 14px; line-height: 1.5;">
+              If you have any questions, feel free to reach out to our support team.
+            </p>
+          </div>
+        </div>
+      `,
+    });
+
     res.status(200).json({
       success: true,
       data: updatedRequest,
@@ -644,7 +668,6 @@ export const cancelRentalRequest = async (req, res, next) => {
     const { requestId } = req.params;
     const userId = req.user.id;
     const { cancelReason } = req.body;
-
     if (!cancelReason || cancelReason.trim() === "") {
       throw new CustomError("Cancel reason is required", 400, "MISSING_FIELDS");
     }
@@ -666,18 +689,20 @@ export const cancelRentalRequest = async (req, res, next) => {
             },
           },
           bccWallet: true,
+          owner: {
+            select: {
+              email: true
+            }
+          }
         },
       });
-
       if (!request) {
         throw new CustomError(
           "Rental request not found or already processed",
           400,
         );
       }
-
       const updates = [];
-
       // Handle BCC refund
       if (request.paidWithBcc && request.usedBccAmount && request.bccWalletId) {
         updates.push(
@@ -702,7 +727,6 @@ export const cancelRentalRequest = async (req, res, next) => {
           }),
         );
       }
-
       // Handle RCC refund
       if (request.paidWithRcc && request.rccUsageDetails.length > 0) {
         for (const usage of request.rccUsageDetails) {
@@ -716,7 +740,6 @@ export const cancelRentalRequest = async (req, res, next) => {
           );
         }
       }
-
       // Update rental request status
       updates.push(
         tx.rentalRequest.update({
@@ -738,6 +761,12 @@ export const cancelRentalRequest = async (req, res, next) => {
                 email: true,
               },
             },
+            owner: {
+              select: {
+                name: true,
+                email: true
+              }
+            }
           },
         }),
       );
@@ -747,7 +776,37 @@ export const cancelRentalRequest = async (req, res, next) => {
       return updatedRequest;
     });
 
-    // TODO: Emit notification to owner
+    //console.log(updatedRequest.owner);
+
+    // Emit notification to owner
+    await resend.emails.send({
+      from: "Brittoo <notifications@brittoo.xyz>",
+      to: updatedRequest.owner.email,
+      subject: `Rental Request Cancelled`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f4f7f6;">
+          <div style="text-align: center; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+            <h2 style="color: #d32f2f; font-size: 24px; margin-bottom: 20px;">Rental Request Cancelled</h2>
+            <p style="color: #374151; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
+              The rental request for your product has been cancelled by the renter.
+            </p>
+            <p style="color: #374151; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
+              <strong>Reason for cancellation:</strong> ${cancelReason.trim()}
+            </p>
+            <p style="color: #374151; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
+              No further action is required at this time. You can view other pending requests or manage your products in your dashboard.
+            </p>
+            <a href="${process.env.CLIENT_BASE_URL}/dashboard/received-requests" style="display: inline-block; padding: 12px 24px; background-color: #4caf50; color: #ffffff; text-decoration: none; font-weight: bold; border-radius: 5px; margin: 20px 0;">
+              View Received Requests
+            </a>
+            <p style="color: #374151; font-size: 14px; line-height: 1.5;">
+              If you have any questions, feel free to reach out to our support team.
+            </p>
+          </div>
+        </div>
+      `,
+    });
+
     res.status(200).json({
       success: true,
       data: updatedRequest,

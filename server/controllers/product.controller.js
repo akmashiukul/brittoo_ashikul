@@ -204,7 +204,7 @@ export const getProducts = async (req, res, next) => {
       totalPages: Math.ceil(total / limit),
     };
 
-    await redisClient.setEx(cacheKey, 20, JSON.stringify(response));
+    await redisClient.setEx(cacheKey, 300, JSON.stringify(response));
 
     res.status(200).json(response);
   } catch (error) {

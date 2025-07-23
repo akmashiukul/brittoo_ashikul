@@ -36,7 +36,7 @@ import ShowRccModal from "./components/modals/ShowRccModal";
 import ConfirmRentalRequestModal from "./components/modals/ConfirmRentalRequestModal";
 import Swal from "sweetalert2";
 import PlacedRequests from "./pages/private/dash-pages/PlacedRequests";
-import RecievedRequests from "./pages/private/dash-pages/RecievedRequests";
+import ReceivedRequests from "./pages/private/dash-pages/ReceivedRequests";
 import MyCredits from "./pages/private/dash-pages/MyCredits";
 import AdminDashUserDetails from "./pages/admin/admin-dash-pages/AdminDashUserDetails";
 import WithdrawalRequests from "./pages/admin/admin-dash-pages/WithdrawalRequests";
@@ -171,7 +171,7 @@ const AppContent = () => {
               <Route path="manage-items" element={<ManageItems />} />
               <Route path="placed-requests" element={<PlacedRequests />} />
               <Route path="my-credits" element={<MyCredits />} />
-              <Route path="recieved-requests" element={<RecievedRequests />} />
+              <Route path="received-requests" element={<ReceivedRequests />} />
               <Route path="user-analytics" element={<UserAnalytics />} />
               {/* //TODO: update also rcc with it */}
               {/* <Route path="update-item/:id" element={<UpdateItem />} /> */}

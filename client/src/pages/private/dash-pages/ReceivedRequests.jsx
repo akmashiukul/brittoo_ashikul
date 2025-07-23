@@ -18,7 +18,7 @@ import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import Loader from "../../../components/shared/Loader";
 
-const RecievedRequests = () => {
+const ReceivedRequests = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -242,7 +242,7 @@ const RecievedRequests = () => {
         <div className="mb-8 border-b pb-4 border-gray-300">
           <div>
             <h1 className="text-3xl font-bold text-gray-800 mb-2">
-              Recieved Rental Requests
+              Received Rental Requests
             </h1>
             <p className="text-gray-600">
               Manage rental requests for your products
@@ -260,7 +260,7 @@ const RecievedRequests = () => {
                 No Requests Found
               </h3>
               <p className="text-green-600">
-                You haven't recieved any rental requests yet.
+                You haven't received any rental requests yet.
               </p>
             </div>
           </div>
@@ -643,4 +643,4 @@ const RecievedRequests = () => {
   );
 };
 
-export default RecievedRequests;
+export default ReceivedRequests;

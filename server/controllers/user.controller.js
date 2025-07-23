@@ -735,7 +735,7 @@ export const getUserPlacedRequestsAdmin = async (req, res, next) => {
   }
 };
 
-export const getUserRecievedRequestsAdmin = async (req, res, next) => {
+export const getUserReceivedRequestsAdmin = async (req, res, next) => {
   try {
     const { userId } = req.params;
     const rentalRequests = await prisma.rentalRequest.findMany({
