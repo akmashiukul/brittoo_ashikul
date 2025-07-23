@@ -22,7 +22,7 @@ Prod:
 
 TODO:
   4. Set diff price for ACADEMIC_BOOK category.
-
+  5. verify@brittoo.xyz> fix this for other emails
   9. dashboard->mycredits->bccTransactions-> add a link/other-similar field here for rejected credits, on click of that reject reason will be shown
   10. Change JWT expiry 
   11. add rate limiter to others and redis cache.

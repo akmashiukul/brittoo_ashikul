@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { Resend } from "resend";
 import { isValidRuetEmail } from "../lib/emailValidator.js";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 import { safeAuthUserSelect } from "../lib/prismaSelects.js";
 const resend = new Resend(`${process.env.RESEND_API_KEY}`);
 
@@ -349,3 +350,59 @@ export const getCurrentUser = async (req, res, next) => {
     next(error);
   }
 };
+
+
+export const generatePasswordResetToken = async (req, res, next) => {
+  const { email } = req.body;
+  try {
+    if (!isValidRuetEmail(email)) {
+      throw new CustomError("The Email is not a valid student mail", 401);
+    }
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      throw new CustomError("User doesn't exist with this mail!", 401);
+    }
+    const token = crypto.randomBytes(32).toString("hex");
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
+
+    await prisma.passwordResetToken.create({
+      data: {
+        token,
+        userId: user.id,
+        expiresAt
+      }
+    });
+
+    const resetLink = `${process.env.CLIENT_BASE_URL}/reset-password?token=${token}`;
+    await resend.emails.send({
+      from: "Brittoo <no-reply@brittoo.xyz>",
+      to: email,
+      subject: "Reset Your Brittoo Password",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2>Password Reset Request</h2>
+          <p>We received a request to reset your Brittoo account password.</p>
+          <p>Click the link below to set a new password. This link is valid for 15 minutes:</p>
+          <div style="margin: 20px 0; text-align: center;">
+            <a href="${resetLink}"
+              style="display: inline-block; padding: 12px 24px; font-size: 16px; color: white; background-color: #007bff; border-radius: 5px; text-decoration: none;">
+              Reset Password
+            </a>
+          </div>
+          <p>If you didn’t request a password reset, you can safely ignore this email.</p>
+          <hr>
+          <p style="font-size: 12px; color: #666;">If the button doesn’t work, copy and paste this URL into your browser:<br>
+          <a href="${resetLink}">${resetLink}</a></p>
+        </div>
+      `,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Reset link sent successfully",
+    })
+  } catch (error) {
+    console.error("error in reset pass controller", error);
+    next(error);
+  }
+}
