@@ -437,10 +437,10 @@ export const validateResetToken = async (req, res, next) => {
     }
     const resetToken = await prisma.passwordResetToken.findUnique({
       where: { token },
-      include: { 
-        user: { 
-          select: { email: true, isSuspended: true } 
-        } 
+      include: {
+        user: {
+          select: { email: true, isSuspended: true }
+        }
       }
     });
     if (!resetToken) {
@@ -475,6 +475,59 @@ export const validateResetToken = async (req, res, next) => {
     });
   } catch (error) {
     console.error("Error validating reset token:", error);
+    next(error);
+  }
+};
+
+
+export const resetPasswordWithToken = async (req, res, next) => {
+  const { token, newPassword } = req.body;
+
+  try {
+    if (!token || !newPassword) {
+      throw new CustomError("Token and new password are required", 400);
+    }
+    // Find and validate token
+    const resetToken = await prisma.passwordResetToken.findUnique({
+      where: { token },
+      include: { user: true }
+    });
+    if (!resetToken) {
+      throw new CustomError("Invalid or expired reset token", 400);
+    }
+    if (resetToken.used) {
+      throw new CustomError("This reset link has already been used", 400);
+    }
+    if (new Date() > resetToken.expiresAt) {
+      throw new CustomError("Reset link has expired. Please request a new one.", 400);
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await prisma.$transaction(async (tx) => {
+      await tx.user.update({
+        where: { id: resetToken.userId },
+        data: { password: hashedPassword }
+      });
+      await tx.passwordResetToken.update({
+        where: { id: resetToken.id },
+        data: { used: true }
+      });
+      // Invalidate all other reset tokens for this user
+      await tx.passwordResetToken.updateMany({
+        where: {
+          userId: resetToken.userId,
+          used: false,
+          id: { not: resetToken.id }
+        },
+        data: { used: true }
+      });
+    });
+    res.status(200).json({
+      success: true,
+      message: "Password reset successful. You can now login with your new password.",
+    });
+  } catch (error) {
+    console.error("Error in reset password with token:", error);
     next(error);
   }
 };
