@@ -1,6 +1,5 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import brittoLogo from "../../assets/brittoo-logo.png";
-import brittoFav from "../../assets/brittoofav.png";
 import { IoLogOut } from "react-icons/io5";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { useEffect, useState } from "react";
@@ -87,12 +86,7 @@ const Navbar = () => {
             <Link to={"/"}>
               <img
                 src={brittoLogo}
-                className="h-8 md:h-10 object-contain hidden md:block"
-                alt="Britto"
-              />
-              <img
-                src={brittoFav}
-                className="h-8 md:h-10 object-contain block md:hidden"
+                className="h-8 md:h-10 object-contain"
                 alt="Britto"
               />
             </Link>
