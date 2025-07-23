@@ -46,6 +46,7 @@ import { useEffect, useState } from "react";
 import Footer from "./components/shared/Footer";
 import Loader from "./components/shared/Loader";
 import TermsAndConditions from "./pages/TermsAndConditions";
+import ResetPasswordModal from "./components/auth/ResetPasswordModal";
 
 const AppContent = () => {
   const location = useLocation();
@@ -102,6 +103,7 @@ const AppContent = () => {
       {/* Auth Modals */}
       <RegisterModal />
       <LoginModal />
+      <ResetPasswordModal />
 
       {/* Credit Modals */}
       <CreditModal />

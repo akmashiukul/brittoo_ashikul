@@ -5,20 +5,16 @@ import { useState } from "react";
 import api from "../../lib/api";
 import Swal from "sweetalert2";
 import Loader from "../shared/Loader";
-import useLoginModalStore from "../../stores/authStores/useLoginModalStore";
-import useRegModalStore from "../../stores/authStores/useRegModalStore";
-import useUserStore from "../../stores/authStores/useUserStore";
 import useResetPasswordModalStore from "../../stores/authStores/useResetPasswordModalStore";
+import useLoginModalStore from "../../stores/authStores/useLoginModalStore";
 
-const LoginModal = () => {
-  const { isLoginModalOpen, closeLoginModal } = useLoginModalStore();
-  const { openRegModal } = useRegModalStore();
-  const { setCurrentUser, loading, setLoading } = useUserStore();
-  const { openResetPasswordModal } = useResetPasswordModalStore();
+const ResetPasswordModal = () => {
+  const { isResetPasswordModalOpen, closeResetPasswordModal } = useResetPasswordModalStore();
+  const { openLoginModal } = useLoginModalStore();
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     email: "",
-    password: "",
   });
 
   const handleChange = (e) => {
@@ -28,41 +24,41 @@ const LoginModal = () => {
     }));
   };
 
-  const handleLogin = async (e) => {
+  const handleGetResetLink = async (e) => {
     e.preventDefault();
     try {
       setLoading(true);
-      const res = await api.post("/api/v1/auth/login", formData);
+      const res = await api.post("/api/v1/auth/reset-password", formData);
       if (!res.data.success) {
-        closeLoginModal();
+        closeResetPasswordModal();
         Swal.fire({
           icon: "error",
-          title: "Login Failed",
-          text: res.message || "An error occurred while Logging in.",
+          title: "Reset Password Failed",
+          text: res.message || "An error occurred.",
         });
         return;
       }
       Swal.fire({
         icon: "success",
-        title: "Login Successfull",
+        title: "Success!",
+        text: "An email has been sent to your Edu-mail. Please check all the folders.",
       });
-      await setCurrentUser(res.data.user);
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("login-dt", new Date().toISOString());
+      closeResetPasswordModal();
     } catch (error) {
-      console.error("Registration Error:", error);
+      console.error(error);
       Swal.fire({
         icon: "error",
         title: "Something went wrong",
         text: error.response?.data?.message || error.message,
       });
+      closeResetPasswordModal();
     } finally {
       setLoading(false);
-      closeLoginModal();
+      closeResetPasswordModal();
     }
   };
 
-  if (!isLoginModalOpen) return null;
+  if (!isResetPasswordModalOpen) return null;
 
   if (loading) {
     return <Loader />;
@@ -73,7 +69,7 @@ const LoginModal = () => {
       id="authentication-modal"
       className="fixed inset-0 z-50 flex justify-center items-center bg-black/70"
       onClick={(e) => {
-        if (e.target === e.currentTarget) closeLoginModal();
+        if (e.target === e.currentTarget) closeResetPasswordModal();
       }}
     >
       <div className="relative p-4 w-full max-w-md max-h-full">
@@ -86,14 +82,14 @@ const LoginModal = () => {
                 alt="Brittoo"
               />
               <h3 className="text-xs md:text-lg font-semibold text-gray-700 mt-1 md:mt-4">
-                Login Now & Get Started
+                Reset Password
               </h3>
             </div>
             <button
               type="button"
               className="absolute top-1 cursor-pointer right-1  text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-xs md:text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
               data-modal-hide="authentication-modal"
-              onClick={closeLoginModal}
+              onClick={closeResetPasswordModal}
             >
               <svg
                 className="w-3 h-3"
@@ -115,13 +111,13 @@ const LoginModal = () => {
           </div>
 
           <div className="p-4 md:p-5">
-            <form onSubmit={handleLogin} className="space-y-4" action='#'>
+            <form onSubmit={handleGetResetLink} className="space-y-4" action='#'>
               <div>
                 <label
                   htmlFor="email"
                   className="block mb-2 text-xs md:text-sm font-medium text-gray-900"
                 >
-                  Your email
+                  Enter Your Registered Email
                 </label>
                 <input
                   type="email"
@@ -130,48 +126,26 @@ const LoginModal = () => {
                   onChange={handleChange}
                   value={formData.email}
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-xs md:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2 md:p-2.5"
-                  placeholder="name@company.com"
+                  placeholder="2010033@student.ruet.ac.bd"
                   required
                 />
               </div>
-              <div>
-                <label
-                  htmlFor="password"
-                  className="block mb-2 text-xs md:text-sm font-medium text-gray-900"
-                >
-                  Your password
-                </label>
-                <input
-                  type="password"
-                  name="password"
-                  id="password"
-                  onChange={handleChange}
-                  value={formData.password}
-                  placeholder="••••••••"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-xs md:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2 md:p-2.5"
-                  required
-                />
-              </div>
-              <p onClick={() => {
-                closeLoginModal();
-                openResetPasswordModal();
-              }} className="text-green-600 text-sm font-semibold cursor-pointer hover:text-green-800 w-fit">Forgot Password ?</p>
               <button
                 type="submit"
-                className="w-full text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-xs md:text-sm px-5 py-2.5 text-center"
+                className="w-full text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-xs md:text-sm px-5 py-2.5 text-center cursor-pointer"
               >
-                Login
+                Get Reset Link
               </button>
               <div className="text-xs md:text-sm font-medium text-gray-500">
-                New to Brittoo?{" "}
+                Remembered Password?{" "}
                 <a
                   onClick={() => {
-                    closeLoginModal();
-                    openRegModal();
+                    closeResetPasswordModal();
+                    openLoginModal();
                   }}
                   className="text-green-700 hover:underline cursor-pointer"
                 >
-                  Sign Up
+                  Login
                 </a>
               </div>
             </form>
@@ -182,4 +156,4 @@ const LoginModal = () => {
   );
 };
 
-export default LoginModal;
+export default ResetPasswordModal;

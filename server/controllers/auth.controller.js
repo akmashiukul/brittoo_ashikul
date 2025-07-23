@@ -229,7 +229,7 @@ export const verifyOTP = async (req, res, next) => {
         email: user.email
       },
       process.env.JWT_SECRET,
-      { expiresIn: "2d" },
+      { expiresIn: "10d" },
     );
 
     const { password: _, otp: __, otpExpiry: ___, ...safeUser } = updatedUser;
@@ -308,7 +308,7 @@ export const login = async (req, res, next) => {
         email: user.email,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "2d" },
+      { expiresIn: "10d" },
     );
 
     const { password: _, otp: __, otpExpiry: ___, ...safeUser } = user;
@@ -351,17 +351,39 @@ export const getCurrentUser = async (req, res, next) => {
   }
 };
 
-
 export const generatePasswordResetToken = async (req, res, next) => {
   const { email } = req.body;
   try {
     if (!isValidRuetEmail(email)) {
       throw new CustomError("The Email is not a valid student mail", 401);
     }
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
     if (!user) {
       throw new CustomError("User doesn't exist with this mail!", 401);
     }
+
+    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const recentRequestsCount = await prisma.passwordResetToken.count({
+      where: {
+        userId: user.id,
+        createdAt: { gte: twentyFourHoursAgo }
+      }
+    });
+
+    if (recentRequestsCount > 3) {
+      throw new CustomError("Too many reset requests. Please try again tomorrow.", 429);
+    }
+    // Invalidate any existing tokens for this user
+    await prisma.passwordResetToken.updateMany({
+      where: {
+        userId: user.id,
+        used: false
+      },
+      data: { used: true }
+    });
+
     const token = crypto.randomBytes(32).toString("hex");
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
 
@@ -406,3 +428,53 @@ export const generatePasswordResetToken = async (req, res, next) => {
     next(error);
   }
 }
+
+export const validateResetToken = async (req, res, next) => {
+  const { token } = req.params;
+  try {
+    if (!token) {
+      throw new CustomError("Token is required", 400);
+    }
+    const resetToken = await prisma.passwordResetToken.findUnique({
+      where: { token },
+      include: { 
+        user: { 
+          select: { email: true, isSuspended: true } 
+        } 
+      }
+    });
+    if (!resetToken) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid reset token",
+        valid: false
+      });
+    }
+    if (resetToken.used) {
+      return res.status(400).json({
+        success: false,
+        message: "This reset link has already been used",
+        valid: false
+      });
+    }
+    if (new Date() > resetToken.expiresAt) {
+      return res.status(400).json({
+        success: false,
+        message: "Reset link has expired",
+        valid: false
+      });
+    }
+    res.status(200).json({
+      success: true,
+      message: "Token is valid",
+      valid: true,
+      data: {
+        email: resetToken.user.email,
+        expiresAt: resetToken.expiresAt
+      }
+    });
+  } catch (error) {
+    console.error("Error validating reset token:", error);
+    next(error);
+  }
+};

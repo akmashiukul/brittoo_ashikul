@@ -77,7 +77,7 @@ export const verifyUser = async (req, res, next) => {
         isSuspended: user.isSuspended,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "2d" },
+      { expiresIn: "10d" },
     );
 
     const { password: _, otp: __, otpExpiry: ___, ...safeUser } = updatedUser;
