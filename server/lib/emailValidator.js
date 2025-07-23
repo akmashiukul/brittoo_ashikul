@@ -1,6 +1,4 @@
 export const isValidRuetEmail = (email) => {
-  const rollLength = 7;
-  const regex = new RegExp(`^\\d{${rollLength}}@student\\.ruet\\.ac\\.bd$`);
-
+  const regex = /^[\w.-]+@([\w-]+\.)?ruet\.ac\.bd$/i;
   return regex.test(email);
-}
+};

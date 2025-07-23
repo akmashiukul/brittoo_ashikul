@@ -12,9 +12,7 @@ export const register = async (req, res, next) => {
   const { name, email, password, latitude, longitude, ipAddress } = req.body;
 
   try {
-    if (!isValidRuetEmail(email)) {
-      throw new CustomError("The Email is not a valid student mail", 401);
-    }
+    const isValidRuetMail = isValidRuetEmail(email);
     let user = await prisma.user.findFirst({
       where: {
         email: email,
@@ -34,6 +32,7 @@ export const register = async (req, res, next) => {
       data: {
         name,
         email,
+        isValidRuetMail,
         password: hashedPassword,
         roll,
         latitude,

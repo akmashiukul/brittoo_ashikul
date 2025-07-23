@@ -11,6 +11,7 @@ model User {
   id          String   @id @default(cuid()) @map("id")
   name        String   @map("name")
   email       String   @unique @map("email")
+  isValidRuetMail Boolean @default(false) @map("is_valid_ruet_mail")
   roll        String   @unique @map("roll")
   password    String   @map("password")
   phoneNumber String?  @map("phone_number")
