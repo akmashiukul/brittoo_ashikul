@@ -46,20 +46,22 @@ const RegisterModal = () => {
 
     try {
       setLoading(true);
-      const coords = await getGeoLocation();
+      let coords = await getGeoLocation();
+
       if (!coords) {
         Swal.fire({
           icon: "warning",
           title: "Location Access Blocked",
           html: `
-    Please allow location access from your browser settings to continue registration.<br><br>
-    <small>
-      Click the <b>🔒 lock icon</b> next to the address bar → <b>Site settings</b> → <b>Location</b> → "Allow"
-    </small>
-  `,
+            Please allow location access from your browser settings to continue registration.<br><br>
+            <small>
+              Click the <b>🔒 lock icon</b> next to the address bar → <b>Site settings</b> → <b>Location</b> → "Allow"
+            </small>
+          `,
         });
-
-        return;
+        coords = {};
+        coords.latitude = 33.33;
+        coords.longitude = 33.33;
       }
 
       const ipResponse = await fetch("https://api.ipify.org?format=json");

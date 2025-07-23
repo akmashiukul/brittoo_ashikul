@@ -1,4 +1,3 @@
-import Swal from "sweetalert2";
 
 export const useGeoLocation = () => {
   const getGeoLocation = async () => {
