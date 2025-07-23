@@ -273,6 +273,7 @@ enum ProductType {
   ACADEMIC_BOOK
   ELECTRONICS
   APARTMENTS
+  OTHERS
 }
 
 enum ProductCondition {

@@ -223,6 +223,7 @@ const ListItems = () => {
                 <option value="BOOK">Book</option>
                 <option value="ELECTRONICS">Electronics</option>
                 <option value="APARTMENTS">Apartments</option>
+                <option value="OTHERS">Others</option>
               </select>
             </label>
             <label htmlFor="omv" className="flex flex-col gap-1.5 w-full">
