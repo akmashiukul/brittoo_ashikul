@@ -3,8 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import api from "../../lib/api";
 import Swal from "sweetalert2";
-import { useGeoLocation } from "../../hooks/useGeoLocation";
-import { PacmanLoader } from "react-spinners";
 import Loader from "../shared/Loader";
 import useRegModalStore from "../../stores/authStores/useRegModalStore";
 import useLoginModalStore from "../../stores/authStores/useLoginModalStore";
@@ -17,7 +15,7 @@ const RegisterModal = () => {
 
   const navigate = useNavigate();
 
-  const { getGeoLocation } = useGeoLocation();
+  //const { getGeoLocation } = useGeoLocation();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -46,23 +44,9 @@ const RegisterModal = () => {
 
     try {
       setLoading(true);
-      let coords = await getGeoLocation();
-
-      if (!coords) {
-        Swal.fire({
-          icon: "warning",
-          title: "Location Access Blocked",
-          html: `
-            Please allow location access from your browser settings to continue registration.<br><br>
-            <small>
-              Click the <b>🔒 lock icon</b> next to the address bar → <b>Site settings</b> → <b>Location</b> → "Allow"
-            </small>
-          `,
-        });
-        coords = {};
-        coords.latitude = 33.33;
-        coords.longitude = 33.33;
-      }
+      const coords = {};
+      coords.latitude = 33.33;
+      coords.longitude = 33.33;
 
       const ipResponse = await fetch("https://api.ipify.org?format=json");
       const { ip } = await ipResponse.json();
@@ -71,7 +55,7 @@ const RegisterModal = () => {
         ...formData,
         latitude: coords.latitude,
         longitude: coords.longitude,
-        ipAddress: ip,
+        ipAddress: ip || "xxx.xxx.xxx.xxx",
       });
 
       console.log(res);
