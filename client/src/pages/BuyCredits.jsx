@@ -38,7 +38,7 @@ const BuyCredits = () => {
   };
 
   return (
-    <div className="p-2 sm:p-4 md:p-6">
+    <div className="p-2 sm:p-4 md:p-6 bg-white">
       <h2 className="text-xl md:text-2xl text-gray-800 font-bold">
         Buy Credits & Start Your Rental Journey
       </h2>

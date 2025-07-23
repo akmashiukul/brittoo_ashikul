@@ -201,7 +201,7 @@ const PlacedRequests = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br p-4 md:p-6">
+    <div className="min-h-screen bg-gradient-to-br p-4 md:p-6 bg-white">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">

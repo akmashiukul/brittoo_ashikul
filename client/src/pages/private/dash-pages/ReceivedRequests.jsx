@@ -238,7 +238,7 @@ const ReceivedRequests = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br p-6">
+    <div className="min-h-screen bg-gradient-to-br p-6 bg-white">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8 border-b pb-4 border-gray-300">

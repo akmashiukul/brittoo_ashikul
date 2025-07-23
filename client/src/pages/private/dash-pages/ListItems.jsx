@@ -109,7 +109,7 @@ const ListItems = () => {
   }
 
   return (
-    <div className="p-4 md:p-10">
+    <div className="p-4 md:p-10 bg-white">
       <div>
         <h1 className="text-lg text-center md:text-left sm:text-2xl font-semibold text-gray-800">
           List Your Items & Start Earning 🤑

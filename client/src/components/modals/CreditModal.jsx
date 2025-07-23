@@ -207,13 +207,12 @@ const CreditModal = () => {
                 🔵Available Blue Cache Credits
               </h3>
               <div className="mt-4 flex flex-col sm:flex-row items-center">
-
-                  <BCC
-                    handleSelect={handleBccSelect}
-                    bccWallet={bccWallet}
-                    selectedBcc={selectedBcc}
-                    inCreditModal={true}
-                  />
+                <BCC
+                  handleSelect={handleBccSelect}
+                  bccWallet={bccWallet}
+                  selectedBcc={selectedBcc}
+                  inCreditModal={true}
+                />
               </div>
               <h3 className="mt-6 text-sm font-semibold text-center sm:text-left">
                 🔴Available Red Cache Credits
@@ -228,6 +227,15 @@ const CreditModal = () => {
                     inCreditModal={true}
                   />
                 ))}
+              </div>
+
+              <div className="mt-6 text-center">
+                <Link
+                  to="/buy-credits"
+                  className="text-sm text-green-600 hover:text-green-700 underline"
+                >
+                  Need more credits? Buy here
+                </Link>
               </div>
             </div>
           </div>
