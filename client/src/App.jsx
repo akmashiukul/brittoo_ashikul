@@ -19,7 +19,6 @@ import ListItems from "./pages/private/dash-pages/ListItems";
 import Overview from "./pages/private/dash-pages/Overview";
 import ManageItems from "./pages/private/dash-pages/ManageItems";
 import UserAnalytics from "./pages/private/dash-pages/UserAnalytics";
-import UpdateItem from "./pages/private/dash-pages/UpdateItem";
 import ProductDetails from "./components/ProductDetails";
 import CreditModal from "./components/modals/CreditModal";
 import BuyBccModal from "./components/modals/BuyBccModal";
@@ -44,10 +43,11 @@ import RequestWithdrawalModal from "./components/modals/RequestWithdrawalModal";
 import ManageRentalRequestsAdmin from "./pages/admin/admin-dash-pages/ManageRentalRequestsAdmin";
 import { useEffect, useState } from "react";
 import Footer from "./components/shared/Footer";
-import Loader from "./components/shared/Loader";
 import TermsAndConditions from "./pages/TermsAndConditions";
 import ResetPasswordModal from "./components/auth/ResetPasswordModal";
 import ResetPassword from "./components/auth/ResetPassword";
+import ManageProducts from "./pages/admin/admin-dash-pages/ManageProducts";
+import UpdateItemAdmin from "./pages/admin/admin-dash-pages/UpdateItemAdmin";
 
 const AppContent = () => {
   const location = useLocation();
@@ -148,6 +148,8 @@ const AppContent = () => {
               <Route path="blue-cc-requests" element={<BlueCCRequests />} />
               <Route path="admin-overview" element={<AdminOverview />} />
               <Route path="manage-users" element={<ManageUsers />} />
+              <Route path="manage-products" element={<ManageProducts />} />
+              <Route path="update-item/:id" element={<UpdateItemAdmin />} />
               <Route
                 path="user-details/:userId"
                 element={<AdminDashUserDetails />}
@@ -173,8 +175,6 @@ const AppContent = () => {
               <Route path="my-credits" element={<MyCredits />} />
               <Route path="received-requests" element={<ReceivedRequests />} />
               <Route path="user-analytics" element={<UserAnalytics />} />
-              {/* //TODO: update also rcc with it */}
-              {/* <Route path="update-item/:id" element={<UpdateItem />} /> */}
             </Route>
           </Route>
         </Routes>

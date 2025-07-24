@@ -261,39 +261,6 @@ export const login = async (req, res, next) => {
       throw new CustomError("Invalid password", 401);
     }
 
-    // If two factor enabled (TODO):
-    /*
-      const otp = Math.floor(10000 + Math.random() * 90000).toString();
-      const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
-      await prisma.user.update({
-        where: { id: user.id },
-        data: {
-          otp,
-          otpExpiry,
-          otpSentCount: user.otpSentCount + 1,
-          lastOtpSentDate: new Date(),
-        },
-      });
-
-      await resend.emails.send({
-        from: "Brittoo <verify@brittoo.xyz>",
-        to: email,
-        subject: "Your Brittoo Login OTP Code",
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2>Brittoo Login Verification</h2>
-            <p>Your OTP verification code for login is:</p>
-            <div style="font-size: 24px; font-weight: bold; color: #007bff; padding: 20px; background-color: #f8f9fa; border-radius: 5px; text-align: center; margin: 20px 0;">
-              ${otp}
-            </div>
-            <p><strong>Important:</strong> This code expires in 5 minutes.</p>
-            <p>If you didn't attempt to log in, please secure your account.</p>
-          </div>
-        `,
-      });
-      const { password: _, otp: __, otpExpiry: ___, ...safeUser } = user;
-    */
-
     const token = jwt.sign(
       {
         id: user.id,

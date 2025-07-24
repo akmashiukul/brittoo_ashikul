@@ -1,5 +1,4 @@
 import { IoSearchCircle } from "react-icons/io5";
-import { FaArrowRightLong } from "react-icons/fa6";
 import { Link, useNavigate } from "react-router-dom";
 
 const Banner = ({ setProductType, setSearch }) => {

@@ -1,24 +1,39 @@
 import jwt from 'jsonwebtoken';
 import { CustomError } from '../lib/customError.js';
+import prisma from "../config/prisma.js";
+import { safeAuthUserSelect } from '../lib/prismaSelects.js';
 
-export const verifyToken = (req, res, next) => {
+export const verifyToken = async (req, res, next) => {
   let token;
-  let authHeader = req.headers.authorization || req.headers.Authorization;
-
-  if(authHeader && authHeader.startsWith("Bearer")) {
+  const authHeader = req.headers.authorization || req.headers.Authorization || '';
+  if (authHeader.toLowerCase().startsWith("bearer ")) {
     token = authHeader.split(" ")[1];
   }
-
-  if(!token) {
-    throw new CustomError("BAD REQUEST", 401);
+  if (!token) {
+    return next(new CustomError("Authorization token missing", 401, "NO_TOKEN_PROVIDED"));
   }
-
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
+    const loggedInUser = await prisma.user.findUnique({
+      where: {
+        id: decoded.id,
+        deletedAt: null,
+      },
+      select: safeAuthUserSelect,
+    });
+    if (!loggedInUser) {
+      return next(new CustomError("Access denied or user not found", 403, "USER_VERIFICATION_ERROR"));
+    }
+    req.user = loggedInUser;
     next();
   } catch (error) {
-    console.log("error in token verfication: ", error)
+    if (error.name === "TokenExpiredError") {
+      return next(new CustomError("Token expired", 401, "TOKEN_EXPIRED"));
+    }
+    if (error.name === "JsonWebTokenError") {
+      return next(new CustomError("Invalid token", 401, "INVALID_TOKEN"));
+    }
+    console.error("Unexpected error in token verification:", error);
     next(error);
   }
-}
+};

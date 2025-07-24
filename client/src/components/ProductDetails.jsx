@@ -35,9 +35,6 @@ const ProductDetails = () => {
 
   const { openCreditModal } = useCreditModalStore();
 
-  ///console.log(`${product?.productImages[0]}`);
-  console.log(product)
-
   useEffect(() => {
     if (initial && final) {
       setNumberOfDays(differenceInDays(final, initial) + 1);
@@ -245,6 +242,14 @@ const ProductDetails = () => {
                       {product.owner.email}
                     </p>
                     <p className="text-xs text-gray-600 mt-1 flex gap-2">
+                      <span className="font-medium">Email Validity</span>
+                      <span className={`text-xs`}>
+                        {
+                          !product.owner.isValidRuetMail ? ( <span className="flex items-center gap-0.5 text-red-500">Not Valid <XCircle size={12} /> </span> ) : (<span className="flex items-center gap-0.5 text-green-500">Valid <CheckCircle size={12} /></span>)
+                        }
+                      </span>
+                    </p>
+                    <p className="text-xs text-gray-600 mt-1 flex gap-2">
                       <span className="font-medium">Verification Status: </span>
                       <span className={`text-xs`}>
                         {
@@ -252,7 +257,7 @@ const ProductDetails = () => {
                         }
                       </span>
                     </p>
-                    <p className="text-xs text-gray-600 mt-3">
+                    <p className="text-xs text-gray-600">
                       <span className="font-medium">Security Score: </span>
                       <span
                         className={`text-xs ${

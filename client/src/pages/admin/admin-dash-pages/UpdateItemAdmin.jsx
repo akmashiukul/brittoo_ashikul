@@ -5,7 +5,7 @@ import Loader from "../../../components/shared/Loader";
 import api from "../../../lib/api";
 import { useNavigate, useParams } from "react-router-dom";
 
-const UpdateItem = () => {
+const UpdateItemAdmin = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [selectedImages, setSelectedImages] = useState([]);
@@ -146,7 +146,7 @@ const UpdateItem = () => {
         title: "Product Updated",
         text: "Your item has been updated successfully!",
       });
-      navigate("/dashboard/manage-items");
+      navigate("/dashboard/admin/manage-products");
     } catch (error) {
       console.error("Error updating item:", error);
       Swal.fire({
@@ -420,4 +420,4 @@ const UpdateItem = () => {
   );
 };
 
-export default UpdateItem;
+export default UpdateItemAdmin;

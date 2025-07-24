@@ -1,7 +1,7 @@
 import { X } from "lucide-react";
 import useShowRccModalStore from "../../stores/creditModalStores/useShowRccModalStore";
-import brittooFav from '../../assets/brittoofav.png'
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import RCC from "../CacheCreditCard/RCC";
 
 const ShowRccModal = () => {
   const { closeShowRccModal, rcc } = useShowRccModalStore();
@@ -47,29 +47,8 @@ const ShowRccModal = () => {
             </button>
           </div>
           <div className="mt-6 flex flex-col items-center pb-10">
-            <div className="text-white w-[210px]  p-5 rounded-xl hover:scale-105 cursor-pointer transition duration-300 shadow-md bg-gradient-to-r from-red-600 to-red-200">
-              <div className="flex justify-between">
-                <div>
-                  <h2 className="text-xs md:text-sm"> CC Amount </h2>
-                  <p className="text-lg md:text-xl font-bold"> {rcc.amount} </p>
-                </div>
-                <img src={brittooFav} alt="fav" className="w-10 h-10" />
-              </div>
-
-              <div className="flex justify-between mt-5">
-                <div>
-                  <h3 className="text-xs"> Issued At </h3>
-                  <p className="font-semibold text-sm"> {new Date(rcc.createdAt).toLocaleDateString()} </p>
-                </div>
-                <div className="text-gray-600">
-                  <h3 className="text-xs"> Valid Till </h3>
-                  <p className={"font-semibold text-sm"}>{
-                       `--/--`
-                    }</p>
-                </div>
-              </div>
-            </div>
-              <p onClick={goToRent} className="mt-4 text-sm underline text-green-600 cursor-pointer hover:text-green-700 font-semibold">Use it for renting items</p>
+            <RCC rcc={rcc} handleSelect={() => {}} key={rcc.id} />
+            <p onClick={goToRent} className="mt-4 text-sm underline text-purple-600 cursor-pointer hover:text-green-700 font-semibold">Use it for renting items</p>
           </div>
         </div>
       </div>

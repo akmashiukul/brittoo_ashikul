@@ -4,12 +4,10 @@ import useUserStore from "../../stores/authStores/useUserStore";
 import brittoLogo from "../../assets/brittoo-logo.png";
 import { IoExit, IoHomeSharp } from "react-icons/io5";
 import { BiSolidCreditCardAlt } from "react-icons/bi";
-import { PiCreditCardDuotone } from "react-icons/pi";
 import { MdOutlineSpaceDashboard } from "react-icons/md";
 import useDashDrawertore from "../../stores/drawerStores/useDashDrawerStore";
-import { BoxIcon, Menu, Users, X } from "lucide-react";
+import { BoxesIcon, BoxIcon, Menu, Users, X } from "lucide-react";
 import { useEffect } from "react";
-import { FaMoneyBillTransfer } from "react-icons/fa6";
 import { GiReceiveMoney } from "react-icons/gi";
 
 const AdminDashboardLayout = () => {
@@ -146,6 +144,23 @@ const AdminDashboardLayout = () => {
                 }}
               >
                 <Users size={13} /> Manage Users
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/dashboard/admin/manage-products"
+                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${
+                  path.includes("/manage-products")
+                    ? "bg-green-600 text-white"
+                    : "text-gray-700"
+                } flex items-center gap-2`}
+                onClick={() => {
+                  if (window.innerWidth <= 425) {
+                    closeDrawer();
+                  }
+                }}
+              >
+                <BoxesIcon size={14} /> Manage Products
               </Link>
             </li>
           </ul>

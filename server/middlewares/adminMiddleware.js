@@ -13,6 +13,7 @@ export const adminMiddleware = async (req, res, next) => {
     if (loggedInUser.role !== "ADMIN") {
       throw new CustomError("Access denied, Admin only", 403, "ADMIN_VERIFICATION_ERROR");
     }
+    req.user = loggedInUser;
     next();
   } catch (error) {
     next(error);
