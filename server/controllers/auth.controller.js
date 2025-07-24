@@ -352,7 +352,6 @@ export const generatePasswordResetToken = async (req, res, next) => {
     if (!user) {
       throw new CustomError("User doesn't exist with this mail!", 401);
     }
-
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
     const recentRequestsCount = await prisma.passwordResetToken.count({
       where: {
@@ -360,18 +359,16 @@ export const generatePasswordResetToken = async (req, res, next) => {
         createdAt: { gte: twentyFourHoursAgo }
       }
     });
-
     if (recentRequestsCount > 3) {
       throw new CustomError("Too many reset requests. Please try again tomorrow.", 429);
     }
-    // Invalidate any existing tokens for this user
-    await prisma.passwordResetToken.updateMany({
+    // Delete any existing reset tokens for this user (to satisfy unique constraint)
+    await prisma.passwordResetToken.deleteMany({
       where: {
         userId: user.id,
-        used: false
-      },
-      data: { used: true }
+      }
     });
+
 
     const token = crypto.randomBytes(32).toString("hex");
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000);

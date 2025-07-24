@@ -42,8 +42,12 @@ const Overview = () => {
     switch (status) {
       case "VERIFIED":
         return <CheckCircle className="w-5 h-5 text-green-500" />;
+      case "VALID":
+        return <CheckCircle className="w-5 h-5 text-green-500" />;
       case "PENDING":
         return <Clock className="w-5 h-5 text-yellow-500" />;
+      case "INVALID":
+        return <XCircle className="w-5 h-5 text-red-500" />;
       default:
         return <XCircle className="w-5 h-5 text-red-500" />;
     }
@@ -190,6 +194,17 @@ const Overview = () => {
                 )}
                 <span className="text-sm font-medium">
                   {userData.user.emailVerified ? "Verified" : "Unverified"}
+                </span>
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Institutional Email Validity</span>
+              <div className="flex items-center gap-2">
+                {getVerificationBadge(
+                  userData.user.isValidRuetMail ? "VALID" : "INVALID",
+                )}
+                <span className={`text-sm font-medium ${!userData.user.isValidRuetMail && "text-red-500"}`}>
+                  {userData.user.isValidRuetMail ? "Valid" : "Invalid"}
                 </span>
               </div>
             </div>

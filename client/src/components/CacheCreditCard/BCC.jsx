@@ -67,7 +67,7 @@ const BCC = ({
 
           <div className="text-right">
             <div className="text-white/60 text-xs font-medium tracking-wide uppercase">
-              Withdrawal Pending
+             Refund Pending
             </div>
             <div className="text-white text-sm font-semibold">
               {bccWallet?.requestedForWithdrawal || "0.00"}

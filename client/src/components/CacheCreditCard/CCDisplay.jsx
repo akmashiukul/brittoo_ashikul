@@ -38,7 +38,7 @@ const CCDisplay = ({ required, selectedBcc, selectedRCCs, remaining, selected })
             {/* Required */}
             <div className="text-center border-r border-gray-300 w-full">
               <div className="text-xs text-gray-500 mb-1">Total Required</div>
-              <div className="text-lg font-semibold text-gray-900">
+              <div className="text-base font-semibold text-gray-900">
                 {required.toLocaleString()}
                 <span className="text-xs font-normal text-gray-500 ml-1">
                   CC
@@ -49,7 +49,7 @@ const CCDisplay = ({ required, selectedBcc, selectedRCCs, remaining, selected })
             {/* Selected */}
             <div className="text-center border-r border-gray-300 w-full">
               <div className="text-xs text-gray-500 mb-1">Selected</div>
-              <h3 className="text-lg font-semibold">
+              <h3 className="text-base font-semibold">
                 <span className={`text-blue-600`}>
                   {selectedBcc.toLocaleString()}
                 </span>
@@ -67,7 +67,7 @@ const CCDisplay = ({ required, selectedBcc, selectedRCCs, remaining, selected })
             {/* Remaining */}
             <div className="text-center w-full">
               <div className="text-xs text-gray-500 mb-1">Remaining</div>
-              <div className={`text-lg font-semibold text-amber-600`}>
+              <div className={`text-base font-semibold text-amber-600`}>
                 {remaining.toLocaleString()}
                 <span className="text-xs font-normal text-gray-500 ml-1">
                   CC
@@ -107,18 +107,17 @@ const CCDisplay = ({ required, selectedBcc, selectedRCCs, remaining, selected })
           <div className="grid grid-cols-3 gap-4">
             <div className="text-center">
               <div className="text-xs text-gray-500 mb-1">Required</div>
-              <div className="text-lg font-semibold text-gray-900">
+              <div className="text-base font-semibold text-gray-900">
                 {required >= 1000
                   ? `${(required / 1000).toFixed(1)}k`
                   : required}
               </div>
-              <div className="text-xs text-gray-400">CC</div>
             </div>
 
             <div className="text-center border-l border-r border-gray-100">
               <div className="text-xs text-gray-500 mb-1">Selected</div>
               <div
-                className={`text-lg font-semibold ${
+                className={`text-base font-semibold ${
                   progressPercentage === 100
                     ? "text-emerald-600"
                     : "text-blue-600"
@@ -128,13 +127,12 @@ const CCDisplay = ({ required, selectedBcc, selectedRCCs, remaining, selected })
                   ? `${(selected / 1000).toFixed(1)}k`
                   : selected}
               </div>
-              <div className="text-xs text-gray-400">CC</div>
             </div>
 
             <div className="text-center">
               <div className="text-xs text-gray-500 mb-1">Remaining</div>
               <div
-                className={`text-lg font-semibold ${
+                className={`text-base font-semibold ${
                   remaining === 0 ? "text-gray-400" : "text-amber-600"
                 }`}
               >
@@ -142,7 +140,6 @@ const CCDisplay = ({ required, selectedBcc, selectedRCCs, remaining, selected })
                   ? `${(remaining / 1000).toFixed(1)}k`
                   : remaining}
               </div>
-              <div className="text-xs text-gray-400">CC</div>
             </div>
           </div>
         </div>

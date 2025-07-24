@@ -374,6 +374,16 @@ const AdminDashUserDetails = () => {
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Institutional Mail</span>
+                      <span
+                        className={
+                          user.isValidRuetMail ? "text-green-600" : "text-red-600"
+                        }
+                      >
+                        {user.isValidRuetMail ? "Valid" : "Invalid"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Brittoo Verified:</span>
                       <span
                         className={

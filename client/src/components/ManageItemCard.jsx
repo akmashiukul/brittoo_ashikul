@@ -92,7 +92,7 @@ const ManageItemCard = ({ product, products, setProducts }) => {
           </div>
           <div className="absolute bottom-2 right-2">
             <div className="bg-gray-800 text-white px-2 py-1 rounded text-sm font-medium">
-              ${pricePerDay}/day
+              BDT {pricePerDay}/day
             </div>
           </div>
         </div>

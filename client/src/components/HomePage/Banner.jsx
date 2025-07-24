@@ -7,9 +7,9 @@ const Banner = ({ setProductType, setSearch }) => {
   const tagClassNames = `border border-gray-300 rounded-3xl py-[6px] px-4 text-gray-800 font-semibold bg-white cursor-pointer hover:bg-green-200 md:text-sm text-xs`;
 
   return (
-    <div className="bg-gradient-to-b from-green-100 to-transparent">
+    <div className="bg-gradient-to-b from-green-100 to-transparent px-4">
       <div className="flex flex-col items-center mx-auto lg:max-w-7xl">
-        <h1 className="text-2xl md:text-7xl font-bold mt-14 sm:mt-24">
+        <h1 className="text-3xl md:text-7xl font-bold mt-14 sm:mt-24 text-center">
           <span className="text-green-500">Own Less,</span> Access More
         </h1>
         <p className="text-gray-500  text-xs md:text-xl mt-4 sm:mt-8 text-center mx-2 md:mx-0">
@@ -41,8 +41,120 @@ const Banner = ({ setProductType, setSearch }) => {
             <IoSearchCircle className="text-green-500 cursor-pointer size-6 md:size-12" />
           </button>
         </div>
-        <div className="w-full overflow-x-auto scrollbar-hide relative mt-8">
-          <ul className="flex gap-4 whitespace-nowrap px-2 md:justify-center justify-start">
+
+        <div className="w-full overflow-hidden relative mt-8">
+          <ul className="flex gap-4 whitespace-nowrap px-2 animate-scroll">
+            <li
+              className={tagClassNames}
+              onClick={() => {
+                setProductType("GADGET");
+                setTimeout(() => {
+                  navigate("/browse");
+                }, 400);
+              }}
+            >
+              Gadgets
+            </li>
+            <li
+              className={tagClassNames}
+              onClick={() => {
+                setProductType("FURNITURE");
+                setTimeout(() => {
+                  navigate("/browse");
+                }, 400);
+              }}
+            >
+              Furniture
+            </li>
+            <li
+              className={tagClassNames}
+              onClick={() => {
+                setProductType("VEHICLE");
+                setTimeout(() => {
+                  navigate("/browse");
+                }, 400);
+              }}
+            >
+              Vehicles
+            </li>
+            <li
+              className={tagClassNames}
+              onClick={() => {
+                setProductType("STATIONARY");
+                setTimeout(() => {
+                  navigate("/browse");
+                }, 400);
+              }}
+            >
+              Stationary
+            </li>
+            <li
+              className={tagClassNames}
+              onClick={() => {
+                setProductType("MUSICAL_INSTRUMENT");
+                setTimeout(() => {
+                  navigate("/browse");
+                }, 400);
+              }}
+            >
+              Musical Instruments
+            </li>
+            <li
+              className={tagClassNames}
+              onClick={() => {
+                setProductType("CLOTHING");
+                setTimeout(() => {
+                  navigate("/browse");
+                }, 400);
+              }}
+            >
+              Clothing
+            </li>
+            <li
+              className={tagClassNames}
+              onClick={() => {
+                setProductType("BOOK");
+                setTimeout(() => {
+                  navigate("/browse");
+                }, 400);
+              }}
+            >
+              Books
+            </li>
+            <li
+              className={tagClassNames}
+              onClick={() => {
+                setProductType("ACADEMIC_BOOK");
+                setTimeout(() => {
+                  navigate("/browse");
+                }, 400);
+              }}
+            >
+              Academic Books
+            </li>
+            <li
+              className={tagClassNames}
+              onClick={() => {
+                setProductType("ELECTRONICS");
+                setTimeout(() => {
+                  navigate("/browse");
+                }, 400);
+              }}
+            >
+              Electronics
+            </li>
+            <li
+              className={tagClassNames}
+              onClick={() => {
+                setProductType("APARTMENTS");
+                setTimeout(() => {
+                  navigate("/browse");
+                }, 400);
+              }}
+            >
+              Apartments
+            </li>
+            {/* Duplicate items for seamless loop */}
             <li
               className={tagClassNames}
               onClick={() => {
@@ -155,6 +267,8 @@ const Banner = ({ setProductType, setSearch }) => {
             </li>
           </ul>
         </div>
+
+
       </div>
     </div>
   );

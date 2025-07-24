@@ -169,8 +169,8 @@ const CreditModal = () => {
         }
       }}
     >
-      <div className="relative p-4 w-full max-w-[760px] max-h-full">
-        <div className="relative bg-white rounded-lg shadow-sm flex flex-col max-h-[95vh]">
+      <div className="relative p-3 sm:p-4 w-full max-w-[760px] max-h-full">
+        <div className="relative bg-white rounded-lg shadow-sm flex flex-col max-h-[90vh]">
           <div className="flex items-center justify-between mx-4 md:mx-5 border-b rounded-t border-gray-200 flex-shrink-0 pb-4">
             <div
               id="credit-calc"

@@ -19,4 +19,5 @@ export const safeAuthUserSelect = {
   suspensionCount: true,
   createdAt: true,
   updatedAt: true,
+  isValidRuetMail: true,
 };

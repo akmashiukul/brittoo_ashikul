@@ -85,9 +85,8 @@ const DashboardLayout = () => {
   return (
     <div className="relative flex min-h-screen">
       <div
-        className={`fixed inset-y-0 left-0 z-50 w-56 md:w-80 bg-gray-100 border-r border-gray-200 transform transition-transform duration-300 ease-in-out ${
-          isDrawerOpen ? "translate-x-0" : "-translate-x-full"
-        } flex flex-col justify-between`}
+        className={`fixed inset-y-0 left-0 z-50 w-56 md:w-80 bg-gray-100 border-r border-gray-200 transform transition-transform duration-300 ease-in-out ${isDrawerOpen ? "translate-x-0" : "-translate-x-full"
+          } flex flex-col justify-between`}
       >
         <div className="px-4 py-6 flex-1 flex flex-col">
           <div className="flex items-center justify-between">
@@ -112,11 +111,10 @@ const DashboardLayout = () => {
             <li>
               <Link
                 to="/dashboard/overview"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${
-                  path.includes("/overview")
+                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/overview")
                     ? "bg-green-600 text-white"
                     : "text-gray-700"
-                } flex items-center gap-2`}
+                  } flex items-center gap-2`}
                 onClick={() => {
                   if (window.innerWidth <= 425) {
                     closeDrawer();
@@ -129,11 +127,10 @@ const DashboardLayout = () => {
             <li>
               <Link
                 to="/dashboard/list-items"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${
-                  path.includes("/list-items")
+                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/list-items")
                     ? "bg-green-600 text-white"
                     : "text-gray-700"
-                } flex items-center gap-2`}
+                  } flex items-center gap-2`}
                 onClick={() => {
                   if (window.innerWidth <= 425) {
                     closeDrawer();
@@ -146,11 +143,10 @@ const DashboardLayout = () => {
             <li>
               <Link
                 to="/dashboard/manage-items"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${
-                  path.includes("/manage-items")
+                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/manage-items")
                     ? "bg-green-600 text-white"
                     : "text-gray-700"
-                } flex items-center gap-2`}
+                  } flex items-center gap-2`}
                 onClick={() => {
                   if (window.innerWidth <= 425) {
                     closeDrawer();
@@ -163,11 +159,10 @@ const DashboardLayout = () => {
             <li>
               <Link
                 to="/dashboard/placed-requests"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${
-                  path.includes("/placed-requests")
+                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/placed-requests")
                     ? "bg-green-600 text-white"
                     : "text-gray-700"
-                } flex items-center gap-2`}
+                  } flex items-center gap-2`}
                 onClick={() => {
                   if (window.innerWidth <= 425) {
                     closeDrawer();
@@ -180,11 +175,10 @@ const DashboardLayout = () => {
             <li>
               <Link
                 to="/dashboard/received-requests"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${
-                  path.includes("/received-requests")
+                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/received-requests")
                     ? "bg-green-600 text-white"
                     : "text-gray-700"
-                } flex items-center gap-2`}
+                  } flex items-center gap-2`}
                 onClick={() => {
                   if (window.innerWidth <= 425) {
                     closeDrawer();
@@ -197,11 +191,10 @@ const DashboardLayout = () => {
             <li>
               <Link
                 to="/dashboard/my-credits"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${
-                  path.includes("/my-credits")
+                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/my-credits")
                     ? "bg-green-600 text-white"
                     : "text-gray-700"
-                } flex items-center gap-2`}
+                  } flex items-center gap-2`}
                 onClick={() => {
                   if (window.innerWidth <= 425) {
                     closeDrawer();
@@ -214,11 +207,10 @@ const DashboardLayout = () => {
             <li>
               <Link
                 to="/dashboard/user-analytics"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${
-                  path.includes("/user-analytics")
+                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/user-analytics")
                     ? "bg-green-600 text-white"
                     : "text-gray-700"
-                } flex items-center gap-2`}
+                  } flex items-center gap-2`}
                 onClick={() => {
                   if (window.innerWidth <= 425) {
                     closeDrawer();
@@ -273,19 +265,20 @@ const DashboardLayout = () => {
       </div>
 
       <button
-        className={`fixed bottom-4 left-4 z-50 p-3 md:p-3 rounded-full shadow-md hover:shadow-2xl transition-all duration-300 group cursor-pointer bg-green-700 ${
-          isDrawerOpen ? "opacity-0 pointer-events-none" : "opacity-100"
-        }`}
+        className={`fixed bottom-4 left-4 z-50 p-4 rounded-full 
+    shadow-md hover:shadow-2xl transition-all duration-400 
+    group cursor-pointer bg-emerald-500 
+    ${isDrawerOpen ? "opacity-0 pointer-events-none" : "opacity-100"}`}
         aria-label="Open drawer"
         onClick={openDrawer}
       >
-        <Menu className="w-6 h-6 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-180 text-white" />
+        <Menu className="w-8 h-8 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-180 text-white animate-pulse" />
       </button>
 
+
       <div
-        className={`flex-1 transition-all duration-300 ${
-          isDrawerOpen ? "ml-0 md:ml-80 relative" : "ml-0"
-        }`}
+        className={`flex-1 transition-all duration-300 ${isDrawerOpen ? "ml-0 md:ml-80 relative" : "ml-0"
+          }`}
       >
         {isDrawerOpen && window.innerWidth < 500 && (
           <div className="absolute bg-black/50 opacity-80 h-full w-full"></div>
