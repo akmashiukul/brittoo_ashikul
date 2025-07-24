@@ -41,7 +41,7 @@ const Banner = ({ setProductType, setSearch }) => {
           </button>
         </div>
 
-        <div className="w-full overflow-hidden relative mt-8">
+        <div className="w-full overflow-x-auto scrollbar-hide relative mt-8">
           <ul className="flex gap-4 whitespace-nowrap px-2 animate-scroll">
             <li
               className={tagClassNames}
@@ -49,7 +49,7 @@ const Banner = ({ setProductType, setSearch }) => {
                 setProductType("GADGET");
                 setTimeout(() => {
                   navigate("/browse");
-                }, 400);
+                }, 200);
               }}
             >
               Gadgets
@@ -60,7 +60,7 @@ const Banner = ({ setProductType, setSearch }) => {
                 setProductType("FURNITURE");
                 setTimeout(() => {
                   navigate("/browse");
-                }, 400);
+                }, 200);
               }}
             >
               Furniture
@@ -71,7 +71,7 @@ const Banner = ({ setProductType, setSearch }) => {
                 setProductType("VEHICLE");
                 setTimeout(() => {
                   navigate("/browse");
-                }, 400);
+                }, 200);
               }}
             >
               Vehicles
@@ -82,7 +82,7 @@ const Banner = ({ setProductType, setSearch }) => {
                 setProductType("STATIONARY");
                 setTimeout(() => {
                   navigate("/browse");
-                }, 400);
+                }, 200);
               }}
             >
               Stationary
@@ -93,7 +93,7 @@ const Banner = ({ setProductType, setSearch }) => {
                 setProductType("MUSICAL_INSTRUMENT");
                 setTimeout(() => {
                   navigate("/browse");
-                }, 400);
+                }, 200);
               }}
             >
               Musical Instruments
@@ -104,7 +104,7 @@ const Banner = ({ setProductType, setSearch }) => {
                 setProductType("CLOTHING");
                 setTimeout(() => {
                   navigate("/browse");
-                }, 400);
+                }, 200);
               }}
             >
               Clothing
@@ -115,7 +115,7 @@ const Banner = ({ setProductType, setSearch }) => {
                 setProductType("BOOK");
                 setTimeout(() => {
                   navigate("/browse");
-                }, 400);
+                }, 200);
               }}
             >
               Books
@@ -126,7 +126,7 @@ const Banner = ({ setProductType, setSearch }) => {
                 setProductType("ACADEMIC_BOOK");
                 setTimeout(() => {
                   navigate("/browse");
-                }, 400);
+                }, 200);
               }}
             >
               Academic Books
@@ -137,7 +137,7 @@ const Banner = ({ setProductType, setSearch }) => {
                 setProductType("ELECTRONICS");
                 setTimeout(() => {
                   navigate("/browse");
-                }, 400);
+                }, 200);
               }}
             >
               Electronics
@@ -148,7 +148,7 @@ const Banner = ({ setProductType, setSearch }) => {
                 setProductType("APARTMENTS");
                 setTimeout(() => {
                   navigate("/browse");
-                }, 400);
+                }, 200);
               }}
             >
               Apartments
@@ -160,7 +160,7 @@ const Banner = ({ setProductType, setSearch }) => {
                 setProductType("GADGET");
                 setTimeout(() => {
                   navigate("/browse");
-                }, 400);
+                }, 200);
               }}
             >
               Gadgets
@@ -171,7 +171,7 @@ const Banner = ({ setProductType, setSearch }) => {
                 setProductType("FURNITURE");
                 setTimeout(() => {
                   navigate("/browse");
-                }, 400);
+                }, 200);
               }}
             >
               Furniture
@@ -182,7 +182,7 @@ const Banner = ({ setProductType, setSearch }) => {
                 setProductType("VEHICLE");
                 setTimeout(() => {
                   navigate("/browse");
-                }, 400);
+                }, 200);
               }}
             >
               Vehicles
@@ -193,7 +193,7 @@ const Banner = ({ setProductType, setSearch }) => {
                 setProductType("STATIONARY");
                 setTimeout(() => {
                   navigate("/browse");
-                }, 400);
+                }, 200);
               }}
             >
               Stationary
@@ -204,7 +204,7 @@ const Banner = ({ setProductType, setSearch }) => {
                 setProductType("MUSICAL_INSTRUMENT");
                 setTimeout(() => {
                   navigate("/browse");
-                }, 400);
+                }, 200);
               }}
             >
               Musical Instruments
@@ -215,7 +215,7 @@ const Banner = ({ setProductType, setSearch }) => {
                 setProductType("CLOTHING");
                 setTimeout(() => {
                   navigate("/browse");
-                }, 400);
+                }, 200);
               }}
             >
               Clothing
@@ -226,7 +226,7 @@ const Banner = ({ setProductType, setSearch }) => {
                 setProductType("BOOK");
                 setTimeout(() => {
                   navigate("/browse");
-                }, 400);
+                }, 200);
               }}
             >
               Books
@@ -237,7 +237,7 @@ const Banner = ({ setProductType, setSearch }) => {
                 setProductType("ACADEMIC_BOOK");
                 setTimeout(() => {
                   navigate("/browse");
-                }, 400);
+                }, 200);
               }}
             >
               Academic Books
@@ -248,7 +248,7 @@ const Banner = ({ setProductType, setSearch }) => {
                 setProductType("ELECTRONICS");
                 setTimeout(() => {
                   navigate("/browse");
-                }, 400);
+                }, 200);
               }}
             >
               Electronics
@@ -259,7 +259,7 @@ const Banner = ({ setProductType, setSearch }) => {
                 setProductType("APARTMENTS");
                 setTimeout(() => {
                   navigate("/browse");
-                }, 400);
+                }, 200);
               }}
             >
               Apartments
