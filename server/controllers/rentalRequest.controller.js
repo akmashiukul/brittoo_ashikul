@@ -77,9 +77,9 @@ export const createRentalRequest = async (req, res, next) => {
     if (product.rentalRequests.length > 0) {
       throw new CustomError("Product is already rented", 400);
     }
-    if (product.isOnHold) {
-      throw new CustomError("Product is currently on hold", 400);
-    }
+    // if (product.isOnHold) {
+    //   throw new CustomError("Product is currently on hold", 400);
+    // }
     if (requesterId === ownerId) {
       throw new CustomError("Cannot rent your own product", 400);
     }

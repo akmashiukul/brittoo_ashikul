@@ -18,6 +18,7 @@ import DaysDisplay from "./DaysDisplay";
 const ProductDetails = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [holdLoading, setHoldLoading] = useState(false);
   const [numberOfDays, setNumberOfDays] = useState(3);
   const [price, setPrice] = useState(0);
   const { currentUser } = useUserStore();
@@ -130,6 +131,56 @@ const ProductDetails = () => {
     openCreditModal({ initial, final, product, setProduct });
   };
 
+  const handleHoldProduct = async (status) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#7e0de0",
+      cancelButtonColor: "#d33",
+      confirmButtonText: `${status}`
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          setHoldLoading(true);
+          const res = await api.put(`/api/v1/admin-dash/hold/${product.id}`, {
+            status
+          }, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`
+            }
+          });
+          if (!res.data.success) {
+            Swal.fire({
+              icon: "error",
+              title: "OOPS!",
+              text: "Couldn't hold the product",
+            });
+            return;
+          }
+          Swal.fire({
+            title: "Success!",
+            text: "Hold status changed successfully",
+            icon: "success"
+          });
+          setHoldLoading(false);
+          setProduct((prev) => ({...prev, isOnHold: res.data.data.isOnHold}));
+        } catch (error) {
+          console.log(error);
+          Swal.fire({
+            icon: "error",
+            title: "OOPS!",
+            text: "Couldn't hold the product",
+          });
+          setHoldLoading(false);
+        } finally {
+          setHoldLoading(false);
+        }
+      }
+    });
+  }
+
   if (loading) {
     return <Loader />;
   }
@@ -153,9 +204,12 @@ const ProductDetails = () => {
           </div>
           {/*  1 - B */}
           <div className="w-full lg:w-1/2">
-            <h2 className="text-xl md:text-2xl font-semibold sm:font-bold">
-              {product.name}
-            </h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl md:text-2xl font-semibold sm:font-bold">
+                {product.name}
+              </h2>
+              <span className="font-bold text-gray-500 px-1 py-0.5 border rounded-xs border-gray-400">{product.productSL}</span>
+            </div>
             <p className="text-xs text-gray-500">
               Listed{" "}
               {formatDistanceToNow(product.createdAt, { addSuffix: true })}
@@ -212,6 +266,24 @@ const ProductDetails = () => {
                 <span>Not for Sale</span>
               </div>
             )}
+            {
+              currentUser?.role === "ADMIN" && (
+                <div className="mt-3">
+                  {
+                    product.isOnHold ? (
+                      <span onClick={() => handleHoldProduct("REMOVE-HOLD")} className="text-sm font-semibold text-red-500 hover:text-red-700 underline cursor-pointer">Remove Hold</span>
+                    ) : (
+                      holdLoading ? (
+                        <span className="text-sm text-amber-500">Loading...</span>
+                      ) : (
+                        <span onClick={() => handleHoldProduct("HOLD")} className="text-sm font-semibold text-green-500 hover:text-green-700 underline cursor-pointer">Hold Product</span>
+                      )
+
+                    )
+                  }
+                </div>
+              )
+            }
 
             <div className="mt-6 md:mt-8">
               <h2 className="text-base md:text-lg font-semibold sm:font-bold text-gray-600">
@@ -245,7 +317,7 @@ const ProductDetails = () => {
                       <span className="font-medium">Email Validity</span>
                       <span className={`text-xs`}>
                         {
-                          !product.owner.isValidRuetMail ? ( <span className="flex items-center gap-0.5 text-red-500">Not Valid <XCircle size={12} /> </span> ) : (<span className="flex items-center gap-0.5 text-green-500">Valid <CheckCircle size={12} /></span>)
+                          !product.owner.isValidRuetMail ? (<span className="flex items-center gap-0.5 text-red-500">Not Valid <XCircle size={12} /> </span>) : (<span className="flex items-center gap-0.5 text-green-500">Valid <CheckCircle size={12} /></span>)
                         }
                       </span>
                     </p>
@@ -253,16 +325,15 @@ const ProductDetails = () => {
                       <span className="font-medium">Verification Status: </span>
                       <span className={`text-xs`}>
                         {
-                          product.owner.isVerified !== "VERIFIED" ? ( <span className="flex items-center gap-0.5 text-red-500">Not Verified <XCircle size={12} /> </span> ) : (<span className="flex items-center gap-0.5 text-green-500">Verified <CheckCircle size={12} /></span>)
+                          product.owner.isVerified !== "VERIFIED" ? (<span className="flex items-center gap-0.5 text-red-500">Not Verified <XCircle size={12} /> </span>) : (<span className="flex items-center gap-0.5 text-green-500">Verified <CheckCircle size={12} /></span>)
                         }
                       </span>
                     </p>
                     <p className="text-xs text-gray-600">
                       <span className="font-medium">Security Score: </span>
                       <span
-                        className={`text-xs ${
-                          securityScoreColor[product.owner.securityScore]
-                        }`}
+                        className={`text-xs ${securityScoreColor[product.owner.securityScore]
+                          }`}
                       >
                         {product.owner.securityScore
                           .toLowerCase()
