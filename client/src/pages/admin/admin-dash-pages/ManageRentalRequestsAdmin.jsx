@@ -8,7 +8,9 @@ import {
   MapPin,
   DollarSign,
   Shield,
+  Box,
 } from "lucide-react";
+import { Link } from 'react-router-dom'
 import api from "../../../lib/api";
 
 const RentalRequestsDashboard = () => {
@@ -281,17 +283,18 @@ const RentalRequestsDashboard = () => {
                   <div className="col-span-2">
                     <div className="text-sm">
                       <div className="font-medium text-gray-800">
-                        {request.owner.name}
+                        {request.requester.name}
                       </div>
                       <div className="flex items-center gap-1 text-xs">
                         <Shield className="w-3 h-3 text-gray-400" />
                         <span
                           className={`font-medium ${getSecurityScoreColor(
-                            request.owner.securityScore,
+                            request.requester.securityScore,
                           )}`}
                         >
-                          {request.owner.securityScore.replace("_", " ")}
+                          {request.requester.securityScore.replace("_", " ")}
                         </span>
+                        <span className="text-[11px] text-gray-500">(Renter)</span>
                       </div>
                     </div>
                   </div>
@@ -386,9 +389,15 @@ const RentalRequestsDashboard = () => {
                       <div className="bg-white rounded-lg p-4 border border-green-100">
                         <h4 className="font-semibold text-green-800 mb-3 flex items-center gap-2">
                           <Phone className="w-4 h-4" />
-                          Contact Info
+                          Renter Contact Info
                         </h4>
                         <div className="space-y-2 text-sm">
+                          <div>
+                            <span className="text-gray-600">Name Phone:</span>
+                            <span className="ml-2 font-medium">
+                              {request.requester.name}
+                            </span>
+                          </div>
                           <div>
                             <span className="text-gray-600">Renter Phone:</span>
                             <span className="ml-2 font-medium">
@@ -402,6 +411,26 @@ const RentalRequestsDashboard = () => {
                             </span>
                           </div>
                           <div>
+                            <span className="text-gray-600">Renter Email Validity:</span>
+                            <span className="ml-2 font-medium">
+                              {request.requester.isValidRuetMail ? "Valid" : "Invalid"}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="bg-white rounded-lg p-4 border border-green-100">
+                        <h4 className="font-semibold text-green-800 mb-3 flex items-center gap-2">
+                          <Phone className="w-4 h-4" />
+                          Owner Contact Info
+                        </h4>
+                        <div className="space-y-2 text-sm">
+                          <div>
+                            <span className="text-gray-600">Owner Name:</span>
+                            <span className="ml-2 font-medium">
+                              {request.owner.name}
+                            </span>
+                          </div>
+                          <div>
                             <span className="text-gray-600">Owner Phone:</span>
                             <span className="ml-2 font-medium">
                               {request.ownerPhoneNumber}
@@ -411,6 +440,55 @@ const RentalRequestsDashboard = () => {
                             <span className="text-gray-600">Owner Email:</span>
                             <span className="ml-2 font-medium">
                               {request.owner.email}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-gray-600">Owner Email Validity:</span>
+                            <span className="ml-2 font-medium">
+                              {request.requester.isValidRuetMail ? "Valid" : "Invalid"}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+
+                      {/* Product Details */}
+                      <div className="bg-white rounded-lg p-4 border border-green-100">
+                        <h4 className="font-semibold text-green-800 mb-3 flex items-center gap-2">
+                          <DollarSign className="w-4 h-4" />
+                          Product Details
+                        </h4>
+                        <div className="space-y-2 text-sm">
+                          <div>
+                            <span className="text-gray-600">Type:</span>
+                            <span className="ml-2 font-medium">
+                              {request.product.productType.replace("_", " ")}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-gray-600">Condition:</span>
+                            <span className="ml-2 font-medium">
+                              {request.product.productCondition}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-gray-600">Age:</span>
+                            <span className="ml-2 font-medium">
+                              {request.product.productAge} years
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-gray-600">OMV:</span>
+                            <span className="ml-2 font-medium">
+                              ৳{request.product.omv}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-gray-600">
+                              Second-hand Price:
+                            </span>
+                            <span className="ml-2 font-medium">
+                              ৳{request.product.secondHandPrice}
                             </span>
                           </div>
                         </div>
@@ -445,7 +523,7 @@ const RentalRequestsDashboard = () => {
                             <span className="text-gray-600">BCC Paid:</span>
                             <span className="ml-2 font-medium">
                               {request.paidWithBcc
-                                ? request.usedBccAmount
+                                ? request.usedBccAmount + " BCC"
                                 : "N/A"}
                             </span>
                           </div>
@@ -457,12 +535,40 @@ const RentalRequestsDashboard = () => {
                           </div>
                         </div>
                       </div>
+                      {/* RCC Details */}
+                      {
+                        request.paidWithRcc && (
+                          <div className="bg-white rounded-lg col-span-2 p-4 border border-green-100">
+                            <h4 className="font-semibold text-green-800 mb-3 flex items-center gap-2">
+                              <Calendar className="w-4 h-4" />
+                              Red Cache Credit Details
+                            </h4>
+                            <div className="grid grid-cols-2 gap-3">
+                              {
+                                request.rccUsageDetails.map((rccUsage) => (
+                                  <a target="_blank" rel="noopener noreferrer" href={`/product-details/${rccUsage.redCacheCredit.sourceProduct.id}`} key={rccUsage.id}>
+                                    <div className="bg-red-100 py-1 px-4 rounded-md flex justify-between items-center hover:scale-102 hover:shadow-xs transition-all duration-300 cursor-pointer border border-red-300">
+                                      <div className="flex items-center gap-1 justify-center border border-red-100 p-0.5 rounded-md justify-self-start">
+                                        <Box size={13} color="red" />
+                                        <span className="font-semibold text-red-500">{rccUsage.redCacheCredit.sourceProduct.productSL}</span>
+                                        <span className="text-sm text-red-500">- {rccUsage.redCacheCredit.sourceProduct.productType}</span>
+                                      </div>
+                                      <span className="text-xs text-red-600">{rccUsage.redCacheCredit.amount}</span>
+                                      <span className="text-xs text-red-600">{rccUsage.usedAmount}</span>
+                                    </div>
+                                  </a>
+                                ))
+                              }
+                            </div>
+                          </div>
+                        )
+                      }
 
                       {/* Collection/Return Details */}
                       <div className="bg-white rounded-lg p-4 border border-green-100">
                         <h4 className="font-semibold text-green-800 mb-3 flex items-center gap-2">
                           <MapPin className="w-4 h-4" />
-                          Collection & Return
+                          Collection
                         </h4>
                         <div className="space-y-2 text-sm">
                           <div>
@@ -477,7 +583,7 @@ const RentalRequestsDashboard = () => {
                             </span>
                             <span className="ml-2 font-medium">
                               {request.renterCollectionMethod ===
-                              "BRITTOO_TERMINAL"
+                                "BRITTOO_TERMINAL"
                                 ? "Terminal Pickup"
                                 : "Home Delivery"}
                             </span>
@@ -502,7 +608,7 @@ const RentalRequestsDashboard = () => {
                               </span>
                             </div>
                           )}
-                          <div>
+                          {/* <div>
                             <span className="text-gray-600">
                               Return Method:
                             </span>
@@ -511,7 +617,7 @@ const RentalRequestsDashboard = () => {
                                 ? "Terminal Return"
                                 : "Home Pickup"}
                             </span>
-                          </div>
+                          </div> */}
                           {request.renterReturnTerminal && (
                             <div>
                               <span className="text-gray-600">
@@ -565,47 +671,6 @@ const RentalRequestsDashboard = () => {
                         </div>
                       </div>
 
-                      {/* Product Details */}
-                      <div className="bg-white rounded-lg p-4 border border-green-100">
-                        <h4 className="font-semibold text-green-800 mb-3 flex items-center gap-2">
-                          <DollarSign className="w-4 h-4" />
-                          Product Details
-                        </h4>
-                        <div className="space-y-2 text-sm">
-                          <div>
-                            <span className="text-gray-600">Type:</span>
-                            <span className="ml-2 font-medium">
-                              {request.product.productType.replace("_", " ")}
-                            </span>
-                          </div>
-                          <div>
-                            <span className="text-gray-600">Condition:</span>
-                            <span className="ml-2 font-medium">
-                              {request.product.productCondition}
-                            </span>
-                          </div>
-                          <div>
-                            <span className="text-gray-600">Age:</span>
-                            <span className="ml-2 font-medium">
-                              {request.product.productAge} years
-                            </span>
-                          </div>
-                          <div>
-                            <span className="text-gray-600">OMV:</span>
-                            <span className="ml-2 font-medium">
-                              ৳{request.product.omv}
-                            </span>
-                          </div>
-                          <div>
-                            <span className="text-gray-600">
-                              Second-hand Price:
-                            </span>
-                            <span className="ml-2 font-medium">
-                              ৳{request.product.secondHandPrice}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
 
                       {/* Actions */}
                       <div className="bg-white rounded-lg p-4 border border-green-100">

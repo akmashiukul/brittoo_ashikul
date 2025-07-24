@@ -225,15 +225,6 @@ export const createRentalRequest = async (req, res, next) => {
         }
       }
 
-      // await tx.product.update({
-      //   where: {
-      //     id: productId,
-      //   },
-      //   data: {
-      //     isOnHold: true
-      //   }
-      // })
-
       return rentalRequest;
     });
 

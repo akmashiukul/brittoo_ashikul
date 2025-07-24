@@ -37,7 +37,15 @@ export const getAllRentalRequests = async (req, res, next) => {
           requester: { select: safeAuthUserSelect },
           bccWallet: true,
           bccTransactions: true,
-          rccUsageDetails: { include: { redCacheCredit: true } },
+          rccUsageDetails: {
+            include: {
+              redCacheCredit: {
+                include: {
+                  sourceProduct: true
+                }
+              }
+            }
+          },
         },
         orderBy: { createdAt: "desc" },
       }),
