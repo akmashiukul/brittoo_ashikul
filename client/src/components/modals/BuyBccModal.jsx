@@ -100,7 +100,7 @@ const BuyBccModal = () => {
             </h3>
             <ul className="text-xs md:text-sm text-blue-700 space-y-1 text-left">
               <li>• Send Money (Not Payment)</li>
-              <li>• Number: <strong>+8801772967677</strong></li>
+              <li>• Number: <strong>+8801860064433</strong></li>
               <li>• Add Your roll at reference</li>
               <li>• Select the gateway and Enter you sent amount</li>
               <li>• Carefully paste the trxId below</li>
