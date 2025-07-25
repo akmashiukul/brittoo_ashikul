@@ -357,16 +357,14 @@ enum RentalRequestStatus {
 }
 
 model RentalRequestRccUsage {
-  id               String @id @default(cuid()) @map("id")
-  rentalRequestId  String @map("rental_request_id")
-  redCacheCreditId String @map("red_cache_credit_id")
-  usedAmount       Int    @map("used_amount")
-
-  rentalRequest  RentalRequest  @relation(fields: [rentalRequestId], references: [id])
-  redCacheCredit RedCacheCredit @relation(fields: [redCacheCreditId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id               String         @id @default(cuid()) @map("id")
+  rentalRequestId  String         @map("rental_request_id")
+  redCacheCreditId String         @map("red_cache_credit_id")
+  usedAmount       Int            @map("used_amount")
+  rentalRequest    RentalRequest  @relation(fields: [rentalRequestId], references: [id], onDelete: Cascade)
+  redCacheCredit   RedCacheCredit @relation(fields: [redCacheCreditId], references: [id], onDelete: Cascade)
+  createdAt        DateTime       @default(now()) @map("created_at")
+  updatedAt        DateTime       @updatedAt @map("updated_at")
 
   @@unique([rentalRequestId, redCacheCreditId])
   @@map("rental_request_rcc_usage")
