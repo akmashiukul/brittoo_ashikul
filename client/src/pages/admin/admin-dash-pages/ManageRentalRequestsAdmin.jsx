@@ -538,7 +538,7 @@ const RentalRequestsDashboard = () => {
                       {/* RCC Details */}
                       {
                         request.paidWithRcc && (
-                          <div className="bg-white rounded-lg col-span-2 p-4 border border-green-100">
+                          <div className="bg-white rounded-lg col-span-2 p-4 border border-green-100 overflow-y-auto">
                             <h4 className="font-semibold text-green-800 mb-3 flex items-center gap-2">
                               <Calendar className="w-4 h-4" />
                               Red Cache Credit Details
