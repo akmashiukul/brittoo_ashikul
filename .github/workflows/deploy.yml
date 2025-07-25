@@ -1,6 +1,5 @@
 name: Deploy Brittoo to VPS
 
-# This runs when you push to main branch
 on:
   push:
     branches: [ main ]
@@ -10,7 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    # Deploy to your VPS server
     - name: Deploy to VPS
       uses: appleboy/ssh-action@v0.1.5
       with:
@@ -19,6 +17,17 @@ jobs:
         password: ${{ secrets.VPS_PASSWORD }}
         script: |
           echo "Starting deployment..."
+          
+          # Load NVM environment
+          export NVM_DIR="/root/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+          [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+          
+          # THIS LINE WAS MISSING - Activate Node.js
+          nvm use node
+          
+          echo "Node version: $(node --version)"
+          echo "NPM version: $(npm --version)"
           
           cd /var/www/brittoo
           
@@ -39,7 +48,15 @@ jobs:
           echo "Restarting nginx..."
           sudo systemctl reload nginx
           
+          # Find and use PM2
           echo "Restarting backend..."
-          pm2 restart brittoo-backend || pm2 start server/index.js --name brittoo-backend
+          npm list -g pm2 > /dev/null 2>&1 && PM2_AVAILABLE=true || PM2_AVAILABLE=false
+          
+          if [ "$PM2_AVAILABLE" = true ]; then
+            pm2 restart brittoo-backend || pm2 start server/index.js --name brittoo-backend
+          else
+            echo "PM2 not found globally, trying npx..."
+            npx pm2 restart brittoo-backend || npx pm2 start server/index.js --name brittoo-backend
+          fi
           
           echo "Deployment completed!"
