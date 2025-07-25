@@ -1,0 +1,45 @@
+name: Deploy Brittoo to VPS
+
+# This runs when you push to main branch
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    # Deploy to your VPS server
+    - name: Deploy to VPS
+      uses: appleboy/ssh-action@v0.1.5
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USERNAME }}
+        password: ${{ secrets.VPS_PASSWORD }}
+        script: |
+          echo "Starting deployment..."
+          
+          cd /var/www/brittoo
+          
+          echo "Pulling latest code..."
+          git pull origin main
+          
+          echo "Building frontend..."
+          cd client
+          npm install --silent
+          npm run build
+          cd ..
+          
+          echo "Installing backend dependencies..."
+          cd server
+          npm install --silent
+          cd ..
+          
+          echo "Restarting nginx..."
+          sudo systemctl reload nginx
+          
+          echo "Restarting backend..."
+          pm2 restart brittoo-backend || pm2 start server/index.js --name brittoo-backend
+          
+          echo "Deployment completed!"
