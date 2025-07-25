@@ -224,7 +224,7 @@ export const verifyOTP = async (req, res, next) => {
         email: user.email
       },
       process.env.JWT_SECRET,
-      { expiresIn: "10d" },
+      { expiresIn: "30d" },
     );
 
     const { password: _, otp: __, otpExpiry: ___, ...safeUser } = updatedUser;
@@ -267,7 +267,7 @@ export const login = async (req, res, next) => {
         email: user.email,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "10d" },
+      { expiresIn: "30d" },
     );
 
     const { password: _, otp: __, otpExpiry: ___, ...safeUser } = user;

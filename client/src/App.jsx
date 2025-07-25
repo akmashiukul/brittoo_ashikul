@@ -72,7 +72,7 @@ const AppContent = () => {
     const now = new Date();
     const diff = now - loginDT;
     const diffInDays = diff / (1000 * 60 * 60 * 24);
-    if (diffInDays >= 2) {
+    if (diffInDays >= 28) {
       setCurrentUser(null);
       localStorage.removeItem("token");
       localStorage.removeItem("login-dt");
