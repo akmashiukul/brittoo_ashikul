@@ -235,9 +235,13 @@ export const getProducts = async (req, res, next) => {
 export const deleteProduct = async (req, res, next) => {
   try {
     const { id } = req.params;
+
+    // Validate user
     if (!req.user || !req.user.id) {
       throw new CustomError("Unauthorized: No user authenticated", 401);
     }
+
+    // Fetch product with rental requests
     const product = await prisma.product.findUniqueOrThrow({
       where: { id, deletedAt: null },
       include: {
@@ -249,65 +253,105 @@ export const deleteProduct = async (req, res, next) => {
                 "PRODUCT_SUBMITTED_BY_OWNER",
                 "PRODUCT_COLLECTED_BY_RENTER",
                 "PRODUCT_RETURNED_BY_RENTER",
-              ]
-            }
-          }
+              ],
+            },
+          },
         },
-      }
+      },
     });
 
-    if (!product) {
-      throw new CustomError("Product not found or you don't have permission to delete this product", 404);
+    // Permission check
+    if (product.ownerId !== req.user.id && !["ADMIN", "MODERATOR"].includes(req.user.role)) {
+      throw new CustomError("Unauthorized to delete this product", 403);
     }
 
-    if (product.ownerId !== req.user.id && req.user.role !== "ADMIN") {
-      throw new CustomError(
-        "Unauthorized to delete this product",
-        403,
-      );
+    // Check for active rental requests
+    if (product.rentalRequests.length > 0) {
+      throw new CustomError("Cannot delete product with active rental requests. Please handle pending requests first.", 400);
     }
+
+    // Check for RedCacheCredit
     const refRcc = await prisma.redCacheCredit.findFirst({
-      where: {
-        sourceProductId: product.id,
-        deletedAt: null
-      }
+      where: { sourceProductId: product.id, deletedAt: null },
     });
     if (refRcc?.inUse > 0) {
       throw new CustomError("Can't delete product. Red Credit referencing this product is in use.", 400);
     }
-    if (product?.rentalRequests?.length > 0) {
-      throw new CustomError("Cannot delete product with active rental requests. Please handle pending requests first.", 400);
-    }
+
+    // Check if product is on hold
     if (product.isOnHold) {
       throw new CustomError("Cannot delete product that is currently on hold", 400);
     }
 
+    // Perform deletions in a transaction
     await prisma.$transaction(async (tx) => {
-      await tx.rentalRequest.deleteMany({
-        where: { productId: product.id }
+      // Delete BCC transactions for safe rental request statuses
+      await tx.bccTransaction.deleteMany({
+        where: {
+          rentalRequestId: {
+            in: await tx.rentalRequest.findMany({
+              where: {
+                productId: product.id,
+                status: {
+                  in: [
+                    "CANCELLED_BY_RENTER",
+                    "REJECTED_BY_OWNER",
+                    "REJECTED_FROM_BRITTOO",
+                    "PRODUCT_RETURNED_TO_OWNER",
+                  ],
+                },
+              },
+              select: { id: true },
+            }).then((rrs) => rrs.map((rr) => rr.id)),
+          },
+        },
       });
 
+      // Delete rental requests with safe statuses
+      await tx.rentalRequest.deleteMany({
+        where: {
+          productId: product.id,
+          status: {
+            in: [
+              "CANCELLED_BY_RENTER",
+              "REJECTED_BY_OWNER",
+              "REJECTED_FROM_BRITTOO",
+              "PRODUCT_RETURNED_TO_OWNER",
+            ],
+          },
+        },
+      });
+
+      // Delete RedCacheCredit (RentalRequestRccUsage handled by onDelete: Cascade)
       if (refRcc) {
         await tx.redCacheCredit.delete({
-          where: { sourceProductId: product.id }
+          where: { id: refRcc.id },
         });
       }
 
+      // Delete product
       await tx.product.delete({
-        where: { id }
+        where: { id },
       });
     });
 
-    const keys = await redisClient.keys("products:*");
-    if (keys.length > 0) {
-      await redisClient.del(keys);
-      console.log("Cache invalidated:", keys);
+    // Invalidate specific cache
+    try {
+      const cacheKey = `products:${id}`;
+      await redisClient.del(cacheKey);
+      console.log("Cache invalidated:", cacheKey);
+    } catch (redisError) {
+      console.error("Failed to invalidate cache:", redisError);
     }
+
     return res.status(200).json({
       success: true,
       message: "Product deleted successfully",
     });
   } catch (error) {
+    if (error.code === "P2025") {
+      throw new CustomError("Product not found or already deleted", 404);
+    }
     console.error(error);
     next(error);
   }
