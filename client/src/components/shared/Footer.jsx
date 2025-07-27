@@ -83,8 +83,8 @@ const Footer = () => {
               Get in Touch
             </h4>
             <div className="space-y-4">
-              <ContactItem icon={Mail} text="aagalib2323@gmail.com" />
-              <ContactItem icon={Phone} text="+8801772967677" />
+              <ContactItem icon={Mail} text="durjoy6812@gmail.com" />
+              <ContactItem icon={Phone} text="+8801860064433" />
               <ContactItem icon={MapPin} text="RUET, Rajshahi, Bangladesh" />
             </div>
             {/* Newsletter Signup */}
