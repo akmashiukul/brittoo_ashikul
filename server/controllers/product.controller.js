@@ -297,12 +297,10 @@ export const deleteProduct = async (req, res, next) => {
         where: { id },
       });
     });
-    try {
-      const cacheKey = `products:${id}`;
-      await redisClient.del(cacheKey);
-      console.log("Cache invalidated:", cacheKey);
-    } catch (redisError) {
-      console.error("Failed to invalidate cache:", redisError);
+    const keys = await redisClient.keys("products:*");
+    if (keys.length > 0) {
+      await redisClient.del(keys);
+      console.log("Cache invalidated:", keys);
     }
     return res.status(200).json({
       success: true,
