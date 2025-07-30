@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Camera, Upload, Check, X, Loader2 } from "lucide-react";
 import api from "../lib/api.js";
 import useUserStore from "../stores/authStores/useUserStore.js";
@@ -266,8 +266,7 @@ const VerifyUser = () => {
         setTimeout(() => navigate("/"), 500);
       } else {
         setMessage(
-          `❌ ${
-            response.data.message || "Submission failed. Please try again."
+          `❌ ${response.data.message || "Submission failed. Please try again."
           }`,
         );
       }
@@ -330,15 +329,20 @@ const VerifyUser = () => {
         <h1 className="text-3xl font-bold text-center text-gray-800 mb-2">
           Identity Verification
         </h1>
-        <p className="text-gray-600 text-center mb-8">
+        <p className="text-gray-600 text-center">
           Please provide your student ID card and a selfie to verify your
           identity
         </p>
+        <div className="flex justify-center flex-col items-center mt-2">
+          <p className="text-gray-500">Or,</p>
+          <Link to={'/dashboard/overview'}>
+            <p className="mt-2  mb-6 text-white bg-green-500 p-2 text-xs md:text-sm border rounded-md w-fit justify-self-center">Verify Later😴</p>
+          </Link>
+        </div>
 
         {/* ID Card Section */}
         <div className="mb-8">
           <h2 className="text-sm md:text-lg border-b border-gray-200 pb-1 font-semibold text-gray-700 mb-4 flex items-center">
-            <Upload className="mr-2" size={20} />
             Student ID Card (Front)
           </h2>
           {!idCardPreview ? (
@@ -386,10 +390,13 @@ const VerifyUser = () => {
 
         {/* Selfie Section */}
         <div className="mb-8">
-          <h2 className="text-sm md:text-lg border-b border-gray-200 pb-1 font-semibold text-gray-700 mb-4 flex items-center">
-            <Camera className="mr-2" size={20} />
-            Selfie Photo
-          </h2>
+          <div className="border-b border-gray-200 pb-2 mb-4">
+            <h2 className="text-sm md:text-lg font-semibold text-gray-700">
+              Selfie Photo
+            </h2>
+            <span className="text-xs">(Take any random photo if you feel uncomfortable)</span>
+          </div>
+
           {!selfiePreview ? (
             <div className="text-center">
               <button
@@ -549,11 +556,10 @@ const VerifyUser = () => {
         {/* Message Display */}
         {message && (
           <div
-            className={`mt-6 p-4 rounded-lg text-center ${
-              message.includes("success")
-                ? "bg-green-100 text-green-700 border border-green-200"
-                : "bg-red-100 text-red-700 border border-red-200"
-            }`}
+            className={`mt-6 p-4 rounded-lg text-center ${message.includes("success")
+              ? "bg-green-100 text-green-700 border border-green-200"
+              : "bg-red-100 text-red-700 border border-red-200"
+              }`}
           >
             {message}
           </div>

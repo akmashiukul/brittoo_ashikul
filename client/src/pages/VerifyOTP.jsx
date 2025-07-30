@@ -51,6 +51,7 @@ export default function VerifyOTP() {
       setMessage("✅ OTP verified successfully!");
       await setCurrentUser(res.data.user);
       localStorage.setItem("token", res.data.token);
+      localStorage.setItem("login-dt", new Date().toISOString());
       setTempUser(null);
     } catch (err) {
       setMessage("❌ Invalid OTP. Please try again.");

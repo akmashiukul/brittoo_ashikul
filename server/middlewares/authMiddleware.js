@@ -28,10 +28,10 @@ export const verifyToken = async (req, res, next) => {
     next();
   } catch (error) {
     if (error.name === "TokenExpiredError") {
-      return next(new CustomError("Token expired", 401, "TOKEN_EXPIRED"));
+      return next(new CustomError("Token expired", 401, "TOKEN_EXPIRED, Please Log In again."));
     }
     if (error.name === "JsonWebTokenError") {
-      return next(new CustomError("Invalid token", 401, "INVALID_TOKEN"));
+      return next(new CustomError("Invalid token", 401, "INVALID_TOKEN, Please Log In again."));
     }
     console.error("Unexpected error in token verification:", error);
     next(error);
