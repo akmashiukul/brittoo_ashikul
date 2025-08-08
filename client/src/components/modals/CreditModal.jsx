@@ -142,7 +142,7 @@ const CreditModal = () => {
       Swal.fire({
         icon: "error",
         title: "Deposit not fulfilled",
-        text: "Kana naki re vai. Dekhos na progress bar fillup hoynai",
+        text: "Please fulfill your deposit. You can view it from the progress bar",
       });
       return;
     }

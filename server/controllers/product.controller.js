@@ -175,6 +175,7 @@ export const getProducts = async (req, res, next) => {
     const products = await prisma.product.findMany({
       where: {
         deletedAt: null,
+        isVirtual: false,
         ...filters,
         ...searchClause,
       },

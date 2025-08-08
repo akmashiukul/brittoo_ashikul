@@ -31,9 +31,7 @@ logs/
 # ----------------------
 prisma/dev.db
 prisma/dev.db-journal
-prisma/migrations/
 **/prisma/dev.db
-**/prisma/migrations/
 
 # ----------------------
 # OS-specific
@@ -57,3 +55,4 @@ uploads/
 
 
 temp.js
+backup_data.sql

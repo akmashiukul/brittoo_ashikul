@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import api from "../../../lib/api";
 import { Link } from "react-router-dom";
+import Avatar from "boring-avatars";
 
 const ManageUsers = () => {
   const [users, setUsers] = useState([]);
@@ -225,8 +226,14 @@ const ManageUsers = () => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-10 w-10">
-                            <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
-                              <User className="h-5 w-5 text-green-600" />
+                            <div className="h-10 w-10 rounded-full flex items-center justify-center">
+                              <Avatar
+                                name={user.email}
+                                colors={["#482344", "#2b5166", "#429867", "#fab243", "#e02130"]}
+                                variant="beam"
+                                size={36}
+                                className="cursor-pointer"
+                              />
                             </div>
                           </div>
                           <div className="ml-4">
@@ -243,11 +250,11 @@ const ManageUsers = () => {
                         {getStatusBadge(user.isVerified)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                          {user.role === "ADMIN" ? <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-500 flex gap-1 items-center w-fit">
-                              {user.role} <LucideShieldUser size={16} />
-                            </span> : (
-                              <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">{user.role}</span>
-                            )}
+                        {user.role === "ADMIN" ? <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-500 flex gap-1 items-center w-fit">
+                          {user.role} <LucideShieldUser size={16} />
+                        </span> : (
+                          <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">{user.role}</span>
+                        )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {new Date(user.createdAt).toLocaleDateString()}
@@ -328,11 +335,10 @@ const ManageUsers = () => {
                         <button
                           key={i + 1}
                           onClick={() => handleFilterChange("page", i + 1)}
-                          className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                            pagination.currentPage === i + 1
+                          className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${pagination.currentPage === i + 1
                               ? "z-10 bg-green-50 border-green-500 text-green-600"
                               : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
-                          }`}
+                            }`}
                         >
                           {i + 1}
                         </button>

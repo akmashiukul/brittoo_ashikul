@@ -12,16 +12,21 @@ const RCC = ({
   return (
     <div
       onClick={() => handleSelect(rcc)}
-      className={`relative w-[250px] h-[150px] rounded-2xl ${
-        inCreditModal &&
+      className={`relative w-[250px] h-[150px] rounded-2xl ${inCreditModal &&
         "cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-2xl"
-      } overflow-hidden ${
-        selectedRcc && !inRRModal
+        } overflow-hidden ${selectedRcc && !inRRModal
           ? "bg-gradient-to-br from-red-600 via-red-700 to-red-800 ring-4 ring-green-200 shadow-xl"
           : "bg-gradient-to-br from-red-600 via-red-400 to-red-600 shadow-lg"
-      }`}
+        }`}
     >
       <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-transparent rounded-2xl" />
+      {
+        rcc.isGiftCredit && (
+          <div className="h-full w-full flex items-center justify-center">
+            <h1 className="text-6xl opacity-35 mr-6">🎁</h1>
+          </div>
+        )
+      }
 
       <div className="absolute top-5 left-6 right-6 flex justify-between items-center">
         <div>
@@ -75,7 +80,7 @@ const RCC = ({
               REF Product SL
             </div>
             <div className="text-white text-sm font-semibold">
-              {rcc.sourceProduct.productSL || "DEMOID123"}
+              {rcc.sourceProduct.productSL.slice(0, 10) || "DEMOID123"}
             </div>
           </div>
         </div>

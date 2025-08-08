@@ -550,7 +550,7 @@ const RentalRequestsDashboard = () => {
                                     <div className="bg-red-100 py-1 px-4 rounded-md flex justify-between items-center hover:scale-102 hover:shadow-xs transition-all duration-300 cursor-pointer border border-red-300">
                                       <div className="flex items-center gap-1 justify-center border border-red-100 p-0.5 rounded-md justify-self-start">
                                         <Box size={13} color="red" />
-                                        <span className="font-semibold text-red-500">{rccUsage.redCacheCredit.sourceProduct.productSL}</span>
+                                        <span className="font-semibold text-red-500">{rccUsage.redCacheCredit.sourceProduct.productSL.slice(0, 8)}</span>
                                         <span className="text-sm text-red-500">- {rccUsage.redCacheCredit.sourceProduct.productType}</span>
                                       </div>
                                       <span className="text-xs text-red-600">{rccUsage.redCacheCredit.amount}</span>

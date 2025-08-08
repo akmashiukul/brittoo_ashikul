@@ -1,6 +1,7 @@
 import { Resend } from "resend";
 import prisma from "../config/prisma.js";
 import { CustomError } from "../lib/customError.js";
+import { isGiftCreditValid } from "../lib/creditValidators.js";
 const resend = new Resend(`${process.env.RESEND_API_KEY}`);
 
 export const createRentalRequest = async (req, res, next) => {
@@ -140,6 +141,20 @@ export const createRentalRequest = async (req, res, next) => {
           throw new CustomError(
             `Insufficient RCC credit balance for credit ID: ${rccUsage.rccId}`,
             400,
+          );
+        }
+        // Check if gift credit is currently valid
+        if (rccCredit.isGiftCredit && !isGiftCreditValid(rccCredit)) {
+          throw new CustomError(
+            `Gift credit has expired and cannot be used`,
+            400
+          );
+        }
+        // IMPORTANT: Check if gift credit will expire during rental period
+        if (rccCredit.isGiftCredit && !isGiftCreditValid(rccCredit, rentalEndDate)) {
+          throw new CustomError(
+            `Gift credit will expire during the rental period (${new Date(rccCredit.validityDate).toLocaleDateString()}). Please choose a different payment method or shorter rental period.`,
+            400
           );
         }
       }
