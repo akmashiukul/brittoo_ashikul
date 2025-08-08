@@ -130,12 +130,19 @@ model WithdrawalRequest {
 }
 
 model RedCacheCredit {
-  id                  String                  @id @default(cuid()) @map("id")
-  amount              Int                     @map("amount")
-  inUse               Int                     @default(0) @map("in_use")
-  renterId            String?                 @map("renter_id")
-  userId              String                  @map("user_id")
-  sourceProductId     String                  @unique @map("source_product_id")
+  id       String  @id @default(cuid()) @map("id")
+  amount   Int     @map("amount")
+  inUse    Int     @default(0) @map("in_use")
+  renterId String? @map("renter_id")
+
+  isGiftCredit Boolean   @default(false) @map("is_gift_credit")
+  validityDate DateTime? @map("validity_date")
+  giftedBy     String?   @map("gifted_by")
+  giftReason   String?   @map("gift_reason")
+
+  userId          String @map("user_id")
+  sourceProductId String @unique @map("source_product_id")
+
   createdAt           DateTime                @default(now()) @map("created_at")
   updatedAt           DateTime                @updatedAt @map("updated_at")
   deletedAt           DateTime?               @map("deleted_at")
@@ -169,13 +176,17 @@ model Product {
   isRented           Boolean          @default(false) @map("is_rented")
   isBrittooVerified  Boolean          @default(false) @map("is_brittoo_verified")
   holdCreditValidity Int?             @map("hold_credit_validity")
-  createdAt          DateTime         @default(now()) @map("created_at")
-  updatedAt          DateTime         @updatedAt @map("updated_at")
-  deletedAt          DateTime?        @map("deleted_at")
-  owner              User             @relation("ProductsRentedOut", fields: [ownerId], references: [id], onDelete: Cascade)
-  redCacheCredits    RedCacheCredit?
-  rentalRequests     RentalRequest[]
-  renters            User[]           @relation("ProductsBorrowed")
+
+  isVirtual   Boolean @default(false) @map("is_virtual")
+  virtualType String? @map("virtual_type")
+
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+  deletedAt       DateTime?       @map("deleted_at")
+  owner           User            @relation("ProductsRentedOut", fields: [ownerId], references: [id], onDelete: Cascade)
+  redCacheCredits RedCacheCredit?
+  rentalRequests  RentalRequest[]
+  renters         User[]          @relation("ProductsBorrowed")
 
   @@unique([ownerId, productSL])
   @@unique([productSlNo, deletedAt])
