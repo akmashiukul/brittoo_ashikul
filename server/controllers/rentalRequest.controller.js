@@ -245,7 +245,7 @@ export const createRentalRequest = async (req, res, next) => {
 
     // TODO: emit notification to owner
     await resend.emails.send({
-      from: "Brittoo <verify@brittoo.xyz>",
+      from: "Brittoo <notifications@brittoo.xyz>",
       to: result.owner.email,
       subject: `Congratulations! You have received a request.`,
       html: `

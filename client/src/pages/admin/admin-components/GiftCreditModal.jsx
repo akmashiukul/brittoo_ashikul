@@ -40,6 +40,10 @@ const GiftCreditModal = ({ isGiftCreditModalOpen, setIsGiftCreditModalOpen, user
           text: "Something went wrong",
         });
       }
+      Swal.fire({
+        icon: "success",
+        title: "Successfull!",
+      });
       setIsGiftCreditModalOpen(false);
     } catch (error) {
       console.error("Gift Credit error:", error);
