@@ -40,7 +40,6 @@ const CreditModal = () => {
             },
           },
         );
-        console.log("bcc wallet:  ", res.data)
         if (!res.data.success) {
           return;
         }

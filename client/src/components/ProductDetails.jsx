@@ -21,6 +21,11 @@ const ProductDetails = () => {
   const [holdLoading, setHoldLoading] = useState(false);
   const [numberOfDays, setNumberOfDays] = useState(3);
   const [price, setPrice] = useState(0);
+  const [couponCode, setCouponCode] = useState("");
+  const [coupon, setCoupon] = useState(null);
+  const [couponValidationError, setCouponValidationError] = useState("");
+  const [discountedPrice, setDiscountedPrice] = useState(0);
+
   const { currentUser } = useUserStore();
   const { id } = useParams();
 
@@ -128,7 +133,7 @@ const ProductDetails = () => {
       });
       return;
     }
-    openCreditModal({ initial, final, product, setProduct });
+    openCreditModal({ initial, final, product: {...product, secondHandPrice: discountedPrice}, setProduct });
   };
 
   const handleHoldProduct = async (status) => {
@@ -165,7 +170,7 @@ const ProductDetails = () => {
             icon: "success"
           });
           setHoldLoading(false);
-          setProduct((prev) => ({...prev, isOnHold: res.data.data.isOnHold}));
+          setProduct((prev) => ({ ...prev, isOnHold: res.data.data.isOnHold }));
         } catch (error) {
           console.log(error);
           Swal.fire({
@@ -180,6 +185,44 @@ const ProductDetails = () => {
       }
     });
   }
+
+  const handleApplyCoupon = async () => {
+    try {
+      const res = await api.get(`/api/v1/coupons/validate/${couponCode}/${currentUser.id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        }
+      });
+      if (!res.data.success) {
+        Swal.fire({
+          icon: "error",
+          title: "OOPS!",
+          text: "Error in Coupon Validation",
+        });
+        setCoupon(null);
+        return;
+      }
+      if (!res.data.valid) {
+        setCouponValidationError(res.data.message);
+        setCoupon(null);
+        return;
+      }
+      setCoupon(res.data.data);
+      setCouponValidationError("");
+      setDiscountedPrice(product.secondHandPrice * (res.data.data.discount/100));
+    } catch (error) {
+      console.log("Error in apply coupon: ", error);
+      alert("Error in coupon validation");
+    }
+  }
+
+  useEffect(() => {
+    if(couponCode == "") {
+      setCouponValidationError("")
+    }
+  }, [couponCode]);
+
+
 
   if (loading) {
     return <Loader />;
@@ -331,19 +374,27 @@ const ProductDetails = () => {
                     </p>
                     <p className="text-xs text-gray-600">
                       <span className="font-medium">Security Score: </span>
-                      <span
-                        className={`text-xs ${securityScoreColor[product.owner.securityScore]
-                          }`}
-                      >
-                        {product.owner.securityScore
-                          .toLowerCase()
-                          .split("_")
-                          .map(
-                            (word) =>
-                              word.charAt(0).toUpperCase() + word.slice(1),
-                          )
-                          .join(" ")}
-                      </span>
+
+                      {
+                        product.owner.securityScore == "MID" ? <span
+                          className={`text-xs ${securityScoreColor[product.owner.securityScore]
+                            }`}
+                        >
+                          Normal
+                        </span> : <span
+                          className={`text-xs ${securityScoreColor[product.owner.securityScore]
+                            }`}
+                        >
+                          {product.owner.securityScore
+                            .toLowerCase()
+                            .split("_")
+                            .map(
+                              (word) =>
+                                word.charAt(0).toUpperCase() + word.slice(1),
+                            )
+                            .join(" ")}
+                        </span>
+                      }
                     </p>
                     <p className="text-xs text-gray-600 mt-1">
                       <span className="font-medium">Suspended: </span>
@@ -351,7 +402,7 @@ const ProductDetails = () => {
                         {product.owner.suspensionCount || 0} times
                       </span>
                     </p>
-                    <p className="text-xs text-gray-600 mt-1">
+                    {/* <p className="text-xs text-gray-600 mt-1">
                       <span className="font-medium">
                         Total Rental Engagements:{" "}
                       </span>
@@ -359,7 +410,7 @@ const ProductDetails = () => {
                         {product.owner._count.borrowedProducts +
                           product.owner._count.rentedOutProducts}
                       </span>
-                    </p>
+                    </p> */}
                   </div>
                 </div>
               </div>
@@ -389,20 +440,36 @@ const ProductDetails = () => {
           final={final}
         />
         <div className="mt-8">
-          <label htmlFor="coupon" className="text-lg font-bold text-gray-700">
-            Enter Coupon{" "}
-            <span className="text-sm font-medium">(If Applicable)</span>:
-          </label>
-          <input
-            type="text"
-            name="coupon"
-            id="coupon"
-            disabled
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-xs md:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-1.5 md:p-2.5"
-            placeholder="AF4K3LK3"
-            required
-          />
+          <div className="mb-2">
+            <h2 className="font-semibold text-gray-600">Credit Required: <span className={`text-green-800 font-bold ${coupon && "line-through"}`}>{product.secondHandPrice}  CC</span>{coupon && <span className={`text-purple-600 font-bold ml-1.5 text-xl`}>{discountedPrice}  CC </span>}</h2>
+            {
+              coupon && <span className="text-purple-500 text-sm">{coupon.discount}% discount applied🤩</span>
+            }
+          </div>
+          <div>
+            <div className="flex items-center justify-between">
+              <label htmlFor="coupon" className="text-lg font-bold text-gray-700">
+                Enter Coupon{" "}
+                <span className="text-sm font-medium">(If Applicable)</span>:
+              </label>
+              {
+                couponCode && <p onClick={handleApplyCoupon} className="text-green-500 font-bold text-base mb-1 mr-1 cursor-pointer">Apply</p>
+              }
+            </div>
+            <input
+              type="text"
+              name="coupon"
+              id="coupon"
+              onChange={(e) => setCouponCode(e.target.value)}
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-xs md:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-1.5 md:p-2.5"
+              placeholder="AF4K3LK3"
+              required
+            />
+          </div>
         </div>
+        {
+          couponValidationError && <p className="text-sm text-red-500">{couponValidationError}</p>
+        }
         <button
           className="w-full text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-xs md:text-sm px-5 py-2.5 text-center cursor-pointer mt-8"
           onClick={requestRental}

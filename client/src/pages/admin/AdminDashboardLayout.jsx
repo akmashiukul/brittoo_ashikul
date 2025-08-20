@@ -6,7 +6,7 @@ import { IoExit, IoHomeSharp } from "react-icons/io5";
 import { BiSolidCreditCardAlt } from "react-icons/bi";
 import { MdOutlineSpaceDashboard } from "react-icons/md";
 import useDashDrawertore from "../../stores/drawerStores/useDashDrawerStore";
-import { BoxesIcon, BoxIcon, Menu, Users, X } from "lucide-react";
+import { BoxesIcon, BoxIcon, Menu, Ticket, Users, X } from "lucide-react";
 import { useEffect } from "react";
 import { GiReceiveMoney } from "react-icons/gi";
 
@@ -177,7 +177,7 @@ const AdminDashboardLayout = () => {
                   }
                 }}
               >
-                <BoxesIcon size={14} /> Manage Coupons
+                <Ticket size={14} /> Manage Coupons
               </Link>
             </li>
           </ul>

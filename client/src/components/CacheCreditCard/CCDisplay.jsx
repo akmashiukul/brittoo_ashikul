@@ -5,8 +5,6 @@ const CCDisplay = ({ required, selectedBcc, selectedRCCs, remaining, selected })
   );
   
   const progressPercentage = (selected / required) * 100;
-  console.log("srcc: ", totalSelectedRcc);
-  console.log("sbcc: ", selectedBcc);
 
   return (
     <div className="w-full mt-3">
