@@ -47,8 +47,6 @@ model User {
   borrowedProducts       Product[]           @relation("ProductsBorrowed")
 
   @@unique([email, deletedAt])
-  @@unique([roll, deletedAt])
-  @@unique([phoneNumber, deletedAt])
   @@index([latitude, longitude])
   @@map("users")
 }
@@ -130,12 +128,12 @@ model WithdrawalRequest {
 }
 
 model RedCacheCredit {
-  id                  String                  @id @default(cuid()) @map("id")
-  amount              Int                     @map("amount")
-  inUse               Int                     @default(0) @map("in_use")
-  renterId            String?                 @map("renter_id")
-  userId              String                  @map("user_id")
-  sourceProductId     String                  @unique @map("source_product_id")
+  id              String  @id @default(cuid()) @map("id")
+  amount          Int     @map("amount")
+  inUse           Int     @default(0) @map("in_use")
+  renterId        String? @map("renter_id")
+  userId          String  @map("user_id")
+  sourceProductId String  @unique @map("source_product_id")
 
   isGiftCredit Boolean   @default(false) @map("is_gift_credit")
   validityDate DateTime? @map("validity_date")
@@ -178,26 +176,41 @@ model Product {
 
   isVirtual   Boolean @default(false) @map("is_virtual")
   virtualType String? @map("virtual_type")
-  
-  createdAt          DateTime         @default(now()) @map("created_at")
-  updatedAt          DateTime         @updatedAt @map("updated_at")
-  deletedAt          DateTime?        @map("deleted_at")
-  owner              User             @relation("ProductsRentedOut", fields: [ownerId], references: [id], onDelete: Cascade)
-  redCacheCredits    RedCacheCredit?
-  rentalRequests     RentalRequest[]
-  renters            User[]           @relation("ProductsBorrowed")
+
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+  deletedAt       DateTime?       @map("deleted_at")
+  owner           User            @relation("ProductsRentedOut", fields: [ownerId], references: [id], onDelete: Cascade)
+  redCacheCredits RedCacheCredit?
+  rentalRequests  RentalRequest[]
+  renters         User[]          @relation("ProductsBorrowed")
 
   @@unique([ownerId, productSL])
   @@unique([productSlNo, deletedAt])
   @@map("products")
 }
 
+model Coupon {
+  id        String   @id @default(cuid()) @map("id")
+  code      String   @unique @map("code")
+  discount  Int      @map("discount")
+  expiresAt DateTime @map("expires_at")
+  isActive  Boolean  @default(true) @map("is_active")
+
+  rentalRequests RentalRequest[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
 model RentalRequest {
-  id                         String                     @id @default(cuid()) @map("id")
-  productId                  String                     @map("product_id")
-  requesterId                String                     @map("requester_id")
-  ownerId                    String                     @map("owner_id")
-  bccWalletId                String?                    @map("bcc_wallet_id")
+  id          String  @id @default(cuid()) @map("id")
+  productId   String  @map("product_id")
+  requesterId String  @map("requester_id")
+  ownerId     String  @map("owner_id")
+  bccWalletId String? @map("bcc_wallet_id")
+  couponId    String? @map("coupon_id")
+
   status                     RentalRequestStatus        @default(REQUESTED_BY_RENTER) @map("status")
   rejectReason               String?                    @map("reject_reason")
   brittooRejectReason        String?                    @map("brittoo_reject_reason")
@@ -227,12 +240,14 @@ model RentalRequest {
   createdAt                  DateTime                   @default(now()) @map("created_at")
   updatedAt                  DateTime                   @updatedAt @map("updated_at")
   deletedAt                  DateTime?                  @map("deleted_at")
-  bccTransactions            BccTransaction[]
-  rccUsageDetails            RentalRequestRccUsage[]
-  bccWallet                  BccWallet?                 @relation(fields: [bccWalletId], references: [id])
-  owner                      User                       @relation("RentalRequestsReceived", fields: [ownerId], references: [id])
-  product                    Product                    @relation(fields: [productId], references: [id])
-  requester                  User                       @relation("RentalRequestsMade", fields: [requesterId], references: [id])
+
+  bccTransactions BccTransaction[]
+  rccUsageDetails RentalRequestRccUsage[]
+  bccWallet       BccWallet?              @relation(fields: [bccWalletId], references: [id])
+  owner           User                    @relation("RentalRequestsReceived", fields: [ownerId], references: [id])
+  product         Product                 @relation(fields: [productId], references: [id])
+  requester       User                    @relation("RentalRequestsMade", fields: [requesterId], references: [id])
+  coupon          Coupon?                 @relation(fields: [couponId], references: [id])
 
   @@index([ownerId, status])
   @@index([productId, status])

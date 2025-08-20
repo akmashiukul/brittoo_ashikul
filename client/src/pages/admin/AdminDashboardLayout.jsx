@@ -163,6 +163,23 @@ const AdminDashboardLayout = () => {
                 <BoxesIcon size={14} /> Manage Products
               </Link>
             </li>
+            <li>
+              <Link
+                to="/dashboard/admin/manage-coupons"
+                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${
+                  path.includes("/manage-coupons")
+                    ? "bg-green-600 text-white"
+                    : "text-gray-700"
+                } flex items-center gap-2`}
+                onClick={() => {
+                  if (window.innerWidth <= 425) {
+                    closeDrawer();
+                  }
+                }}
+              >
+                <BoxesIcon size={14} /> Manage Coupons
+              </Link>
+            </li>
           </ul>
         </div>
 

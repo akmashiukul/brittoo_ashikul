@@ -16,6 +16,7 @@ import adminRentalRequestsRoutes from "./routes/rentalRequest.admin.routes.js";
 import userDashboardRoutes from "./routes/userDashboard.routes.js";
 import withdrawalRequestRoutes from "./routes/withdrawalRequest.routes.js";
 import adminDashBoardRoutes from "./routes/adminDashboard.routes.js";
+import couponRoutes from "./routes/coupon.routes.js";
 
 dotenv.config();
 const app = express();
@@ -49,6 +50,7 @@ app.use("/api/v1/admin/rental-requests", adminRentalRequestsRoutes);
 app.use("/api/v1/user-dashboard", userDashboardRoutes);
 app.use("/api/v1/withdrawal-requests", withdrawalRequestRoutes);
 app.use("/api/v1/admin-dash", adminDashBoardRoutes);
+app.use("/api/v1/coupons", couponRoutes);
 
 app.use(errorHandler);
 app.use(multerErrorHandler);

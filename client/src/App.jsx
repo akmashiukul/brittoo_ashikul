@@ -48,6 +48,7 @@ import ResetPasswordModal from "./components/auth/ResetPasswordModal";
 import ResetPassword from "./components/auth/ResetPassword";
 import ManageProducts from "./pages/admin/admin-dash-pages/ManageProducts";
 import UpdateItemAdmin from "./pages/admin/admin-dash-pages/UpdateItemAdmin";
+import ManageCoupons from "./pages/admin/admin-dash-pages/ManageCoupons";
 
 const AppContent = () => {
   const location = useLocation();
@@ -149,6 +150,7 @@ const AppContent = () => {
               <Route path="admin-overview" element={<AdminOverview />} />
               <Route path="manage-users" element={<ManageUsers />} />
               <Route path="manage-products" element={<ManageProducts />} />
+              <Route path="manage-coupons" element={<ManageCoupons />} />
               <Route path="update-item/:id" element={<UpdateItemAdmin />} />
               <Route
                 path="user-details/:userId"

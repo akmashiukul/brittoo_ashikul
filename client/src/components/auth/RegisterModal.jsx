@@ -181,7 +181,7 @@ const RegisterModal = () => {
                 />
                 {
                   formData.email.length > 0 && !isValidRuetEmail(formData.email) && (
-                    <p className="text-red-500 text-xs">This is not a valid RUET email. You can register but can't participate in any rental process.</p>
+                    <p className="text-red-500 text-xs">This is not a valid RUET email. You may still register, and rental features for other universities and the general market are coming soon.</p>
                   )
                 }
               </div>
