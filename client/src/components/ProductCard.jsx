@@ -68,7 +68,7 @@ const ProductCard = ({ product }) => {
           {tags && (
             <div className="flex items-center gap-2">
               <TagIcon size={16} className="text-gray-500" />
-              <div className="flex flex-wrap gap-1">
+              <div className="flex gap-1 overflow-x-hidden">
                 {tags
                   .split(",")
                   .map((tag) => tag.trim())

@@ -33,6 +33,7 @@ export const getAllRentalRequests = async (req, res, next) => {
         take: limit,
         include: {
           product: true,
+          coupon: true,
           owner: { select: safeAuthUserSelect },
           requester: { select: safeAuthUserSelect },
           bccWallet: true,
@@ -104,7 +105,7 @@ export const updateRentalRequestStatus = async (req, res, next) => {
     }
 
     let updatedRequest;
-    if (status === "PRODUCT_RETURNED_BY_RENTER") {
+    if (status === "PRODUCT_RETURNED_BY_RENTER" || status === "PRODUCT_RETURNED_TO_OWNER") {
       updatedRequest = await prisma.$transaction(async (tx) => {
         const updates = [];
         // Handle BCC refund

@@ -10,7 +10,6 @@ import {
   Shield,
   Box,
 } from "lucide-react";
-import { Link } from 'react-router-dom'
 import api from "../../../lib/api";
 
 const RentalRequestsDashboard = () => {
@@ -32,6 +31,8 @@ const RentalRequestsDashboard = () => {
   const [expandedRows, setExpandedRows] = useState(new Set());
 
   const baseUrl = import.meta.env.VITE_BASE_URL;
+
+  console.log(rentalRequests)
 
   const fetchRentalRequests = async (page = 1) => {
     setLoading(true);
@@ -445,7 +446,7 @@ const RentalRequestsDashboard = () => {
                           <div>
                             <span className="text-gray-600">Owner Email Validity:</span>
                             <span className="ml-2 font-medium">
-                              {request.requester.isValidRuetMail ? "Valid" : "Invalid"}
+                              {request.owner.isValidRuetMail ? "Valid" : "Invalid"}
                             </span>
                           </div>
                         </div>
@@ -516,7 +517,7 @@ const RentalRequestsDashboard = () => {
                           <div>
                             <span className="text-gray-600">Total Cost:</span>
                             <span className="ml-2 font-medium text-green-600">
-                              ৳{request.product.pricePerDay * request.totalDays}
+                              ৳{(request.product.pricePerDay * request.totalDays).toFixed(2)}
                             </span>
                           </div>
                           <div>
@@ -531,6 +532,12 @@ const RentalRequestsDashboard = () => {
                             <span className="text-gray-600">RCC Used:</span>
                             <span className="ml-2 font-medium">
                               {request.paidWithRcc ? "Yes" : "No"}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-gray-600">Coupon Used:</span>
+                            <span className="ml-2 font-medium">
+                              {request.coupon ? request.coupon.code+`(${request.coupon.discount}%)` : "No Coupon Used"}
                             </span>
                           </div>
                         </div>

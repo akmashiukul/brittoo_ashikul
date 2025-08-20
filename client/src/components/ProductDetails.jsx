@@ -24,7 +24,7 @@ const ProductDetails = () => {
   const [couponCode, setCouponCode] = useState("");
   const [coupon, setCoupon] = useState(null);
   const [couponValidationError, setCouponValidationError] = useState("");
-  const [discountedPrice, setDiscountedPrice] = useState(0);
+  const [discountedPrice, setDiscountedPrice] = useState(null);
 
   const { currentUser } = useUserStore();
   const { id } = useParams();
@@ -40,6 +40,22 @@ const ProductDetails = () => {
   const final = range?.to;
 
   const { openCreditModal } = useCreditModalStore();
+
+  function conditionalCeilOrFloor(value) {
+    const decimalPart = value - Math.floor(value);
+
+    if (decimalPart >= 0.5) {
+      return {
+        value: Math.ceil(value),
+        ceil: true,
+      };
+    } else {
+      return {
+        value: Math.floor(value),
+        floor: true,
+      };
+    }
+  }
 
   useEffect(() => {
     if (initial && final) {
@@ -133,7 +149,7 @@ const ProductDetails = () => {
       });
       return;
     }
-    openCreditModal({ initial, final, product: {...product, secondHandPrice: discountedPrice}, setProduct });
+    openCreditModal({ initial, final, product: {...product, secondHandPrice: discountedPrice.value}, setProduct, coupon });
   };
 
   const handleHoldProduct = async (status) => {
@@ -209,7 +225,8 @@ const ProductDetails = () => {
       }
       setCoupon(res.data.data);
       setCouponValidationError("");
-      setDiscountedPrice(product.secondHandPrice * (res.data.data.discount/100));
+      const roundedDiscountPrice = conditionalCeilOrFloor(product.secondHandPrice * (res.data.data.discount/100));
+      setDiscountedPrice(roundedDiscountPrice);
     } catch (error) {
       console.log("Error in apply coupon: ", error);
       alert("Error in coupon validation");
@@ -218,7 +235,8 @@ const ProductDetails = () => {
 
   useEffect(() => {
     if(couponCode == "") {
-      setCouponValidationError("")
+      setCouponValidationError("");
+      setCoupon(null);
     }
   }, [couponCode]);
 
@@ -441,7 +459,7 @@ const ProductDetails = () => {
         />
         <div className="mt-8">
           <div className="mb-2">
-            <h2 className="font-semibold text-gray-600">Credit Required: <span className={`text-green-800 font-bold ${coupon && "line-through"}`}>{product.secondHandPrice}  CC</span>{coupon && <span className={`text-purple-600 font-bold ml-1.5 text-xl`}>{discountedPrice}  CC </span>}</h2>
+            <h2 className="font-semibold text-gray-600">Credit Required: <span className={`text-green-800 font-bold ${coupon && "line-through"}`}>{product.secondHandPrice}  CC</span>{coupon && <span className={`text-purple-600 font-bold ml-1.5 text-xl`}>{discountedPrice.value}  CC <span className="text-xs font-light">{discountedPrice.ceil ? "ceiled" : "(floored)"}</span> </span>}</h2>
             {
               coupon && <span className="text-purple-500 text-sm">{coupon.discount}% discount applied🤩</span>
             }

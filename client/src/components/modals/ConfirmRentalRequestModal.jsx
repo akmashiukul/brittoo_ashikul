@@ -109,6 +109,7 @@ const ConfirmRentalRequestModal = () => {
       setLoading(true);
       const rentalData = {
         productId: data?.rentalDetails?.product?.id,
+        coupon: data?.rentalDetails?.coupon ? data?.rentalDetails?.coupon : null,
         requesterId: currentUser.id,
         ownerId: data?.rentalDetails?.product?.owner.id,
         rentalStartDate: new Date(data?.rentalDetails?.initial).toISOString(),

@@ -21,6 +21,7 @@ export const createRentalRequest = async (req, res, next) => {
       bccWalletId,
       usedBccAmount,
       paidWithRcc,
+      coupon,
       usedRccData = [],
     } = req.body;
 
@@ -171,6 +172,7 @@ export const createRentalRequest = async (req, res, next) => {
           productId,
           requesterId,
           ownerId,
+          couponId: coupon ? coupon.id : null,
           bccWalletId: paidWithBcc ? bccWalletId : null,
           rentalStartDate: new Date(rentalStartDate),
           rentalEndDate: new Date(rentalEndDate),
