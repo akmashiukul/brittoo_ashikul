@@ -68,7 +68,7 @@ const ProductCard = ({ product }) => {
           {tags && (
             <div className="flex items-center gap-2">
               <TagIcon size={16} className="text-gray-500" />
-              <div className="flex gap-1 overflow-x-hidden">
+              <div className="flex gap-1 max-h-6 overflow-hidden">
                 {tags
                   .split(",")
                   .map((tag) => tag.trim())
@@ -77,12 +77,13 @@ const ProductCard = ({ product }) => {
                   .map((tag, index) => (
                     <span
                       key={index}
-                      className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded border border-gray-200"
+                      className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded border border-gray-200 truncate max-w-[80px]"
                     >
-                      {tag.trim()}
+                      {tag}
                     </span>
                   ))}
               </div>
+
             </div>
           )}
         </div>
