@@ -149,7 +149,7 @@ const ProductDetails = () => {
       });
       return;
     }
-    openCreditModal({ initial, final, product: {...product, secondHandPrice: discountedPrice.value}, setProduct, coupon });
+    openCreditModal({ initial, final, product: {...product, secondHandPrice: (product.secondHandPrice - discountedPrice.value)}, setProduct, coupon });
   };
 
   const handleHoldProduct = async (status) => {
@@ -459,7 +459,7 @@ const ProductDetails = () => {
         />
         <div className="mt-8">
           <div className="mb-2">
-            <h2 className="font-semibold text-gray-600">Credit Required: <span className={`text-green-800 font-bold ${coupon && "line-through"}`}>{product.secondHandPrice}  CC</span>{coupon && <span className={`text-purple-600 font-bold ml-1.5 text-xl`}>{discountedPrice.value}  CC <span className="text-xs font-light">{discountedPrice.ceil ? "ceiled" : "(floored)"}</span> </span>}</h2>
+            <h2 className="font-semibold text-gray-600">Credit Required: <span className={`text-green-800 font-bold ${coupon && "line-through"}`}>{product.secondHandPrice}  CC</span>{coupon && <span className={`text-purple-600 font-bold ml-1.5 text-xl`}>{product.secondHandPrice - discountedPrice.value}  CC <span className="text-xs font-light">{discountedPrice.ceil ? "ceiled" : "(floored)"}</span> </span>}</h2>
             {
               coupon && <span className="text-purple-500 text-sm">{coupon.discount}% discount applied🤩</span>
             }
