@@ -32,7 +32,11 @@ const ListItems = () => {
     // Filter invalid files
     const validFiles = files.filter((file) => {
       if (!allowedTypes.includes(file.type)) {
-        alert(`❌ ${file.name} is not a supported format. Please upload JPG, PNG, or WebP.`);
+        Swal.fire({
+          icon: "error",
+          title: "Unsupported Format",
+          text: `${file.name} is not supported. Please upload JPG, PNG, or WebP.`,
+        });
         return false;
       }
       return true;

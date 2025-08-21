@@ -70,14 +70,29 @@ const UpdateItemAdmin = () => {
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+
+    // Filter invalid files
+    const validFiles = files.filter((file) => {
+      if (!allowedTypes.includes(file.type)) {
+        Swal.fire({
+          icon: "error",
+          title: "Unsupported Format",
+          text: `${file.name} is not supported. Please upload JPG, PNG, or WebP.`,
+        });
+        return false;
+      }
+      return true;
+    });
+
     const totalImages =
       existingImages.length +
       selectedImages.length +
-      files.length -
+      validFiles.length - // ✅ use validFiles, not all files
       imagesToDelete.length;
 
     if (totalImages <= 4) {
-      const filesWithPreview = files.map((file) => ({
+      const filesWithPreview = validFiles.map((file) => ({
         file,
         preview: URL.createObjectURL(file),
       }));
@@ -90,6 +105,7 @@ const UpdateItemAdmin = () => {
       });
     }
   };
+
 
   const deleteExistingImage = (index) => {
     setExistingImages((prev) => {
@@ -215,21 +231,21 @@ const UpdateItemAdmin = () => {
                     selectedImages.length -
                     imagesToDelete.length <
                     4 && (
-                    <label
-                      htmlFor="File"
-                      className="flex flex-col h-28 md:h-40 items-center justify-center rounded border border-gray-200 p-4 text-gray-700 cursor-pointer hover:bg-gray-100"
-                    >
-                      <Plus size={28} />
-                      <input
-                        multiple
-                        type="file"
-                        id="File"
-                        accept="image/*"
-                        onChange={handleImageChange}
-                        className="sr-only"
-                      />
-                    </label>
-                  )}
+                      <label
+                        htmlFor="File"
+                        className="flex flex-col h-28 md:h-40 items-center justify-center rounded border border-gray-200 p-4 text-gray-700 cursor-pointer hover:bg-gray-100"
+                      >
+                        <Plus size={28} />
+                        <input
+                          multiple
+                          type="file"
+                          id="File"
+                          accept="image/*"
+                          onChange={handleImageChange}
+                          className="sr-only"
+                        />
+                      </label>
+                    )}
                 </div>
               </div>
             ) : (
