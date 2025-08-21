@@ -27,10 +27,21 @@ const ListItems = () => {
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    const total = selectedImages.length + files.length;
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+
+    // Filter invalid files
+    const validFiles = files.filter((file) => {
+      if (!allowedTypes.includes(file.type)) {
+        alert(`❌ ${file.name} is not a supported format. Please upload JPG, PNG, or WebP.`);
+        return false;
+      }
+      return true;
+    });
+
+    const total = selectedImages.length + validFiles.length;
 
     if (total <= 4) {
-      const filesWithPreview = files.map((file) => ({
+      const filesWithPreview = validFiles.map((file) => ({
         file,
         preview: URL.createObjectURL(file),
       }));
@@ -40,6 +51,7 @@ const ListItems = () => {
       alert("You can only upload up to 4 images in total.");
     }
   };
+
 
   const deleteImage = (indexToDelete) => {
     setSelectedImages((prevImages) => {
@@ -156,6 +168,7 @@ const ListItems = () => {
                         onChange={handleImageChange}
                         className="sr-only"
                       />
+
                     </label>
                   )}
                 </div>
