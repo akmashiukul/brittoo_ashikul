@@ -24,7 +24,11 @@ const ProductDetails = () => {
   const [couponCode, setCouponCode] = useState("");
   const [coupon, setCoupon] = useState(null);
   const [couponValidationError, setCouponValidationError] = useState("");
-  const [discountedPrice, setDiscountedPrice] = useState(null);
+  const [discountedPrice, setDiscountedPrice] = useState({
+    value: 0,
+    floor: false,
+    ceil: false
+  });
 
   const { currentUser } = useUserStore();
   const { id } = useParams();
@@ -149,7 +153,7 @@ const ProductDetails = () => {
       });
       return;
     }
-    openCreditModal({ initial, final, product: {...product, secondHandPrice: (product.secondHandPrice - discountedPrice.value)}, setProduct, coupon });
+    openCreditModal({ initial, final, product: { ...product, secondHandPrice: (product.secondHandPrice - discountedPrice.value) }, setProduct, coupon });
   };
 
   const handleHoldProduct = async (status) => {
@@ -225,7 +229,7 @@ const ProductDetails = () => {
       }
       setCoupon(res.data.data);
       setCouponValidationError("");
-      const roundedDiscountPrice = conditionalCeilOrFloor(product.secondHandPrice * (res.data.data.discount/100));
+      const roundedDiscountPrice = conditionalCeilOrFloor(product.secondHandPrice * (res.data.data.discount / 100));
       setDiscountedPrice(roundedDiscountPrice);
     } catch (error) {
       console.log("Error in apply coupon: ", error);
@@ -234,8 +238,13 @@ const ProductDetails = () => {
   }
 
   useEffect(() => {
-    if(couponCode == "") {
+    if (couponCode == "") {
       setCouponValidationError("");
+      setDiscountedPrice({
+        value: 0,
+        floor: false,
+        ceil: false
+      })
       setCoupon(null);
     }
   }, [couponCode]);

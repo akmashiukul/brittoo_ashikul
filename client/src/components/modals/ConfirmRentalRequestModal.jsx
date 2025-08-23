@@ -139,7 +139,6 @@ const ConfirmRentalRequestModal = () => {
           },
         },
       );
-      console.log(res.data);
       if (!res.data.success) {
         Swal.fire({
           icon: "error",
