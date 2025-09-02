@@ -350,7 +350,7 @@ export const generatePasswordResetToken = async (req, res, next) => {
 
     const resetLink = `${process.env.CLIENT_BASE_URL}/reset-password?token=${token}`;
     await resend.emails.send({
-      from: "Brittoo <no-reply@brittoo.xyz>",
+      from: "Brittoo <notifications@brittoo.xyz>",
       to: email,
       subject: "Reset Your Brittoo Password",
       html: `

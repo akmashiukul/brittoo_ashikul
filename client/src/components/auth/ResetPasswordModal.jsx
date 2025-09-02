@@ -40,8 +40,10 @@ const ResetPasswordModal = () => {
       }
       Swal.fire({
         icon: "success",
-        title: "Success!",
-        text: "An email has been sent to your Edu-mail. Please check all the folders.",
+        title: "Reset Link Sent",
+        text: "Please check your inbox and spam/junk folders.",
+        showConfirmButton: false,
+        footer: '<p>Note: Delivery may take up to 4–5 minutes. Thank you for your patience.</p>'
       });
       closeResetPasswordModal();
     } catch (error) {

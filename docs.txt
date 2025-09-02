@@ -12,3 +12,8 @@ TODO:
   4. Set diff price for ACADEMIC_BOOK category.
 
 PROBLEMS:
+
+
+
+DUMP RESTORES:
+  $ psql -U postgres -d brittoodb -f brittoodb_2025-09-02_02-00-01.sql

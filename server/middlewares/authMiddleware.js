@@ -10,7 +10,7 @@ export const verifyToken = async (req, res, next) => {
     token = authHeader.split(" ")[1];
   }
   if (!token) {
-    return next(new CustomError("Authorization token missing", 401, "NO_TOKEN_PROVIDED"));
+    return next(new CustomError("Authorization token missing, Please Log In again", 401, "NO_TOKEN_PROVIDED"));
   }
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -28,10 +28,10 @@ export const verifyToken = async (req, res, next) => {
     next();
   } catch (error) {
     if (error.name === "TokenExpiredError") {
-      return next(new CustomError("Token expired", 401, "TOKEN_EXPIRED, Please Log In again."));
+      return next(new CustomError("Token expired, Please Log In again.", 401, "TOKEN_EXPIRED"));
     }
     if (error.name === "JsonWebTokenError") {
-      return next(new CustomError("Invalid token", 401, "INVALID_TOKEN, Please Log In again."));
+      return next(new CustomError("Invalid token, Please Log In again.", 401, "INVALID_TOKEN"));
     }
     console.error("Unexpected error in token verification:", error);
     next(error);
