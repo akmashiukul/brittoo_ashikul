@@ -49,6 +49,7 @@ import ResetPassword from "./components/auth/ResetPassword";
 import ManageProducts from "./pages/admin/admin-dash-pages/ManageProducts";
 import UpdateItemAdmin from "./pages/admin/admin-dash-pages/UpdateItemAdmin";
 import ManageCoupons from "./pages/admin/admin-dash-pages/ManageCoupons";
+import ScrollToTop from "./components/ScrollToTop";
 
 const AppContent = () => {
   const location = useLocation();
@@ -112,6 +113,7 @@ const AppContent = () => {
       <CreditModal />
       <ConfirmRentalRequestModal />
       <RequestWithdrawalModal />
+      <ScrollToTop />
 
       {isBuyBccModalOpen && <BuyBccModal />}
       {isShowRccModalOpen && <ShowRccModal />}
