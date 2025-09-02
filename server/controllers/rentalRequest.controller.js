@@ -292,7 +292,8 @@ export const getUserPlacedRequests = async (req, res, next) => {
           select: {
             id: true,
             name: true,
-            productImages: true,
+           
+            optimizedImages: true,
             pricePerDay: true,
             productType: true,
             productCondition: true,
@@ -339,7 +340,8 @@ export const getOwnerRentalRequests = async (req, res, next) => {
           select: {
             id: true,
             name: true,
-            productImages: true,
+           
+            optimizedImages: true,
             pricePerDay: true,
             productType: true,
             productCondition: true,
@@ -465,7 +467,8 @@ export const acceptRentalRequest = async (req, res, next) => {
           product: {
             select: {
               name: true,
-              productImages: true,
+             
+              optimizedImages: true,
             },
           },
           requester: {
@@ -617,7 +620,8 @@ export const rejectRentalRequest = async (req, res, next) => {
             product: {
               select: {
                 name: true,
-                productImages: true,
+               
+                optimizedImages: true,
               },
             },
             requester: {
@@ -760,7 +764,8 @@ export const cancelRentalRequest = async (req, res, next) => {
             product: {
               select: {
                 name: true,
-                productImages: true,
+               
+                optimizedImages: true,
               },
             },
             requester: {

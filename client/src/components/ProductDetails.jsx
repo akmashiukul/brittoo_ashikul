@@ -262,7 +262,7 @@ const ProductDetails = () => {
           {/* 1 - A */}
           <div className="w-full lg:w-1/2">
             <Carousel showThumbs={true} className="text-center">
-              {product?.productImages?.map((image) => (
+              {product?.optimizedImages?.map((image) => (
                 <div key={image}>
                   <img
                     className="w-full h-[150px] md:h-[350px] object-contain"

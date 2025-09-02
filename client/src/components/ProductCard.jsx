@@ -9,7 +9,7 @@ const ProductCard = ({ product }) => {
     productType,
     productCondition,
     tags,
-    productImages,
+    optimizedImages,
   } = product;
 
   const baseUrl = import.meta.env.VITE_BASE_URL;
@@ -40,7 +40,8 @@ const ProductCard = ({ product }) => {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="relative h-40 overflow-hidden">
           <img
-            src={`${baseUrl}${productImages[0]}`}
+            loading="lazy"
+            src={`${baseUrl}${optimizedImages[0]}`}
             alt={name}
             className="w-full h-full object-cover group-hover:scale-110 transition duration-400 group-hover:translate-x-2"
           />

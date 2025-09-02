@@ -258,7 +258,8 @@ export const getUserCreditHistory = async (req, res, next) => {
               id: true,
               name: true,
               productSL: true,
-              productImages: true,
+             
+              optimizedImages: true,
               pricePerDay: true,
             },
           },
@@ -312,7 +313,8 @@ export const getUserCreditHistory = async (req, res, next) => {
               name: true,
               pricePerDay: true,
               productSL: true,
-              productImages: true,
+             
+              optimizedImages: true,
             },
           },
           rccUsageDetails: {

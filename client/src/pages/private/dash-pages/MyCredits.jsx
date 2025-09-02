@@ -470,7 +470,7 @@ const MyCredits = () => {
                       <div className="flex items-center">
                         <Package className="w-4 h-4 text-gray-400 mr-1 sm:mr-2" />
                         <Link
-                          to={rcc.sourceProduct.id}
+                          to={`/product-details/${rcc.sourceProduct.id}`}
                           className="p-1 sm:p-2 border border-gray-200 rounded-lg w-full hover:scale-105 hover:bg-gray-200 hover:text-white transition-all duration-300 hover:ml-1 sm:ml-2"
                         >
                           <div className="text-xs sm:text-sm font-medium text-gray-900">
@@ -687,7 +687,7 @@ const MyCredits = () => {
                         <div className="flex items-center">
                           <Package className="w-4 h-4 text-gray-400 mr-1 sm:mr-2" />
                           <Link
-                            to={rental.product.id}
+                            to={`/product-details/${rental.product.id}`}
                             className="p-1 sm:p-2 border border-gray-200 rounded-lg w-full hover:scale-105 hover:bg-gray-200 hover:text-white transition-all duration-300 hover:ml-1 sm:ml-2"
                           >
                             <div className="text-xs sm:text-sm font-medium text-gray-900">

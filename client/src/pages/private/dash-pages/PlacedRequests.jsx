@@ -291,7 +291,7 @@ const PlacedRequests = () => {
                     >
                       <div className="flex items-center gap-3 border border-gray-50 hover:bg-gray-200 hover:p-2 hover:scale-105 transition-all hover:border-gray-200 cursor-pointer hover:rounded-lg">
                         <img
-                          src={`${baseUrl}${request.product.productImages[0]}`}
+                          src={`${baseUrl}${request.product.optimizedImages[0]}`}
                           alt={request.product.name}
                           className="w-12 h-12 rounded-lg object-cover"
                         />
@@ -391,7 +391,7 @@ const PlacedRequests = () => {
                     <div className="flex items-start gap-3">
                       <Link to={`/product-details/${request.product.id}`}>
                         <img
-                          src={`${baseUrl}${request.product.productImages[0]}`}
+                          src={`${baseUrl}${request.product.optimizedImages[0]}`}
                           alt={request.product.name}
                           className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
                         />

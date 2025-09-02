@@ -281,7 +281,7 @@ const ReceivedRequests = () => {
                       className="lg:w-48 h-48 rounded-xl overflow-hidden flex-shrink-0 border border-gray-300 hover:p-2 hover:shadow-md hover:scale-105 cursor-pointer transition-all duration-300"
                     >
                       <img
-                        src={`${baseUrl}${request.product.productImages[0]}`}
+                        src={`${baseUrl}${request.product.optimizedImages[0]}`}
                         alt={request.product.name}
                         className="w-full h-full object-cover"
                       />

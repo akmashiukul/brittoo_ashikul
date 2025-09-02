@@ -513,7 +513,8 @@ export const getUserCreditHistory = async (req, res, next) => {
               id: true,
               name: true,
               productSL: true,
-              productImages: true,
+             
+              optimizedImages: true,
               pricePerDay: true,
             },
           },
@@ -567,7 +568,8 @@ export const getUserCreditHistory = async (req, res, next) => {
               name: true,
               pricePerDay: true,
               productSL: true,
-              productImages: true,
+             
+              optimizedImages: true,
             },
           },
           rccUsageDetails: {
@@ -702,7 +704,8 @@ export const getUserPlacedRequestsAdmin = async (req, res, next) => {
           select: {
             id: true,
             name: true,
-            productImages: true,
+           
+            optimizedImages: true,
             pricePerDay: true,
             productType: true,
             productCondition: true,
@@ -748,7 +751,8 @@ export const getUserReceivedRequestsAdmin = async (req, res, next) => {
           select: {
             id: true,
             name: true,
-            productImages: true,
+           
+            optimizedImages: true,
             pricePerDay: true,
             productType: true,
             productCondition: true,

@@ -11,7 +11,7 @@ const ManageItemCard = ({ product, products, setProducts }) => {
     productSL,
     productCondition,
     tags,
-    productImages,
+    optimizedImages,
   } = product;
 
   const baseUrl = import.meta.env.VITE_BASE_URL;
@@ -79,7 +79,7 @@ const ManageItemCard = ({ product, products, setProducts }) => {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="relative h-40 overflow-hidden">
           <img
-            src={`${baseUrl}${productImages[0]}`}
+            src={`${baseUrl}${optimizedImages[0]}`}
             alt={name}
             className="w-full h-full object-cover group-hover:scale-110 transition duration-400 group-hover:translate-x-2"
           />
@@ -107,7 +107,7 @@ const ManageItemCard = ({ product, products, setProducts }) => {
           {tags && (
             <div className="flex items-center gap-2">
               <TagIcon size={16} className="text-gray-500" />
-              <div className="flex flex-wrap gap-1">
+              <div className="flex gap-1 max-h-6 overflow-hidden">
                 {tags
                   .split(",")
                   .map((tag) => tag.trim())
@@ -116,12 +116,13 @@ const ManageItemCard = ({ product, products, setProducts }) => {
                   .map((tag, index) => (
                     <span
                       key={index}
-                      className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded border border-gray-200"
+                      className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded border border-gray-200 truncate max-w-[80px]"
                     >
-                      {tag.trim()}
+                      {tag}
                     </span>
                   ))}
               </div>
+
             </div>
           )}
         </div>

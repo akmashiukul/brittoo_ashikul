@@ -3,13 +3,10 @@ import redisClient from "../config/redis.js";
 import { calculatePricePerDay } from "../lib/calculatePrice.js";
 import { calculateSecondHandPrice } from "../lib/calculateSecondHandPrice.js";
 import { CustomError } from "../lib/customError.js";
-
+import sharp from "sharp";
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const productUploadsDir = path.join(__dirname, "../uploads/products");
+import { productUploadsPath, productOptimizedPath } from "../middlewares/productImageUpload.js";
 
 export const createProduct = async (req, res, next) => {
   try {
@@ -40,6 +37,9 @@ export const createProduct = async (req, res, next) => {
     const imagePaths = req.files.map(
       (file) => `/uploads/products/${file.filename}`,
     );
+    const optimizedImages = req.files.map(file => 
+      `/uploads/products/optimized/${file.filename.replace(/\.[^.]+$/, ".webp")}`
+    );
 
     const pricePerDay = calculatePricePerDay(
       parseInt(omv),
@@ -68,6 +68,7 @@ export const createProduct = async (req, res, next) => {
           productDescription,
           ownerId: req.user.id,
           productImages: imagePaths,
+          optimizedImages,
           secondHandPrice: secondHandPrice,
         },
       });
@@ -316,6 +317,18 @@ export const deleteProduct = async (req, res, next) => {
   }
 };
 
+
+// Ensure optimized directory exists
+if (!fs.existsSync(productOptimizedPath)) {
+  fs.mkdirSync(productOptimizedPath, { recursive: true });
+}
+
+const processImage = async (inputPath, outputPath) => {
+  await sharp(inputPath)
+    .resize({ width: 800 }) // max width for frontend
+    .toFormat("webp", { quality: 80 })
+    .toFile(outputPath);
+};
 export const updateProductAdmin = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -331,18 +344,15 @@ export const updateProductAdmin = async (req, res, next) => {
       isForSale,
     } = req.body;
 
-    // Check if the user is an admin
-    if (!req.user || req.user.role !== 'ADMIN') {
-      throw new CustomError('Unauthorized: Admin access required', 403);
+    if (!req.user || req.user.role !== "ADMIN") {
+      throw new CustomError("Unauthorized: Admin access required", 403);
     }
 
-    // Fetch the product with owner securityScore and redCacheCredits
+    // Fetch product
     const product = await prisma.product.findUniqueOrThrow({
       where: { id },
       include: {
-        owner: {
-          select: { securityScore: true },
-        },
+        owner: { select: { securityScore: true } },
         redCacheCredits: true,
       },
     });
@@ -350,7 +360,7 @@ export const updateProductAdmin = async (req, res, next) => {
     // Prepare update data
     const updateData = {};
     if (name) updateData.name = name;
-    if (isForSale) updateData.isForSale = isForSale === 'true';
+    if (isForSale) updateData.isForSale = isForSale === "true";
     if (productType) updateData.productType = productType;
     if (productCondition) updateData.productCondition = productCondition;
     if (productAge) updateData.productAge = parseInt(productAge);
@@ -358,65 +368,90 @@ export const updateProductAdmin = async (req, res, next) => {
     if (tags) updateData.tags = tags;
     if (productDescription) updateData.productDescription = productDescription;
 
+    // Price recalculation if needed
     let newSecondHandPrice;
     if (omv || productCondition || productAge) {
       const finalOmv = omv ? parseInt(omv) : product.omv;
       const finalCondition = productCondition || product.productCondition;
       const finalAge = productAge ? parseInt(productAge) : product.productAge;
+
       const newPrice = calculatePricePerDay(
         finalOmv,
         finalCondition,
         finalAge,
         product.owner.securityScore,
-        3,
+        3
       );
+
       newSecondHandPrice = calculateSecondHandPrice(
         finalOmv,
         finalCondition,
-        finalAge,
+        finalAge
       );
+
       updateData.pricePerDay = parseFloat(newPrice);
       updateData.secondHandPrice = newSecondHandPrice;
     }
 
     // Handle image updates
     let updatedImagePaths = [...product.productImages];
+    let updatedOptimizedPaths = [...product.optimizedImages];
+
+    // 1 - Handle deleted images
     if (deleteImages) {
       const imagesToDelete = Array.isArray(deleteImages)
         ? deleteImages
-        : JSON.parse(deleteImages || '[]');
+        : JSON.parse(deleteImages || "[]");
+
       for (const imagePath of imagesToDelete) {
-        const fullPath = path.join(productUploadsDir, path.basename(imagePath));
+        const filename = path.basename(imagePath);
+        const fullPath = path.join(productUploadsPath, filename);
+        const optimizedPath = path.join(productOptimizedPath, filename.replace(/\.[^.]+$/, ".webp"));
+
         try {
-          if (fs.existsSync(fullPath)) {
-            fs.unlinkSync(fullPath);
-            console.log(`Deleted image: ${fullPath}`);
-          }
+          if (fs.existsSync(fullPath)) fs.unlinkSync(fullPath);
+          if (fs.existsSync(optimizedPath)) fs.unlinkSync(optimizedPath);
+          console.log(`Deleted image + optimized: ${filename}`);
         } catch (err) {
-          console.error(`Error deleting image ${fullPath}:`, err);
+          console.error(`Error deleting image ${filename}:`, err);
         }
       }
-      updatedImagePaths = updatedImagePaths.filter(
-        (path) => !imagesToDelete.includes(path),
-      );
+
+      updatedImagePaths = updatedImagePaths.filter((p) => !imagesToDelete.includes(p));
+      updatedOptimizedPaths = updatedOptimizedPaths.filter((p) => {
+        const filename = path.basename(p);
+        return !imagesToDelete.some((orig) => path.basename(orig).replace(/\.[^.]+$/, ".webp") === filename);
+      });
     }
 
+    // 2 - Handle new uploaded images
     if (req.files && req.files.length > 0) {
-      const newImagePaths = req.files.map(
-        (file) => `/uploads/products/${file.filename}`,
-      );
-      updatedImagePaths = [...updatedImagePaths, ...newImagePaths];
+      for (const file of req.files) {
+        const originalPath = `/uploads/products/${file.filename}`;
+        const optimizedFilename = file.filename.replace(/\.[^.]+$/, ".webp");
+        const optimizedPath = `/uploads/products/optimized/${optimizedFilename}`;
+
+        updatedImagePaths.push(originalPath);
+        updatedOptimizedPaths.push(optimizedPath);
+
+        // Process async
+        const inputPath = path.join(productUploadsPath, file.filename);
+        const outputPath = path.join(productOptimizedPath, optimizedFilename);
+        await processImage(inputPath, outputPath);
+      }
     }
 
+    // Validate total image count
     if (updatedImagePaths.length > 4) {
-      throw new CustomError('Total images cannot exceed 4', 400);
+      throw new CustomError("Total images cannot exceed 4", 400);
     }
 
     if (updatedImagePaths.length > 0) {
       updateData.productImages = updatedImagePaths;
+      updateData.optimizedImages = updatedOptimizedPaths;
     }
 
-    // Update product and RedCacheCredit in a transaction
+    // Update product + credits in transaction
     const updatedProduct = await prisma.$transaction(async (tx) => {
       const productUpdate = await tx.product.update({
         where: { id },
@@ -433,16 +468,16 @@ export const updateProductAdmin = async (req, res, next) => {
       return productUpdate;
     });
 
-    // Invalidate cache
-    const keys = await redisClient.keys('products:*');
+    // 🚀 Invalidate cache
+    const keys = await redisClient.keys("products:*");
     if (keys.length > 0) {
       await redisClient.del(keys);
-      console.log('Cache invalidated:', keys);
+      console.log("Cache invalidated:", keys);
     }
 
     return res.status(200).json({
       success: true,
-      message: 'Product Updated Successfully',
+      message: "Product Updated Successfully",
       product: updatedProduct,
     });
   } catch (error) {
