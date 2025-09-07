@@ -14,12 +14,17 @@ import useCreditModalStore from "../stores/creditModalStores/useCreditModalStore
 import calendarImage from "../assets/calendar.png";
 import { formatDistanceToNow } from "date-fns";
 import DaysDisplay from "./DaysDisplay";
+import HourSelector from "./HourSelector";
+import { useGadgetPriceCalculate } from "../hooks/useGadgetPriceCalculate";
+import { useVehiclePriceCalculate } from "../hooks/useVehiclePriceCalculate";
+import { useHourlyPrice } from "../hooks/useHourlyPrice";
 
 const ProductDetails = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [holdLoading, setHoldLoading] = useState(false);
   const [numberOfDays, setNumberOfDays] = useState(3);
+  const [isHourlyRental, setIsHourlyRental] = useState(false);
   const [price, setPrice] = useState(0);
   const [couponCode, setCouponCode] = useState("");
   const [coupon, setCoupon] = useState(null);
@@ -29,13 +34,25 @@ const ProductDetails = () => {
     floor: false,
     ceil: false
   });
+  const [pickerValue, setPickerValue] = useState({
+    hour: 2,
+    period: 'AM'
+  });
+  const [hourlyPrice, setHourlyPrice] = useState(0);
+  const [numberOfHours, setNumberOfHours] = useState(1);
 
   const { currentUser } = useUserStore();
   const { id } = useParams();
 
   const baseUrl = import.meta.env.VITE_BASE_URL;
 
+  // ---------- HOOKSS ----------
   const { calculatePricePerDay } = usePriceCalculate();
+  const { calculateGadgetPricePerDay } = useGadgetPriceCalculate();
+  const { calculateVehiclePricePerDay } = useVehiclePriceCalculate();
+  const { calculateHourlyPrice } = useHourlyPrice();
+
+
   const [range, setRange] = useState({
     from: undefined,
     to: undefined,
@@ -68,17 +85,44 @@ const ProductDetails = () => {
   }, [initial, final]);
 
   useEffect(() => {
-    if (product) {
-      const newPrice = calculatePricePerDay(
-        product.omv,
-        product.productCondition,
-        product.productAge,
-        product.owner.securityScore,
-        numberOfDays,
-      );
-      setPrice(newPrice);
+    if(isHourlyRental) {
+      const newHourlyPrice = calculateHourlyPrice(price, numberOfHours);
+      setHourlyPrice(newHourlyPrice);
     }
-  }, [calculatePricePerDay, numberOfDays, product]);
+  }, [calculateHourlyPrice, isHourlyRental, numberOfHours, price]);
+
+  useEffect(() => {
+    if (product) {
+      if (product.productType === "GADGET") {
+        const newPrice = calculateGadgetPricePerDay(
+          product.omv,
+          product.productCondition,
+          product.productAge,
+          product.owner.securityScore,
+          numberOfDays,
+        );
+        setPrice(newPrice);
+      } else if (product.productType === "VEHICLE") {
+        const newPrice = calculateVehiclePricePerDay(
+          product.omv,
+          product.productCondition,
+          product.productAge,
+          product.owner.securityScore,
+          numberOfDays,
+        );
+        setPrice(newPrice);
+      } else {
+        const newPrice = calculatePricePerDay(
+          product.omv,
+          product.productCondition,
+          product.productAge,
+          product.owner.securityScore,
+          numberOfDays,
+        );
+        setPrice(newPrice);
+      }
+    }
+  }, [calculateGadgetPricePerDay, calculatePricePerDay, calculateVehiclePricePerDay, numberOfDays, product]);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -465,7 +509,12 @@ const ProductDetails = () => {
           setRange={setRange}
           initial={initial}
           final={final}
+          isHourlyRental={isHourlyRental}
+          setIsHourlyRental={setIsHourlyRental}
         />
+        {
+          (numberOfDays === 1 && isHourlyRental) && (<HourSelector pickerValue={pickerValue} setPickerValue={setPickerValue} numberOfHours={numberOfHours} setNumberOfHours={setNumberOfHours} hourlyPrice={hourlyPrice} />)
+        }
         <div className="mt-8">
           <div className="mb-2">
             <h2 className="font-semibold text-gray-600">Credit Required: <span className={`text-green-800 font-bold ${coupon && "line-through"}`}>{product.secondHandPrice}  CC</span>{coupon && <span className={`text-purple-600 font-bold ml-1.5 text-xl`}>{product.secondHandPrice - discountedPrice.value}  CC <span className="text-xs font-light">{discountedPrice.ceil ? "ceiled" : "(floored)"}</span> </span>}</h2>

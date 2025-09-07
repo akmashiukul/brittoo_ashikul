@@ -1,4 +1,4 @@
-import prisma from "./config/prisma.js";
+import prisma from "../server/config/prisma.js";
 
 const fillOptimizedImages = async () => {
   const products = await prisma.product.findMany();

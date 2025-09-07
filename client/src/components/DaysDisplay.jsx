@@ -1,5 +1,5 @@
 import React from "react";
-import { Calendar, Clock, TrendingUp, CalendarDays, Info } from "lucide-react";
+import { Calendar, Clock, CalendarDays, Info, Sparkle } from "lucide-react";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
 import { Tooltip } from "flowbite-react";
@@ -12,6 +12,8 @@ const DaysDisplay = ({
   setRange,
   initial,
   final,
+  isHourlyRental,
+  setIsHourlyRental
 }) => {
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
@@ -84,7 +86,35 @@ const DaysDisplay = ({
           </div>
         )}
       </div>
-
+      {
+        numberOfDays === 1 && (initial && final) && !isHourlyRental && (
+          <div className="flex font-semibold items-center mb-2 border-b border-gray-300 pt-4 pb-4 justify-center text-green-600 bg-gray-50 relative">
+            <div onClick={() => {
+              setIsHourlyRental(true);
+              window.scrollTo({
+                top: window.scrollY + 480,
+                behavior: 'smooth'
+              });
+            }} className="flex gap-1 items-center cursor-pointer">
+              <p className="underline italic">Rent On Hourly Basis</p>
+              <span className="rounded-full bg-purple-100 px-2.5 py-0.5 text-xs whitespace-nowrap text-purple-700 flex items-center gap-1 absolute top-2 left-2">
+                New <Sparkle size={10} />
+              </span>
+              <Clock size={14} />
+            </div>
+          </div>
+        )
+      }
+      {
+        numberOfDays === 1 && (initial && final) && isHourlyRental && (
+          <div className="flex font-semibold items-center mb-2 border-b border-gray-300 pt-4 pb-4 justify-center text-green-600 bg-gray-50">
+            <div onClick={() => setIsHourlyRental(false)} className="flex gap-1 items-center cursor-pointer">
+              <p className="underline italic">Rent On Daily Basis</p>
+              <Calendar size={14} />
+            </div>
+          </div>
+        )
+      }
       <div className="px-6 py-4">
         <div className="flex items-center gap-2 mb-4">
           <Tooltip
@@ -112,25 +142,33 @@ const DaysDisplay = ({
         </div>
       </div>
 
-      <div className="px-6 py-4 bg-gray-100 border-t border-gray-100">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm">
-          <div className="text-gray-600">
-            <span className="font-medium">Total Cost: </span>
-            <span className="text-green-700 font-bold">
-              BDT {(price * numberOfDays).toFixed(2)}
-            </span>
+      {
+        !isHourlyRental && (
+          <div className="px-6 py-4 bg-gray-100 border-t border-gray-100">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm">
+              <div className="text-gray-600">
+                <span className="font-medium">Total Cost: </span>
+                <span className="text-green-700 font-bold">
+                  BDT {(price * numberOfDays).toFixed(2)}
+                </span>
+              </div>
+              <div className="text-gray-500">
+                {numberOfDays > 7 ? (
+                  <span className="text-green-500">
+                    ✓ Long-term discount applied
+                  </span>
+                ) : numberOfDays > 1 ? (
+                  <span className="text-green-500">
+                    ✓ Discount applied
+                  </span>
+                ) : (
+                  <span>Standard pricing</span>
+                )}
+              </div>
+            </div>
           </div>
-          <div className="text-gray-500">
-            {numberOfDays > 7 ? (
-              <span className="text-green-500">
-                ✓ Long-term discount applied
-              </span>
-            ) : (
-              <span>Standard pricing</span>
-            )}
-          </div>
-        </div>
-      </div>
+        )
+      }
     </div>
   );
 };

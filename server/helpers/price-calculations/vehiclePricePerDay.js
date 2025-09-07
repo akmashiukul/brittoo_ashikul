@@ -50,17 +50,36 @@ export function calculatePricePerDay(
             : usageYears < 8
               ? 0.4
               : 0.3;
+
   const baseRate = baseRates[day] || 0.009 - (day - 10) * 0.0001;
   const basePrice = omv * baseRate;
   const scaleFactor = getScaleFactor(omv);
-  const finalPrice =
+  let finalPrice =
     basePrice *
     conditionMap[condition] *
     usageMultiplier *
     securityMap[securityScore] *
     scaleFactor;
 
+  const floorBase = 1.00375 * Math.sqrt(omv) + 65.02;
+  const dayFloorMultiplier = Math.pow(0.97, Math.max(0, day - 1));
+  const floorPrice = floorBase * dayFloorMultiplier;
+
+  const ceilBase = 1.6 * Math.sqrt(omv) + 10.87;
+  
+  //change this changeRate to give more discount for increasing days
+  const changeRate = 0.93;
+  const dayCeilMultiplier = Math.pow(0.93, Math.max(0, day - 1));
+  const ceilPrice = ceilBase * dayCeilMultiplier;
+
+  finalPrice = Math.max(finalPrice, floorPrice);
+  finalPrice = Math.min(finalPrice, ceilPrice);
+
   return parseFloat(finalPrice.toFixed(2));
 }
 
-//console.log(calculatePricePerDay(40000, 'GOOD', 2, 'MID', 15))
+const price = 450;
+const days = 1;
+
+console.log("Price: ", price, " Renting days: ", days)
+console.log(calculatePricePerDay(price, 'GOOD', 2, 'MID', days))
