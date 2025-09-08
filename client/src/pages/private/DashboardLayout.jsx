@@ -272,7 +272,7 @@ const DashboardLayout = () => {
         aria-label="Open drawer"
         onClick={openDrawer}
       >
-        <Menu className="w-8 h-8 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-180 text-white animate-pulse" />
+        <Menu className="w-6 h-6 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-180 text-white animate-pulse" />
       </button>
 
 

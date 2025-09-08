@@ -470,19 +470,15 @@ const MyCredits = () => {
                       {creditHistory?.redCacheCredits?.map((rcc) => (
                         <tr key={rcc.id} className="hover:bg-gray-50">
                           <td className="px-2 sm:px-4 py-2 sm:py-4">
-                            <div className="flex items-center">
+                            <div className="flex items-center max-w-36">
                               <Package className="w-4 h-4 text-gray-400 mr-1 sm:mr-2 flex-shrink-0" />
-                              <Link to={`/product-details/${rcc.sourceProduct.id}`} className="p-1 sm:p-2 border border-gray-200 rounded-lg w-full hover:scale-105 hover:bg-gray-200 hover:text-white transition-all duration-300 hover:ml-1 sm:ml-2">
+                              <Link to={`/product-details/${rcc.sourceProduct.id}`} className="p-1 sm:p-2 border border-gray-200 rounded-lg w-full hover:scale-105 hover:bg-gray-200 hover:text-white transition-all duration-300 hover:ml-1 sm:ml-2 min-w-36">
                                 <div className="text-xs sm:text-sm font-medium text-gray-900 truncate">
-                                  {rcc.sourceProduct.name}
+                                  {(rcc.sourceProduct.name).slice(0, 16)}..
                                 </div>
                                 <div className="flex items-center gap-1 flex-wrap">
                                   <div className="text-xs text-gray-500">
-                                    {rcc.sourceProduct.productSL}
-                                  </div>
-                                  <div className="h-1 w-1 bg-gray-400 rounded-full"></div>
-                                  <div className="text-xs text-gray-500">
-                                    BDT {rcc.sourceProduct.pricePerDay}/Day
+                                    {(rcc.sourceProduct.productSL).slice(0, 10) || "DEMOID"}
                                   </div>
                                 </div>
                               </Link>
@@ -684,15 +680,11 @@ const MyCredits = () => {
                                   className="p-1 sm:p-2 border border-gray-200 rounded-lg w-full hover:scale-105 hover:bg-gray-200 hover:text-white transition-all duration-300 hover:ml-1 sm:ml-2"
                                 >
                                   <div className="text-xs sm:text-sm font-medium text-gray-900">
-                                    {rental.product.name}
+                                    {(rental.product.name || "Product").slice(0, 14)}...
                                   </div>
                                   <div className="flex items-center gap-1">
                                     <div className="text-xs text-gray-500">
-                                      {rental.product.productSL}
-                                    </div>
-                                    <div className="h-1 w-1 bg-gray-400 rounded-full"></div>
-                                    <div className="text-xs text-gray-500">
-                                      BDT {rental.product.pricePerDay}/Day
+                                      {(rental.product.productSL || "D123").slice(0, 4)}
                                     </div>
                                   </div>
                                 </Link>
