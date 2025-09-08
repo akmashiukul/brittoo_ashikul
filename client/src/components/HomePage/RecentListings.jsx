@@ -58,7 +58,7 @@ const RecentListings = () => {
     <div className="mt-32">
       <div className="flex flex-col items-center text-center">
         <h1 className="text-3xl font-bold text-gray-900">Recent Listings</h1>
-        <p className="text-gray-500 mt-1 text-sm">
+        <p className="text-gray-500 mt-1 text-sm mx-3">
           Discover newly listed items available for rent, handpicked from
           trusted users.
         </p>
