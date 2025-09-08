@@ -568,7 +568,7 @@ const RentalRequestsDashboard = () => {
                               <div>
                                 <span className="text-gray-600">Price Per Day:</span>
                                 <span className="ml-2 font-medium">
-                                  ৳{(parseFloat(request.pricePerDay) || request.product.pricePerDay).toFixed(2)}
+                                  ৳{(parseFloat(request.pricePerDay) || request.product.pricePerDay)}
                                 </span>
                               </div>
                               <div>
