@@ -7,6 +7,9 @@ import sharp from "sharp";
 import fs from "fs";
 import path from "path";
 import { productUploadsPath, productOptimizedPath } from "../middlewares/productImageUpload.js";
+import { calculateGadgetPricePerDay } from "../helpers/price-calculations/gadgetPricePerDay.js";
+import { calculateVehiclePricePerDay } from "../helpers/price-calculations/vehiclePricePerDay.js";
+import { calculateHourlyPrice } from "../helpers/price-calculations/calculateHourlyPrice.js";
 
 export const createProduct = async (req, res, next) => {
   try {
@@ -37,17 +40,39 @@ export const createProduct = async (req, res, next) => {
     const imagePaths = req.files.map(
       (file) => `/uploads/products/${file.filename}`,
     );
-    const optimizedImages = req.files.map(file => 
+    const optimizedImages = req.files.map(file =>
       `/uploads/products/optimized/${file.filename.replace(/\.[^.]+$/, ".webp")}`
     );
 
-    const pricePerDay = calculatePricePerDay(
-      parseInt(omv),
-      productCondition,
-      parseInt(productAge),
-      owner.securityScore,
-      3,
-    );
+    let pricePerHour;
+    let pricePerDay;
+    if (productType === "GADGET") {
+      pricePerDay = calculateGadgetPricePerDay(
+        parseInt(omv),
+        productCondition,
+        parseInt(productAge),
+        owner.securityScore,
+        3,
+      );
+      pricePerHour = calculateHourlyPrice(pricePerDay, 2);
+    } else if (productType === "VEHICLE") {
+      pricePerDay = calculateVehiclePricePerDay(
+        parseInt(omv),
+        productCondition,
+        parseInt(productAge),
+        owner.securityScore,
+        3,
+      );
+      pricePerHour = calculateHourlyPrice(pricePerDay, 2);
+    } else {
+      pricePerDay = calculatePricePerDay(
+        parseInt(omv),
+        productCondition,
+        parseInt(productAge),
+        owner.securityScore,
+        3,
+      );
+    }
     const secondHandPrice = calculateSecondHandPrice(
       parseInt(omv),
       productCondition,
@@ -70,6 +95,7 @@ export const createProduct = async (req, res, next) => {
           productImages: imagePaths,
           optimizedImages,
           secondHandPrice: secondHandPrice,
+          pricePerHour: (productType === "GADGET" || productType === "VEHICLE") ? pricePerHour : null,
         },
       });
       const prefix = product.productType.charAt(0);

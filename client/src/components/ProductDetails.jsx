@@ -85,7 +85,7 @@ const ProductDetails = () => {
   }, [initial, final]);
 
   useEffect(() => {
-    if(isHourlyRental) {
+    if (isHourlyRental) {
       const newHourlyPrice = calculateHourlyPrice(price, numberOfHours);
       setHourlyPrice(newHourlyPrice);
     }
@@ -197,7 +197,19 @@ const ProductDetails = () => {
       });
       return;
     }
-    openCreditModal({ initial, final, product: { ...product, secondHandPrice: (product.secondHandPrice - discountedPrice.value) }, setProduct, coupon });
+    openCreditModal({
+      initial,
+      final,
+      //new
+      isHourlyRental,
+      pricePerDay: price,
+      pricePerHour: hourlyPrice,
+      numberOfHours,
+      pickerValue,
+      product: { ...product, secondHandPrice: (product.secondHandPrice - discountedPrice.value) },
+      setProduct,
+      coupon
+    });
   };
 
   const handleHoldProduct = async (status) => {

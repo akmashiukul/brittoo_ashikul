@@ -136,11 +136,11 @@ const ReceivedRequests = () => {
       });
       closeModal();
     } catch (err) {
-        Swal.fire({
-          icon: "error",
-          title: "ERROR!",
-          text: err.response?.data?.message || "Something went wrong",
-        });
+      Swal.fire({
+        icon: "error",
+        title: "ERROR!",
+        text: err.response?.data?.message || "Something went wrong",
+      });
     } finally {
       setProcessingRequest(null);
     }
@@ -297,7 +297,7 @@ const ReceivedRequests = () => {
                           <div className="flex items-center gap-4 text-xs text-gray-600 mb-3">
                             <div className="flex items-center gap-1">
                               <DollarSign className="w-4 h-4" />
-                              <span>৳{request.product.pricePerDay}/day</span>
+                              <span>৳{(parseFloat(request.pricePerDay) || request.product.pricePerDay)}/day</span>
                             </div>
                             <div className="flex items-center gap-1">
                               <Package className="w-4 h-4" />
@@ -385,55 +385,122 @@ const ReceivedRequests = () => {
                             <Calendar className="w-4 h-4" />
                             <span className="font-medium">Rental Details</span>
                           </div>
-                          <div className="space-y-2">
-                            <div className="flex justify-between">
-                              <span className="text-xs text-gray-600">
-                                Start Date:
-                              </span>
-                              <span className="text-xs font-medium text-gray-800">
-                                {formatDate(request.rentalStartDate)}
-                              </span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-xs text-gray-600">
-                                End Date:
-                              </span>
-                              <span className="text-xs font-medium text-gray-800">
-                                {formatDate(request.rentalEndDate)}
-                              </span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-xs text-gray-600">
-                                Duration:
-                              </span>
-                              <span className="text-xs font-medium text-gray-800">
-                                {request.totalDays} days
-                              </span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-xs text-gray-600">
-                                Total Amount:
-                              </span>
-                              <span className="text-xs font-medium text-green-600">
-                                ৳
-                                {(
-                                  request.product.pricePerDay *
-                                  request.totalDays
-                                ).toFixed(2)}
-                              </span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-xs text-gray-600">
-                                Collection:
-                              </span>
-                              <span className="text-xs font-medium text-gray-800">
-                                {request.renterCollectionMethod ===
-                                  "BRITTOO_TERMINAL"
-                                  ? "Terminal Pickup"
-                                  : "Home Delivery"}
-                              </span>
-                            </div>
-                          </div>
+                          {
+                            request.isHourlyRental ? (
+                              <div className="space-y-2">
+                                <div className="flex justify-between">
+                                  <span className="text-xs text-purple-600 p-1 bg-purple-100 rounded-md">
+                                    Hourly Rental
+                                  </span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-xs text-gray-600">
+                                    Start Date:
+                                  </span>
+                                  <span className="text-xs font-medium text-gray-800">
+                                    {formatDate(request.rentalStartDate)}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-xs text-gray-600">
+                                    Start Hour:
+                                  </span>
+                                  <span className="text-xs font-medium text-gray-800">
+                                    {request.startingHour}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-xs text-gray-600">
+                                    Duration:
+                                  </span>
+                                  <span className="text-xs font-medium text-gray-800">
+                                    {request.totalHours} hours
+                                  </span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-xs text-gray-600">
+                                    Price Per Hour:
+                                  </span>
+                                  <span className="text-xs font-medium text-gray-800">
+                                    BDT {parseFloat(request.pricePerHour).toFixed(2)}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-xs text-gray-600">
+                                    Total Amount:
+                                  </span>
+                                  <span className="text-xs font-medium text-green-600">
+                                    ৳
+                                    {(
+                                      request.pricePerHour *
+                                      request.totalHours
+                                    ).toFixed(2)}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-xs text-gray-600">
+                                    Collection:
+                                  </span>
+                                  <span className="text-xs font-medium text-gray-800">
+                                    {request.renterCollectionMethod ===
+                                      "BRITTOO_TERMINAL"
+                                      ? "Terminal Pickup"
+                                      : "Home Delivery"}
+                                  </span>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="space-y-2">
+                                <div className="flex justify-between">
+                                  <span className="text-xs text-gray-600">
+                                    Start Date:
+                                  </span>
+                                  <span className="text-xs font-medium text-gray-800">
+                                    {formatDate(request.rentalStartDate)}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-xs text-gray-600">
+                                    End Date:
+                                  </span>
+                                  <span className="text-xs font-medium text-gray-800">
+                                    {formatDate(request.rentalEndDate)}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-xs text-gray-600">
+                                    Duration:
+                                  </span>
+                                  <span className="text-xs font-medium text-gray-800">
+                                    {request.totalDays} days
+                                  </span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-xs text-gray-600">
+                                    Total Amount:
+                                  </span>
+                                  <span className="text-xs font-medium text-green-600">
+                                    ৳
+                                    {(
+                                      (parseFloat(request.pricePerDay) || request.product.pricePerDay) *
+                                      request.totalDays
+                                    ).toFixed(2)}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-xs text-gray-600">
+                                    Collection:
+                                  </span>
+                                  <span className="text-xs font-medium text-gray-800">
+                                    {request.renterCollectionMethod ===
+                                      "BRITTOO_TERMINAL"
+                                      ? "Terminal Pickup"
+                                      : "Home Delivery"}
+                                  </span>
+                                </div>
+                              </div>
+                            )
+                          }
                         </div>
                       </div>
 

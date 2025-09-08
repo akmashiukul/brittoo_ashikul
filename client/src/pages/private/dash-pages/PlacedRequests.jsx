@@ -301,7 +301,7 @@ const PlacedRequests = () => {
                           </h3>
                           <div className="flex items-center gap-2 text-xs text-gray-600">
                             <DollarSign className="w-3 h-3" />
-                            <span>৳{request.product.pricePerDay}/day</span>
+                            <span>৳{(parseFloat(request.pricePerDay) || request.product.pricePerDay)}/day</span>
                           </div>
                         </div>
                       </div>
@@ -322,19 +322,37 @@ const PlacedRequests = () => {
                     </div>
 
                     {/* Rental Period */}
-                    <div className="col-span-2">
-                      <div className="text-sm">
-                        <div className="font-medium text-gray-800">
-                          {formatDate(request.rentalStartDate)}
+                    {
+                      request.isHourlyRental ? (
+                        <div className="col-span-2">
+                          <div className="text-sm">
+                            <div className="font-medium text-gray-800">
+                              {formatDate(request.rentalStartDate)}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              From {request.startingHour}
+                            </div>
+                            <div className="text-xs text-green-600 font-medium">
+                              for {request.totalHours} {request.totalHours === 1 ? "Hour" : "Hours"}
+                            </div>
+                          </div>
                         </div>
-                        <div className="text-xs text-gray-500">
-                          to {formatDate(request.rentalEndDate)}
+                      ) : (
+                        <div className="col-span-2">
+                          <div className="text-sm">
+                            <div className="font-medium text-gray-800">
+                              {formatDate(request.rentalStartDate)}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              to {formatDate(request.rentalEndDate)}
+                            </div>
+                            <div className="text-xs text-green-600 font-medium">
+                              {request.totalDays} {request.totalDays === 1 ? "Day" : "Days"}
+                            </div>
+                          </div>
                         </div>
-                        <div className="text-xs text-green-600 font-medium">
-                          {request.totalDays} days
-                        </div>
-                      </div>
-                    </div>
+                      )
+                    }
 
                     {/* Owner */}
                     <div className="col-span-2">
@@ -422,16 +440,31 @@ const PlacedRequests = () => {
                           <span>{formatStatus(request.status)}</span>
                         </div>
 
-                        <div className="flex items-center gap-4 text-xs text-gray-600">
-                          <div className="flex items-center gap-1">
-                            <DollarSign className="w-3 h-3" />
-                            <span>৳{request.product.pricePerDay}/day</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Calendar className="w-3 h-3" />
-                            <span>{request.totalDays} days</span>
-                          </div>
-                        </div>
+                        {
+                          request.isHourlyRental ? (
+                            <div className="flex items-center gap-4 text-xs text-gray-600">
+                              <div className="flex items-center gap-1">
+                                <DollarSign className="w-3 h-3" />
+                                <span>৳{parseFloat(request.pricePerHour).toFixed(2)}/hour</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <Clock className="w-3 h-3" />
+                                <span>{request.totalHours} hours</span>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-4 text-xs text-gray-600">
+                              <div className="flex items-center gap-1">
+                                <DollarSign className="w-3 h-3" />
+                                <span>৳{((parseFloat(request.pricePerDay) || parseFloat(request.product.pricePerDay))).toFixed(2)}/day</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <Calendar className="w-3 h-3" />
+                                <span>{request.totalDays} days</span>
+                              </div>
+                            </div>
+                          )
+                        }
                       </div>
                     </div>
                   </div>
@@ -470,28 +503,73 @@ const PlacedRequests = () => {
                             <Calendar className="w-4 h-4" />
                             Rental Details
                           </h4>
-                          <div className="space-y-2 text-sm">
-                            <div>
-                              <span className="text-gray-600">Start Date:</span>
-                              <span className="ml-2 font-medium">
-                                {formatDate(request.rentalStartDate)}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="text-gray-600">End Date:</span>
-                              <span className="ml-2 font-medium">
-                                {formatDate(request.rentalEndDate)}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="text-gray-600">Total Cost:</span>
-                              <span className="ml-2 font-medium text-green-600">
-                                ৳
-                                {(request.product.pricePerDay *
-                                  request.totalDays).toFixed(2)}
-                              </span>
-                            </div>
-                          </div>
+                          {
+                            request.isHourlyRental ? (
+                              <div className="space-y-2 text-sm">
+                                <div>
+                                  <span className="text-gray-600">Start Date:</span>
+                                  <span className="ml-2 font-medium">
+                                    {formatDate(request.rentalStartDate)}
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className="text-gray-600">Starting Hour:</span>
+                                  <span className="ml-2 font-medium">
+                                    {request.startingHour}
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className="text-gray-600">Total Hours:</span>
+                                  <span className="ml-2 font-medium">
+                                    {request.totalHours}
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className="text-gray-600">Price Per Hour:</span>
+                                  <span className="ml-2 font-medium">
+                                    {(parseFloat(request.pricePerHour)).toFixed(2)}/hr
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className="text-gray-600">Total Cost:</span>
+                                  <span className="ml-2 font-medium text-green-600">
+                                    ৳
+                                    {(parseFloat(request.pricePerHour) *
+                                      request.totalHours).toFixed(2)}
+                                  </span>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="space-y-2 text-sm">
+                                <div>
+                                  <span className="text-gray-600">Start Date:</span>
+                                  <span className="ml-2 font-medium">
+                                    {formatDate(request.rentalStartDate)}
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className="text-gray-600">End Date:</span>
+                                  <span className="ml-2 font-medium">
+                                    {formatDate(request.rentalEndDate)}
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className="text-gray-600">Price Per Day:</span>
+                                  <span className="ml-2 font-medium">
+                                    ৳{parseFloat(request.pricePerDay) || request.product.pricePerDay}
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className="text-gray-600">Total Cost:</span>
+                                  <span className="ml-2 font-medium text-green-600">
+                                    ৳
+                                    {((parseFloat(request.pricePerDay) || request.product.pricePerDay) *
+                                      request.totalDays).toFixed(2)}
+                                  </span>
+                                </div>
+                              </div>
+                            )
+                          }
                         </div>
 
                         {/* Collection Method */}
@@ -511,7 +589,7 @@ const PlacedRequests = () => {
                               <span className="text-gray-600">Method:</span>
                               <span className="ml-2 font-medium">
                                 {request.renterCollectionMethod ===
-                                "BRITTOO_TERMINAL"
+                                  "BRITTOO_TERMINAL"
                                   ? "Terminal Pickup"
                                   : "Home Delivery"}
                               </span>

@@ -156,6 +156,7 @@ model Product {
   productSL          String           @unique @map("product_sl")
   name               String           @map("name")
   pricePerDay        Decimal?         @map("price_per_day")
+  pricePerHour       Decimal?         @map("price_per_hour") //new
   productImages      String[]         @map("product_images")
   optimizedImages    String[]         @default([]) @map("optimized_images")
   productType        ProductType      @map("product_type")
@@ -170,10 +171,13 @@ model Product {
   isOnHold           Boolean          @default(false) @map("is_on_hold")
   holdStartDate      DateTime?        @map("hold_start_date")
   holdEndDate        DateTime?        @map("hold_end_date")
-  isForSale          Boolean          @map("is_for_sale")
-  isRented           Boolean          @default(false) @map("is_rented")
-  isBrittooVerified  Boolean          @default(false) @map("is_brittoo_verified")
-  holdCreditValidity Int?             @map("hold_credit_validity")
+
+  askingPrice Int?    @map("asking_price") //new
+  isForSale   Boolean @map("is_for_sale")
+
+  isRented           Boolean @default(false) @map("is_rented")
+  isBrittooVerified  Boolean @default(false) @map("is_brittoo_verified")
+  holdCreditValidity Int?    @map("hold_credit_validity")
 
   isVirtual   Boolean @default(false) @map("is_virtual")
   virtualType String? @map("virtual_type")
@@ -223,12 +227,16 @@ model RentalRequest {
   rentalEndDate       DateTime            @map("rental_end_date")
 
   // new
-  totalDays   Int  @map("total_days")
-  pricePerDay Int? @map("price_per_day")
+  totalDays   Int      @map("total_days")
+  pricePerDay Decimal? @map("price_per_day")
 
   // new
-  totalHours   Int? @map("total_hours")
-  pricePerHour Int? @map("price_per_hour")
+  isHourlyRental Boolean  @default(false) @map("is_hourly_rental")
+  totalHours     Int?     @map("total_hours")
+  startingHour   String?  @map("starting_hour")
+  pricePerHour   Decimal? @map("price_per_hour")
+
+  // payment, due
 
   ownerSubmitMethod          CollectionOrDepositMethod? @map("owner_submit_method")
   renterCollectionMethod     CollectionOrDepositMethod  @map("renter_collection_method")

@@ -15,7 +15,7 @@ const Footer = () => {
     <footer className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white mt-18">
       {/* Main Footer Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
           {/* Brand Section */}
           <div className="lg:col-span-1">
             <div className="flex items-center mb-6">
@@ -66,16 +66,7 @@ const Footer = () => {
           </div>
 
           {/* Support Links */}
-          <div>
-            <h4 className="text-lg font-semibold mb-6 text-white">Support</h4>
-            <ul className="space-y-3">
-              <FooterLink href="#" text="Help Center" />
-              <FooterLink href="#" text="Contact Support" />
-              <FooterLink href="#" text="FAQ" />
-              <FooterLink href="#" text="Community Guidelines" />
-              <FooterLink href="#" text="Report Issue" />
-            </ul>
-          </div>
+          
 
           {/* Contact Info */}
           <div>
@@ -108,8 +99,7 @@ const Footer = () => {
       {/* Bottom Section */}
       <div className="border-t border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-6">
+            <div className="flex flex-col justify-center sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-6">
               <p className="text-gray-400 text-sm">
                 © {currentYear} Brittoo. All rights reserved.
               </p>
@@ -119,18 +109,7 @@ const Footer = () => {
                 <span>for sustainable communities</span>
               </div>
             </div>
-
-            <div className="flex space-x-6">
-              <FooterLink href="#" text="Privacy Policy" className="text-sm" />
-              <FooterLink
-                href="#"
-                text="Terms of Service"
-                className="text-sm"
-              />
-              <FooterLink href="#" text="Cookie Policy" className="text-sm" />
-            </div>
           </div>
-        </div>
       </div>
     </footer>
   );

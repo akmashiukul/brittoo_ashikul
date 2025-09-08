@@ -217,16 +217,16 @@ const Navbar = () => {
             {isHamMenuOpen && (
               <div className="absolute end-0 z-10 mt-0.5 w-40 divide-gray-100 rounded-md border border-gray-100 bg-white shadow-lg top-12 overflow-x-hidden right-2">
                 <div className="p-2">
-                  <NavLink to="/" className={menuClassname}>
+                  <NavLink onClick={() => setIsHamMenuOpen(false)} to="/" className={menuClassname}>
                     Home
                   </NavLink>
-                  <NavLink to="/browse" className={menuClassname}>
+                  <NavLink onClick={() => setIsHamMenuOpen(false)} to="/browse" className={menuClassname}>
                     Browse Items
                   </NavLink>
-                  <NavLink to="/buy-credits" className={menuClassname}>
+                  <NavLink onClick={() => setIsHamMenuOpen(false)} to="/buy-credits" className={menuClassname}>
                     Buy Credits
                   </NavLink>
-                  <NavLink
+                  <NavLink onClick={() => setIsHamMenuOpen(false)}
                     to="/dashboard/overview"
                     className={menuClassname}
                   >

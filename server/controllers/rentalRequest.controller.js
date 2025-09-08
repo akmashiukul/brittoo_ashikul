@@ -23,6 +23,11 @@ export const createRentalRequest = async (req, res, next) => {
       paidWithRcc,
       coupon,
       usedRccData = [],
+      isHourlyRental,
+      pricePerHour,
+      totalHours,
+      pricePerDay,
+      startingHour
     } = req.body;
 
     if (!productId || !requesterId || !ownerId) {
@@ -178,6 +183,7 @@ export const createRentalRequest = async (req, res, next) => {
           rentalEndDate: new Date(rentalEndDate),
           submissionDeadline,
           totalDays,
+
           renterCollectionMethod,
           renterPhoneNumber,
           renterDeliveryAddress:
@@ -188,6 +194,12 @@ export const createRentalRequest = async (req, res, next) => {
           usedBccAmount: paidWithBcc ? usedBccAmount : null,
           paidWithRcc,
           status: "REQUESTED_BY_RENTER",
+          //new
+          isHourlyRental,
+          pricePerDay,
+          pricePerHour,
+          totalHours,
+          startingHour,
         },
         include: {
           product: true,
@@ -292,9 +304,10 @@ export const getUserPlacedRequests = async (req, res, next) => {
           select: {
             id: true,
             name: true,
-           
+
             optimizedImages: true,
             pricePerDay: true,
+            pricePerHour: true,
             productType: true,
             productCondition: true,
             ownerId: true,
@@ -340,7 +353,7 @@ export const getOwnerRentalRequests = async (req, res, next) => {
           select: {
             id: true,
             name: true,
-           
+
             optimizedImages: true,
             pricePerDay: true,
             productType: true,
@@ -467,7 +480,7 @@ export const acceptRentalRequest = async (req, res, next) => {
           product: {
             select: {
               name: true,
-             
+
               optimizedImages: true,
             },
           },
@@ -620,7 +633,7 @@ export const rejectRentalRequest = async (req, res, next) => {
             product: {
               select: {
                 name: true,
-               
+
                 optimizedImages: true,
               },
             },
@@ -764,7 +777,7 @@ export const cancelRentalRequest = async (req, res, next) => {
             product: {
               select: {
                 name: true,
-               
+
                 optimizedImages: true,
               },
             },

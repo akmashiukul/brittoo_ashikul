@@ -1,10 +1,9 @@
-import { Home, Loader2, MapPin, TagIcon, X } from "lucide-react";
+import { Calendar, Clock, ClockPlus, Home, MapPin, X } from "lucide-react";
 import useConfirmRentalRequestModalStore from "../../stores/creditModalStores/useConfirmRentalRequestModalStore";
 import RCC from "../CacheCreditCard/RCC";
 import BCC from "../CacheCreditCard/BCC";
 import { differenceInDays } from "date-fns";
-import { usePriceCalculate } from "../../hooks/usePriceCalculate";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useUserStore from "../../stores/authStores/useUserStore";
 import api from "../../lib/api";
 import Swal from "sweetalert2";
@@ -27,19 +26,34 @@ const ConfirmRentalRequestModal = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { calculatePricePerDay } = usePriceCalculate();
+  //const { calculatePricePerDay } = usePriceCalculate();
   const numberOfDays =
     differenceInDays(
       data?.rentalDetails?.final.toDateString(),
       data?.rentalDetails?.initial?.toDateString(),
     ) + 1;
-  const pricePerDay = calculatePricePerDay(
-    data?.rentalDetails?.product?.omv,
-    data?.rentalDetails?.product?.productCondition,
-    data?.rentalDetails?.product?.productAge,
-    data?.rentalDetails?.product?.owner.securityScore,
-    numberOfDays,
-  );
+  // const pricePerDay = calculatePricePerDay(
+  //   data?.rentalDetails?.product?.omv,
+  //   data?.rentalDetails?.product?.productCondition,
+  //   data?.rentalDetails?.product?.productAge,
+  //   data?.rentalDetails?.product?.owner.securityScore,
+  //   numberOfDays,
+  // );
+  const [pricePerDay, setPricePerDay] = useState(0);
+  const [pricePerHour, setPricePerHour] = useState(0);
+  const [numberOfHours, setNumberOfHours] = useState(0);
+  const [isHourlyRental, setIsHourlyRental] = useState(false);
+
+  useEffect(() => {
+    if(data?.rentalDetails) {
+      setPricePerDay(data?.rentalDetails?.pricePerDay);
+      setIsHourlyRental(data?.rentalDetails?.isHourlyRental);
+      setPricePerHour(data?.rentalDetails?.pricePerHour);
+      setNumberOfHours(data?.rentalDetails?.numberOfHours);
+    }
+  }, [data?.rentalDetails]);
+
+
   const conditionColor =
     {
       NEW: "text-green-400",
@@ -128,6 +142,11 @@ const ConfirmRentalRequestModal = () => {
           rccId: item.rcc.id,
           selectedAmount: item.selectedAmount,
         })),
+        isHourlyRental: data?.rentalDetails?.isHourlyRental,
+        pricePerHour: isHourlyRental ? pricePerHour : null,
+        totalHours: isHourlyRental ? numberOfHours : null,
+        pricePerDay,
+        startingHour: isHourlyRental ? (data?.rentalDetails?.pickerValue?.hour + " " + data?.rentalDetails?.pickerValue?.period) : null,
       };
       const token = localStorage.getItem("token");
       const res = await api.post(
@@ -162,7 +181,7 @@ const ConfirmRentalRequestModal = () => {
           title: "OOPS!",
           text: "Please verify yourself before renting something.",
           footer:
-          '<a href="/verify-user" style="color: #2563eb; text-decoration: underline;">Goto Verify</a>',
+            '<a href="/verify-user" style="color: #2563eb; text-decoration: underline;">Goto Verify</a>',
         });
       } else {
         Swal.fire({
@@ -280,27 +299,49 @@ const ConfirmRentalRequestModal = () => {
                 </p>
               </div>
             </div>
-
-            <div className="mx-4 py-4">
-              <h2 className="text-lg font-medium text-gray-900 mb-2">
-                Rental Period
-              </h2>
-              <div className="border-b w-fit border-gray-300 pb-1 space-y-1">
-                <h3 className="text-sm text-gray-800 ">
-                  <span className="font-medium">Start date:</span>{" "}
-                  {data?.rentalDetails?.initial.toDateString()}
-                </h3>
-                <h3 className="text-sm text-gray-800 ">
-                  <span className="font-medium">End date: </span>
-                  {data?.rentalDetails?.final?.toDateString()}
-                </h3>
-              </div>
-              <h3 className="text-sm text-gray-800 mt-1">
-                <span className="font-medium">Total Days:</span> {numberOfDays}
-              </h3>
-              {/* one case for initial == final */}
-            </div>
-
+            {
+              data?.rentalDetails?.isHourlyRental ? (
+                <div className="mx-4 py-4">
+                  <h2 className="text-lg font-medium text-gray-900 mb-2">
+                    Rental Period <span className="text-base italic text-cyan-600">(Hourly Rental)</span>
+                  </h2>
+                  <div className="w-fit border-gray-300 space-y-1">
+                    <h3 className="text-sm text-gray-800 flex gap-1">
+                      <span className="font-medium flex items-center gap-1"> <Calendar size={12} /> Rental Date:</span>{" "}
+                      {data?.rentalDetails?.initial.toDateString()}
+                    </h3>
+                    <h3 className="text-sm text-gray-800 flex gap-1">
+                      <span className="font-medium flex items-center gap-1"><Clock size={12} /> Starting Hour:</span>{" "}
+                      {data?.rentalDetails?.pickerValue.hour}:00 {data?.rentalDetails?.pickerValue.period}
+                    </h3>
+                    <h3 className="text-sm text-gray-800 flex gap-1">
+                      <span className="font-medium flex items-center gap-1"><ClockPlus size={12} /> Total Hours:</span>{" "}
+                      {data?.rentalDetails?.pickerValue.hour}
+                    </h3>
+                  </div>
+                </div>
+              ) : (
+                <div className="mx-4 py-4">
+                  <h2 className="text-lg font-medium text-gray-900 mb-2">
+                    Rental Period <span className="text-base italic text-cyan-600">(Daily Rental)</span>
+                  </h2>
+                  <div className="border-b w-fit border-gray-300 pb-1 space-y-1">
+                    <h3 className="text-sm text-gray-800 ">
+                      <span className="font-medium">Start date:</span>{" "}
+                      {data?.rentalDetails?.initial.toDateString()}
+                    </h3>
+                    <h3 className="text-sm text-gray-800 ">
+                      <span className="font-medium">End date: </span>
+                      {data?.rentalDetails?.final?.toDateString()}
+                    </h3>
+                  </div>
+                  <h3 className="text-sm text-gray-800 mt-1">
+                    <span className="font-medium">Total Days:</span> {numberOfDays}
+                  </h3>
+                  {/* one case for initial == final */}
+                </div>
+              )
+            }
             <div>
               <div className="max-w-sm mx-4">
                 <h3 className="text-lg font-medium text-gray-900 mb-4">
@@ -317,11 +358,10 @@ const ConfirmRentalRequestModal = () => {
                         key={method.id}
                         className={`
                 flex items-center p-4 rounded-lg border-2 cursor-pointer transition-all duration-200
-                ${
-                  isSelected
-                    ? "border-green-500 bg-green-50 shadow-sm"
-                    : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-                }
+                ${isSelected
+                            ? "border-green-500 bg-green-50 shadow-sm"
+                            : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                          }
               `}
                       >
                         <input
@@ -336,11 +376,10 @@ const ConfirmRentalRequestModal = () => {
                         <div
                           className={`
                 flex items-center justify-center w-10 h-10 rounded-full mr-4 transition-colors
-                ${
-                  isSelected
-                    ? "bg-green-500 text-white"
-                    : "bg-gray-100 text-gray-600"
-                }
+                ${isSelected
+                              ? "bg-green-500 text-white"
+                              : "bg-gray-100 text-gray-600"
+                            }
               `}
                         >
                           <IconComponent size={20} />
@@ -348,9 +387,8 @@ const ConfirmRentalRequestModal = () => {
 
                         <div className="flex-1">
                           <div
-                            className={`font-medium ${
-                              isSelected ? "text-green-900" : "text-gray-900"
-                            }`}
+                            className={`font-medium ${isSelected ? "text-green-900" : "text-gray-900"
+                              }`}
                           >
                             {method.label}
                           </div>
@@ -362,11 +400,10 @@ const ConfirmRentalRequestModal = () => {
                         <div
                           className={`
                 w-5 h-5 rounded-full border-2 ml-4 transition-all
-                ${
-                  isSelected
-                    ? "border-green-500 bg-green-500"
-                    : "border-gray-300"
-                }
+                ${isSelected
+                              ? "border-green-500 bg-green-500"
+                              : "border-gray-300"
+                            }
               `}
                         >
                           {isSelected && (
@@ -436,7 +473,7 @@ const ConfirmRentalRequestModal = () => {
                       name="pickupPoint"
                       id="pickupPoint"
                       required
-                      className="border bg-white border-gray-300 rounded-md px-2 py-2 md:py-3 p md:px-4 focus:border-gray-400 focus:outline-none text-xs md:text-sm max-w-64 sm:max-w-xl"
+                      className="border bg-white border-gray-300 rounded-md px-2 py-2 md:py-3 p md:px-4 focus:border-gray-400 focus:outline-none text-xs md:text-sm w-full sm:max-w-xl"
                       onChange={(e) => setPickupPoint(e.target.value)}
                     >
                       <option value="">Please select</option>
@@ -453,53 +490,105 @@ const ConfirmRentalRequestModal = () => {
               </div>
             </div>
 
-            <div className="mx-4 py-4 mt-2">
-              <h2 className="text-lg font-medium text-gray-900 mb-2">
-                Total Amount
-              </h2>
-              <div className="border-b w-fit border-gray-300 pb-1 space-y-1">
-                <h3 className="text-sm text-gray-800 ">
-                  <span className="">Price Per Day: </span>{" "}
-                  <span className="font-medium">৳{pricePerDay}</span>
-                </h3>
-                <h3 className="text-sm text-gray-800 ">
-                  <span className="">Subtotal Price: </span>
-                  <span className="font-medium">
-                    ৳{(pricePerDay * numberOfDays).toFixed(2)}{" "}
-                    <span className="text-[11px] font-normal">
-                      (For {numberOfDays} {numberOfDays == 1 ? "Day" : "Days"})
+            {
+              data?.rentalDetails?.isHourlyRental ? (
+                <div className="mx-4 py-4 mt-2">
+                  <h2 className="text-lg font-medium text-gray-900 mb-2">
+                    Total Amount
+                  </h2>
+                  <div className="border-b w-fit border-gray-300 pb-1 space-y-1">
+                    <h3 className="text-sm text-gray-800 ">
+                      <span className="">Price Per Hour: </span>{" "}
+                      <span className="font-medium">৳{pricePerHour}</span>
+                    </h3>
+                    <h3 className="text-sm text-gray-800 ">
+                      <span className="">Subtotal Price: </span>
+                      <span className="font-medium">
+                        ৳{((parseFloat(pricePerHour) * parseFloat(numberOfHours)) || 0.00).toFixed(2)}{" "}
+                        <span className="text-[11px] font-normal">
+                          (For {numberOfHours} {numberOfHours == 1 ? "Hour" : "Hours"})
+                        </span>
+                      </span>
+                    </h3>
+                    <h3 className="text-sm text-gray-800 ">
+                      <span className="">Delivery Charge: </span>
+                      <span className="font-medium">
+                        ৳{selectedMethod === "HOME" ? "10" : "0"}
+                      </span>
+                    </h3>
+                  </div>
+                  <h3 className="text-sm text-gray-800 mt-1">
+                    <span className="">Total </span>{" "}
+                    <span className="font-bold">
+                      ≈ BDT{" "}
+                      {
+                        conditionalCeilOrFloor(
+                          pricePerHour * numberOfHours +
+                          (selectedMethod === "HOME" ? 10 : 0),
+                        ).value
+                      }{" "}
+                      <span className="text-[11px] font-normal ml-0.5">
+                        {conditionalCeilOrFloor(
+                          pricePerHour * numberOfHours +
+                          (selectedMethod === "HOME" ? 10 : 0),
+                        ).ceil
+                          ? "(ceiled)"
+                          : "(floored)"}
+                      </span>
                     </span>
-                  </span>
-                </h3>
-                <h3 className="text-sm text-gray-800 ">
-                  <span className="">Delivery Charge: </span>
-                  <span className="font-medium">
-                    ৳{selectedMethod === "HOME" ? "10" : "0"}
-                  </span>
-                </h3>
-              </div>
-              <h3 className="text-sm text-gray-800 mt-1">
-                <span className="">Total </span>{" "}
-                <span className="font-bold">
-                  ≈ BDT{" "}
-                  {
-                    conditionalCeilOrFloor(
-                      pricePerDay * numberOfDays +
-                        (selectedMethod === "HOME" ? 10 : 0),
-                    ).value
-                  }{" "}
-                  <span className="text-[11px] font-normal ml-0.5">
-                    {conditionalCeilOrFloor(
-                      pricePerDay * numberOfDays +
-                        (selectedMethod === "HOME" ? 10 : 0),
-                    ).ceil
-                      ? "(ceiled)"
-                      : "(floored)"}
-                  </span>
-                </span>
-              </h3>
-              {/* one case for initial == final */}
-            </div>
+                  </h3>
+
+                </div>
+              ) : (
+                <div className="mx-4 py-4 mt-2">
+                  <h2 className="text-lg font-medium text-gray-900 mb-2">
+                    Total Amount
+                  </h2>
+                  <div className="border-b w-fit border-gray-300 pb-1 space-y-1">
+                    <h3 className="text-sm text-gray-800 ">
+                      <span className="">Price Per Day: </span>{" "}
+                      <span className="font-medium">৳{pricePerDay}</span>
+                    </h3>
+                    <h3 className="text-sm text-gray-800 ">
+                      <span className="">Subtotal Price: </span>
+                      <span className="font-medium">
+                        ৳{(pricePerDay * numberOfDays).toFixed(2)}{" "}
+                        <span className="text-[11px] font-normal">
+                          (For {numberOfDays} {numberOfDays == 1 ? "Day" : "Days"})
+                        </span>
+                      </span>
+                    </h3>
+                    <h3 className="text-sm text-gray-800 ">
+                      <span className="">Delivery Charge: </span>
+                      <span className="font-medium">
+                        ৳{selectedMethod === "HOME" ? "10" : "0"}
+                      </span>
+                    </h3>
+                  </div>
+                  <h3 className="text-sm text-gray-800 mt-1">
+                    <span className="">Total </span>{" "}
+                    <span className="font-bold">
+                      ≈ BDT{" "}
+                      {
+                        conditionalCeilOrFloor(
+                          pricePerDay * numberOfDays +
+                          (selectedMethod === "HOME" ? 10 : 0),
+                        ).value
+                      }{" "}
+                      <span className="text-[11px] font-normal ml-0.5">
+                        {conditionalCeilOrFloor(
+                          pricePerDay * numberOfDays +
+                          (selectedMethod === "HOME" ? 10 : 0),
+                        ).ceil
+                          ? "(ceiled)"
+                          : "(floored)"}
+                      </span>
+                    </span>
+                  </h3>
+
+                </div>
+              )
+            }
 
             <div className="space-y-4 mx-4 mt-2">
               <h2 className="text-lg font-medium text-gray-900 mb-2">
@@ -508,7 +597,7 @@ const ConfirmRentalRequestModal = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
                 {data?.selectedRCCs?.map((selectedRcc) => (
                   <RCC
-                    handleSelect={() => {}}
+                    handleSelect={() => { }}
                     key={selectedRcc.rcc.id}
                     rcc={selectedRcc.rcc}
                     selectedRCCs={data?.selectedRCCs}
@@ -516,10 +605,10 @@ const ConfirmRentalRequestModal = () => {
                   />
                 ))}
               </div>
-              {data?.selectedBcc && (
+              {data?.selectedBcc > 0 && (
                 <div>
                   <BCC
-                    handleSelect={() => {}}
+                    handleSelect={() => { }}
                     bccWallet={data?.bccWallet}
                     selectedBcc={data?.selectedBcc}
                     inRRModal={true}

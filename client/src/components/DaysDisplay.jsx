@@ -88,7 +88,7 @@ const DaysDisplay = ({
       </div>
       {
         numberOfDays === 1 && (initial && final) && !isHourlyRental && (
-          <div className="flex font-semibold items-center mb-2 border-b border-gray-300 pt-4 pb-4 justify-center text-green-600 bg-gray-50 relative">
+          <div className="flex font-semibold items-center mb-2 border-b border-gray-300 pt-4 pb-4 justify-center text-green-600 bg-cyan-50 relative">
             <div onClick={() => {
               setIsHourlyRental(true);
               window.scrollTo({
@@ -97,7 +97,7 @@ const DaysDisplay = ({
               });
             }} className="flex gap-1 items-center cursor-pointer">
               <p className="underline italic">Rent On Hourly Basis</p>
-              <span className="rounded-full bg-purple-100 px-2.5 py-0.5 text-xs whitespace-nowrap text-purple-700 flex items-center gap-1 absolute top-2 left-2">
+              <span className="rounded-full bg-purple-100 px-2.5 py-0.5 text-xs whitespace-nowrap text-purple-700 flex items-center gap-1 absolute top-2 left-2 animate-pulse duration-1000">
                 New <Sparkle size={10} />
               </span>
               <Clock size={14} />
@@ -107,7 +107,7 @@ const DaysDisplay = ({
       }
       {
         numberOfDays === 1 && (initial && final) && isHourlyRental && (
-          <div className="flex font-semibold items-center mb-2 border-b border-gray-300 pt-4 pb-4 justify-center text-green-600 bg-gray-50">
+          <div className="flex font-semibold items-center mb-2 border-b border-gray-300 pt-4 pb-4 justify-center text-green-600 bg-cyan-50">
             <div onClick={() => setIsHourlyRental(false)} className="flex gap-1 items-center cursor-pointer">
               <p className="underline italic">Rent On Daily Basis</p>
               <Calendar size={14} />

@@ -123,7 +123,7 @@ export default function HourSelector({ pickerValue, setPickerValue, numberOfHour
 
         {/* Summary */}
         <div className="px-6 py-4 bg-gray-100 border-t border-gray-100">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm">
+          <div className="flex flex-col gap-2 text-sm">
             <div className="text-gray-600 flex items-center gap-1">
               <span className="font-medium flex items-center gap-1"><Clock size={12} /> Price Per Hour: </span>
               <span className="text-green-700 font-bold">

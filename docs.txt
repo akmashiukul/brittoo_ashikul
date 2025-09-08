@@ -21,6 +21,11 @@ DUMP RESTORES:
 
 
 
+FIX TESTS:
+  1. added quotation in .env in server: client_base_url
+
+
+
 
 FIXED:
   1. noreply at password reset link mail

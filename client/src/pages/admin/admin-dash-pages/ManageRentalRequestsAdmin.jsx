@@ -246,10 +246,6 @@ const RentalRequestsDashboard = () => {
                         <h3 className="font-semibold text-gray-800 text-sm">
                           {request.product.name}
                         </h3>
-                        <div className="flex items-center gap-2 text-xs text-gray-600">
-                          <DollarSign className="w-3 h-3" />
-                          <span>৳{request.product.pricePerDay}/day</span>
-                        </div>
                       </div>
                     </a>
                   </div>
@@ -501,46 +497,109 @@ const RentalRequestsDashboard = () => {
                           <Calendar className="w-4 h-4" />
                           Rental Details
                         </h4>
-                        <div className="space-y-2 text-sm">
-                          <div>
-                            <span className="text-gray-600">Start Date:</span>
-                            <span className="ml-2 font-medium">
-                              {formatDate(request.rentalStartDate)}
-                            </span>
-                          </div>
-                          <div>
-                            <span className="text-gray-600">End Date:</span>
-                            <span className="ml-2 font-medium">
-                              {formatDate(request.rentalEndDate)}
-                            </span>
-                          </div>
-                          <div>
-                            <span className="text-gray-600">Total Cost:</span>
-                            <span className="ml-2 font-medium text-green-600">
-                              ৳{(request.product.pricePerDay * request.totalDays).toFixed(2)}
-                            </span>
-                          </div>
-                          <div>
-                            <span className="text-gray-600">BCC Paid:</span>
-                            <span className="ml-2 font-medium">
-                              {request.paidWithBcc
-                                ? request.usedBccAmount + " BCC"
-                                : "N/A"}
-                            </span>
-                          </div>
-                          <div>
-                            <span className="text-gray-600">RCC Used:</span>
-                            <span className="ml-2 font-medium">
-                              {request.paidWithRcc ? "Yes" : "No"}
-                            </span>
-                          </div>
-                          <div>
-                            <span className="text-gray-600">Coupon Used:</span>
-                            <span className="ml-2 font-medium">
-                              {request.coupon ? request.coupon.code+`(${request.coupon.discount}%)` : "No Coupon Used"}
-                            </span>
-                          </div>
-                        </div>
+                        {
+                          request.isHourlyRental ? (
+                            <div className="space-y-2 text-sm">
+                              <div>
+                                <span className="text-gray-600">Start Date:</span>
+                                <span className="ml-2 font-medium">
+                                  {formatDate(request.rentalStartDate)}
+                                </span>
+                              </div>
+                              <div>
+                                <span className="text-gray-600">Starting Hour:</span>
+                                <span className="ml-2 font-medium">
+                                  {request.startingHour}
+                                </span>
+                              </div>
+                              <div>
+                                <span className="text-gray-600">Total Hours:</span>
+                                <span className="ml-2 font-medium">
+                                  {request.totalHours}
+                                </span>
+                              </div>
+                              <div>
+                                <span className="text-gray-600">Price Per Hour:</span>
+                                <span className="ml-2 font-medium">
+                                  ৳{parseFloat(request.pricePerHour).toFixed(2)}
+                                </span>
+                              </div>
+                              <div>
+                                <span className="text-gray-600">Total Cost:</span>
+                                <span className="ml-2 font-medium text-green-600">
+                                  ৳{(parseFloat(request.pricePerHour) * request.totalHours).toFixed(2)}
+                                </span>
+                              </div>
+                              <div>
+                                <span className="text-gray-600">BCC Paid:</span>
+                                <span className="ml-2 font-medium">
+                                  {request.paidWithBcc
+                                    ? request.usedBccAmount + " BCC"
+                                    : "N/A"}
+                                </span>
+                              </div>
+                              <div>
+                                <span className="text-gray-600">RCC Used:</span>
+                                <span className="ml-2 font-medium">
+                                  {request.paidWithRcc ? "Yes" : "No"}
+                                </span>
+                              </div>
+                              <div>
+                                <span className="text-gray-600">Coupon Used:</span>
+                                <span className="ml-2 font-medium">
+                                  {request.coupon ? request.coupon.code + `(${request.coupon.discount}%)` : "No Coupon Used"}
+                                </span>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="space-y-2 text-sm">
+                              <div>
+                                <span className="text-gray-600">Start Date:</span>
+                                <span className="ml-2 font-medium">
+                                  {formatDate(request.rentalStartDate)}
+                                </span>
+                              </div>
+                              <div>
+                                <span className="text-gray-600">End Date:</span>
+                                <span className="ml-2 font-medium">
+                                  {formatDate(request.rentalEndDate)}
+                                </span>
+                              </div>
+                              <div>
+                                <span className="text-gray-600">Price Per Day:</span>
+                                <span className="ml-2 font-medium">
+                                  ৳{(parseFloat(request.pricePerDay) || request.product.pricePerDay).toFixed(2)}
+                                </span>
+                              </div>
+                              <div>
+                                <span className="text-gray-600">Total Cost:</span>
+                                <span className="ml-2 font-medium text-green-600">
+                                  ৳{((parseFloat(request.pricePerDay) || request.product.pricePerDay) * request.totalDays).toFixed(2)}
+                                </span>
+                              </div>
+                              <div>
+                                <span className="text-gray-600">BCC Paid:</span>
+                                <span className="ml-2 font-medium">
+                                  {request.paidWithBcc
+                                    ? request.usedBccAmount + " BCC"
+                                    : "N/A"}
+                                </span>
+                              </div>
+                              <div>
+                                <span className="text-gray-600">RCC Used:</span>
+                                <span className="ml-2 font-medium">
+                                  {request.paidWithRcc ? "Yes" : "No"}
+                                </span>
+                              </div>
+                              <div>
+                                <span className="text-gray-600">Coupon Used:</span>
+                                <span className="ml-2 font-medium">
+                                  {request.coupon ? request.coupon.code + `(${request.coupon.discount}%)` : "No Coupon Used"}
+                                </span>
+                              </div>
+                            </div>
+                          )
+                        }
                       </div>
                       {/* RCC Details */}
                       {

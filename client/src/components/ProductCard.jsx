@@ -1,4 +1,4 @@
-import { TagIcon } from "lucide-react";
+import { Calendar, Clock2, TagIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const ProductCard = ({ product }) => {
@@ -53,9 +53,17 @@ const ProductCard = ({ product }) => {
             </div>
           </div>
           <div className="absolute bottom-2 right-2">
-            <div className="bg-gray-800 text-white px-2 py-1 rounded text-sm font-medium">
-              BDT {parseFloat(pricePerDay).toFixed(2)}/day
-            </div>
+            {
+              productType === "GADGET" || productType === "VEHICLE" ? (
+                <div className="bg-teal-800 text-white px-2 py-1 rounded text-sm font-medium flex items-center gap-1">
+                  <Clock2 size={14} strokeWidth={3} /> BDT {parseFloat(product.pricePerHour).toFixed(2)}/hr
+                </div>
+              ) : (
+                <div className="bg-gray-800 text-white px-2 py-1 rounded text-sm font-medium flex items-center gap-1">
+                  <Calendar size={14} strokeWidth={3} /> BDT {parseFloat(pricePerDay).toFixed(2)}/day
+                </div>
+              )
+            }
           </div>
         </div>
 

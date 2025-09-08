@@ -5,7 +5,7 @@ function getScaleFactor(omv) {
   return Math.max(0.5, Math.min(1.8, factor));
 }
 
-export function calculatePricePerDay(
+export function calculateGadgetPricePerDay(
   omv,
   condition,
   usageYears,

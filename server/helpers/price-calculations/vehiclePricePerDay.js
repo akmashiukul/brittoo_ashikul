@@ -5,7 +5,7 @@ function getScaleFactor(omv) {
   return Math.max(0.5, Math.min(1.8, factor));
 }
 
-export function calculatePricePerDay(
+export function calculateVehiclePricePerDay(
   omv,
   condition,
   usageYears,
@@ -77,9 +77,3 @@ export function calculatePricePerDay(
 
   return parseFloat(finalPrice.toFixed(2));
 }
-
-const price = 450;
-const days = 1;
-
-console.log("Price: ", price, " Renting days: ", days)
-console.log(calculatePricePerDay(price, 'GOOD', 2, 'MID', days))
