@@ -8,6 +8,7 @@ import {
   RefreshCw,
   AlertTriangle,
   HashIcon,
+  Info,
 } from "lucide-react";
 import api from "../../../lib/api";
 import BCC from "../../../components/CacheCreditCard/BCC";
@@ -17,6 +18,7 @@ import Loader from "../../../components/shared/Loader";
 import { BiMoneyWithdraw } from "react-icons/bi";
 import useRequestWithdrawalModalStore from "../../../stores/creditModalStores/useRequestWithdrawalModalStore";
 import MyWithdrawalRequests from "./MyWithdrawalRequests";
+import { Tooltip } from "flowbite-react";
 
 const MyCredits = () => {
   const [creditHistory, setCreditHistory] = useState(null);
@@ -227,12 +229,20 @@ const MyCredits = () => {
     );
   }
 
+  const tabs = [
+    { key: "overview", label: "Overview" },
+    { key: "bcc-transactions", label: "BCC Transactions" },
+    { key: "withdrawal-requests", label: "Withdrawal Requests" },
+    { key: "rcc-details", label: "RCC Details" },
+    { key: "rcc-usage", label: "RCC Usage" }
+  ];
+
   return (
-    <div className="max-w-full mx-auto p-4 sm:p-6 min-h-screen bg-white">
-      <div className="mb-6 sm:mb-8">
+    <div className="w-full max-w-full mx-auto p-3 sm:p-4 lg:p-6 min-h-screen bg-white overflow-x-hidden">
+      <div className="mb-4 sm:mb-6 lg:mb-8">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-gray-200 pb-3">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
+          <div className="mb-3 sm:mb-0">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 mb-2">
               Credits Dashboard
             </h1>
             <p className="text-gray-600 text-sm sm:text-base">
@@ -241,7 +251,7 @@ const MyCredits = () => {
           </div>
           <button
             onClick={refetchData}
-            className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm sm:text-base mt-4 sm:mt-0"
+            className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm sm:text-base"
           >
             <RefreshCw
               className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`}
@@ -252,95 +262,97 @@ const MyCredits = () => {
       </div>
 
       {/* Summary Statistics */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
-        <div className="bg-white p-4 sm:p-6 rounded-md border border-gray-200">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 mb-4 sm:mb-6 lg:mb-8">
+        <div className="bg-white p-3 sm:p-4 lg:p-6 rounded-md border border-gray-200">
           <div className="flex items-center">
             <div className="p-2 bg-blue-100 rounded-lg">
-              <Package className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+              <Package className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-blue-600" />
             </div>
-            <div className="ml-3 sm:ml-4">
+            <div className="ml-2 sm:ml-3 lg:ml-4">
               <p className="text-xs sm:text-sm font-medium text-gray-600">
                 Total Available BCC
               </p>
-              <p className="text-xl sm:text-2xl font-bold text-gray-900">
+              <p className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">
                 {creditHistory?.summary?.bcc?.availableBalance || 0}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-4 sm:p-6 rounded-md border border-gray-200">
+        <div className="bg-white p-3 sm:p-4 lg:p-6 rounded-md border border-gray-200">
           <div className="flex items-center">
             <div className="p-2 bg-red-100 rounded-lg">
-              <Package className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
+              <Package className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-red-600" />
             </div>
-            <div className="ml-3 sm:ml-4">
+            <div className="ml-2 sm:ml-3 lg:ml-4">
               <p className="text-xs sm:text-sm font-medium text-gray-600">
                 Available RCC
               </p>
-              <p className="text-xl sm:text-2xl font-bold text-gray-900">
+              <p className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">
                 {creditHistory?.summary?.rcc?.availableAmount || 0}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-4 sm:p-6 rounded-md border border-gray-200">
+        <div className="bg-white p-3 sm:p-4 lg:p-6 rounded-md border border-gray-200">
           <div className="flex items-center">
             <div className="p-2 bg-green-100 rounded-lg">
-              <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
+              <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-green-600" />
             </div>
-            <div className="ml-3 sm:ml-4">
+            <div className="ml-2 sm:ml-3 lg:ml-4">
               <p className="text-xs sm:text-sm font-medium text-gray-600">
                 Total Rentals
               </p>
-              <p className="text-xl sm:text-2xl font-bold text-gray-900">
+              <p className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">
                 {creditHistory?.summary?.rentals?.totalRentals || 0}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-4 sm:p-6 rounded-md border border-gray-200">
+        <div className="bg-white p-3 sm:p-4 lg:p-6 rounded-md border border-gray-200">
           <div className="flex items-center">
             <div className="p-2 bg-yellow-100 rounded-lg">
-              <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600" />
+              <Clock className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-yellow-600" />
             </div>
-            <div className="ml-3 sm:ml-4">
+            <div className="ml-2 sm:ml-3 lg:ml-4">
               <p className="text-xs sm:text-sm font-medium text-gray-600">
                 Total Pending BCC
               </p>
-              <p className="text-xl sm:text-2xl font-bold text-gray-900">
+              <p className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">
                 {creditHistory?.summary?.bcc?.totalPendingBcc || 0}
               </p>
             </div>
           </div>
         </div>
-        <div className="bg-white p-4 sm:p-6 rounded-md border border-gray-200">
+
+        <div className="bg-white p-3 sm:p-4 lg:p-6 rounded-md border border-gray-200">
           <div className="flex items-center">
             <div className="p-2 bg-gray-100 rounded-lg">
-              <Package className="w-5 h-5 sm:w-6 sm:h-6 text-red-200" />
+              <Package className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-red-200" />
             </div>
-            <div className="ml-3 sm:ml-4">
+            <div className="ml-2 sm:ml-3 lg:ml-4">
               <p className="text-xs sm:text-sm font-medium text-gray-600">
                 In Use RCC
               </p>
-              <p className="text-xl sm:text-2xl font-bold text-gray-900">
+              <p className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">
                 {creditHistory?.summary?.rcc?.totalInUse || 0}
               </p>
             </div>
           </div>
         </div>
-        <div className="bg-white p-4 sm:p-6 rounded-md border border-gray-200">
+
+        <div className="bg-white p-3 sm:p-4 lg:p-6 rounded-md border border-gray-200">
           <div className="flex items-center">
             <div className="p-2 bg-gray-100 rounded-lg">
-              <Package className="w-5 h-5 sm:w-6 sm:h-6 text-blue-200" />
+              <Package className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-blue-200" />
             </div>
-            <div className="ml-3 sm:ml-4">
+            <div className="ml-2 sm:ml-3 lg:ml-4">
               <p className="text-xs sm:text-sm font-medium text-gray-600">
                 In Use BCC
               </p>
-              <p className="text-xl sm:text-2xl font-bold text-gray-900">
+              <p className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">
                 {creditHistory?.summary?.bcc?.lockedBalance || 0}
               </p>
             </div>
@@ -348,414 +360,405 @@ const MyCredits = () => {
         </div>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="mb-4 sm:mb-6">
+      {/* Tab Navigation - Fixed to always wrap */}
+      <div className="mb-4 sm:mb-6 overflow-x-hidden">
         <div className="border-b border-gray-200">
-          <nav className="flex flex-wrap gap-2 sm:gap-4 justify-center sm:justify-start">
-            {[
-              "overview",
-              "bcc-transactions",
-              "withdrawal-requests",
-              "rcc-details",
-              "rcc-usage",
-            ].map((tab) => (
+          <nav className="flex flex-wrap gap-1 sm:gap-2 lg:gap-4">
+            {tabs.map((tab) => (
               <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`py-2 px-2 sm:px-3 border-b-2 font-medium text-xs sm:text-sm capitalize cursor-pointer ${
-                  activeTab === tab
-                    ? "border-green-500 text-green-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={`py-2 px-2 sm:px-3 lg:px-4 border-b-2 font-medium text-xs sm:text-sm cursor-pointer whitespace-nowrap ${activeTab === tab.key
+                  ? "border-green-500 text-green-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                  }`}
               >
-                {tab
-                  .replace("-", " ")
-                  .replace("rcc", "RCC")
-                  .replace("bcc", "BCC")}
+                {tab.label}
               </button>
             ))}
           </nav>
         </div>
       </div>
 
-      {/* Overview Tab */}
-      {activeTab === "overview" && (
-        <div className="space-y-6">
-          <div className="flex-1 pb-4">
-            <div className="px-2 sm:px-3 md:px-5 mt-2">
-              <div className="flex flex-col sm:flex-row justify-between items-center">
-                <h3 className="mt-1 text-sm font-semibold text-center sm:text-left">
-                  🔵Available Blue Cache Credits
-                </h3>
-                <button
-                  onClick={() =>
-                    openRequestWithdrawalModal(
-                      creditHistory?.bccWallet
-                        ? {
+      {/* Tab Content Container - Fixed overflow issues */}
+      <div className="w-full overflow-x-hidden">
+        {/* Overview Tab */}
+        {activeTab === "overview" && (
+          <div className="space-y-6">
+            <div className="flex-1 pb-4">
+              <div className="px-2 sm:px-3 md:px-5 mt-2">
+                <div className="flex flex-col sm:flex-row justify-between items-center">
+                  <h3 className="mt-1 text-sm font-semibold text-center sm:text-left">
+                    🔵Available Blue Cache Credits
+                  </h3>
+                  <button
+                    onClick={() =>
+                      openRequestWithdrawalModal(
+                        creditHistory?.bccWallet
+                          ? {
                             bccWallet: creditHistory.bccWallet,
                             setCreditHistory,
                             creditHistory,
                           }
-                        : {
+                          : {
                             bccWallet: {
                               availableBalance: 0,
                               lockedBalance: 0,
                             },
                             setCreditHistory,
                           },
-                    )
-                  }
-                  className="py-1 px-3 sm:px-4 text-xs sm:text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 hover:shadow-md cursor-pointer flex gap-1 items-center mt-2 sm:mt-0"
-                >
-                  <span>Withdraw Money</span> <BiMoneyWithdraw />
-                </button>
-              </div>
-              <div className="mt-4 flex flex-col sm:flex-row items-center">
-                <BCC
-                  handleSelect={() => {}}
-                  bccWallet={
-                    creditHistory?.bccWallet || {
-                      availableBalance: 0,
-                      lockedBalance: 0,
+                      )
                     }
-                  }
-                />
-              </div>
-              <h3 className="mt-4 sm:mt-6 text-sm font-semibold text-center sm:text-left">
-                🔴Available Red Cache Credits
-              </h3>
-              <div className="flex flex-wrap items-center gap-4 mt-2 justify-center sm:justify-start">
-                {creditHistory?.redCacheCredits?.map((credit) => (
-                  <RCC handleSelect={() => {}} key={credit.id} rcc={credit} />
-                ))}
+                    className="py-1 px-3 sm:px-4 text-xs sm:text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 hover:shadow-md cursor-pointer flex gap-1 items-center mt-2 sm:mt-0"
+                  >
+                    <span>Withdraw Money</span> <BiMoneyWithdraw />
+                  </button>
+                </div>
+                <div className="mt-4 flex flex-col sm:flex-row items-center">
+                  <BCC
+                    handleSelect={() => { }}
+                    bccWallet={
+                      creditHistory?.bccWallet || {
+                        availableBalance: 0,
+                        lockedBalance: 0,
+                      }
+                    }
+                  />
+                </div>
+                <h3 className="mt-4 sm:mt-6 text-sm font-semibold text-center sm:text-left">
+                  🔴Available Red Cache Credits
+                </h3>
+                <div className="flex flex-wrap items-center gap-4 mt-2 justify-center sm:justify-start">
+                  {creditHistory?.redCacheCredits?.map((credit) => (
+                    <RCC handleSelect={() => { }} key={credit.id} rcc={credit} />
+                  ))}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* RCC Details Tab */}
-      {activeTab === "rcc-details" && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="p-4 border-b border-gray-200">
-            <h3 className="text-base sm:text-lg font-semibold text-gray-800">
-              Red Cache Credits Details
-            </h3>
-          </div>
-          <div
-            className="overflow-x-auto"
-            style={{ overflowX: "auto", touchAction: "pan-x" }}
-          >
-            <table className="w-full min-w-[320px] sm:min-w-[480px] md:min-w-[640px]">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Source Product
-                  </th>
-                  <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Amount
-                  </th>
-                  <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
-                    In Use
-                  </th>
-                  <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
-                    Hold Status
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {creditHistory?.redCacheCredits?.map((rcc) => (
-                  <tr key={rcc.id} className="hover:bg-gray-50">
-                    <td className="px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <Package className="w-4 h-4 text-gray-400 mr-1 sm:mr-2" />
-                        <Link
-                          to={`/product-details/${rcc.sourceProduct.id}`}
-                          className="p-1 sm:p-2 border border-gray-200 rounded-lg w-full hover:scale-105 hover:bg-gray-200 hover:text-white transition-all duration-300 hover:ml-1 sm:ml-2"
-                        >
-                          <div className="text-xs sm:text-sm font-medium text-gray-900">
-                            {rcc.sourceProduct.name}
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <div className="text-xs text-gray-500">
-                              {rcc.sourceProduct.productSL}
+        {/* RCC Details Tab */}
+        {activeTab === "rcc-details" && (
+          <div className="w-full overflow-x-hidden">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+              <div className="p-3 sm:p-4 border-b border-gray-200">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-800">
+                  Red Cache Credits Details
+                </h3>
+              </div>
+              <div className="overflow-x-auto">
+                <div className="min-w-full">
+                  <table className="w-full">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Source Product
+                        </th>
+                        <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Amount
+                        </th>
+                        <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
+                          In Use
+                        </th>
+                        <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
+                          Hold Status
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {creditHistory?.redCacheCredits?.map((rcc) => (
+                        <tr key={rcc.id} className="hover:bg-gray-50">
+                          <td className="px-2 sm:px-4 py-2 sm:py-4">
+                            <div className="flex items-center">
+                              <Package className="w-4 h-4 text-gray-400 mr-1 sm:mr-2 flex-shrink-0" />
+                              <Link to={`/product-details/${rcc.sourceProduct.id}`} className="p-1 sm:p-2 border border-gray-200 rounded-lg w-full hover:scale-105 hover:bg-gray-200 hover:text-white transition-all duration-300 hover:ml-1 sm:ml-2">
+                                <div className="text-xs sm:text-sm font-medium text-gray-900 truncate">
+                                  {rcc.sourceProduct.name}
+                                </div>
+                                <div className="flex items-center gap-1 flex-wrap">
+                                  <div className="text-xs text-gray-500">
+                                    {rcc.sourceProduct.productSL}
+                                  </div>
+                                  <div className="h-1 w-1 bg-gray-400 rounded-full"></div>
+                                  <div className="text-xs text-gray-500">
+                                    BDT {rcc.sourceProduct.pricePerDay}/Day
+                                  </div>
+                                </div>
+                              </Link>
                             </div>
-                            <div className="h-1 w-1 bg-gray-400 rounded-full"></div>
-                            <div className="text-xs text-gray-500">
-                              BDT {rcc.sourceProduct.pricePerDay}/Day
-                            </div>
-                          </div>
-                        </Link>
-                      </div>
-                    </td>
-                    <td className="px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap">
-                      <span className="text-xs sm:text-sm font-medium text-gray-900">
-                        {rcc.amount}
-                      </span>
-                    </td>
-                    <td className="px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap hidden sm:table-cell">
-                      <span className="text-xs sm:text-sm text-gray-900">
-                        {rcc.inUse}
-                      </span>
-                    </td>
-                    <td className="px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap hidden sm:table-cell">
-                      <span
-                        className={`inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          rcc.inUse > 0
-                            ? "bg-red-100 text-red-800"
-                            : "bg-green-100 text-green-800"
-                        }`}
-                      >
-                        {rcc.inUse > 0 ? "On Hold" : "Not Hold"}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {activeTab === "withdrawal-requests" && (
-        <div>
-          <MyWithdrawalRequests />
-        </div>
-      )}
-
-      {/* BCC Transactions Tab */}
-      {activeTab === "bcc-transactions" && (
-        <div className="space-y-6">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="p-4 border-b border-gray-200">
-              <h3 className="text-base sm:text-lg font-semibold text-gray-800">
-                BCC Transaction History
-              </h3>
-            </div>
-            <div
-              className="overflow-x-auto"
-              style={{ overflowX: "auto", touchAction: "pan-x" }}
-            >
-              <table className="w-full min-w-[320px] sm:min-w-[480px] md:min-w-[640px]">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Transaction ID
-                    </th>
-                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Type
-                    </th>
-                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Amount
-                    </th>
-                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
-                      Gateway
-                    </th>
-                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
-                      Status
-                    </th>
-                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
-                      Date
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {creditHistory?.bccTransactions?.map((transaction) => (
-                    <tr key={transaction.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-4 whitespace-nowrap">
-                        <span className="text-sm font-mono text-gray-900">
-                          {["PURCHASE_BCC", "MONEY_WITHDRAWAL"].includes(
-                            transaction.transactionType,
-                          ) ? (
-                            <span className="flex items-center gap-0.5 uppercase text-teal-600">
-                              <HashIcon size={14} />
-                              {transaction.transactionId}
+                          </td>
+                          <td className="px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap">
+                            <span className="text-xs sm:text-sm font-medium text-gray-900">
+                              {rcc.amount}
                             </span>
-                          ) : transaction.rentalRequestId ? (
-                            <Link
-                              to={"/dashboard/placed-requests"}
-                              className="uppercase text-purple-600 border py-0.5 px-3 rounded-lg border-purple-100 hover:bg-purple-500 hover:text-white transition-all"
+                          </td>
+                          <td className="px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap hidden sm:table-cell">
+                            <span className="text-xs sm:text-sm text-gray-900">
+                              {rcc.inUse}
+                            </span>
+                          </td>
+                          <td className="px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap hidden sm:table-cell">
+                            <span
+                              className={`inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium ${rcc.inUse > 0
+                                ? "bg-red-100 text-red-800"
+                                : "bg-green-100 text-green-800"
+                                }`}
                             >
-                              {getTransactionReference(transaction)}
-                            </Link>
-                          ) : (
-                            <Link
-                              to={"/dashboard/placed-requests"}
-                              className="uppercase text-gray-600 border py-0.5 px-3 rounded-lg border-gray-100 hover:bg-gray-500 hover:text-white transition-all"
-                            >
-                              RR-PENDING
-                            </Link>
-                          )}
-                        </span>
-                      </td>
-
-                      <td className="px-4 py-4 whitespace-nowrap">
-                        <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 ${getTransactionTypeColor(
-                            transaction.transactionType,
-                          )}`}
-                        >
-                          {transaction.transactionType}
-                        </span>
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap">
-                        <span className="text-sm font-medium text-gray-900">
-                          {transaction.transactionType === "RENT_DEPOSIT" ||
-                          transaction.transactionType === "MONEY_WITHDRAWAL"
-                            ? "-"
-                            : "+"}
-                          {transaction.amount}
-                        </span>
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap">
-                        <span
-                          className={`text-sm ${
-                            transaction.paymentGateway
-                              ? "text-gray-900"
-                              : "text-green-600"
-                          }`}
-                        >
-                          {transaction.paymentGateway || "BR_CIRC"}
-                        </span>
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          {getStatusIcon(transaction.status)}
-                          <span
-                            className={`ml-2 text-sm ${getStatusColor(
-                              transaction.status,
-                            )}`}
-                          >
-                            {transaction.status}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap">
-                        <span className="text-sm text-gray-900">
-                          {formatDate(transaction.createdAt)}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                              {rcc.inUse > 0 ? "On Hold" : "Not Hold"}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* RCC Usage Tab */}
-      {activeTab === "rcc-usage" && (
-        <div className="space-y-6">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="p-4 border-b border-gray-200">
-              <h3 className="text-base sm:text-lg font-semibold text-gray-800">
-                Credit Usage in Rentals
-              </h3>
-            </div>
-            <div
-              className="overflow-x-auto"
-              style={{ overflowX: "auto", touchAction: "pan-x" }}
-            >
-              <table className="w-full min-w-[320px] sm:min-w-[480px] md:min-w-[640px]">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Product
-                    </th>
-                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Duration
-                    </th>
-                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
-                      BCC Used
-                    </th>
-                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
-                      RCC Used
-                    </th>
-                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
-                      Period
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {creditHistory?.rentalHistory?.map((rental) => (
-                    <tr key={rental.id} className="hover:bg-gray-50">
-                      <td className="px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <Package className="w-4 h-4 text-gray-400 mr-1 sm:mr-2" />
-                          <Link
-                            to={`/product-details/${rental.product.id}`}
-                            className="p-1 sm:p-2 border border-gray-200 rounded-lg w-full hover:scale-105 hover:bg-gray-200 hover:text-white transition-all duration-300 hover:ml-1 sm:ml-2"
-                          >
-                            <div className="text-xs sm:text-sm font-medium text-gray-900">
-                              {rental.product.name}
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <div className="text-xs text-gray-500">
-                                {rental.product.productSL}
+        {activeTab === "withdrawal-requests" && (
+          <div className="w-full overflow-x-hidden">
+            <MyWithdrawalRequests />
+          </div>
+        )}
+
+        {/* BCC Transactions Tab */}
+        {activeTab === "bcc-transactions" && (
+          <div className="w-full overflow-x-hidden">
+            <div className="space-y-4 sm:space-y-6">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                <div className="p-3 sm:p-4 border-b border-gray-200">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-800">
+                    BCC Transaction History
+                  </h3>
+                </div>
+                <div className="overflow-x-auto">
+                  <div className="min-w-full">
+                    <table className="w-full">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Transaction ID
+                          </th>
+                          <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Type
+                          </th>
+                          <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Amount
+                          </th>
+                          <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
+                            Gateway
+                          </th>
+                          <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
+                            Status
+                          </th>
+                          <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+                            Date
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {creditHistory?.bccTransactions?.map((transaction) => (
+                          <tr key={transaction.id} className="hover:bg-gray-50">
+                            <td className="px-2 sm:px-4 py-2 sm:py-4">
+                              <div className="min-w-0">
+                                {["PURCHASE_BCC", "MONEY_WITHDRAWAL"].includes(
+                                  transaction.transactionType,
+                                ) ? (
+                                  <span className="flex items-center gap-0.5 text-xs font-mono text-teal-600 break-all">
+                                    <HashIcon size={12} className="flex-shrink-0" />
+                                    <span className="truncate">{transaction.transactionId}</span>
+                                  </span>
+                                ) : transaction.rentalRequestId ? (
+                                  <button className="text-xs text-purple-600 border py-0.5 px-2 rounded-lg border-purple-100 hover:bg-purple-500 hover:text-white transition-all">
+                                    {getTransactionReference(transaction)}
+                                  </button>
+                                ) : (
+                                  <button className="text-xs text-gray-600 border py-0.5 px-2 rounded-lg border-gray-100 hover:bg-gray-500 hover:text-white transition-all">
+                                    RR-PENDING
+                                  </button>
+                                )}
                               </div>
-                              <div className="h-1 w-1 bg-gray-400 rounded-full"></div>
-                              <div className="text-xs text-gray-500">
-                                BDT {rental.product.pricePerDay}/Day
+                            </td>
+                            <td className="px-2 sm:px-4 py-2 sm:py-4">
+                              <span
+                                className={`inline-flex items-center px-1.5 sm:px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 ${getTransactionTypeColor(
+                                  transaction.transactionType,
+                                )} break-all`}
+                              >
+                                <span className="truncate">{transaction.transactionType}</span>
+                              </span>
+                            </td>
+                            <td className="px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap">
+                              <span className="text-xs sm:text-sm font-medium text-gray-900">
+                                {transaction.transactionType === "RENT_DEPOSIT" ||
+                                  transaction.transactionType === "MONEY_WITHDRAWAL"
+                                  ? "-"
+                                  : "+"}
+                                {transaction.amount}
+                              </span>
+                            </td>
+                            <td className="px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap hidden sm:table-cell">
+                              <span
+                                className={`text-xs sm:text-sm ${transaction.paymentGateway
+                                  ? "text-gray-900"
+                                  : "text-green-600"
+                                  }`}
+                              >
+                                {transaction.paymentGateway || "BR_CIRC"}
+                              </span>
+                            </td>
+                            <td className="px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap hidden sm:table-cell">
+                              <div className="flex items-center">
+                                {getStatusIcon(transaction.status)}
+                                <span
+                                  className={`ml-1 sm:ml-2 text-xs sm:text-sm ${getStatusColor(
+                                    transaction.status,
+                                  )}`}
+                                >
+                                  {transaction.status}
+                                </span>
                               </div>
-                            </div>
-                          </Link>
-                        </div>
-                      </td>
-                      <td className="px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap">
-                        <span className="text-xs sm:text-sm text-gray-900">
-                          {rental.totalDays} days
-                        </span>
-                      </td>
-                      <td className="px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap hidden sm:table-cell">
-                        <span className="text-xs sm:text-sm font-medium text-gray-900">
-                          {rental.usedBccAmount || 0}
-                        </span>
-                      </td>
-                      <td className="px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap hidden sm:table-cell">
-                        <div className="text-xs sm:text-sm text-gray-900">
-                          {rental.rccUsageDetails?.map((usage, index) => (
-                            <div key={index} className="mb-1">
-                              <span className="font-medium">
-                                {usage.usedAmount}
+                            </td>
+                            <td className="px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap hidden lg:table-cell">
+                              <span className="text-xs sm:text-sm text-gray-900">
+                                {formatDate(transaction.createdAt)}
                               </span>
-                              <span className="text-gray-500 ml-1 text-xs">
-                                (from{" "}
-                                {usage.redCacheCredit.sourceProduct.productSL})
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </td>
-                      <td className="px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap">
-                        <div
-                          className={`inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 rounded-full text-xs font-medium border ${getRentalRequestStatusColor(
-                            rental.status,
-                          )}`}
-                        >
-                          {getRentalRequestStatusIcon(rental.status)}
-                          <span className="hidden sm:inline">
-                            {formatStatus(rental.status)}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap hidden sm:table-cell">
-                        <div className="text-xs sm:text-sm text-gray-900">
-                          {formatDate(rental.rentalStartDate)} -{" "}
-                          {formatDate(rental.rentalEndDate)}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+
+        {/* RCC Usage Tab */}
+        {activeTab === "rcc-usage" && (
+          <div className="w-full overflow-x-hidden">
+            <div className="space-y-4 sm:space-y-6">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                <div className="p-3 sm:p-4 border-b border-gray-200">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-800">
+                    Credit Usage in Rentals
+                  </h3>
+                </div>
+                <div className="overflow-x-auto">
+                  <div className="min-w-full">
+                    <table className="w-full">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Product
+                          </th>
+                          <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Duration
+                          </th>
+                          <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
+                            BCC Used
+                          </th>
+                          <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+                            RCC Used
+                          </th>
+                          <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Status
+                          </th>
+                          <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+                            Period
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {creditHistory?.rentalHistory?.map((rental) => (
+                          <tr key={rental.id} className="hover:bg-gray-50">
+                            <td className="px-2 sm:px-4 py-2 sm:py-4">
+                              <div className="flex items-center min-w-0">
+                                <Package className="w-4 h-4 text-gray-400 mr-1 sm:mr-2 flex-shrink-0" />
+                                <Link
+                                  to={`/product-details/${rental.product.id}`}
+                                  className="p-1 sm:p-2 border border-gray-200 rounded-lg w-full hover:scale-105 hover:bg-gray-200 hover:text-white transition-all duration-300 hover:ml-1 sm:ml-2"
+                                >
+                                  <div className="text-xs sm:text-sm font-medium text-gray-900">
+                                    {rental.product.name}
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <div className="text-xs text-gray-500">
+                                      {rental.product.productSL}
+                                    </div>
+                                    <div className="h-1 w-1 bg-gray-400 rounded-full"></div>
+                                    <div className="text-xs text-gray-500">
+                                      BDT {rental.product.pricePerDay}/Day
+                                    </div>
+                                  </div>
+                                </Link>
+                              </div>
+                            </td>
+                            <td className="px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap">
+                              <span className="text-xs sm:text-sm text-gray-900">
+                                {rental.totalDays} days
+                              </span>
+                            </td>
+                            <td className="px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap hidden sm:table-cell">
+                              <span className="text-xs sm:text-sm font-medium text-gray-900">
+                                {rental.usedBccAmount || 0}
+                              </span>
+                            </td>
+                            <td className="px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap hidden lg:table-cell">
+                              <div className="text-xs sm:text-sm text-gray-900 max-w-xs">
+                                {rental.rccUsageDetails?.map((usage, index) => (
+                                  <div key={index} className="mb-1">
+                                    <span className="font-medium">
+                                      {usage.usedAmount}
+                                    </span>
+                                    <span className="text-gray-500 ml-1 text-xs">
+                                      (from{" "}
+                                      {usage.redCacheCredit.sourceProduct.productSL})
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </td>
+                            <td className="px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap">
+                              <div
+                                className={`hidden sm:inline-flex items-center gap-1 sm:gap-2 px-1.5 sm:px-2 lg:px-3 py-1 rounded-full text-xs font-medium border ${getRentalRequestStatusColor(
+                                  rental.status,
+                                )}`}
+                              >
+                                {getRentalRequestStatusIcon(rental.status)}
+                                <span className="overflow-x-auto">
+                                  {formatStatus(rental.status)}
+                                </span>
+                              </div>
+                              <Tooltip
+                                placement="top-start"
+                                style="dark"
+                                content={formatStatus(rental.status)}
+                              >
+                                <Info className="w-4 h-4 text-blue-500 sm:hidden" />
+                              </Tooltip>
+                            </td>
+                            <td className="px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap hidden lg:table-cell">
+                              <div className="text-xs sm:text-sm text-gray-900">
+                                {formatDate(rental.rentalStartDate)} -{" "}
+                                {formatDate(rental.rentalEndDate)}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
