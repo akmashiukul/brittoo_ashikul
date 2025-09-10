@@ -236,6 +236,7 @@ export const getProducts = async (req, res, next) => {
     const total = await prisma.product.count({
       where: {
         deletedAt: null,
+        isVirtual: false,
         ...filters,
         ...searchClause,
       },

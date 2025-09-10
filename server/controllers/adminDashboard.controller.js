@@ -97,6 +97,7 @@ export const getAnalytics = async (req, res) => {
       by: ['productType'],
       where: {
         deletedAt: null,
+        isVirtual: false,
       },
       _count: {
         id: true,
