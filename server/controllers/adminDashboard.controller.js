@@ -154,6 +154,13 @@ export const getAnalytics = async (req, res) => {
         },
         deletedAt: null,
       },
+      include: {
+        product: {
+          select: {
+            pricePerDay: true,
+          }
+        }
+      },
       select: {
         createdAt: true,
         pricePerDay: true,
@@ -173,8 +180,13 @@ export const getAnalytics = async (req, res) => {
 
       if (rental.isHourlyRental && rental.pricePerHour && rental.totalHours) {
         revenue = parseFloat(rental.pricePerHour) * rental.totalHours;
-      } else if (rental.pricePerDay && rental.totalDays) {
-        revenue = parseFloat(rental.pricePerDay) * rental.totalDays;
+      } else {
+        if (rental.pricePerDay) {
+          revenue = parseFloat(rental.pricePerDay) * rental.totalDays;
+        } else {
+          revenue = parseFloat(rental.product.pricePerDay) * rental.totalDays;
+        }
+
       }
 
       if (!revenueMap.has(dateKey)) {
@@ -277,7 +289,7 @@ export const getAnalytics = async (req, res) => {
     let withoutDocuments = 0;
 
     documentStatus.forEach(status => {
-      if (status.selfie && status.idCardFront && status.idCardBack) {
+      if (status.selfie && status.idCardFront) {
         withDocuments += status._count.id;
       } else {
         withoutDocuments += status._count.id;
