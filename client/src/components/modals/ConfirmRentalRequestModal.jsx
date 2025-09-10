@@ -214,8 +214,8 @@ const ConfirmRentalRequestModal = () => {
       }}
     >
       <div className="relative p-4 w-full max-w-[760px] max-h-full">
-        <div className="relative bg-white rounded-lg shadow-sm flex flex-col max-h-[95vh]">
-          <div className="flex items-center justify-between mx-4 md:mx-5 border-b rounded-t border-gray-200 flex-shrink-0 pb-4">
+        <div className="relative bg-white rounded-lg shadow-sm flex flex-col sm:max-h-[95vh] max-h-[88vh]">
+          <div className="flex items-center justify-between bg-gray-100 md:mx-5 border-b rounded-t border-gray-200 flex-shrink-0 pb-2 sm:pb-4">
             <div
               id="credit-calc"
               className="flex flex-col items-center text-center w-full"
@@ -224,8 +224,7 @@ const ConfirmRentalRequestModal = () => {
                 Confirm Your Request
               </h3>
               <p className="text-xs text-gray-600">
-                Bro! brittoo will be at your support 24/7. Just start your
-                renting journey without hesitation.
+                Start your rental journey🤩
               </p>
             </div>
             <button
@@ -240,7 +239,7 @@ const ConfirmRentalRequestModal = () => {
           </div>
 
           <div className="overflow-y-auto">
-            <div className="mt-6 mx-4 flex gap-4 items-start border-b border-gray-200 pb-4">
+            <div className="mt-3 sm:mt-6 mx-4 flex gap-4 items-start border-b border-gray-200 pb-4">
               <img
                 src={`${baseUrl}${data?.rentalDetails?.product?.optimizedImages[0]}`}
                 alt="image"
