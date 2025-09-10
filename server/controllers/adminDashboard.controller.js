@@ -150,16 +150,13 @@ export const getAnalytics = async (req, res) => {
     const revenueData = await prisma.rentalRequest.findMany({
       where: {
         status: {
-          in: ['PRODUCT_COLLECTED_BY_RENTER', 'PRODUCT_RETURNED_BY_RENTER', 'PRODUCT_RETURNED_TO_OWNER'],
+          in: [
+            'PRODUCT_COLLECTED_BY_RENTER',
+            'PRODUCT_RETURNED_BY_RENTER',
+            'PRODUCT_RETURNED_TO_OWNER',
+          ],
         },
         deletedAt: null,
-      },
-      include: {
-        product: {
-          select: {
-            pricePerDay: true,
-          }
-        }
       },
       select: {
         createdAt: true,
@@ -168,8 +165,14 @@ export const getAnalytics = async (req, res) => {
         totalDays: true,
         totalHours: true,
         isHourlyRental: true,
+        product: {
+          select: {
+            pricePerDay: true,
+          },
+        },
       },
     });
+
 
     const revenueTimeline = [];
     const revenueMap = new Map();
