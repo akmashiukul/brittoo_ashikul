@@ -235,36 +235,42 @@ const AdminOverview = () => {
             </ResponsiveContainer>
           </div>
 
-          {/* Popular Products */}
+          {/* popular products */}
+
           <div className="bg-white rounded-lg shadow-sm p-6 border border-green-100">
             <div className="flex items-center mb-4">
               <Star className="w-6 h-6 text-green-600 mr-3" />
               <h3 className="text-lg font-semibold text-gray-900">Most Popular Products</h3>
             </div>
-            <ResponsiveContainer width="100%" height={250}>
+            <ResponsiveContainer width="100%" height={300}>
               <BarChart
                 data={analytics?.popularProducts || []}
-                layout="horizontal"
-                margin={{ left: 100 }}
+                margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis type="number" stroke="#6b7280" fontSize={12} />
-                <YAxis
-                  type="category"
+                <XAxis
                   dataKey="name"
                   stroke="#6b7280"
                   fontSize={11}
-                  width={90}
-                  tick={{ textAnchor: 'end' }}
+                  angle={-45}
+                  textAnchor="end"
+                  height={100}
+                  interval={0}
                 />
+                <YAxis stroke="#6b7280" fontSize={12} />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: 'white',
                     border: '1px solid #e5e7eb',
                     borderRadius: '8px'
                   }}
+                  formatter={(value) => [`${value} rentals`, 'Popular Products']}
                 />
-                <Bar dataKey="rentals" fill={COLORS.secondary} radius={[0, 4, 4, 0]} />
+                <Bar
+                  dataKey="rentals"
+                  fill={COLORS.secondary}
+                  radius={[4, 4, 0, 0]}
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>

@@ -204,39 +204,47 @@ export const getAnalytics = async (req, res) => {
 
     revenueMap.forEach(value => revenueTimeline.push(value));
 
-    // 5. Popular Products (top 10 most rented)
-    const popularProducts = await prisma.product.findMany({
+    // 5. Popular Products (only products with rentals)
+    const popularProducts = await prisma.rentalRequest.groupBy({
+      by: ['productId'],
       where: {
-        deletedAt: null,
-        isVirtual: false,
-      },
-      select: {
-        id: true,
-        name: true,
-        _count: {
-          select: {
-            rentalRequests: {
-              where: {
-                status: {
-                  in: ['PRODUCT_COLLECTED_BY_RENTER', 'PRODUCT_RETURNED_BY_RENTER', 'PRODUCT_RETURNED_TO_OWNER'],
-                },
-              },
-            },
-          },
+        status: {
+          in: ['PRODUCT_COLLECTED_BY_RENTER', 'PRODUCT_RETURNED_BY_RENTER', 'PRODUCT_RETURNED_TO_OWNER'],
         },
+        deletedAt: null,
+      },
+      _count: {
+        id: true,
       },
       orderBy: {
-        rentalRequests: {
-          _count: 'desc',
+        _count: {
+          id: 'desc',
         },
       },
       take: 10,
     });
 
-    const popularProductsData = popularProducts.map(product => ({
-      name: product.name,
-      rentals: product._count.rentalRequests,
-    }));
+    // Get product names for the popular products
+    const productIds = popularProducts.map(p => p.productId);
+    const products = await prisma.product.findMany({
+      where: {
+        id: {
+          in: productIds,
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+
+    const popularProductsData = popularProducts.map(rental => {
+      const product = products.find(p => p.id === rental.productId);
+      return {
+        name: product?.name || 'Unknown Product',
+        rentals: rental._count.id,
+      };
+    });
 
     // 6. Rental Duration Analysis
     const rentalDurations = await prisma.rentalRequest.findMany({
