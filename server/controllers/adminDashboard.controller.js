@@ -149,10 +149,6 @@ export const getAnalytics = async (req, res) => {
     // 4. Revenue Analysis (past 2 months)
     const revenueData = await prisma.rentalRequest.findMany({
       where: {
-        createdAt: {
-          gte: startDate,
-          lte: endDate,
-        },
         status: {
           in: ['PRODUCT_COLLECTED_BY_RENTER', 'PRODUCT_RETURNED_BY_RENTER', 'PRODUCT_RETURNED_TO_OWNER'],
         },
@@ -197,6 +193,7 @@ export const getAnalytics = async (req, res) => {
     const popularProducts = await prisma.product.findMany({
       where: {
         deletedAt: null,
+        isVirtual: false,
       },
       select: {
         id: true,
@@ -267,7 +264,7 @@ export const getAnalytics = async (req, res) => {
 
     // 7. User Document Upload Status
     const documentStatus = await prisma.user.groupBy({
-      by: ['selfie', 'idCardFront', 'idCardBack'],
+      by: ['selfie', 'idCardFront'],
       where: {
         deletedAt: null,
       },
