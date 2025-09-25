@@ -197,8 +197,6 @@ export const getProducts = async (req, res, next) => {
       }
       : {};
 
-    console.log(filters);
-
     const products = await prisma.product.findMany({
       where: {
         deletedAt: null,

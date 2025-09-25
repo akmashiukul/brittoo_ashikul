@@ -1,4 +1,4 @@
-import prisma from "./config/prisma.js";
+import prisma from "../server/config/prisma.js";
 
 const GIFT_AMOUNT = 40000;
 const OWNER_ID = "cmdfxaltw0000jkp25nslc1p8";
