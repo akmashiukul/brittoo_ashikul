@@ -65,13 +65,15 @@ const buildSystemInstruction = (product = {}) => {
 
 const extractCleanMessage = (text) => {
   let cleanText = text
-    .replace(/SUGGESTED_PRICE:\s*[0-9]+(?:\.[0-9]+)?\s*/i, '')
-    .replace(/^MESSAGE:\s*/i, '')
-    .replace(/^ASSISTANT:\s*/i, '')
-    .replace(/^USER:\s*/i, '')
+    .replace(/SUGGESTED_PRICE:\s*[0-9]+(?:\.[0-9]+)?\s*/gi, '')
+    .replace(/\b(MESSAGE|ASSISTANT|USER):\s*/gi, '')
+    .replace(/\bTK\b\s*/gi, '')
+    .replace(/^\s+|\s+$/g, '')
     .trim();
+
   return cleanText || text;
 };
+
 
 const prepareConversationContent = (history) => {
   return history
@@ -95,7 +97,8 @@ const extractSuggestedPrice = (text, threshold) => {
 export const negotiatePrice = async (req, res) => {
   const startTime = Date.now();
   try {
-    const { userId, message, product, confirm, close } = req.body;
+    const { message, product, confirm, close } = req.body;
+    const userId = req.user.id;
     if (!userId) return res.status(400).json({ error: "userId required" });
     if (!message) return res.status(400).json({ error: "message required" });
     if (!product || typeof product !== "object") {

@@ -7,6 +7,7 @@ import cors from "cors";
 import { multerErrorHandler } from "./lib/multerErrorHandler.js";
 import path from "path";
 import { fileURLToPath } from "url";
+import { startAuthServer } from "./grpc/authService.js";
 
 import bccRoutes from "./routes/bcc.routes.js";
 import rccRoutes from "./routes/rcc.routes.js";
@@ -17,6 +18,9 @@ import userDashboardRoutes from "./routes/userDashboard.routes.js";
 import withdrawalRequestRoutes from "./routes/withdrawalRequest.routes.js";
 import adminDashBoardRoutes from "./routes/adminDashboard.routes.js";
 import couponRoutes from "./routes/coupon.routes.js";
+
+// services
+startAuthServer();
 
 dotenv.config();
 const app = express();
