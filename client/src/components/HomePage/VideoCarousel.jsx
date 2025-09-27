@@ -66,7 +66,7 @@ export default function VideoCarousel() {
 
   return (
     <div className="w-full md:w-fit flex md:justify-start justify-center mt-10 px-2 sm:px-0">
-      <div className="relative w-full max-w-[768px] aspect-[768/544] border-4 border-green-600 rounded-2xl shadow-xl">
+      <div className="relative w-full max-w-[580px] aspect-[768/544] border-4 border-green-600 rounded-2xl shadow-xl">
         
         {/* overlay text ABOVE swiper */}
         <div
@@ -75,10 +75,10 @@ export default function VideoCarousel() {
                      bg-green-900/50 md:bg-black/50 backdrop-blur-xs text-white 
                      px-3 py-2 rounded-md z-20"
         >
-          <h3 className="text-sm md:text-lg font-bold">
+          <h3 className="text-sm md:text-base font-bold">
             {slides[currentIndex]?.title}
           </h3>
-          <p className="text-xs md:text-sm max-w-48">
+          <p className="text-xs max-w-48">
             {slides[currentIndex]?.subtitle}
           </p>
         </div>
