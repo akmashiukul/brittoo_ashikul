@@ -218,7 +218,7 @@ const CreditModal = () => {
               <h3 className="mt-6 text-sm font-semibold text-center sm:text-left">
                 🔴Available Red Cache Credits
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2 justify-self-center place-items-center sm:justify-self-start">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2 justify-self-center place-items-center sm:justify-self-start sm:place-items-start">
                 {rcc?.map((credit) => (
                   <RCC
                     handleSelect={handleRccSelect}

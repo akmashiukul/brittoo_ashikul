@@ -5,7 +5,7 @@ import Loader from "./shared/Loader";
 import { useParams } from "react-router-dom";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
-import { CheckCircle, TagIcon, XCircle } from "lucide-react";
+import { CheckCircle, Stars, TagIcon, XCircle } from "lucide-react";
 import Avatar from "boring-avatars";
 import { usePriceCalculate } from "../hooks/usePriceCalculate";
 import { differenceInDays } from "date-fns";
@@ -18,6 +18,7 @@ import HourSelector from "./HourSelector";
 import { useGadgetPriceCalculate } from "../hooks/useGadgetPriceCalculate";
 import { useVehiclePriceCalculate } from "../hooks/useVehiclePriceCalculate";
 import { useHourlyPrice } from "../hooks/useHourlyPrice";
+import PriceNegotiateWithBot from "./modals/PriceNegotiateWithBot";
 
 const ProductDetails = () => {
   const [product, setProduct] = useState(null);
@@ -40,6 +41,7 @@ const ProductDetails = () => {
   });
   const [hourlyPrice, setHourlyPrice] = useState(0);
   const [numberOfHours, setNumberOfHours] = useState(1);
+  const [showNegotiateModal, setShowNegotiateModal] = useState(false);
 
   const { currentUser } = useUserStore();
   const { id } = useParams();
@@ -85,11 +87,11 @@ const ProductDetails = () => {
   }, [initial, final]);
 
   useEffect(() => {
-    if (isHourlyRental) {
-      const newHourlyPrice = calculateHourlyPrice(price, numberOfHours);
+    if (isHourlyRental && product) {
+      const newHourlyPrice = calculateHourlyPrice(product?.pricePerDay, numberOfHours);
       setHourlyPrice(newHourlyPrice);
     }
-  }, [calculateHourlyPrice, isHourlyRental, numberOfHours, price]);
+  }, [calculateHourlyPrice, isHourlyRental, numberOfHours, product]);
 
   useEffect(() => {
     if (product) {
@@ -382,9 +384,15 @@ const ProductDetails = () => {
               </span>
             </p>
             {product.isForSale ? (
-              <div className="flex items-center gap-1 text-green-600 text-sm mt-2 font-semibold">
-                <CheckCircle className="w-4 h-4" />
-                <span>Available for Sale</span>
+              <div>
+                <div className="flex items-center gap-1 text-green-600 text-sm mt-2 font-semibold">
+                  <CheckCircle className="w-4 h-4" />
+                  <span>Available for Sale</span>
+                </div>
+                {/* <div className="relative mt-3 flex items-center gap-1">
+                  <button onClick={() => setShowNegotiateModal(true)} className="text-xs border-purple-500 text-purple-500 bg-white border rounded-md px-2 py-1 hover:text-white hover:bg-purple-500 cursor-pointer">Negotiate Price </button>
+                  <Stars size={17} color="#a855f7" />
+                </div> */}
               </div>
             ) : (
               <div className="flex items-center gap-1 text-red-500 text-sm mt-2 font-semibold">
@@ -565,6 +573,13 @@ const ProductDetails = () => {
           Request Rental
         </button>
       </div>
+      {/* {showNegotiateModal && (
+        <PriceNegotiateWithBot
+          product={product}
+          isOpen={showNegotiateModal}
+          onClose={() => setShowNegotiateModal(false)}
+        />
+      )} */}
     </div>
   );
 };
