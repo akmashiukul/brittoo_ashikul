@@ -69,7 +69,7 @@ export function calculateVehiclePricePerDay(
   
   //change this changeRate to give more discount for increasing days
   const changeRate = 0.93;
-  const dayCeilMultiplier = Math.pow(0.93, Math.max(0, day - 1));
+  const dayCeilMultiplier = Math.pow(changeRate, Math.max(0, day - 1));
   const ceilPrice = ceilBase * dayCeilMultiplier;
 
   finalPrice = Math.max(finalPrice, floorPrice);

@@ -354,6 +354,9 @@ const processImage = async (inputPath, outputPath) => {
     .toFormat("webp", { quality: 80 })
     .toFile(outputPath);
 };
+
+
+
 export const updateProductAdmin = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -395,26 +398,47 @@ export const updateProductAdmin = async (req, res, next) => {
 
     // Price recalculation if needed
     let newSecondHandPrice;
-    if (omv || productCondition || productAge) {
+    if (omv || productCondition || productAge || productType) {
       const finalOmv = omv ? parseInt(omv) : product.omv;
       const finalCondition = productCondition || product.productCondition;
       const finalAge = productAge ? parseInt(productAge) : product.productAge;
 
-      const newPrice = calculatePricePerDay(
-        finalOmv,
-        finalCondition,
-        finalAge,
-        product.owner.securityScore,
-        3
-      );
-
+      let newPricePerHour;
+      let newPricePerDay;
+      if (updateData.productType === "GADGET") {
+        newPricePerDay = calculateGadgetPricePerDay(
+          parseInt(finalOmv),
+          finalCondition,
+          parseInt(finalAge),
+          product.owner.securityScore,
+          3,
+        );
+        newPricePerHour = calculateHourlyPrice(newPricePerDay, 2);
+      } else if (updateData.productType === "VEHICLE") {
+        newPricePerDay = calculateVehiclePricePerDay(
+          parseInt(finalOmv),
+          finalCondition,
+          parseInt(finalAge),
+          product.owner.securityScore,
+          3,
+        );
+        newPricePerHour = calculateHourlyPrice(newPricePerDay, 2);
+      } else {
+        newPricePerDay = calculatePricePerDay(
+          parseInt(finalOmv),
+          finalCondition,
+          parseInt(finalAge),
+          product.owner.securityScore,
+          3,
+        );
+      }
       newSecondHandPrice = calculateSecondHandPrice(
-        finalOmv,
+        parseInt(finalOmv),
         finalCondition,
-        finalAge
+        parseInt(finalAge),
       );
 
-      updateData.pricePerDay = parseFloat(newPrice);
+      updateData.pricePerDay = parseFloat(newPricePerDay);
       updateData.secondHandPrice = newSecondHandPrice;
     }
 

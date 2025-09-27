@@ -12,7 +12,7 @@ const TEMPERATURE = 0.35;
 // Cache system instruction to avoid rebuilding
 const instructionCache = new Map();
 
-const buildSystemInstruction = (product = {}) => {
+const buildSystemInstruction = (product = {}, userName = "") => {
   const { productName, marketValue, usageYears, condition, askingPrice, threshold, id } = product;
 
   const cacheKey = id || JSON.stringify({ productName, marketValue, askingPrice, threshold });
@@ -28,6 +28,7 @@ const buildSystemInstruction = (product = {}) => {
     Used for: ${usageYears ?? "unknown"}.
     Condition: ${condition ?? "unknown"}.
     Owner minimum threshold (do NOT go below): ${threshold ?? "unknown"} TK.
+    UserName: ${userName ?? "unknown"}
 
     COMMUNICATION STYLE: Speak naturally. Like a real agent for second hand product.
     Goal: Start negotiation from the asking price and try to maximize the final price for the owner while never suggesting below the threshold.
@@ -115,7 +116,7 @@ export const negotiatePrice = async (req, res) => {
 
     let session = await getNegotiationState(userId, product.id);
     if (!session) {
-      const systemInstruction = buildSystemInstruction(product);
+      const systemInstruction = buildSystemInstruction(product, req.user.name);
       session = {
         history: [{ role: "system", text: systemInstruction }],
         lastActive: Date.now(),
@@ -130,7 +131,7 @@ export const negotiatePrice = async (req, res) => {
 
     const contents = prepareConversationContent(session.history);
     const systemInstruction = session.history.find(m => m.role === "system")?.text
-      ?? buildSystemInstruction(product);
+      ?? buildSystemInstruction(product, req.user.name);
 
 
     const response = await ai.models.generateContent({
