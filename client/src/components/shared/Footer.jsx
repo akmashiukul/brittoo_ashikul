@@ -7,6 +7,7 @@ import {
   FaLinkedin,
   FaTwitter,
 } from "react-icons/fa6";
+import Swal from "sweetalert2";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -26,13 +27,38 @@ const Footer = () => {
               through collaborative consumption and reduced waste.
             </p>
             <div className="flex space-x-4">
-              <SocialLink
+              <a
                 href="https://www.facebook.com/profile.php?id=61575887767858"
-                icon={FaFacebook}
-              />
-              <SocialLink href="#" icon={FaTwitter} />
-              <SocialLink href="#" icon={FaInstagram} />
-              <SocialLink href="#" icon={FaLinkedin} />
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-gray-700 hover:bg-emerald-500 p-3 rounded-xl transition-all duration-300 transform hover:scale-110 group"
+              >
+                <FaFacebook className="h-5 w-5 text-gray-300 group-hover:text-white" />
+              </a>
+              <div
+                onClick={() => {
+                  Swal.fire({
+                    icon: "info",
+                    title: "Heads Up!",
+                    text: "We’re not on Twitter yet, but stay tuned for updates! 😃"
+                  });
+                }}
+                className="bg-gray-700 hover:bg-emerald-500 p-3 rounded-xl transition-all duration-300 transform hover:scale-110 group"
+              >
+                <FaTwitter className="h-5 w-5 text-gray-300 group-hover:text-white" />
+              </div>
+              <div
+                onClick={() => {
+                  Swal.fire({
+                    icon: "info",
+                    title: "Heads Up!",
+                    text: "We’re not on Linked yet, but stay tuned for updates! 😃"
+                  });
+                }}
+                className="bg-gray-700 hover:bg-emerald-500 p-3 rounded-xl transition-all duration-300 transform hover:scale-110 group"
+              >
+                <FaLinkedin className="h-5 w-5 text-gray-300 group-hover:text-white" />
+              </div>
             </div>
           </div>
 
@@ -66,7 +92,7 @@ const Footer = () => {
           </div>
 
           {/* Support Links */}
-          
+
 
           {/* Contact Info */}
           <div>
@@ -99,17 +125,17 @@ const Footer = () => {
       {/* Bottom Section */}
       <div className="border-t border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <div className="flex flex-col justify-center sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-6">
-              <p className="text-gray-400 text-sm">
-                © {currentYear} Brittoo. All rights reserved.
-              </p>
-              <div className="flex items-center text-gray-400 text-sm">
-                <span>Made with</span>
-                <Heart className="h-4 w-4 mx-1 text-green-500" />
-                <span>for sustainable communities</span>
-              </div>
+          <div className="flex flex-col justify-center sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-6">
+            <p className="text-gray-400 text-sm">
+              © {currentYear} Brittoo. All rights reserved.
+            </p>
+            <div className="flex items-center text-gray-400 text-sm">
+              <span>Made with</span>
+              <Heart className="h-4 w-4 mx-1 text-green-500" />
+              <span>for sustainable communities</span>
             </div>
           </div>
+        </div>
       </div>
     </footer>
   );
@@ -123,30 +149,6 @@ const DeveloperLink = ({ href, text, icon: Icon }) => (
       </div>
       <span className="text-gray-300">{text}</span>
     </div>
-  </a>
-);
-
-const FooterLink = ({ href, text, className = "" }) => (
-  <li>
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={`text-gray-300 hover:text-emerald-400 transition-colors duration-300 ${className}`}
-    >
-      {text}
-    </a>
-  </li>
-);
-
-const SocialLink = ({ href, icon: Icon }) => (
-  <a
-    href={href}
-    target="_blank"
-    rel="noopener noreferrer"
-    className="bg-gray-700 hover:bg-emerald-500 p-3 rounded-xl transition-all duration-300 transform hover:scale-110 group"
-  >
-    <Icon className="h-5 w-5 text-gray-300 group-hover:text-white" />
   </a>
 );
 
