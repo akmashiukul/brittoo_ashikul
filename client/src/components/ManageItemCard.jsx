@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import api from "../lib/api";
 
-const ManageItemCard = ({ product, products, setProducts }) => {
+const ManageItemCard = ({ product, products, setProducts, setShowUpdateModal, setUpdatingProduct }) => {
   const {
     id,
     name,
@@ -14,7 +14,6 @@ const ManageItemCard = ({ product, products, setProducts }) => {
     tags,
     optimizedImages,
   } = product;
-
   const baseUrl = import.meta.env.VITE_BASE_URL;
 
   const handleDelete = async () => {
@@ -137,14 +136,16 @@ const ManageItemCard = ({ product, products, setProducts }) => {
         </div>
 
         <div className="px-4 pb-4 flex space-x-2">
-          {/* //TODO: update also rcc with it */}
-          {/* <Link
-            to={`/dashboard/update-item/${id}`}
+          <button
+            onClick={() => {
+              setUpdatingProduct(product);
+              setShowUpdateModal(true)
+            }}
             className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 py-1.5 text-xs rounded font-medium border border-gray-300 flex items-center cursor-pointer justify-center space-x-1"
           >
             <Edit3 className="w-4 h-4" />
             <span>Edit</span>
-          </Link> */}
+          </button>
           <button
             onClick={handleDelete}
             className="flex-1 cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-800 py-1.5 text-xs rounded font-medium border border-gray-300 flex items-center justify-center space-x-1"

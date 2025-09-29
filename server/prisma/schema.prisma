@@ -46,6 +46,10 @@ model User {
   withdrawalRequests     WithdrawalRequest[]
   borrowedProducts       Product[]           @relation("ProductsBorrowed")
 
+  // buys
+  purchaseRequestsReceived PurchaseRequest[] @relation("PurchaseRequestsReceived")
+  purchaseRequestsMade     PurchaseRequest[] @relation("PurchaseRequestsMade")
+
   @@unique([email, deletedAt])
   @@index([latitude, longitude])
   @@map("users")
@@ -134,6 +138,7 @@ model RedCacheCredit {
   renterId        String? @map("renter_id")
   userId          String  @map("user_id")
   sourceProductId String  @unique @map("source_product_id")
+  isFrozen        Boolean @default(false) @map("is_frozen")
 
   isGiftCredit Boolean   @default(false) @map("is_gift_credit")
   validityDate DateTime? @map("validity_date")
@@ -171,9 +176,11 @@ model Product {
   isOnHold           Boolean          @default(false) @map("is_on_hold")
   holdStartDate      DateTime?        @map("hold_start_date")
   holdEndDate        DateTime?        @map("hold_end_date")
+  isAvailable        Boolean          @default(true) @map("is_available")
 
   askingPrice Int?    @map("asking_price") //new
-  isForSale   Boolean @map("is_for_sale")
+  minPrice    Int?    @map("min_price")
+  isForSale   Boolean @default(false) @map("is_for_sale")
 
   isRented           Boolean @default(false) @map("is_rented")
   isBrittooVerified  Boolean @default(false) @map("is_brittoo_verified")
@@ -189,6 +196,8 @@ model Product {
   redCacheCredits RedCacheCredit?
   rentalRequests  RentalRequest[]
   renters         User[]          @relation("ProductsBorrowed")
+
+  purchaseRequests PurchaseRequest[]
 
   @@unique([ownerId, productSL])
   @@unique([productSlNo, deletedAt])
@@ -285,6 +294,58 @@ model RentalRequestRccUsage {
 
   @@unique([rentalRequestId, redCacheCreditId])
   @@map("rental_request_rcc_usage")
+}
+
+model PurchaseRequest {
+  id            String                       @id @default(cuid()) @map("id")
+  productId     String                       @map("product_id")
+  buyerId       String                       @map("buyer_id")
+  sellerId      String                       @map("seller_id")
+  status        PurchaseRequestStatus        @default(REQUESTED_BY_BUYER) @map("status")
+  paymentStatus PurchaseRequestPaymentStatus @default(PENDING) @map("payment_status")
+
+  sellerRejectReason  String? @map("seller_reject_reason")
+  buyerCancelReason   String? @map("buyer_cancel_reasong")
+  brittooRejectReason String? @map("brittoo_reject_reason")
+
+  askingPrice    Int @map("asking_price")
+  dealPrice      Int @map("deal_price")
+  totalPrice     Int @map("total_price") // deal + seller delivery charge + buyer delivery charge
+  platformCharge Int @map("platform_charge")
+
+  buyerCollectionMethod  CollectionOrDepositMethod  @map("buyer_collection_method")
+  sellerDeliveryMethod   CollectionOrDepositMethod? @map("seller_delivery_method")
+  buyerPhoneNumber       String                     @map("buyer_phone_number")
+  sellerPhoneNumber      String                     @map("seller_phone_number")
+  buyerDeliveryAddress   String?                    @map("buyer_delivery_address")
+  buyerPickupTerminal    BrittoTerminal?            @map("buyer_pickup_terminal")
+  sellerDeliveryAddress  String?                    @map("seller_delivery_address")
+  sellerDeliveryTerminal BrittoTerminal?            @map("seller_delivery_terminal")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  seller  User    @relation("PurchaseRequestsReceived", fields: [sellerId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+  buyer   User    @relation("PurchaseRequestsMade", fields: [buyerId], references: [id])
+
+  @@map("purchase_requests")
+}
+
+enum PurchaseRequestStatus {
+  REQUESTED_BY_BUYER
+  CANCELLED_BY_BUYER
+  ACCEPTED_BY_SELLER
+  REJECTED_BY_SELLER
+  REJECTED_FROM_BRITTOO
+  PRODUCT_SUBMITTED_BY_SELLER
+  PRODUCT_COLLECTED_BY_BUYER
+}
+
+enum PurchaseRequestPaymentStatus {
+  PENDING
+  COMPLETED
 }
 
 enum VerifyStatus {

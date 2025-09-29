@@ -140,7 +140,7 @@ const UpdateItemAdmin = () => {
         formDataToSend.append("deleteImages", JSON.stringify(imagesToDelete));
       }
 
-      const res = await api.put(`/api/v1/products/${id}`, formDataToSend, {
+      const res = await api.put(`/api/v1/products/update/admin/${id}`, formDataToSend, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",

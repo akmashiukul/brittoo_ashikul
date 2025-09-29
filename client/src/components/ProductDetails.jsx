@@ -383,16 +383,32 @@ const ProductDetails = () => {
                 BDT {product.omv}.00
               </span>
             </p>
-            {product.isForSale ? (
+            {product.isForSale && product?.ownerId !== currentUser?.id ? (
               <div>
+                <hr className="w-full border-t border-gray-300 mt-2 mb-2 mx-auto" />
                 <div className="flex items-center gap-1 text-green-600 text-sm mt-2 font-semibold">
                   <CheckCircle className="w-4 h-4" />
                   <span>Available for Sale</span>
                 </div>
-                {/* <div className="relative mt-3 flex items-center gap-1">
-                  <button onClick={() => setShowNegotiateModal(true)} className="text-xs border-purple-500 text-purple-500 bg-white border rounded-md px-2 py-1 hover:text-white hover:bg-purple-500 cursor-pointer">Negotiate Price </button>
-                  <Stars size={17} color="#a855f7" />
-                </div> */}
+                <p className="text-sm text-gray-600 mt-2">
+                  <span className="font-semibold">Asking Price: </span>{" "}
+                  <span className={`px-2 py-1 rounded-md text-sm`}>
+                    BDT {product.askingPrice}.00
+                  </span>
+                </p>
+                {
+                  product?.askingPrice == product?.minPrice ? (
+                    <div>
+                      <p className="text-sm italic mt-1 text-gray-500">(Fixed Price) Not Negotiable</p>
+                      <button onClick={() => setShowNegotiateModal(true)} className="text-xs border-purple-500 text-purple-500 bg-white border rounded-md px-2 py-1 hover:text-white hover:bg-purple-500 cursor-pointer mt-2">Place Buying Request</button>
+                    </div>
+                  ) : (
+                    <div className="relative mt-3 flex items-center gap-1">
+                      <button onClick={() => setShowNegotiateModal(true)} className="text-xs border-purple-500 text-purple-500 bg-white border rounded-md px-2 py-1 hover:text-white hover:bg-purple-500 cursor-pointer">Negotiate Price </button>
+                      <Stars size={17} color="#a855f7" />
+                    </div>
+                  )
+                }
               </div>
             ) : (
               <div className="flex items-center gap-1 text-red-500 text-sm mt-2 font-semibold">
@@ -573,13 +589,13 @@ const ProductDetails = () => {
           Request Rental
         </button>
       </div>
-      {/* {showNegotiateModal && (
+      {showNegotiateModal && (
         <PriceNegotiateWithBot
           product={product}
           isOpen={showNegotiateModal}
           onClose={() => setShowNegotiateModal(false)}
         />
-      )} */}
+      )}
     </div>
   );
 };

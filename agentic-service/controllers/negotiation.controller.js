@@ -13,21 +13,21 @@ const TEMPERATURE = 0.35;
 const instructionCache = new Map();
 
 const buildSystemInstruction = (product = {}, userName = "") => {
-  const { productName, marketValue, usageYears, condition, askingPrice, threshold, id } = product;
+  const { name, omv, productAge, productCondition, askingPrice, minPrice, id } = product;
 
-  const cacheKey = id || JSON.stringify({ productName, marketValue, askingPrice, threshold });
+  const cacheKey = id || JSON.stringify({ name, omv, askingPrice, minPrice });
 
   if (instructionCache.has(cacheKey)) {
     return instructionCache.get(cacheKey);
   }
 
   const systemInstruction = `You are Brittoo's bargaining assistant.
-    Product: ${productName ?? "unknown"}.
-    Market value: ${marketValue ?? "unknown"} TK.
+    Product: ${name ?? "unknown"}.
+    Market value: ${omv ?? "unknown"} TK.
     Owner asking price: ${askingPrice ?? "unknown"} TK.
-    Used for: ${usageYears ?? "unknown"}.
-    Condition: ${condition ?? "unknown"}.
-    Owner minimum threshold (do NOT go below): ${threshold ?? "unknown"} TK.
+    Used for: ${productAge ?? "unknown"}.
+    Condition: ${productCondition ?? "unknown"}.
+    Owner minimum threshold (do NOT go below): ${minPrice ?? "unknown"} TK.
     UserName: ${userName ?? "unknown"}
 
     COMMUNICATION STYLE: Speak naturally. Like a real agent for second hand product.
@@ -48,6 +48,7 @@ const buildSystemInstruction = (product = {}, userName = "") => {
     5) When making a counter-offer after a buyer's numeric offer:
       - Prefer counters that are not lower than the last assistant SUGGESTED_PRICE unless the buyer's offer is lower and you are intentionally conceding to reach agreement.
       - Never propose a price below the owner's minimum threshold.
+      - Accept if the price greater than you suggestion or greater than askingPrice.
       - Give a one-line reason (brief) in the MESSAGE explaining the counter (e.g., condition, market value, included accessories).
 
     6) If you must refuse to propose a price for any reason, answer the user's informational question and do NOT include SUGGESTED_PRICE.
@@ -84,12 +85,12 @@ const prepareConversationContent = (history) => {
     .join("\n\n");
 };
 
-const extractSuggestedPrice = (text, threshold) => {
+const extractSuggestedPrice = (text, minPrice) => {
   const match = text.match(/SUGGESTED_PRICE:\s*([0-9]+(?:\.[0-9]+)?)/i);
   if (!match) return null;
   const price = Number(match[1]);
-  if (threshold && price < threshold) {
-    console.warn(`⚠️ AI suggested price ${price} below threshold ${threshold}`);
+  if (minPrice && price < minPrice) {
+    console.warn(`⚠️ AI suggested price ${price} below threshold ${minPrice}`);
     return null;
   }
   return price;
@@ -98,20 +99,12 @@ const extractSuggestedPrice = (text, threshold) => {
 export const negotiatePrice = async (req, res) => {
   const startTime = Date.now();
   try {
-    const { message, product, confirm, close } = req.body;
+    const { message, product } = req.body;
     const userId = req.user.id;
     if (!userId) return res.status(400).json({ error: "userId required" });
     if (!message) return res.status(400).json({ error: "message required" });
     if (!product || typeof product !== "object") {
       return res.status(400).json({ error: "product object required" });
-    }
-
-    if (confirm === true || close === true) {
-      const cleared = await clearNegotiationState(userId, product.id);
-      return res.json({
-        reply: cleared ? "✅ Negotiation closed successfully" : "⚠️ No active negotiation found",
-        cleared
-      });
     }
 
     let session = await getNegotiationState(userId, product.id);
@@ -146,8 +139,10 @@ export const negotiatePrice = async (req, res) => {
 
     const botText = response?.text ?? "Error: empty response";
     session.history.push({ role: "assistant", text: botText });
-    const suggestedPrice = extractSuggestedPrice(botText, product.threshold);
+    const suggestedPrice = extractSuggestedPrice(botText, product.minPrice);
     const cleanReply = extractCleanMessage(botText);
+
+    console.log(session.history)
 
     await saveNegotiationState(userId, product.id, session, SESSION_TTL_SECONDS);
 

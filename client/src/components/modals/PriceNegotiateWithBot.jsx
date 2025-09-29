@@ -19,12 +19,11 @@ const PriceNegotiateWithBot = ({ product, isOpen, onClose }) => {
 
   useEffect(() => {
     if (isOpen) {
-      // Initialize chat with a welcome message
       setMessages([
         {
           id: 1,
           type: 'bot',
-          content: `Hello! I'm here to help you negotiate the price for ${product.productName}. The current asking price is ₹${product.askingPrice}. What price would you like to offer?`,
+          content: `Hello! I'm here to help you negotiate the price for ${product.name}. The current asking price is ৳${product.askingPrice}. What price would you like to offer?`,
           timestamp: new Date()
         }
       ]);
@@ -33,7 +32,6 @@ const PriceNegotiateWithBot = ({ product, isOpen, onClose }) => {
 
   const sendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
-
     const userMessage = {
       id: Date.now(),
       type: 'user',
@@ -49,7 +47,7 @@ const PriceNegotiateWithBot = ({ product, isOpen, onClose }) => {
         message: inputMessage,
         confirm: false,
         close: false,
-        product: product
+        product,
       });
 
       const botMessage = {
@@ -85,7 +83,7 @@ const PriceNegotiateWithBot = ({ product, isOpen, onClose }) => {
     setIsLoading(true);
     try {
       const response = await negotiationApi.post('/api/v2/agents/negotiate', {
-        message: `I accept the offer of ₹${currentOffer}`,
+        message: `I accept the offer of ৳${currentOffer}`,
         confirm: true,
         close: false,
         product: product
@@ -94,15 +92,15 @@ const PriceNegotiateWithBot = ({ product, isOpen, onClose }) => {
       const confirmMessage = {
         id: Date.now(),
         type: 'bot',
-        content: `Great! The deal is confirmed at ₹${currentOffer}. Thank you for negotiating!`,
+        content: `Great! The deal is confirmed at ৳${currentOffer}. Thank you for negotiating!`,
         timestamp: new Date()
       };
 
       setMessages(prev => [...prev, confirmMessage]);
-      
+
       // You can add logic here to handle the confirmed deal
       // e.g., redirect to payment page, update product status, etc.
-      
+
     } catch (error) {
       console.error('Error confirming offer:', error);
     } finally {
@@ -146,48 +144,44 @@ const PriceNegotiateWithBot = ({ product, isOpen, onClose }) => {
           {messages.map((message) => (
             <div
               key={message.id}
-              className={`flex items-start gap-3 ${
-                message.type === 'user' ? 'flex-row-reverse' : ''
-              }`}
+              className={`flex items-start gap-3 ${message.type === 'user' ? 'flex-row-reverse' : ''
+                }`}
             >
-              <div className={`p-2 rounded-full ${
-                message.type === 'user' 
-                  ? 'bg-green-600' 
+              <div className={`p-2 rounded-full ${message.type === 'user'
+                  ? 'bg-green-600'
                   : 'bg-gray-200'
-              }`}>
+                }`}>
                 {message.type === 'user' ? (
                   <User className="text-white" size={16} />
                 ) : (
                   <Bot className="text-gray-600" size={16} />
                 )}
               </div>
-              
-              <div className={`flex-1 max-w-xs lg:max-w-md ${
-                message.type === 'user' ? 'text-right' : ''
-              }`}>
-                <div className={`p-3 rounded-lg ${
-                  message.type === 'user'
+
+              <div className={`flex-1 max-w-xs lg:max-w-md ${message.type === 'user' ? 'text-right' : ''
+                }`}>
+                <div className={`p-3 rounded-lg ${message.type === 'user'
                     ? 'bg-green-600 text-white'
                     : 'bg-gray-100 text-gray-800'
-                }`}>
+                  }`}>
                   {message.content}
                 </div>
-                
+
                 {message.suggestedPrice && (
                   <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded-lg">
                     <p className="text-sm text-green-800">
-                      Suggested Price: <span className="font-semibold">₹{message.suggestedPrice}</span>
+                      Suggested Price: <span className="font-semibold">৳{message.suggestedPrice}</span>
                     </p>
                   </div>
                 )}
-                
+
                 <p className="text-xs text-gray-500 mt-1">
                   {message.timestamp.toLocaleTimeString()}
                 </p>
               </div>
             </div>
           ))}
-          
+
           {isLoading && (
             <div className="flex items-center gap-3">
               <div className="bg-gray-200 p-2 rounded-full">
@@ -199,7 +193,7 @@ const PriceNegotiateWithBot = ({ product, isOpen, onClose }) => {
               </div>
             </div>
           )}
-          
+
           <div ref={messagesEndRef} />
         </div>
 
@@ -211,7 +205,7 @@ const PriceNegotiateWithBot = ({ product, isOpen, onClose }) => {
               disabled={isLoading}
               className="w-full bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white font-medium py-2 px-4 rounded-lg transition-colors"
             >
-              Accept Offer of ₹{currentOffer}
+              Accept Offer of ৳{currentOffer}
             </button>
           </div>
         )}

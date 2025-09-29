@@ -356,6 +356,82 @@ const processImage = async (inputPath, outputPath) => {
 };
 
 
+export const updateProductUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const {
+      isForSale,
+      isAvailable,
+      askingPrice,
+      minPrice
+    } = req.body;
+    if (!req.user) {
+      throw new CustomError("Unauthorized", 403);
+    }
+
+    const product = await prisma.product.findUniqueOrThrow({
+      where: { id },
+      include: {
+        owner: { select: { securityScore: true, name: true } },
+        redCacheCredits: true,
+      },
+    });
+
+    const normalizeBool = (val) => {
+      if (typeof val === "boolean") return val;
+      if (typeof val === "string") return val.toLowerCase() === "true";
+      return false;
+    };
+
+    const isForSaleBool = normalizeBool(isForSale);
+    const isAvailableBool = normalizeBool(isAvailable);
+
+    // Prepare update data
+    const updateData = {};
+    if (isForSaleBool !== undefined) updateData.isForSale = isForSaleBool;
+    if (isAvailableBool !== undefined) updateData.isAvailable = isAvailableBool;
+    if (updateData.isForSale) {
+      updateData.askingPrice = parseInt(askingPrice);
+      updateData.minPrice = parseInt(minPrice);
+    }
+
+    // Update product + credits in transaction
+    const updatedProduct = await prisma.$transaction(async (tx) => {
+      const productUpdate = await tx.product.update({
+        where: { id },
+        data: updateData,
+      });
+
+      if (updateData.isAvailable == false && product.redCacheCredits) {
+        await tx.redCacheCredit.update({
+          where: { id: product.redCacheCredits.id },
+          data: {
+            isFrozen: true,
+          },
+        });
+      }
+      return productUpdate;
+    });
+
+    // Invalidate cache
+    const keys = await redisClient.keys("products:*");
+    if (keys.length > 0) {
+      await redisClient.del(keys);
+      console.log("Cache invalidated:", keys);
+    }
+    console.log(`Product: ${product.name} Updated By: `, product.owner.name)
+
+    return res.status(200).json({
+      success: true,
+      message: "Product Updated Successfully",
+      product: updatedProduct,
+    });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+
 
 export const updateProductAdmin = async (req, res, next) => {
   try {
@@ -403,43 +479,46 @@ export const updateProductAdmin = async (req, res, next) => {
       const finalCondition = productCondition || product.productCondition;
       const finalAge = productAge ? parseInt(productAge) : product.productAge;
 
-      let newPricePerHour;
-      let newPricePerDay;
+      console.log("final cond: ", finalCondition)
       if (updateData.productType === "GADGET") {
-        newPricePerDay = calculateGadgetPricePerDay(
+        console.log("Old ppd: ", product.pricePerDay)
+        const newPricePerDay = calculateGadgetPricePerDay(
           parseInt(finalOmv),
           finalCondition,
           parseInt(finalAge),
           product.owner.securityScore,
           3,
         );
-        newPricePerHour = calculateHourlyPrice(newPricePerDay, 2);
+        const newPricePerHour = calculateHourlyPrice(newPricePerDay, 2);
+        updateData.pricePerDay = parseFloat(newPricePerDay);
+        updateData.pricePerHour = parseFloat(newPricePerHour);
       } else if (updateData.productType === "VEHICLE") {
-        newPricePerDay = calculateVehiclePricePerDay(
+        const newPricePerDay = calculateVehiclePricePerDay(
           parseInt(finalOmv),
           finalCondition,
           parseInt(finalAge),
           product.owner.securityScore,
           3,
         );
-        newPricePerHour = calculateHourlyPrice(newPricePerDay, 2);
+        const newPricePerHour = calculateHourlyPrice(newPricePerDay, 2);
+        updateData.pricePerDay = parseFloat(newPricePerDay);
+        updateData.pricePerHour = parseFloat(newPricePerHour);
       } else {
-        newPricePerDay = calculatePricePerDay(
+        const newPricePerDay = calculatePricePerDay(
           parseInt(finalOmv),
           finalCondition,
           parseInt(finalAge),
           product.owner.securityScore,
           3,
         );
+        updateData.pricePerDay = parseFloat(newPricePerDay);
       }
       newSecondHandPrice = calculateSecondHandPrice(
         parseInt(finalOmv),
         finalCondition,
         parseInt(finalAge),
       );
-
-      updateData.pricePerDay = parseFloat(newPricePerDay);
-      updateData.secondHandPrice = newSecondHandPrice;
+      updateData.secondHandPrice = parseFloat(newSecondHandPrice);
     }
 
     // Handle image updates
