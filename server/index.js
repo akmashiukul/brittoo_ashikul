@@ -18,6 +18,8 @@ import userDashboardRoutes from "./routes/userDashboard.routes.js";
 import withdrawalRequestRoutes from "./routes/withdrawalRequest.routes.js";
 import adminDashBoardRoutes from "./routes/adminDashboard.routes.js";
 import couponRoutes from "./routes/coupon.routes.js";
+import adminPurchaseRoutes from "./routes/admin-routes/purchaseRequestAdmin.routes.js";
+import userPurchaseRoutes from "./routes/user-routes/purchaseRequestUser.routes.js";
 
 // services
 startAuthServer();
@@ -55,6 +57,8 @@ app.use("/api/v1/user-dashboard", userDashboardRoutes);
 app.use("/api/v1/withdrawal-requests", withdrawalRequestRoutes);
 app.use("/api/v1/admin-dash", adminDashBoardRoutes);
 app.use("/api/v1/coupons", couponRoutes);
+app.use("/api/v1/purchase", userPurchaseRoutes);
+app.use("/api/v1/admin/purchase", adminPurchaseRoutes);
 
 app.use(errorHandler);
 app.use(multerErrorHandler);

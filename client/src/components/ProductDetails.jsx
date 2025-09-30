@@ -400,7 +400,7 @@ const ProductDetails = () => {
                   product?.askingPrice == product?.minPrice ? (
                     <div>
                       <p className="text-sm italic mt-1 text-gray-500">(Fixed Price) Not Negotiable</p>
-                      <button onClick={() => setShowNegotiateModal(true)} className="text-xs border-purple-500 text-purple-500 bg-white border rounded-md px-2 py-1 hover:text-white hover:bg-purple-500 cursor-pointer mt-2">Place Buying Request</button>
+                      <button className="text-xs border-purple-500 text-purple-500 bg-white border rounded-md px-2 py-1 hover:text-white hover:bg-purple-500 cursor-pointer mt-2">Place Buying Request</button>
                     </div>
                   ) : (
                     <div className="relative mt-3 flex items-center gap-1">

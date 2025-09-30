@@ -1,6 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import "dotenv/config";
-import { clearNegotiationState, getNegotiationState, saveNegotiationState } from "../helpers/negotiationCache.js";
+import { getNegotiationState, saveNegotiationState } from "../helpers/negotiationCache.js";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 

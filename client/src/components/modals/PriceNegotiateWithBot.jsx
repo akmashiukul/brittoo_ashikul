@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { X, Send, Bot, User, Loader2 } from 'lucide-react';
 import negotiationApi from '../../lib/negotiationApi';
+import Swal from 'sweetalert2';
 
 const PriceNegotiateWithBot = ({ product, isOpen, onClose }) => {
   const [messages, setMessages] = useState([]);
@@ -49,7 +50,6 @@ const PriceNegotiateWithBot = ({ product, isOpen, onClose }) => {
         close: false,
         product,
       });
-
       const botMessage = {
         id: Date.now() + 1,
         type: 'bot',
@@ -80,32 +80,50 @@ const PriceNegotiateWithBot = ({ product, isOpen, onClose }) => {
   const confirmOffer = async () => {
     if (!currentOffer) return;
 
-    setIsLoading(true);
-    try {
-      const response = await negotiationApi.post('/api/v2/agents/negotiate', {
-        message: `I accept the offer of ৳${currentOffer}`,
-        confirm: true,
-        close: false,
-        product: product
-      });
+    Swal.fire({
+      title: `Place purchase request?`,
+      text: `A request will be sent to the seller to buy ${product.name} for BDT ${currentOffer}`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Place Request!"
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        setIsLoading(true);
+        try {
+          const response = await negotiationApi.post('/api/v2/agents/negotiate', {
+            message: `I accept the offer of ৳${currentOffer}`,
+            confirm: true,
+            close: false,
+            product: product
+          });
+          const botMessage = {
+            id: Date.now() + 1,
+            type: 'bot',
+            content: response.data.reply,
+            timestamp: new Date(),
+            suggestedPrice: response.data.suggestedPrice
+          };
+          setMessages(prev => [...prev, botMessage]);
 
-      const confirmMessage = {
-        id: Date.now(),
-        type: 'bot',
-        content: `Great! The deal is confirmed at ৳${currentOffer}. Thank you for negotiating!`,
-        timestamp: new Date()
-      };
+          // put place request api call
 
-      setMessages(prev => [...prev, confirmMessage]);
+          Swal.fire({
+            title: "Success!",
+            text: "You have successfully placed request.",
+            icon: "success"
+          });
+          // You can add logic here to handle the confirmed deal
+          // e.g., redirect to payment page, update product status, etc.
 
-      // You can add logic here to handle the confirmed deal
-      // e.g., redirect to payment page, update product status, etc.
-
-    } catch (error) {
-      console.error('Error confirming offer:', error);
-    } finally {
-      setIsLoading(false);
-    }
+        } catch (error) {
+          console.error('Error confirming offer:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    });
   };
 
   const handleKeyPress = (e) => {
@@ -148,8 +166,8 @@ const PriceNegotiateWithBot = ({ product, isOpen, onClose }) => {
                 }`}
             >
               <div className={`p-2 rounded-full ${message.type === 'user'
-                  ? 'bg-green-600'
-                  : 'bg-gray-200'
+                ? 'bg-green-600'
+                : 'bg-gray-200'
                 }`}>
                 {message.type === 'user' ? (
                   <User className="text-white" size={16} />
@@ -161,8 +179,8 @@ const PriceNegotiateWithBot = ({ product, isOpen, onClose }) => {
               <div className={`flex-1 max-w-xs lg:max-w-md ${message.type === 'user' ? 'text-right' : ''
                 }`}>
                 <div className={`p-3 rounded-lg ${message.type === 'user'
-                    ? 'bg-green-600 text-white'
-                    : 'bg-gray-100 text-gray-800'
+                  ? 'bg-green-600 text-white'
+                  : 'bg-gray-100 text-gray-800'
                   }`}>
                   {message.content}
                 </div>
