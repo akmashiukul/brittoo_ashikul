@@ -6,7 +6,7 @@ import { IoExit, IoHomeSharp } from "react-icons/io5";
 import { BiSolidCreditCardAlt } from "react-icons/bi";
 import { MdOutlineSpaceDashboard } from "react-icons/md";
 import useDashDrawertore from "../../stores/drawerStores/useDashDrawerStore";
-import { BoxesIcon, BoxIcon, Menu, Ticket, Users, X } from "lucide-react";
+import { BoxesIcon, BoxIcon, FolderKanban, Menu, Ticket, Users, X } from "lucide-react";
 import { useEffect } from "react";
 import { GiReceiveMoney } from "react-icons/gi";
 
@@ -17,19 +17,19 @@ const AdminDashboardLayout = () => {
   const { isDrawerOpen, openDrawer, closeDrawer } = useDashDrawertore();
 
   useEffect(() => {
-  const handleResize = () => {
-    if (window.innerWidth >= 768) {
-      openDrawer();
-    } else {
-      closeDrawer();
-    }
-  };
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        openDrawer();
+      } else {
+        closeDrawer();
+      }
+    };
 
-  handleResize();
-  window.addEventListener("resize", handleResize);
+    handleResize();
+    window.addEventListener("resize", handleResize);
 
-  return () => window.removeEventListener("resize", handleResize);
-}, [closeDrawer, openDrawer]);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [closeDrawer, openDrawer]);
 
 
 
@@ -37,9 +37,8 @@ const AdminDashboardLayout = () => {
   return (
     <div className="relative flex min-h-screen overflow-x-scroll">
       <div
-        className={`fixed inset-y-0 left-0 z-50 w-56 md:w-80 bg-gray-100 border-r border-gray-200 transform transition-transform duration-300 ease-in-out ${
-          isDrawerOpen ? "translate-x-0" : "-translate-x-full"
-        } flex flex-col justify-between`}
+        className={`fixed inset-y-0 left-0 z-50 w-56 md:w-80 bg-gray-100 border-r border-gray-200 transform transition-transform duration-300 ease-in-out ${isDrawerOpen ? "translate-x-0" : "-translate-x-full"
+          } flex flex-col justify-between`}
       >
         <div className="px-4 py-6 flex-1 flex flex-col">
           <div className="flex items-center justify-between">
@@ -64,11 +63,10 @@ const AdminDashboardLayout = () => {
             <li>
               <Link
                 to="/dashboard/admin/admin-overview"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${
-                  path.includes("/admin-overview")
+                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/admin-overview")
                     ? "bg-green-600 text-white"
                     : "text-gray-700"
-                } flex items-center gap-2`}
+                  } flex items-center gap-2`}
                 onClick={() => {
                   if (window.innerWidth <= 425) {
                     closeDrawer();
@@ -81,11 +79,10 @@ const AdminDashboardLayout = () => {
             <li>
               <Link
                 to="/dashboard/admin/manage-rental-requests"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${
-                  path.includes("/manage-rental-requests")
+                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/manage-rental-requests")
                     ? "bg-green-600 text-white"
                     : "text-gray-700"
-                } flex items-center gap-2`}
+                  } flex items-center gap-2`}
                 onClick={() => {
                   if (window.innerWidth <= 425) {
                     closeDrawer();
@@ -97,12 +94,27 @@ const AdminDashboardLayout = () => {
             </li>
             <li>
               <Link
-                to="/dashboard/admin/blue-cc-requests"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${
-                  path.includes("/blue-cc-requests")
+                to="/dashboard/admin/manage-purchase-requests"
+                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/manage-purchase-requests")
                     ? "bg-green-600 text-white"
                     : "text-gray-700"
-                } flex items-center gap-2`}
+                  } flex items-center gap-2`}
+                onClick={() => {
+                  if (window.innerWidth <= 425) {
+                    closeDrawer();
+                  }
+                }}
+              >
+                <FolderKanban size={13} /> Manage Purchase Requests
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/dashboard/admin/blue-cc-requests"
+                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/blue-cc-requests")
+                    ? "bg-green-600 text-white"
+                    : "text-gray-700"
+                  } flex items-center gap-2`}
                 onClick={() => {
                   if (window.innerWidth <= 425) {
                     closeDrawer();
@@ -115,11 +127,10 @@ const AdminDashboardLayout = () => {
             <li>
               <Link
                 to="/dashboard/admin/withdrawal-requests"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${
-                  path.includes("/withdrawal-requests")
+                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/withdrawal-requests")
                     ? "bg-green-600 text-white"
                     : "text-gray-700"
-                } flex items-center gap-2`}
+                  } flex items-center gap-2`}
                 onClick={() => {
                   if (window.innerWidth <= 425) {
                     closeDrawer();
@@ -132,11 +143,10 @@ const AdminDashboardLayout = () => {
             <li>
               <Link
                 to="/dashboard/admin/manage-users"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${
-                  path.includes("/manage-users")
+                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/manage-users")
                     ? "bg-green-600 text-white"
                     : "text-gray-700"
-                } flex items-center gap-2`}
+                  } flex items-center gap-2`}
                 onClick={() => {
                   if (window.innerWidth <= 425) {
                     closeDrawer();
@@ -149,11 +159,10 @@ const AdminDashboardLayout = () => {
             <li>
               <Link
                 to="/dashboard/admin/manage-products"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${
-                  path.includes("/manage-products")
+                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/manage-products")
                     ? "bg-green-600 text-white"
                     : "text-gray-700"
-                } flex items-center gap-2`}
+                  } flex items-center gap-2`}
                 onClick={() => {
                   if (window.innerWidth <= 425) {
                     closeDrawer();
@@ -166,11 +175,10 @@ const AdminDashboardLayout = () => {
             <li>
               <Link
                 to="/dashboard/admin/manage-coupons"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${
-                  path.includes("/manage-coupons")
+                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/manage-coupons")
                     ? "bg-green-600 text-white"
                     : "text-gray-700"
-                } flex items-center gap-2`}
+                  } flex items-center gap-2`}
                 onClick={() => {
                   if (window.innerWidth <= 425) {
                     closeDrawer();
@@ -222,9 +230,8 @@ const AdminDashboardLayout = () => {
       </div>
 
       <button
-        className={`fixed bottom-4 left-4 z-50 p-3 md:p-3 rounded-full shadow-md hover:shadow-2xl transition-all duration-300 group cursor-pointer bg-gray-100 border border-gray-200 ${
-          isDrawerOpen ? "opacity-0 pointer-events-none" : "opacity-100"
-        }`}
+        className={`fixed bottom-4 left-4 z-50 p-3 md:p-3 rounded-full shadow-md hover:shadow-2xl transition-all duration-300 group cursor-pointer bg-gray-100 border border-gray-200 ${isDrawerOpen ? "opacity-0 pointer-events-none" : "opacity-100"
+          }`}
         aria-label="Open drawer"
         onClick={openDrawer}
       >
@@ -232,12 +239,11 @@ const AdminDashboardLayout = () => {
       </button>
 
       <div
-        className={`flex-1 transition-all duration-300 ${
-          isDrawerOpen ? "ml-0 md:ml-80 relative" : "ml-0"
-        }`}
+        className={`flex-1 transition-all duration-300 ${isDrawerOpen ? "ml-0 md:ml-80 relative" : "ml-0"
+          }`}
       >
         {
-          (isDrawerOpen && window.innerWidth < 500) &&<div className="absolute bg-black/50 opacity-80 h-full w-full"></div>
+          (isDrawerOpen && window.innerWidth < 500) && <div className="absolute bg-black/50 opacity-80 h-full w-full"></div>
         }
         <Outlet />
       </div>

@@ -36,8 +36,9 @@ export const placePurchaseRequest = async (req, res, next) => {
       throw new CustomError("Pickup terminal required", 400, "BAD_REQUEST");
     }
 
-    const platformCharge = Math.round(dealPrice * 0.05); // 5% platform charge
-    const totalPrice = dealPrice + platformCharge;
+    const platformCharge = Math.round(parseInt(dealPrice) * 0.05); // 5% platform charge. 
+    // EKhance change korle please change on ManagePlacedPurchaseRequests.jsx file too (5%)
+    const totalPrice = parseInt(dealPrice) + platformCharge;
 
     const purchaseRequest = await prisma.purchaseRequest.create({
       data: {
@@ -50,8 +51,8 @@ export const placePurchaseRequest = async (req, res, next) => {
         platformCharge,
         buyerCollectionMethod,
         buyerPhoneNumber,
-        buyerDeliveryAddress,
-        buyerPickupTerminal,
+        buyerDeliveryAddress: buyerCollectionMethod === "HOME" ? buyerDeliveryAddress : null,
+        buyerPickupTerminal: buyerCollectionMethod === "BRITTOO_TERMINAL" ? buyerPickupTerminal : null,
         sellerPhoneNumber: product.owner.phoneNumber || "",
       },
       include: {
@@ -105,8 +106,8 @@ export const acceptPurchaseRequest = async (req, res, next) => {
         status: "ACCEPTED_BY_SELLER",
         sellerDeliveryMethod,
         sellerPhoneNumber,
-        sellerDeliveryAddress,
-        sellerDeliveryTerminal,
+        sellerDeliveryAddress: sellerDeliveryMethod === "HOME" ? sellerDeliveryAddress : null,
+        sellerDeliveryTerminal: sellerDeliveryMethod === "BRITTOO_TERMINAL" ? sellerDeliveryTerminal : null,
       },
       include: {
         product: true,

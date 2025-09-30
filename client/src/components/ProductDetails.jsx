@@ -410,12 +410,12 @@ const ProductDetails = () => {
                   )
                 }
               </div>
-            ) : (
+            ) : !product.isForSale ? (
               <div className="flex items-center gap-1 text-red-500 text-sm mt-2 font-semibold">
                 <XCircle className="w-4 h-4" />
                 <span>Not for Sale</span>
               </div>
-            )}
+            ) : <></>}
             {
               currentUser?.role === "ADMIN" && (
                 <div className="mt-3">

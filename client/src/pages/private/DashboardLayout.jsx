@@ -13,7 +13,7 @@ import {
   MdOutlineSpaceDashboard,
 } from "react-icons/md";
 import useDashDrawertore from "../../stores/drawerStores/useDashDrawerStore";
-import { ListCheck, Menu, X } from "lucide-react";
+import { ListCheck, Menu, PackageCheck, ShoppingCart, X } from "lucide-react";
 import { AiOutlineProduct } from "react-icons/ai";
 import { useEffect } from "react";
 import { FaShoppingCart, FaUserCog } from "react-icons/fa";
@@ -85,10 +85,11 @@ const DashboardLayout = () => {
   return (
     <div className="relative flex min-h-screen">
       <div
-        className={`fixed inset-y-0 left-0 z-50 w-56 md:w-80 bg-gray-100 border-r border-gray-200 transform transition-transform duration-300 ease-in-out ${isDrawerOpen ? "translate-x-0" : "-translate-x-full"
-          } flex flex-col justify-between`}
+        className={`fixed inset-y-0 left-0 z-50 w-3/4 md:w-80 bg-gray-100 border-r border-gray-200 transform transition-transform duration-300 ease-in-out ${isDrawerOpen ? "translate-x-0" : "-translate-x-full"
+          } flex flex-col`}
       >
-        <div className="px-4 py-6 flex-1 flex flex-col">
+        {/* Fixed Header */}
+        <div className="px-4 py-6 flex-shrink-0">
           <div className="flex items-center justify-between">
             <Link to="/" onClick={closeDrawer}>
               <img
@@ -106,14 +107,17 @@ const DashboardLayout = () => {
             </button>
           </div>
           <hr className="w-full border-t border-gray-300 my-4 mx-auto" />
+        </div>
 
-          <ul className="mt-6 space-y-2 flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
+        {/* Scrollable Navigation Links */}
+        <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 px-4">
+          <ul className="space-y-2 pb-4">
             <li>
               <Link
                 to="/dashboard/overview"
                 className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/overview")
-                    ? "bg-green-600 text-white"
-                    : "text-gray-700"
+                  ? "bg-green-600 text-white"
+                  : "text-gray-700"
                   } flex items-center gap-2`}
                 onClick={() => {
                   if (window.innerWidth <= 425) {
@@ -128,8 +132,8 @@ const DashboardLayout = () => {
               <Link
                 to="/dashboard/list-items"
                 className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/list-items")
-                    ? "bg-green-600 text-white"
-                    : "text-gray-700"
+                  ? "bg-green-600 text-white"
+                  : "text-gray-700"
                   } flex items-center gap-2`}
                 onClick={() => {
                   if (window.innerWidth <= 425) {
@@ -144,8 +148,8 @@ const DashboardLayout = () => {
               <Link
                 to="/dashboard/manage-items"
                 className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/manage-items")
-                    ? "bg-green-600 text-white"
-                    : "text-gray-700"
+                  ? "bg-green-600 text-white"
+                  : "text-gray-700"
                   } flex items-center gap-2`}
                 onClick={() => {
                   if (window.innerWidth <= 425) {
@@ -160,8 +164,8 @@ const DashboardLayout = () => {
               <Link
                 to="/dashboard/placed-requests"
                 className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/placed-requests")
-                    ? "bg-green-600 text-white"
-                    : "text-gray-700"
+                  ? "bg-green-600 text-white"
+                  : "text-gray-700"
                   } flex items-center gap-2`}
                 onClick={() => {
                   if (window.innerWidth <= 425) {
@@ -169,15 +173,15 @@ const DashboardLayout = () => {
                   }
                 }}
               >
-                <FaShoppingCart /> My Placed Requests
+                <FaShoppingCart /> My Placed Rental Requests
               </Link>
             </li>
             <li>
               <Link
                 to="/dashboard/received-requests"
                 className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/received-requests")
-                    ? "bg-green-600 text-white"
-                    : "text-gray-700"
+                  ? "bg-green-600 text-white"
+                  : "text-gray-700"
                   } flex items-center gap-2`}
                 onClick={() => {
                   if (window.innerWidth <= 425) {
@@ -185,15 +189,47 @@ const DashboardLayout = () => {
                   }
                 }}
               >
-                <ListCheck size={16} /> Received Requests
+                <ListCheck size={16} /> Received Rental Requests
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/dashboard/received-purchase-requests"
+                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/received-purchase-requests")
+                  ? "bg-green-600 text-white"
+                  : "text-gray-700"
+                  } flex items-center gap-2`}
+                onClick={() => {
+                  if (window.innerWidth <= 425) {
+                    closeDrawer();
+                  }
+                }}
+              >
+                <PackageCheck size={16} /> Received Purchase Requests
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/dashboard/placed-purchase-requests"
+                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/placed-purchase-requests")
+                  ? "bg-green-600 text-white"
+                  : "text-gray-700"
+                  } flex items-center gap-2`}
+                onClick={() => {
+                  if (window.innerWidth <= 425) {
+                    closeDrawer();
+                  }
+                }}
+              >
+                <ShoppingCart size={16} /> Placed Purchase Requests
               </Link>
             </li>
             <li>
               <Link
                 to="/dashboard/my-credits"
                 className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/my-credits")
-                    ? "bg-green-600 text-white"
-                    : "text-gray-700"
+                  ? "bg-green-600 text-white"
+                  : "text-gray-700"
                   } flex items-center gap-2`}
                 onClick={() => {
                   if (window.innerWidth <= 425) {
@@ -208,8 +244,8 @@ const DashboardLayout = () => {
               <Link
                 to="/dashboard/user-analytics"
                 className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/user-analytics")
-                    ? "bg-green-600 text-white"
-                    : "text-gray-700"
+                  ? "bg-green-600 text-white"
+                  : "text-gray-700"
                   } flex items-center gap-2`}
                 onClick={() => {
                   if (window.innerWidth <= 425) {
@@ -220,11 +256,11 @@ const DashboardLayout = () => {
                 <IoAnalytics /> Analytics
               </Link>
             </li>
-            <li></li>
           </ul>
         </div>
 
-        <div className="border-t border-gray-100">
+        {/* Fixed Footer */}
+        <div className="border-t border-gray-100 flex-shrink-0">
           <ul className="px-4 py-2">
             <li>
               <Link

@@ -50,6 +50,9 @@ import ManageProducts from "./pages/admin/admin-dash-pages/ManageProducts";
 import UpdateItemAdmin from "./pages/admin/admin-dash-pages/UpdateItemAdmin";
 import ManageCoupons from "./pages/admin/admin-dash-pages/ManageCoupons";
 import ScrollToTop from "./components/ScrollToTop";
+import AdminManagePurchaseRequests from "./pages/admin/admin-dash-pages/AdminManagePurchaseRequests";
+import ManagePlacedPurchaseRequests from "./pages/private/dash-pages/ManagePlacedPurchaseRequests";
+import ManageReceivedPurchaseRequests from "./pages/private/dash-pages/ManageReceivedPurchaseRequests";
 
 const AppContent = () => {
   const location = useLocation();
@@ -166,6 +169,10 @@ const AppContent = () => {
                 path="manage-rental-requests"
                 element={<ManageRentalRequestsAdmin />}
               />
+              <Route
+                path="manage-purchase-requests"
+                element={<AdminManagePurchaseRequests />}
+              />
             </Route>
           </Route>
 
@@ -179,6 +186,8 @@ const AppContent = () => {
               <Route path="my-credits" element={<MyCredits />} />
               <Route path="received-requests" element={<ReceivedRequests />} />
               <Route path="user-analytics" element={<UserAnalytics />} />
+              <Route path="placed-purchase-requests" element={<ManagePlacedPurchaseRequests />} />
+              <Route path="received-purchase-requests" element={<ManageReceivedPurchaseRequests />} />
             </Route>
           </Route>
         </Routes>

@@ -26,7 +26,7 @@ const buildSystemInstruction = (product = {}, userName = "") => {
     Market value: ${omv ?? "unknown"} TK.
     Owner asking price: ${askingPrice ?? "unknown"} TK.
     Used for: ${productAge ?? "unknown"}.
-    Condition: ${productCondition ?? "unknown"}.
+    Condition: ${productCondition ? productCondition.toLowerCase() :  "unknown"}.
     Owner minimum threshold (do NOT go below): ${minPrice ?? "unknown"} TK.
     UserName: ${userName ?? "unknown"}
 
@@ -34,6 +34,8 @@ const buildSystemInstruction = (product = {}, userName = "") => {
     Goal: Start negotiation from the asking price and try to maximize the final price for the owner while never suggesting below the threshold.
 
     OUTPUT RULES (follow exactly):
+    0) Never ever reveal owner's threshold and try to maximize the price as much as you can. dont't jump quickly from a higher price to a very lower price. decrease price slowly.
+
     1) Only include a single machine-parseable line when proposing an offer:
       SUGGESTED_PRICE: <number>
       Then a short human-friendly MESSAGE: <text>
@@ -153,13 +155,39 @@ export const negotiatePrice = async (req, res) => {
 
   } catch (err) {
     const duration = Date.now() - startTime;
+
+    // specific Gemini errors
+    if (err.message?.includes('RATE_LIMIT') || err.status === 429) {
+      console.error("Gemini rate limit hit:", {
+        error: err.message,
+        duration: `${duration}ms`,
+        userId: req.user?.id,
+        productId: req.body?.product?.id
+      });
+      return res.status(429).json({
+        error: "rate_limit",
+        message: "AI service is busy. Please try again in a minute."
+      });
+    }
+
+    // quota errors
+    if (err.message?.includes('QUOTA') || err.status === 403) {
+      console.error("Gemini quota exceeded:", err.message);
+
+      return res.status(503).json({
+        error: "service_unavailable",
+        message: "Negotiation service temporarily unavailable. Please try later."
+      });
+    }
+
+    // Generic error
     console.error("negotiatePrice error:", {
       error: err.message,
+      stack: err.stack,
       duration: `${duration}ms`,
-      userId: req.body?.userId,
+      userId: req.user?.id,
       productId: req.body?.product?.id
     });
-
     return res.status(500).json({
       error: "internal_error",
       message: "Failed to process negotiation request"
