@@ -20,12 +20,20 @@ import adminDashBoardRoutes from "./routes/adminDashboard.routes.js";
 import couponRoutes from "./routes/coupon.routes.js";
 import adminPurchaseRoutes from "./routes/admin-routes/purchaseRequestAdmin.routes.js";
 import userPurchaseRoutes from "./routes/user-routes/purchaseRequestUser.routes.js";
+import chatRoutes from "./routes/user-routes/purcaseChat.routes.js";
 
-// services
+import { createServer } from "http";
+import { initializeSocket } from "./socket/chatSocket.js";
+
 startAuthServer();
 
 dotenv.config();
 const app = express();
+
+const server = createServer(app);
+// Initialize Socket.IO
+initializeSocket(server);
+
 app.use(cors({
   origin: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -59,13 +67,13 @@ app.use("/api/v1/admin-dash", adminDashBoardRoutes);
 app.use("/api/v1/coupons", couponRoutes);
 app.use("/api/v1/purchase", userPurchaseRoutes);
 app.use("/api/v1/admin/purchase", adminPurchaseRoutes);
+app.use("/api/v1/chat", chatRoutes);
 
 app.use(errorHandler);
 app.use(multerErrorHandler);
 
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server is dancing on http://localhost:${PORT} \n${new Date(Date.now()).toLocaleTimeString()}
-    `);
+server.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server is dancing on http://localhost:${PORT} \n${new Date(Date.now()).toLocaleTimeString()}`);
 });
 
 // ngrok http --url=evolving-champion-bullfrog.ngrok-free.app 80

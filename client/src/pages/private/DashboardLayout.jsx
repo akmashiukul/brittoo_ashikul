@@ -13,7 +13,7 @@ import {
   MdOutlineSpaceDashboard,
 } from "react-icons/md";
 import useDashDrawertore from "../../stores/drawerStores/useDashDrawerStore";
-import { ListCheck, Menu, PackageCheck, ShoppingCart, X } from "lucide-react";
+import { ListCheck, Menu, MessageCircle, PackageCheck, ShoppingCart, X } from "lucide-react";
 import { AiOutlineProduct } from "react-icons/ai";
 import { useEffect } from "react";
 import { FaShoppingCart, FaUserCog } from "react-icons/fa";
@@ -238,6 +238,22 @@ const DashboardLayout = () => {
                 }}
               >
                 <BiCreditCard size={16} /> My Credits
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/dashboard/incoming-chats"
+                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/incoming-chats")
+                  ? "bg-green-600 text-white"
+                  : "text-gray-700"
+                  } flex items-center gap-2`}
+                onClick={() => {
+                  if (window.innerWidth <= 425) {
+                    closeDrawer();
+                  }
+                }}
+              >
+                <MessageCircle size={16} /> Incoming Chats
               </Link>
             </li>
             <li>

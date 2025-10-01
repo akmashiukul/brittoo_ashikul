@@ -5,7 +5,7 @@ import Loader from "./shared/Loader";
 import { useParams } from "react-router-dom";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
-import { CheckCircle, Stars, TagIcon, XCircle } from "lucide-react";
+import { CheckCircle, MessageCircle, Stars, TagIcon, XCircle } from "lucide-react";
 import Avatar from "boring-avatars";
 import { usePriceCalculate } from "../hooks/usePriceCalculate";
 import { differenceInDays } from "date-fns";
@@ -19,6 +19,7 @@ import { useGadgetPriceCalculate } from "../hooks/useGadgetPriceCalculate";
 import { useVehiclePriceCalculate } from "../hooks/useVehiclePriceCalculate";
 import { useHourlyPrice } from "../hooks/useHourlyPrice";
 import PriceNegotiateWithBot from "./modals/PriceNegotiateWithBot";
+import ChatModal from "./modals/ChatModal";
 
 const ProductDetails = () => {
   const [product, setProduct] = useState(null);
@@ -42,6 +43,8 @@ const ProductDetails = () => {
   const [hourlyPrice, setHourlyPrice] = useState(0);
   const [numberOfHours, setNumberOfHours] = useState(1);
   const [showNegotiateModal, setShowNegotiateModal] = useState(false);
+
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   const { currentUser } = useUserStore();
   const { id } = useParams();
@@ -396,6 +399,13 @@ const ProductDetails = () => {
                     BDT {product.askingPrice}.00
                   </span>
                 </p>
+                <button
+                  onClick={() => setIsChatOpen(true)}
+                  className="flex items-center gap-2 px-3 py-1.5 mt-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors cursor-pointer text-sm"
+                >
+                  <MessageCircle className="w-5 h-5" />
+                  Chat with Seller
+                </button>
                 {
                   product?.askingPrice == product?.minPrice ? (
                     <div>
@@ -596,6 +606,15 @@ const ProductDetails = () => {
           onClose={() => setShowNegotiateModal(false)}
         />
       )}
+      {
+        isChatOpen && (
+          <ChatModal
+            isOpen={isChatOpen}
+            onClose={() => setIsChatOpen(false)}
+            productId={product?.id}
+          />
+        )
+      }
     </div>
   );
 };

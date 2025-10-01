@@ -53,6 +53,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import AdminManagePurchaseRequests from "./pages/admin/admin-dash-pages/AdminManagePurchaseRequests";
 import ManagePlacedPurchaseRequests from "./pages/private/dash-pages/ManagePlacedPurchaseRequests";
 import ManageReceivedPurchaseRequests from "./pages/private/dash-pages/ManageReceivedPurchaseRequests";
+import IncomingChats from "./pages/private/dash-pages/IncomingChats";
 
 const AppContent = () => {
   const location = useLocation();
@@ -186,6 +187,7 @@ const AppContent = () => {
               <Route path="my-credits" element={<MyCredits />} />
               <Route path="received-requests" element={<ReceivedRequests />} />
               <Route path="user-analytics" element={<UserAnalytics />} />
+              <Route path="incoming-chats" element={<IncomingChats />} />
               <Route path="placed-purchase-requests" element={<ManagePlacedPurchaseRequests />} />
               <Route path="received-purchase-requests" element={<ManageReceivedPurchaseRequests />} />
             </Route>
