@@ -55,12 +55,11 @@ export const initializeSocket = (server) => {
   io.on("connection", (socket) => {
     onlineUsers.set(socket.userId, socket.id);
 
-    io.emit("user_status", { 
-      userId: socket.userId, 
-      isOnline: true 
+    io.emit("user_status", {
+      userId: socket.userId,
+      isOnline: true
     });
 
-    
     socket.on("join_room", async ({ chatRoomId }) => {
       try {
         const chatRoom = await prisma.chatRoom.findFirst({
@@ -87,6 +86,11 @@ export const initializeSocket = (server) => {
           data: { isRead: true }
         });
         socket.to(chatRoomId).emit("messages_read", { chatRoomId });
+        const partnerId = socket.userId === chatRoom.buyerId ? chatRoom.sellerId : chatRoom.buyerId;
+        const isPartnerOnline = onlineUsers.get(partnerId);
+        if (isPartnerOnline) {
+          io.to(chatRoomId).emit("partner_status", { isOnline: true })
+        } else io.to(chatRoomId).emit("partner_status", { isOnline: false })
       } catch (error) {
         console.error("Join room error:", error);
         socket.emit("error", { message: "Failed to join room" });
@@ -122,13 +126,13 @@ export const initializeSocket = (server) => {
           }
         });
         io.to(chatRoomId).emit("new_message", message);
-        const recipientId = socket.userId === chatRoom.buyerId 
-          ? chatRoom.sellerId 
+        const recipientId = socket.userId === chatRoom.buyerId
+          ? chatRoom.sellerId
           : chatRoom.buyerId;
 
         if (!onlineUsers.has(recipientId)) {
           // TODO: Send push notification
-          
+
         }
       } catch (error) {
         console.error("Send message error:", error);
@@ -149,12 +153,11 @@ export const initializeSocket = (server) => {
       socket.leave(chatRoomId);
     });
 
-
     socket.on("disconnect", () => {
       onlineUsers.delete(socket.userId);
-      io.emit("user_status", { 
-        userId: socket.userId, 
-        isOnline: false 
+      io.emit("user_status", {
+        userId: socket.userId,
+        isOnline: false
       });
     });
   });

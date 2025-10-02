@@ -78,7 +78,7 @@ const IncomingChats = () => {
   return (
     <div className="max-w-4xl mx-auto p-4">
       <div className="bg-white rounded-lg shadow">
-        <div className="p-4 border-b">
+        <div className="p-4 border-b border-gray-300">
           <h2 className="text-xl font-semibold text-gray-900">
             Incoming Messages
           </h2>

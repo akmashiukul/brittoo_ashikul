@@ -41,7 +41,7 @@ const ChatModal = ({ isOpen, onClose, productId, chatRoomId: initialChatRoomId }
   };
 
   useEffect(() => {
-    if(isPartnerTyping) {
+    if (isPartnerTyping) {
       scrollToBottom();
     }
   }, [isPartnerTyping])
@@ -56,6 +56,14 @@ const ChatModal = ({ isOpen, onClose, productId, chatRoomId: initialChatRoomId }
       fetchMessages();
     }
   }, [isOpen, productId, initialChatRoomId]);
+
+  useEffect(() => {
+    if (socket && chatRoom) {
+      socket.on("partner_status", ({ isOnline }) => {
+        setIsPartnerOnline(isOnline);
+      })
+    }
+  }, [chatRoom, socket]);
 
   // Initialize socket connection
   useEffect(() => {
@@ -105,10 +113,10 @@ const ChatModal = ({ isOpen, onClose, productId, chatRoomId: initialChatRoomId }
     });
     newSocket.on('user_status', ({ userId, isOnline }) => {
       if (chatRoom) {
-        const partnerId = chatRoom.buyerId === currentUser.id 
-          ? chatRoom.sellerId 
+        const partnerId = chatRoom.buyerId === currentUser.id
+          ? chatRoom.sellerId
           : chatRoom.buyerId;
-        
+
         if (userId === partnerId) {
           setIsPartnerOnline(isOnline);
         }
@@ -217,14 +225,14 @@ const ChatModal = ({ isOpen, onClose, productId, chatRoomId: initialChatRoomId }
 
   if (!isOpen) return null;
 
-  const partner = chatRoom?.buyerId === currentUser.id 
-    ? chatRoom?.seller 
+  const partner = chatRoom?.buyerId === currentUser.id
+    ? chatRoom?.seller
     : chatRoom?.buyer;
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg w-full max-w-2xl h-[600px] flex flex-col shadow-2xl">
-        
+
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-300 bg-gray-50">
           <div className="flex items-center gap-3">
@@ -244,13 +252,11 @@ const ChatModal = ({ isOpen, onClose, productId, chatRoomId: initialChatRoomId }
                     <span className="text-gray-600">{partner.name}</span>
                     <div className="flex items-center gap-1">
                       <Circle
-                        className={`w-2 h-2 fill-current ${
-                          isPartnerOnline ? 'text-green-500' : 'text-gray-400'
-                        }`}
+                        className={`w-2 h-2 fill-current ${isPartnerOnline ? 'text-green-500' : 'text-gray-400'
+                          }`}
                       />
-                      <span className={`text-xs ${
-                        isPartnerOnline ? 'text-green-600' : 'text-gray-500'
-                      }`}>
+                      <span className={`text-xs ${isPartnerOnline ? 'text-green-600' : 'text-gray-500'
+                        }`}>
                         {isPartnerOnline ? 'Online' : 'Offline'}
                       </span>
                     </div>
@@ -317,17 +323,15 @@ const ChatModal = ({ isOpen, onClose, productId, chatRoomId: initialChatRoomId }
                     className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
                   >
                     <div
-                      className={`max-w-[70%] rounded-lg px-4 py-2 shadow-sm ${
-                        isOwn
+                      className={`max-w-[70%] rounded-lg px-4 py-2 shadow-sm ${isOwn
                           ? 'bg-green-600 text-white'
                           : 'bg-white text-gray-900'
-                      }`}
+                        }`}
                     >
                       <p className="text-sm break-words">{msg.content}</p>
                       <p
-                        className={`text-xs mt-1 ${
-                          isOwn ? 'text-green-100' : 'text-gray-500'
-                        }`}
+                        className={`text-xs mt-1 ${isOwn ? 'text-green-100' : 'text-gray-500'
+                          }`}
                       >
                         {new Date(msg.createdAt).toLocaleTimeString([], {
                           hour: '2-digit',
