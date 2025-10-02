@@ -6,7 +6,7 @@ import useUserStore from '../../../stores/authStores/useUserStore';
 import api from '../../../lib/api';
 import ChatModal from '../../../components/modals/ChatModal';
 
-const IncomingChats = () => {
+const OutgoingChats = () => {
   const [chatRooms, setChatRooms] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedChatRoomId, setSelectedChatRoomId] = useState(null);
@@ -15,22 +15,22 @@ const IncomingChats = () => {
   const { currentUser } = useUserStore();
 
   useEffect(() => {
-    fetchIncomingChats();
+    fetchOutgoingChats();
   }, []);
 
-  const fetchIncomingChats = async () => {
+  const fetchOutgoingChats = async () => {
     setIsLoading(true);
     try {
       const res = await api.get('/api/v1/chat/rooms');
       
-      // Filter: Only chats where currentUser is the SELLER
-      const incomingChats = res.data.data.filter(
-        room => room.sellerId === currentUser.id
+      // Filter: Only chats where currentUser is the BUYER
+      const outgoingChats = res.data.data.filter(
+        room => room.buyerId === currentUser.id
       );
       
-      setChatRooms(incomingChats);
+      setChatRooms(outgoingChats);
     } catch (err) {
-      console.error('Error fetching incoming chats:', err);
+      console.error('Error fetching outgoing chats:', err);
     } finally {
       setIsLoading(false);
     }
@@ -44,7 +44,7 @@ const IncomingChats = () => {
   const closeChat = () => {
     setIsChatModalOpen(false);
     setSelectedChatRoomId(null);
-    fetchIncomingChats(); // Refresh list
+    fetchOutgoingChats(); // Refresh list
   };
 
   const formatTime = (date) => {
@@ -80,10 +80,10 @@ const IncomingChats = () => {
       <div className="bg-white rounded-lg shadow">
         <div className="p-4 border-b">
           <h2 className="text-xl font-semibold text-gray-900">
-            Incoming Messages
+            Outgoing Messages
           </h2>
           <p className="text-sm text-gray-600">
-            Buyers interested in your products
+            Products you're interested in buying
           </p>
         </div>
 
@@ -91,7 +91,8 @@ const IncomingChats = () => {
           {chatRooms.length === 0 ? (
             <div className="p-8 text-center text-gray-500">
               <MessageSquare className="w-12 h-12 mx-auto mb-2 text-gray-400" />
-              <p>No incoming messages yet</p>
+              <p>No outgoing messages yet</p>
+              <p className="text-sm mt-1">Start chatting with sellers!</p>
             </div>
           ) : (
             chatRooms.map((room) => (
@@ -102,7 +103,7 @@ const IncomingChats = () => {
               >
                 <div className="flex items-start gap-3">
                   <Avatar
-                    name={room.buyer.email}
+                    name={room.seller.email}
                     colors={["#482344", "#2b5166", "#429867", "#fab243", "#e02130"]}
                     variant="beam"
                     size={50}
@@ -112,7 +113,7 @@ const IncomingChats = () => {
                     <div className="flex items-center justify-between mb-1">
                       <div className="flex items-center gap-2">
                         <h3 className="font-semibold text-gray-900">
-                          {room.buyer.name}
+                          {room.seller.name}
                         </h3>
                         <Circle
                           className={`w-2 h-2 fill-current ${
@@ -160,4 +161,4 @@ const IncomingChats = () => {
   );
 };
 
-export default IncomingChats;
+export default OutgoingChats;

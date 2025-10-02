@@ -4,13 +4,13 @@ import prisma from "../config/prisma.js";
 import { safeAuthUserSelect } from "../lib/prismaSelects.js";
 
 let io;
+const onlineUsers = new Map(); // userId: socketId
 
-const onlineUsers = new Map();
-
+// Init
 export const initializeSocket = (server) => {
   io = new Server(server, {
     cors: {
-      origin: process.env.CLIENT_URL || "http://localhost:5173", // Specify exact origin
+      origin: process.env.CLIENT_BASE_URL,
       methods: ["GET", "POST"],
       credentials: true,
       allowedHeaders: ["Content-Type", "Authorization"]
@@ -20,64 +20,49 @@ export const initializeSocket = (server) => {
     transports: ['websocket', 'polling']
   });
 
-  // Socket Auth Middleware
+  // auth middleware
   io.use(async (socket, next) => {
     try {
       const token = socket.handshake.auth.token;
-      console.log("Socket auth attempt, token present:", !!token);
-
       if (!token) {
-        console.error("No token provided in socket auth");
-        return next(new Error("Auth token missing in socket auth middleware"));
+        return next(new Error("No authentication token provided"));
       }
-
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      console.log("Token decoded for user:", decoded.id);
-
       const user = await prisma.user.findUnique({
-        where: {
-          id: decoded.id,
-          deletedAt: null
-        },
+        where: { id: decoded.id, deletedAt: null },
         select: safeAuthUserSelect,
       });
-
       if (!user) {
-        console.error("User not found:", decoded.id);
-        return next(new Error("Access denied or user not found"));
+        return next(new Error("User not found"));
       }
-
       if (user.isSuspended) {
-        console.error("User is suspended:", decoded.id);
         return next(new Error("Account is suspended"));
       }
-
       socket.user = user;
       socket.userId = user.id;
-      console.log("Socket auth successful for user:", user.id);
       next();
     } catch (error) {
-      console.error("Socket auth error:", error);
       if (error.name === "TokenExpiredError") {
-        return next(new Error("Token expired"));
+        return next(new Error("Token expired, Please Log in again"));
       }
       if (error.name === "JsonWebTokenError") {
-        return next(new Error("Invalid token"));
+        return next(new Error("Invalid token. Please log in again"));
       }
-      next(new Error("Authentication error"));
+      next(new Error("Authentication failed. Please log in again"));
     }
   });
 
-  // On connect
   io.on("connection", (socket) => {
-    console.log(`✅ User connected: ${socket.userId} (Socket ID: ${socket.id})`);
     onlineUsers.set(socket.userId, socket.id);
-    io.emit("user_online", { userId: socket.userId });
 
+    io.emit("user_status", { 
+      userId: socket.userId, 
+      isOnline: true 
+    });
+
+    
     socket.on("join_room", async ({ chatRoomId }) => {
       try {
-        console.log(`User ${socket.userId} attempting to join room: ${chatRoomId}`);
-
         const chatRoom = await prisma.chatRoom.findFirst({
           where: {
             id: chatRoomId,
@@ -87,41 +72,30 @@ export const initializeSocket = (server) => {
             ]
           }
         });
-
         if (!chatRoom) {
-          console.error(`Access denied: User ${socket.userId} not part of room ${chatRoomId}`);
-          socket.emit("error", { message: "Access denied to this chat room" });
+          socket.emit("error", { message: "Access denied" });
           return;
         }
-
         socket.join(chatRoomId);
-        console.log(`✅ User ${socket.userId} joined room: ${chatRoomId}`);
-
-        // Mark messages as read
+        // Mark all unread messages as read
         await prisma.message.updateMany({
           where: {
             chatRoomId,
             senderId: { not: socket.userId },
             isRead: false
           },
-          data: {
-            isRead: true
-          }
+          data: { isRead: true }
         });
-
         socket.to(chatRoomId).emit("messages_read", { chatRoomId });
       } catch (error) {
         console.error("Join room error:", error);
-        socket.emit("error", { message: "Failed to join chat room" });
+        socket.emit("error", { message: "Failed to join room" });
       }
     });
 
-    // Send message
+
     socket.on("send_message", async ({ chatRoomId, content }) => {
       try {
-        console.log(`📨 User ${socket.userId} sending message to room: ${chatRoomId}`);
-
-        // Verify user is part of this chat room
         const chatRoom = await prisma.chatRoom.findFirst({
           where: {
             id: chatRoomId,
@@ -129,19 +103,12 @@ export const initializeSocket = (server) => {
               { buyerId: socket.userId },
               { sellerId: socket.userId }
             ]
-          },
-          include: {
-            buyer: { select: { id: true, name: true } },
-            seller: { select: { id: true, name: true } }
           }
         });
-
         if (!chatRoom) {
-          console.error(`Access denied: User ${socket.userId} not part of room ${chatRoomId}`);
-          socket.emit("error", { message: "Access denied to this chat room" });
+          socket.emit("error", { message: "Access denied" });
           return;
         }
-
         const message = await prisma.message.create({
           data: {
             chatRoomId,
@@ -154,20 +121,14 @@ export const initializeSocket = (server) => {
             }
           }
         });
+        io.to(chatRoomId).emit("new_message", message);
+        const recipientId = socket.userId === chatRoom.buyerId 
+          ? chatRoom.sellerId 
+          : chatRoom.buyerId;
 
-        console.log(`✅ Message created:`, message.id);
-
-        // Send the message to all users in this room
-        io.to(chatRoomId).emit("new_message", {
-          ...message,
-          chatRoomId
-        });
-
-        // PUSH notifications for offline users
-        const recipientId = socket.userId === chatRoom.buyerId ? chatRoom.sellerId : chatRoom.buyerId;
         if (!onlineUsers.has(recipientId)) {
-          console.log(`📲 Recipient ${recipientId} is offline, send push notification`);
-          // TODO: Implement push notification
+          // TODO: Send push notification
+          
         }
       } catch (error) {
         console.error("Send message error:", error);
@@ -175,7 +136,7 @@ export const initializeSocket = (server) => {
       }
     });
 
-    // Typing indicator
+
     socket.on("typing", ({ chatRoomId, isTyping }) => {
       socket.to(chatRoomId).emit("user_typing", {
         userId: socket.userId,
@@ -183,29 +144,29 @@ export const initializeSocket = (server) => {
       });
     });
 
-    // Leave room
+
     socket.on("leave_room", (chatRoomId) => {
       socket.leave(chatRoomId);
-      console.log(`User ${socket.userId} left room ${chatRoomId}`);
     });
 
-    socket.on("disconnect", (reason) => {
-      console.log(`❌ User ${socket.userId} disconnected: ${reason}`);
+
+    socket.on("disconnect", () => {
       onlineUsers.delete(socket.userId);
-      io.emit("user_offline", { userId: socket.userId });
+      io.emit("user_status", { 
+        userId: socket.userId, 
+        isOnline: false 
+      });
     });
   });
-
-  console.log("✅ Socket.IO initialized successfully");
-
+  console.log("Socket.IO initialized");
   return io;
-}
+};
 
 export const getIO = () => {
   if (!io) throw new Error("Socket.IO not initialized");
   return io;
-}
+};
 
 export const isUserOnline = (userId) => {
   return onlineUsers.has(userId);
-}
+};

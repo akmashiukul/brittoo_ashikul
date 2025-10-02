@@ -242,7 +242,7 @@ export const getChatMessages = async (req, res, next) => {
     const userId = req.user.id;
     const { page = 1, limit = 50 } = req.query;
 
-    // Verify user has access to this chat room
+    // Verify user has access and get room details
     const chatRoom = await prisma.chatRoom.findFirst({
       where: {
         id: chatRoomId,
@@ -250,6 +250,31 @@ export const getChatMessages = async (req, res, next) => {
           { buyerId: userId },
           { sellerId: userId }
         ]
+      },
+      include: {
+        product: {
+          select: {
+            id: true,
+            name: true,
+            productImages: true,
+            askingPrice: true,
+            minPrice: true
+          }
+        },
+        buyer: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          }
+        },
+        seller: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          }
+        }
       }
     });
 
@@ -259,8 +284,8 @@ export const getChatMessages = async (req, res, next) => {
 
     const pageNum = parseInt(page);
     const limitNum = parseInt(limit);
-    
-    // Get messages with pagination (ordered desc, so newest first in query)
+
+    // Get messages with pagination
     const messages = await prisma.message.findMany({
       where: { chatRoomId },
       include: {
@@ -291,14 +316,27 @@ export const getChatMessages = async (req, res, next) => {
       data: { isRead: true }
     });
 
-    // Reverse so oldest is first (chronological order)
+    // Reverse so oldest is first
     const messagesInOrder = messages.reverse();
+
+    // Check if partner is online
+    const partnerId = chatRoom.buyerId === userId ? chatRoom.sellerId : chatRoom.buyerId;
+    const isPartnerOnline = isUserOnline(partnerId);
 
     res.status(200).json({
       success: true,
       message: "Messages retrieved successfully",
       data: {
         messages: messagesInOrder,
+        chatRoom: {
+          id: chatRoom.id,
+          product: chatRoom.product,
+          buyer: chatRoom.buyer,
+          seller: chatRoom.seller,
+          buyerId: chatRoom.buyerId,
+          sellerId: chatRoom.sellerId,
+          isPartnerOnline
+        },
         pagination: {
           currentPage: pageNum,
           totalPages: Math.ceil(totalMessages / limitNum),

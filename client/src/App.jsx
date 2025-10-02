@@ -54,6 +54,8 @@ import AdminManagePurchaseRequests from "./pages/admin/admin-dash-pages/AdminMan
 import ManagePlacedPurchaseRequests from "./pages/private/dash-pages/ManagePlacedPurchaseRequests";
 import ManageReceivedPurchaseRequests from "./pages/private/dash-pages/ManageReceivedPurchaseRequests";
 import IncomingChats from "./pages/private/dash-pages/IncomingChats";
+import OutgoingChats from "./pages/private/dash-pages/OutgoingChats";
+import AdminManageChats from "./pages/admin/admin-dash-pages/AdminManageChats";
 
 const AppContent = () => {
   const location = useLocation();
@@ -174,6 +176,10 @@ const AppContent = () => {
                 path="manage-purchase-requests"
                 element={<AdminManagePurchaseRequests />}
               />
+              <Route
+                path="manage-chats"
+                element={<AdminManageChats />}
+              />
             </Route>
           </Route>
 
@@ -188,6 +194,7 @@ const AppContent = () => {
               <Route path="received-requests" element={<ReceivedRequests />} />
               <Route path="user-analytics" element={<UserAnalytics />} />
               <Route path="incoming-chats" element={<IncomingChats />} />
+              <Route path="outgoing-chats" element={<OutgoingChats />} />
               <Route path="placed-purchase-requests" element={<ManagePlacedPurchaseRequests />} />
               <Route path="received-purchase-requests" element={<ManageReceivedPurchaseRequests />} />
             </Route>
