@@ -1,6 +1,7 @@
 import express from "express";
-import { createOrGetChatRoom, deleteChatRoom, getChatMessages, getMyChatRooms } from "../../controllers/user-controllers/purchaseChat.controller.js";
+import { createOrGetChatRoom, deleteChatRoom, getAllChatRoomsAdmin, getChatMessages, getMyChatRooms } from "../../controllers/user-controllers/purchaseChat.controller.js";
 import { verifyToken } from "../../middlewares/authMiddleware.js";
+import { adminMiddleware } from "../../middlewares/adminMiddleware.js";
 
 const router = express.Router();
 
@@ -9,11 +10,16 @@ router.post("/room", verifyToken, createOrGetChatRoom);
 
 // Get all chat rooms for current user
 router.get("/rooms", verifyToken, getMyChatRooms);
-
 // Get messages for a specific chat room
 router.get("/room/:chatRoomId/messages", verifyToken, getChatMessages);
 
+
+// admin
+router.get("/admin/rooms", verifyToken, adminMiddleware, getAllChatRoomsAdmin);
+router.delete("/room/:chatRoomId", verifyToken, adminMiddleware, deleteChatRoom);
+
+
+
 // Delete chat room
-router.delete("/room/:chatRoomId", verifyToken, deleteChatRoom);
 
 export default router;

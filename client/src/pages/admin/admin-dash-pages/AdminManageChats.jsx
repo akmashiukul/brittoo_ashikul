@@ -11,7 +11,8 @@ const AdminManageChats = () => {
   const [selectedChatRoomId, setSelectedChatRoomId] = useState(null);
   const [isChatModalOpen, setIsChatModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all'); // all, active, inactive
+
+  console.log(chatRooms)
 
   useEffect(() => {
     fetchAllChats();
@@ -19,13 +20,13 @@ const AdminManageChats = () => {
 
   useEffect(() => {
     filterChats();
-  }, [searchTerm, filterStatus, chatRooms]);
+  }, [searchTerm, chatRooms]);
 
   const fetchAllChats = async () => {
     setIsLoading(true);
     try {
       // You'll need to create this admin endpoint
-      const res = await api.get('/api/v1/admin/chat/rooms');
+      const res = await api.get('/api/v1/chat/admin/rooms');
       setChatRooms(res.data.data);
     } catch (err) {
       console.error('Error fetching all chats:', err);
@@ -45,14 +46,6 @@ const AdminManageChats = () => {
         room.product.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-
-    // Filter by status
-    if (filterStatus === 'active') {
-      filtered = filtered.filter(room => room.isActive);
-    } else if (filterStatus === 'inactive') {
-      filtered = filtered.filter(room => !room.isActive);
-    }
-
     setFilteredRooms(filtered);
   };
 
@@ -114,7 +107,7 @@ const AdminManageChats = () => {
     <div className="max-w-6xl mx-auto p-4">
       <div className="bg-white rounded-lg shadow">
         {/* Header */}
-        <div className="p-4 border-b">
+        <div className="p-4 border-b border-gray-300">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">
             Manage All Chats
           </h2>
@@ -131,20 +124,6 @@ const AdminManageChats = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
               />
-            </div>
-
-            {/* Filter */}
-            <div className="relative">
-              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="pl-10 pr-8 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 appearance-none bg-white cursor-pointer"
-              >
-                <option value="all">All Chats</option>
-                <option value="active">Active Only</option>
-                <option value="inactive">Inactive Only</option>
-              </select>
             </div>
           </div>
 
@@ -250,6 +229,7 @@ const AdminManageChats = () => {
           isOpen={isChatModalOpen}
           onClose={closeChat}
           chatRoomId={selectedChatRoomId}
+          isAdmin={true}
         />
       )}
     </div>

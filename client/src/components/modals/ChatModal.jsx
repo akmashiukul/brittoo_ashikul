@@ -5,7 +5,7 @@ import api from '../../lib/api';
 import Avatar from 'boring-avatars';
 import useUserStore from '../../stores/authStores/useUserStore';
 
-const ChatModal = ({ isOpen, onClose, productId, chatRoomId: initialChatRoomId }) => {
+const ChatModal = ({ isOpen, onClose, productId, chatRoomId: initialChatRoomId, isAdmin = false }) => {
   // States
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
@@ -58,16 +58,16 @@ const ChatModal = ({ isOpen, onClose, productId, chatRoomId: initialChatRoomId }
   }, [isOpen, productId, initialChatRoomId]);
 
   useEffect(() => {
-    if (socket && chatRoom) {
+    if (socket && chatRoom && !isAdmin) {
       socket.on("partner_status", ({ isOnline }) => {
         setIsPartnerOnline(isOnline);
       })
     }
-  }, [chatRoom, socket]);
+  }, [chatRoom, isAdmin, socket]);
 
   // Initialize socket connection
   useEffect(() => {
-    if (!chatRoomIdRef.current || !isOpen) return;
+    if (!chatRoomIdRef.current || !isOpen || isAdmin) return;
     const token = localStorage.getItem('token');
     if (!token) {
       console.error('No token found');
@@ -131,7 +131,7 @@ const ChatModal = ({ isOpen, onClose, productId, chatRoomId: initialChatRoomId }
       }
       newSocket.disconnect();
     };
-  }, [isOpen, chatRoom, currentUser.id]);
+  }, [isOpen, chatRoom, currentUser.id, isAdmin]);
 
   // Auto-scroll when new messages arrive
   useEffect(() => {
@@ -142,12 +142,12 @@ const ChatModal = ({ isOpen, onClose, productId, chatRoomId: initialChatRoomId }
 
 
   useEffect(() => {
-    if (!socket || !chatRoomIdRef.current) return;
+    if (!socket || !chatRoomIdRef.current || isAdmin) return;
     socket.emit('typing', {
       chatRoomId: chatRoomIdRef.current,
       isTyping: newMessage.trim().length > 0
     });
-  }, [newMessage, socket]);
+  }, [isAdmin, newMessage, socket]);
 
 
   const createOrGetChatRoom = async () => {
@@ -324,8 +324,8 @@ const ChatModal = ({ isOpen, onClose, productId, chatRoomId: initialChatRoomId }
                   >
                     <div
                       className={`max-w-[70%] rounded-lg px-4 py-2 shadow-sm ${isOwn
-                          ? 'bg-green-600 text-white'
-                          : 'bg-white text-gray-900'
+                        ? 'bg-green-600 text-white'
+                        : 'bg-white text-gray-900'
                         }`}
                     >
                       <p className="text-sm break-words">{msg.content}</p>
@@ -362,30 +362,34 @@ const ChatModal = ({ isOpen, onClose, productId, chatRoomId: initialChatRoomId }
         </div>
 
         {/* Input Area */}
-        <div className="p-4 border-t border-gray-300 bg-white">
-          {!isConnected && (
-            <div className="mb-2 text-sm text-red-600 text-center">
-              Connecting...
+        {
+          !isAdmin && (
+            <div className="p-4 border-t border-gray-300 bg-white">
+              {!isConnected && (
+                <div className="mb-2 text-sm text-red-600 text-center">
+                  Connecting...
+                </div>
+              )}
+              <form onSubmit={sendMessage} className="flex gap-2">
+                <input
+                  type="text"
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  placeholder="Type a message..."
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  disabled={!isConnected}
+                />
+                <button
+                  type="submit"
+                  disabled={!newMessage.trim() || !isConnected}
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+                >
+                  <Send className="w-5 h-5" />
+                </button>
+              </form>
             </div>
-          )}
-          <form onSubmit={sendMessage} className="flex gap-2">
-            <input
-              type="text"
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Type a message..."
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              disabled={!isConnected}
-            />
-            <button
-              type="submit"
-              disabled={!newMessage.trim() || !isConnected}
-              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
-            >
-              <Send className="w-5 h-5" />
-            </button>
-          </form>
-        </div>
+          )
+        }
       </div>
     </div>
   );

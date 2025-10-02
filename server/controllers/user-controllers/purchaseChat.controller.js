@@ -387,3 +387,40 @@ export const deleteChatRoom = async (req, res, next) => {
     next(error);
   }
 };
+
+
+
+export const getAllChatRoomsAdmin = async (req, res, next) => {
+  try {
+    const chatRooms = await prisma.chatRoom.findMany({
+      orderBy: { updatedAt: "desc" },
+      include: {
+        buyer: {
+          select: { id: true, name: true, email: true }
+        },
+        seller: {
+          select: { id: true, name: true, email: true }
+        },
+        product: {
+          select: { id: true, name: true }
+        },
+        messages: {
+          take: 1, // last message preview
+          orderBy: { createdAt: "desc" },
+        },
+        _count: {
+          select: { messages: true }
+        }
+      }
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "All chat rooms fetched",
+      data: chatRooms
+    });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
