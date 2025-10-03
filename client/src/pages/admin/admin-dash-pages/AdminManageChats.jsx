@@ -135,7 +135,7 @@ const AdminManageChats = () => {
         </div>
 
         {/* Chat List */}
-        <div className="divide-y max-h-[600px] overflow-y-auto">
+        <div className="divide-y divide-gray-400 max-h-[600px] overflow-y-auto">
           {filteredRooms.length === 0 ? (
             <div className="p-8 text-center text-gray-500">
               <MessageSquare className="w-12 h-12 mx-auto mb-2 text-gray-400" />

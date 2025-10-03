@@ -24,6 +24,7 @@ const ChatModal = ({ isOpen, onClose, productId, chatRoomId: initialChatRoomId, 
   const messagesContainerRef = useRef(null);
   const chatRoomIdRef = useRef(initialChatRoomId);
   const previousScrollHeight = useRef(0);
+  const isCreatingRoom = useRef(false);
 
   const { currentUser } = useUserStore();
 
@@ -31,7 +32,6 @@ const ChatModal = ({ isOpen, onClose, productId, chatRoomId: initialChatRoomId, 
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Maintain scroll position when loading old messages
   const maintainScrollPosition = () => {
     if (messagesContainerRef.current) {
       const newScrollHeight = messagesContainerRef.current.scrollHeight;
@@ -46,11 +46,15 @@ const ChatModal = ({ isOpen, onClose, productId, chatRoomId: initialChatRoomId, 
     }
   }, [isPartnerTyping])
 
-
+  // FIXED: Prevent race condition
   useEffect(() => {
     if (!isOpen) return;
+
     if (productId && !initialChatRoomId) {
-      createOrGetChatRoom();
+      // Only call if not already creating
+      if (!isCreatingRoom.current) {
+        createOrGetChatRoom();
+      }
     } else if (initialChatRoomId) {
       chatRoomIdRef.current = initialChatRoomId;
       fetchMessages();
@@ -65,7 +69,6 @@ const ChatModal = ({ isOpen, onClose, productId, chatRoomId: initialChatRoomId, 
     }
   }, [chatRoom, isAdmin, socket]);
 
-  // Initialize socket connection
   useEffect(() => {
     if (!chatRoomIdRef.current || !isOpen || isAdmin) return;
     const token = localStorage.getItem('token');
@@ -82,35 +85,43 @@ const ChatModal = ({ isOpen, onClose, productId, chatRoomId: initialChatRoomId, 
       reconnectionAttempts: 5,
       timeout: 10000,
     });
+
     newSocket.on('connect', () => {
       console.log('✅ Socket connected');
       setIsConnected(true);
       newSocket.emit('join_room', { chatRoomId: chatRoomIdRef.current });
     });
+
     newSocket.on('connect_error', (err) => {
       console.error('Socket connection error:', err.message);
       setIsConnected(false);
     });
+
     newSocket.on('disconnect', () => {
       console.log('❌ Socket disconnected');
       setIsConnected(false);
     });
+
     newSocket.on('error', (error) => {
       console.error('Socket error:', error);
       alert(error.message || 'Socket error occurred');
     });
+
     newSocket.on('new_message', (message) => {
       setMessages(prev => [...prev, message]);
       setIsPartnerTyping(false);
     });
+
     newSocket.on('messages_read', ({ chatRoomId }) => {
       console.log('Messages read in room:', chatRoomId);
     });
+
     newSocket.on('user_typing', ({ userId, isTyping }) => {
       if (userId !== currentUser.id) {
         setIsPartnerTyping(isTyping);
       }
     });
+
     newSocket.on('user_status', ({ userId, isOnline }) => {
       if (chatRoom) {
         const partnerId = chatRoom.buyerId === currentUser.id
@@ -133,13 +144,11 @@ const ChatModal = ({ isOpen, onClose, productId, chatRoomId: initialChatRoomId, 
     };
   }, [isOpen, chatRoom, currentUser.id, isAdmin]);
 
-  // Auto-scroll when new messages arrive
   useEffect(() => {
     if (messages.length > 0 && !isLoadingMore) {
       scrollToBottom();
     }
   }, [messages]);
-
 
   useEffect(() => {
     if (!socket || !chatRoomIdRef.current || isAdmin) return;
@@ -149,9 +158,12 @@ const ChatModal = ({ isOpen, onClose, productId, chatRoomId: initialChatRoomId, 
     });
   }, [isAdmin, newMessage, socket]);
 
-
   const createOrGetChatRoom = async () => {
+    if (isCreatingRoom.current) return;
+
+    isCreatingRoom.current = true;
     setIsLoading(true);
+
     try {
       const res = await api.post('/api/v1/chat/room', { productId });
       setChatRoom(res.data.data);
@@ -164,6 +176,7 @@ const ChatModal = ({ isOpen, onClose, productId, chatRoomId: initialChatRoomId, 
       alert(err.response?.data?.message || 'Failed to create chat');
     } finally {
       setIsLoading(false);
+      isCreatingRoom.current = false;
     }
   };
 
@@ -182,13 +195,11 @@ const ChatModal = ({ isOpen, onClose, productId, chatRoomId: initialChatRoomId, 
     }
   };
 
-
   const loadMoreMessages = async () => {
     if (isLoadingMore || !hasMore) return;
     setIsLoadingMore(true);
     const nextPage = page + 1;
     try {
-      // Save current scroll position
       if (messagesContainerRef.current) {
         previousScrollHeight.current = messagesContainerRef.current.scrollHeight;
       }
@@ -208,7 +219,6 @@ const ChatModal = ({ isOpen, onClose, productId, chatRoomId: initialChatRoomId, 
     }
   };
 
-
   const sendMessage = async (e) => {
     e.preventDefault();
     const trimmedMessage = newMessage.trim();
@@ -222,7 +232,6 @@ const ChatModal = ({ isOpen, onClose, productId, chatRoomId: initialChatRoomId, 
     setNewMessage('');
   };
 
-
   if (!isOpen) return null;
 
   const partner = chatRoom?.buyerId === currentUser.id
@@ -232,53 +241,98 @@ const ChatModal = ({ isOpen, onClose, productId, chatRoomId: initialChatRoomId, 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg w-full max-w-2xl h-[600px] flex flex-col shadow-2xl">
+        {
+          isAdmin ? (
+            <div className="flex items-center justify-between w-full px-4 py-2 bg-white shadow-sm rounded-md">
+              {/* Product Info */}
+              <div className="flex flex-col">
+                <h3 className="font-semibold text-gray-900 text-base">
+                  {chatRoom?.product?.name || 'Loading...'}
+                </h3>
+                <span className="text-xs text-gray-500">Monitoring Chat</span>
+              </div>
 
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-300 bg-gray-50">
-          <div className="flex items-center gap-3">
-            {partner && (
-              <>
-                <Avatar
-                  name={partner.email}
-                  colors={["#482344", "#2b5166", "#429867", "#fab243", "#e02130"]}
-                  variant="beam"
-                  size={40}
-                />
-                <div>
-                  <h3 className="font-semibold text-gray-900">
-                    {chatRoom?.product?.name || 'Loading...'}
-                  </h3>
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="text-gray-600">{partner.name}</span>
-                    <div className="flex items-center gap-1">
-                      <Circle
-                        className={`w-2 h-2 fill-current ${isPartnerOnline ? 'text-green-500' : 'text-gray-400'
-                          }`}
-                      />
-                      <span className={`text-xs ${isPartnerOnline ? 'text-green-600' : 'text-gray-500'
-                        }`}>
-                        {isPartnerOnline ? 'Online' : 'Offline'}
-                      </span>
-                    </div>
-                  </div>
+              {/* Buyer ↔ Seller */}
+              <div className="flex items-center gap-6">
+                {/* Seller */}
+                <div className="flex flex-col items-center">
+                  <Avatar
+                    name={chatRoom?.seller?.email}
+                    colors={["#482344", "#2b5166", "#429867", "#fab243", "#e02130"]}
+                    variant="beam"
+                    size={36}
+                  />
+                  <span className="text-xs text-gray-600">{chatRoom?.seller?.name}</span>
+                  <span className="text-[10px] text-purple-500 font-medium">Seller</span>
                 </div>
-              </>
-            )}
-          </div>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 p-1 rounded hover:bg-gray-200 transition"
-          >
-            <X className="w-6 h-6" />
-          </button>
-        </div>
 
-        {/* Messages Container */}
+                <span className="text-gray-400">⇄</span>
+
+                {/* Buyer */}
+                <div className="flex flex-col items-center">
+                  <Avatar
+                    name={chatRoom?.buyer?.email}
+                    colors={["#482344", "#2b5166", "#429867", "#fab243", "#e02130"]}
+                    variant="beam"
+                    size={36}
+                  />
+                  <span className="text-xs text-gray-600">{chatRoom?.buyer?.name}</span>
+                  <span className="text-[10px] text-blue-500 font-medium">Buyer</span>
+                </div>
+              </div>
+
+              {/* Close button */}
+              <button
+                onClick={onClose}
+                className="text-gray-500 hover:text-gray-700 p-1 rounded hover:bg-gray-100 transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between p-4 border-b border-gray-300 bg-gray-50">
+              <div className="flex items-center gap-3">
+                {partner && (
+                  <>
+                    <Avatar
+                      name={partner.email}
+                      colors={["#482344", "#2b5166", "#429867", "#fab243", "#e02130"]}
+                      variant="beam"
+                      size={40}
+                    />
+                    <div>
+                      <h3 className="font-semibold text-gray-900">
+                        {chatRoom?.product?.name || 'Loading...'}
+                      </h3>
+                      <div className="flex items-center gap-2 text-sm">
+                        <span className="text-gray-600">{partner.name}</span>
+                        <div className="flex items-center gap-1">
+                          <Circle
+                            className={`w-2 h-2 fill-current ${isPartnerOnline ? 'text-green-500' : 'text-gray-400'}`}
+                          />
+                          <span className={`text-xs ${isPartnerOnline ? 'text-green-600' : 'text-gray-500'}`}>
+                            {isPartnerOnline ? 'Online' : 'Offline'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )
+                }
+              </div>
+              <button
+                onClick={onClose}
+                className="text-gray-500 hover:text-gray-700 p-1 rounded hover:bg-gray-200 transition"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+          )
+        }
         <div
           ref={messagesContainerRef}
           className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50"
         >
-          {/* Load More Button */}
           {hasMore && !isLoading && (
             <div className="flex justify-center mb-4">
               <button
@@ -301,19 +355,16 @@ const ChatModal = ({ isOpen, onClose, productId, chatRoomId: initialChatRoomId, 
             </div>
           )}
 
-          {/* Loading State */}
           {isLoading ? (
             <div className="flex justify-center items-center h-full">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
             </div>
           ) : messages.length === 0 ? (
-            // Empty State
             <div className="flex flex-col items-center justify-center h-full text-gray-500">
               <p className="text-lg">No messages yet</p>
               <p className="text-sm">Start the conversation!</p>
             </div>
           ) : (
-            // Messages List
             <>
               {messages.map((msg) => {
                 const isOwn = msg.senderId === currentUser.id;
@@ -323,9 +374,7 @@ const ChatModal = ({ isOpen, onClose, productId, chatRoomId: initialChatRoomId, 
                     className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
                   >
                     <div
-                      className={`max-w-[70%] rounded-lg px-4 py-2 shadow-sm ${isOwn
-                        ? 'bg-green-600 text-white'
-                        : 'bg-white text-gray-900'
+                      className={`max-w-[70%] rounded-lg px-4 py-2 shadow-sm ${isOwn ? 'bg-green-600 text-white' : 'bg-white text-gray-900'
                         }`}
                     >
                       <p className="text-sm break-words">{msg.content}</p>
@@ -345,7 +394,6 @@ const ChatModal = ({ isOpen, onClose, productId, chatRoomId: initialChatRoomId, 
             </>
           )}
 
-          {/* Typing Indicator */}
           {isPartnerTyping && (
             <div className="flex justify-start">
               <div className="bg-white rounded-lg px-4 py-3">
@@ -361,35 +409,32 @@ const ChatModal = ({ isOpen, onClose, productId, chatRoomId: initialChatRoomId, 
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input Area */}
-        {
-          !isAdmin && (
-            <div className="p-4 border-t border-gray-300 bg-white">
-              {!isConnected && (
-                <div className="mb-2 text-sm text-red-600 text-center">
-                  Connecting...
-                </div>
-              )}
-              <form onSubmit={sendMessage} className="flex gap-2">
-                <input
-                  type="text"
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder="Type a message..."
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                  disabled={!isConnected}
-                />
-                <button
-                  type="submit"
-                  disabled={!newMessage.trim() || !isConnected}
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
-                >
-                  <Send className="w-5 h-5" />
-                </button>
-              </form>
-            </div>
-          )
-        }
+        {!isAdmin && (
+          <div className="p-4 border-t border-gray-300 bg-white">
+            {!isConnected && (
+              <div className="mb-2 text-sm text-red-600 text-center">
+                Connecting...
+              </div>
+            )}
+            <form onSubmit={sendMessage} className="flex gap-2">
+              <input
+                type="text"
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                placeholder="Type a message..."
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                disabled={!isConnected}
+              />
+              <button
+                type="submit"
+                disabled={!newMessage.trim() || !isConnected}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+              >
+                <Send className="w-5 h-5" />
+              </button>
+            </form>
+          </div>
+        )}
       </div>
     </div>
   );
