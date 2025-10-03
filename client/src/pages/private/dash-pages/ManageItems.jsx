@@ -4,7 +4,7 @@ import ManageItemCard from "../../../components/ManageItemCard";
 import api from "../../../lib/api";
 import Loader from "../../../components/shared/Loader";
 import useUserStore from "../../../stores/authStores/useUserStore";
-import { X } from "lucide-react";
+import { Sparkle, X } from "lucide-react";
 
 const ManageItems = () => {
   const [products, setProducts] = useState([]);
@@ -22,34 +22,35 @@ const ManageItems = () => {
         minPrice: updatingProduct.minPrice ?? 0,
         isForSale: updatingProduct.isForSale,
         isAvailable: updatingProduct.isAvailable ?? true,
+        isAiEnabled: updatingProduct.isAiEnabled
       });
     }
   }, [updatingProduct]);
 
   const fetchProducts = async () => {
-      try {
-        const token = localStorage.getItem("token");
+    try {
+      const token = localStorage.getItem("token");
 
-        if (!token || !currentUser.id) {
-          throw new Error("Please log in to view your products.");
-        }
-
-        const response = await api.get(`/api/v1/products?ownerId=${currentUser.id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        setProducts(response.data.products || []);
-      } catch (err) {
-        setError(err.response?.data?.message || err.message);
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: err.response?.data?.message || err.message,
-        });
-      } finally {
-        setLoading(false);
+      if (!token || !currentUser.id) {
+        throw new Error("Please log in to view your products.");
       }
-    };
+
+      const response = await api.get(`/api/v1/products?ownerId=${currentUser.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setProducts(response.data.products || []);
+    } catch (err) {
+      setError(err.response?.data?.message || err.message);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: err.response?.data?.message || err.message,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchProducts();
@@ -65,7 +66,7 @@ const ManageItems = () => {
       alert('Asking price can not be less than min price');
       return;
     }
-    
+
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
@@ -255,6 +256,39 @@ const ManageItems = () => {
                                     onChange={(e) => setUpdatedData({ ...updatedData, minPrice: e.target.value })}
                                   />
                                 </label>
+                                <div className="space-y-2 w-full">
+                                  <label className="flex items-start gap-2">
+                                    <p className="text-sm font-medium text-gray-700 flex flex-col items-start">
+                                      <span>Want to use AI for negotiating price for you?</span>
+                                      <span className="text-xs font-normal">(1% from your selling price will be taken as charge)</span>
+                                    </p>
+                                    <span className="rounded-full bg-purple-100 px-2.5 py-0.5 text-xs whitespace-nowrap text-purple-700 flex items-center gap-1">
+                                      New <Sparkle size={10} />
+                                    </span>
+                                  </label>
+                                  <div className="flex gap-4">
+                                    <label className="flex items-center space-x-2">
+                                      <input
+                                        type="radio"
+                                        name="isAiEnabled"
+                                        value="true"
+                                        checked={updatedData.isAiEnabled}
+                                        onChange={() => setUpdatedData({ ...updatedData, isAiEnabled: true })}
+                                      />
+                                      <span>Yes</span>
+                                    </label>
+                                    <label className="flex items-center space-x-2">
+                                      <input
+                                        type="radio"
+                                        name="isAiEnabled"
+                                        value="false"
+                                        checked={!updatedData.isAiEnabled}
+                                        onChange={() => setUpdatedData({ ...updatedData, isAiEnabled: false })}
+                                      />
+                                      <span>No</span>
+                                    </label>
+                                  </div>
+                                </div>
                               </>
                             )
                           }

@@ -1,4 +1,4 @@
-import { Plus, Upload, X } from "lucide-react";
+import { Plus, Sparkle, Upload, X } from "lucide-react";
 import { useState } from "react";
 import Swal from "sweetalert2";
 import Loader from "../../../components/shared/Loader";
@@ -17,6 +17,9 @@ const ListItems = () => {
     omv: "",
     productDescription: "",
     isForSale: false,
+    minPrice: 0,
+    askingPrice: 0,
+    isAiEnabled: false,
   });
 
   const { openShowRccModal, setRcc } = useShowRccModalStore();
@@ -101,7 +104,10 @@ const ListItems = () => {
         tags: "",
         omv: "",
         productDescription: "",
-        isForSale: false
+        isForSale: false,
+        isAiEnabled: false,
+        askingPrice: 0,
+        minPrice: 0
       });
       // Show cache credit
       await setRcc(res.data.rcc);
@@ -343,6 +349,76 @@ const ListItems = () => {
             </label>
           </div>
         </div>
+        {
+          formData.isForSale && (
+            <div className="flex flex-col gap-5">
+              <div className="flex flex-col gap-5 items-center">
+                <label htmlFor="askingPrice" className="flex flex-col gap-1.5 w-full">
+                  <span className="text-sm font-medium text-gray-700">
+                    Your Asking Price
+                  </span>
+                  <input
+                    type="number"
+                    required
+                    id="askingPrice"
+                    className="border bg-white border-gray-300 rounded-md w-full px-2 py-2 md:py-3 p md:px-4 focus:border-gray-400 focus:outline-none text-xs md:text-sm"
+                    value={formData.askingPrice}
+                    onChange={(e) => setFormData({ ...formData, askingPrice: e.target.value })}
+                  />
+                </label>
+                <label htmlFor="minPrice" className="flex flex-col gap-1.5 w-full">
+                  <div className="md:flex md:flex-row md:items-center gap-0.5 md:gap-2 flex flex-col items-start">
+                    <span className="text-sm font-medium text-gray-700">
+                      Minimum threshold price - Below which you'll not sell
+                    </span>
+                    <span className="text-xs text-gray-600">(This is not visible to others)</span>
+                  </div>
+                  <input
+                    type="number"
+                    required
+                    id="minPrice"
+                    className="border bg-white border-gray-300 rounded-md w-full px-2 py-2 md:py-3 p md:px-4 focus:border-gray-400 focus:outline-none text-xs md:text-sm"
+                    value={formData.minPrice}
+                    onChange={(e) => setFormData({ ...formData, minPrice: e.target.value })}
+                  />
+                </label>
+              </div>
+              <div className="space-y-2 w-full">
+                <label className="flex items-start gap-2">
+                  <p className="text-sm font-medium text-gray-700 flex flex-col items-start">
+                    <span>Want to use AI for negotiating price for you?</span>
+                    <span className="text-xs font-normal">(1% from your selling price will be taken as charge)</span>
+                  </p>
+                  <span className="rounded-full bg-purple-100 px-2.5 py-0.5 text-xs whitespace-nowrap text-purple-700 flex items-center gap-1">
+                    New <Sparkle size={10} />
+                  </span>
+                </label>
+                <div className="flex gap-4">
+                  <label className="flex items-center space-x-2">
+                    <input
+                      type="radio"
+                      name="isAiEnabled"
+                      value="true"
+                      checked={formData.isAiEnabled}
+                      onChange={() => setFormData({ ...formData, isAiEnabled: true })}
+                    />
+                    <span>Yes</span>
+                  </label>
+                  <label className="flex items-center space-x-2">
+                    <input
+                      type="radio"
+                      name="isAiEnabled"
+                      value="false"
+                      checked={!formData.isAiEnabled}
+                      onChange={() => setFormData({ ...formData, isAiEnabled: false })}
+                    />
+                    <span>No</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          )
+        }
         <label
           htmlFor="productDescription"
           className="flex flex-col gap-1.5 w-full"

@@ -186,6 +186,7 @@ model Product {
   askingPrice Int?    @map("asking_price") //new
   minPrice    Int?    @map("min_price")
   isForSale   Boolean @default(false) @map("is_for_sale")
+  isAiEnabled Boolean @default(false) @map("is_ai_enabled")
 
   isRented           Boolean @default(false) @map("is_rented")
   isBrittooVerified  Boolean @default(false) @map("is_brittoo_verified")

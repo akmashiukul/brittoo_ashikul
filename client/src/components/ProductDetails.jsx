@@ -425,23 +425,21 @@ const ProductDetails = () => {
                       <p className="text-sm italic mt-1 text-gray-500">(Fixed Price) Not Negotiable</p>
                       <button className="text-xs border-purple-500 text-purple-500 bg-white border rounded-md px-2 py-1 hover:text-white hover:bg-purple-500 cursor-pointer mt-2">Place Buying Request</button>
                     </div>
-                  ) : (
+                  ) : product.isAiEnabled && (
                     <div className="relative mt-3 flex items-center gap-2">
                       <button
                         onClick={() => setShowNegotiateModal(true)}
                         className="relative text-sm px-3 py-1.5 rounded-md 
                           bg-gradient-to-r from-purple-500 via-fuchsia-500 to-purple-600 
-                          text-white border border-purple-400 shadow-md 
-                          hover:shadow-purple-500/50 hover:scale-[1.03] 
+                          text-white border border-purple-400  
+                          hover:shadow-purple-500/50 hover:shadow-sm 
                           transition-all duration-300 ease-in-out 
                           flex items-center gap-1 overflow-hidden cursor-pointer"
                       >
                         <span className="relative z-10 flex items-center gap-1">
                           <Bot size={16} className="text-white" /> <span>Negotiate Price</span> <span className="text-xs font-serif">(AI)</span>
                         </span>
-                        <span className="absolute inset-0 rounded-md bg-gradient-to-r from-purple-400/20 to-fuchsia-400/20 blur-md animate-pulse"></span>
                       </button>
-
                       <Stars size={18} className="text-purple-500" />
                     </div>
 

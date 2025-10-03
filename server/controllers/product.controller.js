@@ -22,6 +22,9 @@ export const createProduct = async (req, res, next) => {
       tags,
       productDescription,
       isForSale,
+      isAiEnabled = false,
+      askingPrice,
+      minPrice
     } = req.body;
     if (!req.user || !req.user.id) {
       throw new CustomError("Unauthorized: No user authenticated", 401);
@@ -78,6 +81,8 @@ export const createProduct = async (req, res, next) => {
       productCondition,
       parseInt(productAge),
     );
+
+
     const result = await prisma.$transaction(async (tx) => {
       const product = await tx.product.create({
         data: {
@@ -87,6 +92,9 @@ export const createProduct = async (req, res, next) => {
           productType,
           productCondition,
           isForSale: isForSale === "false" ? false : true,
+          isAiEnabled: isAiEnabled === "false" ? false : true,
+          askingPrice: isForSale === "false" ? null : parseInt(askingPrice),
+          minPrice: isForSale === "false" ? null : parseInt(minPrice),
           productAge: parseInt(productAge),
           omv: parseInt(omv),
           tags,
@@ -363,7 +371,8 @@ export const updateProductUser = async (req, res, next) => {
       isForSale,
       isAvailable,
       askingPrice,
-      minPrice
+      minPrice,
+      isAiEnabled,
     } = req.body;
     if (!req.user) {
       throw new CustomError("Unauthorized", 403);
@@ -385,11 +394,13 @@ export const updateProductUser = async (req, res, next) => {
 
     const isForSaleBool = normalizeBool(isForSale);
     const isAvailableBool = normalizeBool(isAvailable);
+    const isAiEnabledBool = normalizeBool(isAiEnabled);
 
     // Prepare update data
     const updateData = {};
     if (isForSaleBool !== undefined) updateData.isForSale = isForSaleBool;
     if (isAvailableBool !== undefined) updateData.isAvailable = isAvailableBool;
+    if (isAiEnabledBool !== undefined) updateData.isAiEnabled = isAiEnabledBool;
     if (updateData.isForSale) {
       updateData.askingPrice = parseInt(askingPrice);
       updateData.minPrice = parseInt(minPrice);
