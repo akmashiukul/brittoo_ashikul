@@ -81,6 +81,7 @@ const AdminManageProductCard = ({ product, products, setProducts }) => {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="relative h-40 overflow-hidden">
           <img
+            loading="lazy"
             src={`${baseUrl}${optimizedImages[0]}`}
             alt={name}
             className="w-full h-full object-cover group-hover:scale-110 transition duration-400 group-hover:translate-x-2"
@@ -93,18 +94,25 @@ const AdminManageProductCard = ({ product, products, setProducts }) => {
             </div>
           </div>
           <div className="absolute bottom-2 right-2">
-            {
-              productType === "GADGET" || productType === "VEHICLE" ? (
-                <div className="bg-teal-800 text-white px-2 py-1 rounded text-sm font-medium flex items-center gap-1">
-                  <Clock2 size={14} strokeWidth={3} /> BDT {parseFloat(product.pricePerHour).toFixed(2)}/hr
-                </div>
-              ) : (
-                <div className="bg-gray-800 text-white px-2 py-1 rounded text-sm font-medium flex items-center gap-1">
-                  <Calendar size={14} strokeWidth={3} /> BDT {parseFloat(pricePerDay).toFixed(2)}/day
-                </div>
-              )
-            }
+            {productType === "GADGET" || productType === "VEHICLE" ? (
+              <div className="bg-teal-800 text-white px-2 py-1 rounded text-sm font-medium flex items-center gap-1">
+                <Clock2 size={14} strokeWidth={3} /> BDT{" "}
+                {parseFloat(product.pricePerHour).toFixed(2)}/hr
+              </div>
+            ) : (
+              <div className="bg-gray-800 text-white px-2 py-1 rounded text-sm font-medium flex items-center gap-1">
+                <Calendar size={14} strokeWidth={3} /> BDT{" "}
+                {parseFloat(pricePerDay).toFixed(2)}/day
+              </div>
+            )}
           </div>
+          {!product.isAvailable && (
+            <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 bg-black/60 py-3 text-center">
+              <span className="text-white text-xl font-bold tracking-wide">
+                UNAVAILABLE
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="p-4 space-y-2">

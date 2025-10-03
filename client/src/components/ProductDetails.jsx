@@ -20,7 +20,6 @@ import { useVehiclePriceCalculate } from "../hooks/useVehiclePriceCalculate";
 import { useHourlyPrice } from "../hooks/useHourlyPrice";
 import PriceNegotiateWithBot from "./modals/PriceNegotiateWithBot";
 import ChatModal from "./modals/ChatModal";
-import PurchaseRequestModal from "./modals/PurchaseRequestModal";
 import OfferPriceModal from "./modals/OfferPriceModal";
 
 const ProductDetails = () => {
@@ -337,7 +336,12 @@ const ProductDetails = () => {
             </Carousel>
           </div>
           {/*  1 - B */}
-          <div className="w-full lg:w-1/2">
+          <div className="w-full lg:w-1/2 relative overflow-hidden">
+            {!product.isAvailable && (
+              <div className="absolute top-12 -right-12 rotate-37 md:rotate-34 md:top-11 bg-red-600/80 text-white text-2xl md:text-3xl font-bold px-20 py-2 md:py-3 shadow-md z-10">
+                UNAVAILABLE
+              </div>
+            )}
             <div className="flex items-center justify-between">
               <h2 className="text-xl md:text-2xl font-semibold sm:font-bold">
                 {product.name}
@@ -409,10 +413,10 @@ const ProductDetails = () => {
                   <MessageCircle className="w-5 h-5" />
                   Chat with Seller
                 </button>
-                <button onClick={() =>  setIsOfferModalOpen(true)} className="flex items-center gap-1 px-3 py-1.5 rounded-md 
+                <button onClick={() => setIsOfferModalOpen(true)} className="flex items-center gap-1 px-3 py-1.5 rounded-md 
                    border border-green-600 text-green-600 hover:bg-green-600 
                    transition-colors text-sm mt-2 hover:text-white cursor-pointer">
-                  <HandCoins  className="w-5 h-5" />
+                  <HandCoins className="w-5 h-5" />
                   Offer a Price
                 </button>
                 {
@@ -640,7 +644,7 @@ const ProductDetails = () => {
         )
       }{
         isOfferModalOpen && (
-          <OfferPriceModal 
+          <OfferPriceModal
             product={product}
             setShowModal={setIsOfferModalOpen}
           />
