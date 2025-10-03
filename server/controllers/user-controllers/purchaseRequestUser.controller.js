@@ -36,7 +36,7 @@ export const placePurchaseRequest = async (req, res, next) => {
       throw new CustomError("Pickup terminal required", 400, "BAD_REQUEST");
     }
 
-    const platformCharge = Math.round(parseInt(dealPrice) * 0.05); // 5% platform charge. 
+    const platformCharge = Math.round(parseInt(dealPrice) * 0.01); // 1% platform charge. 
     // EKhance change korle please change on ManagePlacedPurchaseRequests.jsx file too (5%)
     const totalPrice = parseInt(dealPrice) + platformCharge;
 
@@ -46,7 +46,7 @@ export const placePurchaseRequest = async (req, res, next) => {
         buyerId: userId,
         sellerId: product.ownerId,
         askingPrice: product.askingPrice || 0,
-        dealPrice,
+        dealPrice: parseInt(dealPrice),
         totalPrice,
         platformCharge,
         buyerCollectionMethod,

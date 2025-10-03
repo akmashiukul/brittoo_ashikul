@@ -5,7 +5,7 @@ import Loader from "./shared/Loader";
 import { useParams } from "react-router-dom";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
-import { CheckCircle, MessageCircle, Stars, TagIcon, XCircle } from "lucide-react";
+import { Bot, CheckCircle, HandCoins, MessageCircle, Stars, TagIcon, XCircle } from "lucide-react";
 import Avatar from "boring-avatars";
 import { usePriceCalculate } from "../hooks/usePriceCalculate";
 import { differenceInDays } from "date-fns";
@@ -20,6 +20,8 @@ import { useVehiclePriceCalculate } from "../hooks/useVehiclePriceCalculate";
 import { useHourlyPrice } from "../hooks/useHourlyPrice";
 import PriceNegotiateWithBot from "./modals/PriceNegotiateWithBot";
 import ChatModal from "./modals/ChatModal";
+import PurchaseRequestModal from "./modals/PurchaseRequestModal";
+import OfferPriceModal from "./modals/OfferPriceModal";
 
 const ProductDetails = () => {
   const [product, setProduct] = useState(null);
@@ -45,6 +47,7 @@ const ProductDetails = () => {
   const [showNegotiateModal, setShowNegotiateModal] = useState(false);
 
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
 
   const { currentUser } = useUserStore();
   const { id } = useParams();
@@ -401,10 +404,16 @@ const ProductDetails = () => {
                 </p>
                 <button
                   onClick={() => setIsChatOpen(true)}
-                  className="flex items-center gap-2 px-3 py-1.5 mt-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors cursor-pointer text-sm"
+                  className="flex items-center gap-2 px-3 py-1.5 mt-2 border border-green-600 text-green-600 rounded-md hover:bg-green-600 transition-colors cursor-pointer text-sm hover:text-white"
                 >
                   <MessageCircle className="w-5 h-5" />
                   Chat with Seller
+                </button>
+                <button onClick={() =>  setIsOfferModalOpen(true)} className="flex items-center gap-1 px-3 py-1.5 rounded-md 
+                   border border-green-600 text-green-600 hover:bg-green-600 
+                   transition-colors text-sm mt-2 hover:text-white cursor-pointer">
+                  <HandCoins  className="w-5 h-5" />
+                  Offer a Price
                 </button>
                 {
                   product?.askingPrice == product?.minPrice ? (
@@ -413,10 +422,25 @@ const ProductDetails = () => {
                       <button className="text-xs border-purple-500 text-purple-500 bg-white border rounded-md px-2 py-1 hover:text-white hover:bg-purple-500 cursor-pointer mt-2">Place Buying Request</button>
                     </div>
                   ) : (
-                    <div className="relative mt-3 flex items-center gap-1">
-                      <button onClick={() => setShowNegotiateModal(true)} className="text-xs border-purple-500 text-purple-500 bg-white border rounded-md px-2 py-1 hover:text-white hover:bg-purple-500 cursor-pointer">Negotiate Price </button>
-                      <Stars size={17} color="#a855f7" />
+                    <div className="relative mt-3 flex items-center gap-2">
+                      <button
+                        onClick={() => setShowNegotiateModal(true)}
+                        className="relative text-sm px-3 py-1.5 rounded-md 
+                          bg-gradient-to-r from-purple-500 via-fuchsia-500 to-purple-600 
+                          text-white border border-purple-400 shadow-md 
+                          hover:shadow-purple-500/50 hover:scale-[1.03] 
+                          transition-all duration-300 ease-in-out 
+                          flex items-center gap-1 overflow-hidden cursor-pointer"
+                      >
+                        <span className="relative z-10 flex items-center gap-1">
+                          <Bot size={16} className="text-white" /> <span>Negotiate Price</span> <span className="text-xs font-serif">(AI)</span>
+                        </span>
+                        <span className="absolute inset-0 rounded-md bg-gradient-to-r from-purple-400/20 to-fuchsia-400/20 blur-md animate-pulse"></span>
+                      </button>
+
+                      <Stars size={18} className="text-purple-500" />
                     </div>
+
                   )
                 }
               </div>
@@ -612,6 +636,13 @@ const ProductDetails = () => {
             isOpen={isChatOpen}
             onClose={() => setIsChatOpen(false)}
             productId={product?.id}
+          />
+        )
+      }{
+        isOfferModalOpen && (
+          <OfferPriceModal 
+            product={product}
+            setShowModal={setIsOfferModalOpen}
           />
         )
       }

@@ -245,7 +245,7 @@ const AdminManagePurchaseRequests = () => {
                       <div className="space-y-2 text-sm">
                         <p><span className="text-gray-600">Asking Price:</span> <span className="font-medium">৳{request.askingPrice}</span></p>
                         <p><span className="text-gray-600">Deal Price:</span> <span className="font-medium">৳{request.dealPrice}</span></p>
-                        <p><span className="text-gray-600">Platform Charge:</span> <span className="font-medium">৳{request.platformCharge}</span></p>
+                        <p><span className="text-gray-600">Platform Charge:</span> <span className="font-medium">৳{request.platformCharge} (1%)</span></p>
                         <p className="pt-2 border-t"><span className="text-gray-900 font-semibold">Total Price:</span> <span className="font-bold text-green-600">৳{request.totalPrice}</span></p>
                       </div>
 

@@ -139,7 +139,7 @@ const ManagePlacedPurchaseRequests = () => {
                       </div>
                       <div className="flex items-center gap-2 text-gray-600">
                         <Package className="w-4 h-4 text-green-600" />
-                        <span>Platform Charge: ৳{request.platformCharge} (5%)</span>
+                        <span>Platform Charge: ৳{request.platformCharge} (1%)</span>
                       </div>
                       <div className="flex items-center gap-2 text-gray-600">
                         <Package className="w-4 h-4 text-green-600" />
