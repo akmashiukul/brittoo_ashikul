@@ -11,7 +11,8 @@ message VerifyResponse {
   string id = 2;
   string name = 3;
   string email = 4;
-  string error = 5;
+  string role = 5;
+  string error = 6;
 }
 
 service AuthService {

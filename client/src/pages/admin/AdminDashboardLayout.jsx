@@ -6,7 +6,7 @@ import { IoExit, IoHomeSharp } from "react-icons/io5";
 import { BiSolidCreditCardAlt } from "react-icons/bi";
 import { MdOutlineSpaceDashboard } from "react-icons/md";
 import useDashDrawertore from "../../stores/drawerStores/useDashDrawerStore";
-import { BoxesIcon, BoxIcon, FolderKanban, Menu, MonitorCog, Ticket, Users, X } from "lucide-react";
+import { Bot, BoxesIcon, BoxIcon, FolderKanban, Menu, MonitorCog, Ticket, Users, X } from "lucide-react";
 import { useEffect } from "react";
 import { GiReceiveMoney } from "react-icons/gi";
 
@@ -186,6 +186,22 @@ const AdminDashboardLayout = () => {
                 }}
               >
                 <MonitorCog size={14} /> Manage Chats
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/dashboard/admin/negotiation-history"
+                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/negotiation-history")
+                    ? "bg-green-600 text-white"
+                    : "text-gray-700"
+                  } flex items-center gap-2`}
+                onClick={() => {
+                  if (window.innerWidth <= 425) {
+                    closeDrawer();
+                  }
+                }}
+              >
+                <Bot size={14} /> Negotiation History
               </Link>
             </li>
             <li>

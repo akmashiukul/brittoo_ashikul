@@ -56,6 +56,7 @@ import ManageReceivedPurchaseRequests from "./pages/private/dash-pages/ManageRec
 import IncomingChats from "./pages/private/dash-pages/IncomingChats";
 import OutgoingChats from "./pages/private/dash-pages/OutgoingChats";
 import AdminManageChats from "./pages/admin/admin-dash-pages/AdminManageChats";
+import NegotiationHistory from "./pages/admin/admin-dash-pages/NegotiationHistory";
 
 const AppContent = () => {
   const location = useLocation();
@@ -179,6 +180,10 @@ const AppContent = () => {
               <Route
                 path="manage-chats"
                 element={<AdminManageChats />}
+              />
+              <Route
+                path="negotiation-history"
+                element={<NegotiationHistory />}
               />
             </Route>
           </Route>

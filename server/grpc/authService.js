@@ -21,7 +21,8 @@ export const startAuthServer = () => {
           select: {
             id: true,
             name: true,
-            email: true
+            email: true,
+            role: true
           }
         });
         if (!user) {
@@ -32,6 +33,7 @@ export const startAuthServer = () => {
           id: user.id,
           name: user.name,
           email: user.email,
+          role: user.role
         });
 
       } catch (error) {
