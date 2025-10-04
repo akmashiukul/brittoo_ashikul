@@ -11,6 +11,7 @@ export function calculateGadgetPricePerDay(
   usageYears,
   securityScore,
   day,
+  customScale = 1.00
 ) {
   const baseRates = {
     1: 0.022,
@@ -75,11 +76,7 @@ export function calculateGadgetPricePerDay(
   finalPrice = Math.max(finalPrice, floorPrice);
   finalPrice = Math.min(finalPrice, ceilPrice);
 
-  return parseFloat(finalPrice.toFixed(2));
+  const scaledFinalPrice = finalPrice * parseFloat(customScale);
+
+  return parseFloat(scaledFinalPrice.toFixed(2));
 }
-
-// const price = 27000;
-// const days = 1;
-
-// console.log("Price: ", price, " Renting days: ", days)
-// console.log(calculatePricePerDay(price, 'GOOD', 2, 'MID', days))

@@ -187,6 +187,7 @@ model Product {
   minPrice    Int?    @map("min_price")
   isForSale   Boolean @default(false) @map("is_for_sale")
   isAiEnabled Boolean @default(false) @map("is_ai_enabled")
+  scale       Decimal @default(1.00) @map("scale")
 
   isRented           Boolean @default(false) @map("is_rented")
   isBrittooVerified  Boolean @default(false) @map("is_brittoo_verified")

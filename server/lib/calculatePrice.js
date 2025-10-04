@@ -11,6 +11,7 @@ export function calculatePricePerDay(
   usageYears,
   securityScore,
   day,
+  customScale = 1
 ) {
   const baseRates = {
     1: 0.022,
@@ -59,8 +60,10 @@ export function calculatePricePerDay(
     usageMultiplier *
     securityMap[securityScore] *
     scaleFactor;
+  
+  const scaledFinalPrice = finalPrice * parseFloat(customScale);
 
-  return parseFloat(finalPrice.toFixed(2));
+  return parseFloat(scaledFinalPrice.toFixed(2));
 }
 
 //console.log(calculatePricePerDay(40000, 'GOOD', 2, 'MID', 15))

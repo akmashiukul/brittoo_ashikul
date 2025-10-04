@@ -6,7 +6,6 @@ import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 const productUploadsDir = path.join(__dirname, "../uploads/products");
 const optimizedDir = path.join(productUploadsDir, "optimized");
 
@@ -41,8 +40,8 @@ const upload = multer({
 // Sharp processing function
 const processImage = async (filePath, outputPath) => {
   await sharp(filePath)
-    .resize({ width: 1200 }) // max width, maintain aspect ratio
-    .toFormat("webp", { quality: 80 }) // compress to webp
+    .resize({ width: 1200 })
+    .toFormat("webp", { quality: 80 })
     .toFile(outputPath);
 };
 
@@ -54,6 +53,7 @@ export const productImageUpload = (req, res, next) => {
       return res.status(400).json({ message: err.message });
     }
 
+    // ✅ Check if files exist before processing
     if (req.files && req.files.length > 0) {
       try {
         for (const file of req.files) {
@@ -61,19 +61,19 @@ export const productImageUpload = (req, res, next) => {
             optimizedDir,
             path.basename(file.filename, path.extname(file.filename)) + ".webp"
           );
-
           await processImage(file.path, outputPath);
-
-          // Attach optimized path to file object
           file.optimizedPath = outputPath;
         }
+        console.log(`✅ Files uploaded and optimized: ${req.files.length} files`);
       } catch (e) {
         console.error("💥 Image Processing Error:", e);
         return res.status(500).json({ message: "Image processing failed" });
       }
+    } else {
+      // ✅ No files uploaded - this is fine for updates without images
+      console.log("ℹ️ No files uploaded - proceeding with other updates");
     }
 
-    console.log(`✅ Files uploaded and optimized: ${req.files.length} files`);
     next();
   });
 };

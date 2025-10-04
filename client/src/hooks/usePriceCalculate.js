@@ -12,6 +12,7 @@ export const usePriceCalculate = () => {
     usageYears,
     securityScore,
     day,
+    customScale = 1
   ) {
     const baseRates = {
       1: 0.022,
@@ -43,14 +44,14 @@ export const usePriceCalculate = () => {
       usageYears < 1
         ? 1.0
         : usageYears < 2
-        ? 0.85
-        : usageYears < 3
-        ? 0.7
-        : usageYears < 5
-        ? 0.55
-        : usageYears < 8
-        ? 0.4
-        : 0.3;
+          ? 0.85
+          : usageYears < 3
+            ? 0.7
+            : usageYears < 5
+              ? 0.55
+              : usageYears < 8
+                ? 0.4
+                : 0.3;
     const baseRate = baseRates[day] || 0.009 - (day - 10) * 0.0001;
     const basePrice = omv * baseRate;
     const scaleFactor = getScaleFactor(omv);
@@ -61,7 +62,9 @@ export const usePriceCalculate = () => {
       securityMap[securityScore] *
       scaleFactor;
 
-    return parseFloat(finalPrice.toFixed(2));
+    const scaledFinalPrice = finalPrice * parseFloat(customScale);
+
+    return parseFloat(scaledFinalPrice.toFixed(2));
   }
 
   return { calculatePricePerDay };

@@ -13,8 +13,10 @@ const DaysDisplay = ({
   initial,
   final,
   isHourlyRental,
-  setIsHourlyRental
+  setIsHourlyRental,
+  type
 }) => {
+  console.log(type)
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
@@ -87,7 +89,7 @@ const DaysDisplay = ({
         )}
       </div>
       {
-        numberOfDays === 1 && (initial && final) && !isHourlyRental && (
+        numberOfDays === 1 && (initial && final) && !isHourlyRental && (type === "GADGET" || type === "VEHICLE") && (
           <div className="flex font-semibold items-center mb-2 border-b border-gray-300 pt-4 pb-4 justify-center text-green-600 bg-cyan-50 relative">
             <div onClick={() => {
               setIsHourlyRental(true);

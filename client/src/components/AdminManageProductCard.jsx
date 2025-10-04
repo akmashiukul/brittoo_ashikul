@@ -1,7 +1,9 @@
-import { Trash2, Edit3, TagIcon, Clock2, Calendar } from "lucide-react";
+import { Trash2, Edit3, TagIcon, Clock2, Calendar, MoveVertical } from "lucide-react";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import api from "../lib/api";
+import { useState } from "react";
+import ScalePriceModal from "../pages/admin/admin-components/ScalePriceModal";
 
 const AdminManageProductCard = ({ product, products, setProducts }) => {
   const {
@@ -14,6 +16,7 @@ const AdminManageProductCard = ({ product, products, setProducts }) => {
     tags,
     optimizedImages,
   } = product;
+  const [showScaleModal, setShowScaleModal] = useState(false);
 
   const baseUrl = import.meta.env.VITE_BASE_URL;
 
@@ -77,14 +80,14 @@ const AdminManageProductCard = ({ product, products, setProducts }) => {
     }[productCondition] || productCondition;
 
   return (
-    <div className="w-full max-w-sm mx-auto group hover:scale-105 transition duration-300">
+    <div className="w-full max-w-sm mx-auto group hover:shadow-md transition duration-300">
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="relative h-40 overflow-hidden">
           <img
             loading="lazy"
             src={`${baseUrl}${optimizedImages[0]}`}
             alt={name}
-            className="w-full h-full object-cover group-hover:scale-110 transition duration-400 group-hover:translate-x-2"
+            className="w-full h-full object-cover"
           />
           <div className="absolute top-2 left-2">
             <div
@@ -145,7 +148,7 @@ const AdminManageProductCard = ({ product, products, setProducts }) => {
           )}
         </div>
 
-        <div className="px-4 pb-4 flex space-x-2">
+        <div className="px-4 pb-2 flex space-x-2">
           {/* //TODO: update also rcc with it */}
           <Link
             to={`/dashboard/admin/update-item/${id}`}
@@ -155,21 +158,43 @@ const AdminManageProductCard = ({ product, products, setProducts }) => {
             <span>Edit</span>
           </Link>
           <button
-            onClick={handleDelete}
+            onClick={() => setShowScaleModal(true)}
             className="flex-1 cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-800 py-1.5 text-xs rounded font-medium border border-gray-300 flex items-center justify-center space-x-1"
+          >
+            <MoveVertical color="#3b82f6" className="w-4 h-4" />
+            <span className="text-blue-500">Scale Price</span>
+          </button>
+        </div>
+        <div className="px-4 pb-2">
+          <button
+            onClick={handleDelete}
+            className="w-full flex-1 cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-800 py-1.5 text-xs rounded font-medium border border-gray-300 flex items-center justify-center space-x-1"
           >
             <Trash2 color="#ef4444" className="w-4 h-4" />
             <span className="text-red-500">Delete</span>
           </button>
         </div>
-        <Link to={`/product-details/${id}`} className="flex justify-center">
-          <button
-            className="mb-4 w-fit text-sm text-green-600 underline cursor-pointer"
-          >
-            View Details
-          </button>
-        </Link>
+        <div className="flex justify-center mb-4 ">
+          <Link to={`/product-details/${id}`}>
+            <button
+              className="w-fit text-sm text-green-600 underline cursor-pointer"
+            >
+              View Details
+            </button>
+          </Link>
+        </div>
       </div>
+      {
+        showScaleModal && (
+          <ScalePriceModal 
+            product={product}
+            setShowModal={setShowScaleModal}
+            products={products}
+            setProducts={setProducts}
+            key={product.id}
+          />
+        )
+      }
     </div>
   );
 };

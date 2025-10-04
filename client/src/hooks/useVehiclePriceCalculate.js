@@ -11,6 +11,7 @@ export const useVehiclePriceCalculate = () => {
     usageYears,
     securityScore,
     day,
+    customScale = 1
   ) {
     const baseRates = {
       1: 0.022,
@@ -68,14 +69,16 @@ export const useVehiclePriceCalculate = () => {
 
     //change this changeRate to give more discount for increasing days
     const changeRate = 0.93;
-    
+
     const dayCeilMultiplier = Math.pow(changeRate, Math.max(0, day - 1));
     const ceilPrice = ceilBase * dayCeilMultiplier;
 
     finalPrice = Math.max(finalPrice, floorPrice);
     finalPrice = Math.min(finalPrice, ceilPrice);
 
-    return parseFloat(finalPrice.toFixed(2));
+    const scaledFinalPrice = finalPrice * parseFloat(customScale);
+
+    return parseFloat(scaledFinalPrice.toFixed(2));
   }
   return { calculateVehiclePricePerDay }
 }

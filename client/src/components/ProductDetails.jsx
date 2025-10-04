@@ -98,6 +98,7 @@ const ProductDetails = () => {
     }
   }, [calculateHourlyPrice, isHourlyRental, numberOfHours, product]);
 
+
   useEffect(() => {
     if (product) {
       if (product.productType === "GADGET") {
@@ -107,6 +108,7 @@ const ProductDetails = () => {
           product.productAge,
           product.owner.securityScore,
           numberOfDays,
+          product.scale
         );
         setPrice(newPrice);
       } else if (product.productType === "VEHICLE") {
@@ -116,6 +118,7 @@ const ProductDetails = () => {
           product.productAge,
           product.owner.securityScore,
           numberOfDays,
+          product.scale
         );
         setPrice(newPrice);
       } else {
@@ -125,6 +128,7 @@ const ProductDetails = () => {
           product.productAge,
           product.owner.securityScore,
           numberOfDays,
+          product.scale
         );
         setPrice(newPrice);
       }
@@ -292,7 +296,7 @@ const ProductDetails = () => {
       }
       setCoupon(res.data.data);
       setCouponValidationError("");
-      const roundedDiscountPrice = conditionalCeilOrFloor(product.secondHandPrice * (res.data.data.discount / 100));
+      const roundedDiscountPrice = conditionalCeilOrFloor(product?.secondHandPrice * (res.data.data.discount / 100));
       setDiscountedPrice(roundedDiscountPrice);
     } catch (error) {
       console.log("Error in apply coupon: ", error);
@@ -314,7 +318,7 @@ const ProductDetails = () => {
 
 
 
-  if (loading) {
+  if (loading && !product) {
     return <Loader />;
   }
 
@@ -423,7 +427,6 @@ const ProductDetails = () => {
                   product?.askingPrice == product?.minPrice ? (
                     <div>
                       <p className="text-sm italic mt-1 text-gray-500">(Fixed Price) Not Negotiable</p>
-                      <button className="text-xs border-purple-500 text-purple-500 bg-white border rounded-md px-2 py-1 hover:text-white hover:bg-purple-500 cursor-pointer mt-2">Place Buying Request</button>
                     </div>
                   ) : product.isAiEnabled && (
                     <div className="relative mt-3 flex items-center gap-2">
@@ -583,6 +586,7 @@ const ProductDetails = () => {
           final={final}
           isHourlyRental={isHourlyRental}
           setIsHourlyRental={setIsHourlyRental}
+          type={product.productType}
         />
         {
           (numberOfDays === 1 && isHourlyRental) && (<HourSelector pickerValue={pickerValue} setPickerValue={setPickerValue} numberOfHours={numberOfHours} setNumberOfHours={setNumberOfHours} hourlyPrice={hourlyPrice} />)

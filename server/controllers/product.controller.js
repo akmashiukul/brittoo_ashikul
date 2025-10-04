@@ -24,7 +24,7 @@ export const createProduct = async (req, res, next) => {
       isForSale,
       isAiEnabled = false,
       askingPrice,
-      minPrice
+      minPrice,
     } = req.body;
     if (!req.user || !req.user.id) {
       throw new CustomError("Unauthorized: No user authenticated", 401);
@@ -457,6 +457,7 @@ export const updateProductAdmin = async (req, res, next) => {
       productDescription,
       deleteImages,
       isForSale,
+      scale
     } = req.body;
 
     if (!req.user || req.user.role !== "ADMIN") {
@@ -472,6 +473,10 @@ export const updateProductAdmin = async (req, res, next) => {
       },
     });
 
+    console.log("prev ppd", product.pricePerDay)
+    console.log("prev pph", product.pricePerHour)
+    console.log("prev scale", product.scale)
+
     // Prepare update data
     const updateData = {};
     if (name) updateData.name = name;
@@ -482,16 +487,19 @@ export const updateProductAdmin = async (req, res, next) => {
     if (omv) updateData.omv = parseInt(omv);
     if (tags) updateData.tags = tags;
     if (productDescription) updateData.productDescription = productDescription;
+    if (scale) updateData.scale = scale;
 
     // Price recalculation if needed
     let newSecondHandPrice;
-    if (omv || productCondition || productAge || productType) {
+    if (omv || productCondition || productAge || productType || scale) {
       const finalOmv = omv ? parseInt(omv) : product.omv;
       const finalCondition = productCondition || product.productCondition;
       const finalAge = productAge ? parseInt(productAge) : product.productAge;
+      const newScale = scale ? parseFloat(scale) : product.scale;
+      const newProductType = productType ? productType : product.productType;
 
       console.log("final cond: ", finalCondition)
-      if (updateData.productType === "GADGET") {
+      if (newProductType === "GADGET") {
         console.log("Old ppd: ", product.pricePerDay)
         const newPricePerDay = calculateGadgetPricePerDay(
           parseInt(finalOmv),
@@ -499,17 +507,19 @@ export const updateProductAdmin = async (req, res, next) => {
           parseInt(finalAge),
           product.owner.securityScore,
           3,
+          newScale
         );
         const newPricePerHour = calculateHourlyPrice(newPricePerDay, 2);
         updateData.pricePerDay = parseFloat(newPricePerDay);
         updateData.pricePerHour = parseFloat(newPricePerHour);
-      } else if (updateData.productType === "VEHICLE") {
+      } else if (newProductType === "VEHICLE") {
         const newPricePerDay = calculateVehiclePricePerDay(
           parseInt(finalOmv),
           finalCondition,
           parseInt(finalAge),
           product.owner.securityScore,
           3,
+          newScale
         );
         const newPricePerHour = calculateHourlyPrice(newPricePerDay, 2);
         updateData.pricePerDay = parseFloat(newPricePerDay);
@@ -521,6 +531,7 @@ export const updateProductAdmin = async (req, res, next) => {
           parseInt(finalAge),
           product.owner.securityScore,
           3,
+          newScale
         );
         updateData.pricePerDay = parseFloat(newPricePerDay);
       }
@@ -595,6 +606,26 @@ export const updateProductAdmin = async (req, res, next) => {
       const productUpdate = await tx.product.update({
         where: { id },
         data: updateData,
+        include: {
+          owner: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              securityScore: true,
+              brittooVerified: true,
+              suspensionCount: true,
+              isValidRuetMail: true,
+              isVerified: true,
+              _count: {
+                select: {
+                  rentedOutProducts: true,
+                  borrowedProducts: true,
+                },
+              },
+            },
+          },
+        },
       });
 
       if ((omv || productCondition || productAge) && product.redCacheCredits) {
@@ -613,6 +644,11 @@ export const updateProductAdmin = async (req, res, next) => {
       await redisClient.del(keys);
       console.log("Cache invalidated:", keys);
     }
+
+    console.log("new ppd", updatedProduct.pricePerDay)
+    console.log("new pph", updatedProduct.pricePerHour)
+    console.log("new scale", updatedProduct.scale)
+
 
     return res.status(200).json({
       success: true,

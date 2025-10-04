@@ -11,6 +11,7 @@ export function calculateVehiclePricePerDay(
   usageYears,
   securityScore,
   day,
+  customScale = 1
 ) {
   const baseRates = {
     1: 0.022,
@@ -74,8 +75,10 @@ export function calculateVehiclePricePerDay(
 
   finalPrice = Math.max(finalPrice, floorPrice);
   finalPrice = Math.min(finalPrice, ceilPrice);
+  
+  const scaledFinalPrice = finalPrice * parseFloat(customScale);
 
-  return parseFloat(finalPrice.toFixed(2));
+  return parseFloat(scaledFinalPrice.toFixed(2));
 }
 
 /*

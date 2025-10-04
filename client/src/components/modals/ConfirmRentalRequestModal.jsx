@@ -215,7 +215,7 @@ const ConfirmRentalRequestModal = () => {
     >
       <div className="relative p-4 w-full max-w-[760px] max-h-full">
         <div className="relative bg-white rounded-lg shadow-sm flex flex-col sm:max-h-[95vh] max-h-[88vh]">
-          <div className="flex items-center justify-between bg-gray-100 md:mx-5 border-b rounded-t border-gray-200 flex-shrink-0 pb-2 sm:pb-4">
+          <div className="flex items-center justify-between bg-gray-100 border-b rounded-t border-gray-200 flex-shrink-0 pb-2 sm:pb-4">
             <div
               id="credit-calc"
               className="flex flex-col items-center text-center w-full"
