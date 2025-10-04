@@ -1,6 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 import "dotenv/config";
 import { getNegotiationState, saveNegotiationState } from "../helpers/negotiationCache.js";
+import NegotiationMessage from "../models/NegotiationMessage.js";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -9,12 +10,10 @@ const MAX_HISTORY = 12;
 const MODEL_NAME = "gemini-2.5-flash-lite";
 const TEMPERATURE = 0.35;
 
-// Cache system instruction to avoid rebuilding
 const instructionCache = new Map();
 
 const buildSystemInstruction = (product = {}, userName = "") => {
   const { name, omv, productAge, productCondition, askingPrice, minPrice, id } = product;
-
   const cacheKey = id || JSON.stringify({ name, omv, askingPrice, minPrice });
 
   if (instructionCache.has(cacheKey)) {
@@ -57,7 +56,6 @@ const buildSystemInstruction = (product = {}, userName = "") => {
 
     Be concise, follow these rules strictly, and only produce SUGGESTED_PRICE when the user has explicitly initiated price negotiation.`;
 
-  // Cache size limit to prevent memory leaks
   if (instructionCache.size >= 100) {
     const firstKey = instructionCache.keys().next().value;
     instructionCache.delete(firstKey);
@@ -78,11 +76,10 @@ const extractCleanMessage = (text) => {
   return cleanText || text;
 };
 
-
 const prepareConversationContent = (history) => {
   return history
     .slice(-MAX_HISTORY)
-    .filter(m => m.role !== "system") // rm sys msg
+    .filter(m => m.role !== "system")
     .map(m => `${m.role.toUpperCase()}: ${m.text}`)
     .join("\n\n");
 };
@@ -103,6 +100,9 @@ export const negotiatePrice = async (req, res) => {
   try {
     const { message, product } = req.body;
     const userId = req.user.id;
+    const userName = req.user.name;
+    const userEmail = req.user.email;
+    
     if (!userId) return res.status(400).json({ error: "userId required" });
     if (!message) return res.status(400).json({ error: "message required" });
     if (!product || typeof product !== "object") {
@@ -111,7 +111,7 @@ export const negotiatePrice = async (req, res) => {
 
     let session = await getNegotiationState(userId, product.id);
     if (!session) {
-      const systemInstruction = buildSystemInstruction(product, req.user.name);
+      const systemInstruction = buildSystemInstruction(product, userName);
       session = {
         history: [{ role: "system", text: systemInstruction }],
         lastActive: Date.now(),
@@ -119,15 +119,44 @@ export const negotiatePrice = async (req, res) => {
         userId
       };
     }
+    
     const sanitizedMessage = message.trim().substring(0, 500);
 
-    session.history.push({ role: "user", text: sanitizedMessage });
+    // Add user message
+    const userMessage = { 
+      role: "user", 
+      text: sanitizedMessage,
+      timestamp: Date.now()
+    };
+    session.history.push(userMessage);
     session.lastActive = Date.now();
+
+    // Save user message to MongoDB
+    NegotiationMessage.findOneAndUpdate(
+      { userId, productId: product.id },
+      {
+        $setOnInsert: {
+          userId,
+          userName,
+          userEmail,
+          productId: product.id,
+          productName: product.name
+        },
+        $push: { 
+          messages: {
+            role: userMessage.role,
+            text: userMessage.text,
+            timestamp: new Date(userMessage.timestamp)
+          }
+        },
+        $set: { lastActive: new Date() }
+      },
+      { upsert: true }
+    ).catch(err => console.error('MongoDB save error:', err));
 
     const contents = prepareConversationContent(session.history);
     const systemInstruction = session.history.find(m => m.role === "system")?.text
-      ?? buildSystemInstruction(product, req.user.name);
-
+      ?? buildSystemInstruction(product, userName);
 
     const response = await ai.models.generateContent({
       model: MODEL_NAME,
@@ -140,11 +169,34 @@ export const negotiatePrice = async (req, res) => {
     });
 
     const botText = response?.text ?? "Error: empty response";
-    session.history.push({ role: "assistant", text: botText });
     const suggestedPrice = extractSuggestedPrice(botText, product.minPrice);
+    
+    // Add assistant message
+    const assistantMessage = { 
+      role: "assistant", 
+      text: botText,
+      suggestedPrice,
+      timestamp: Date.now()
+    };
+    session.history.push(assistantMessage);
+    
+    // Save assistant message to MongoDB
+    NegotiationMessage.findOneAndUpdate(
+      { userId, productId: product.id },
+      {
+        $push: { 
+          messages: {
+            role: assistantMessage.role,
+            text: assistantMessage.text,
+            suggestedPrice: assistantMessage.suggestedPrice,
+            timestamp: new Date(assistantMessage.timestamp)
+          }
+        },
+        $set: { lastActive: new Date() }
+      }
+    ).catch(err => console.error('MongoDB save error:', err));
+    
     const cleanReply = extractCleanMessage(botText);
-
-    console.log(session.history)
 
     await saveNegotiationState(userId, product.id, session, SESSION_TTL_SECONDS);
 
@@ -156,7 +208,6 @@ export const negotiatePrice = async (req, res) => {
   } catch (err) {
     const duration = Date.now() - startTime;
 
-    // specific Gemini errors
     if (err.message?.includes('RATE_LIMIT') || err.status === 429) {
       console.error("Gemini rate limit hit:", {
         error: err.message,
@@ -170,17 +221,14 @@ export const negotiatePrice = async (req, res) => {
       });
     }
 
-    // quota errors
     if (err.message?.includes('QUOTA') || err.status === 403) {
       console.error("Gemini quota exceeded:", err.message);
-
       return res.status(503).json({
         error: "service_unavailable",
         message: "Negotiation service temporarily unavailable. Please try later."
       });
     }
 
-    // Generic error
     console.error("negotiatePrice error:", {
       error: err.message,
       stack: err.stack,

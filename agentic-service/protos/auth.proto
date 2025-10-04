@@ -10,7 +10,8 @@ message VerifyResponse {
   bool valid = 1;
   string id = 2;
   string name = 3;
-  string error = 4;
+  string email = 4;
+  string error = 5;
 }
 
 service AuthService {

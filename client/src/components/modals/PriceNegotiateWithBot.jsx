@@ -4,6 +4,7 @@ import negotiationApi from '../../lib/negotiationApi';
 import Swal from 'sweetalert2';
 import api from '../../lib/api';
 import PurchaseRequestModal from './PurchaseRequestModal';
+import useUserStore from '../../stores/authStores/useUserStore';
 
 const PriceNegotiateWithBot = ({ product, isOpen, onClose }) => {
   const [messages, setMessages] = useState([]);
@@ -21,6 +22,7 @@ const PriceNegotiateWithBot = ({ product, isOpen, onClose }) => {
     dealPrice: 0,
     productId: product?.id
   });
+  const { currentUser } = useUserStore();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -58,9 +60,8 @@ const PriceNegotiateWithBot = ({ product, isOpen, onClose }) => {
     try {
       const response = await negotiationApi.post('/api/v2/agents/negotiate', {
         message: inputMessage,
-        confirm: false,
-        close: false,
         product,
+        user: currentUser
       });
       const botMessage = {
         id: Date.now() + 1,
@@ -106,9 +107,8 @@ const PriceNegotiateWithBot = ({ product, isOpen, onClose }) => {
         try {
           await negotiationApi.post('/api/v2/agents/negotiate', {
             message: `I accept the offer of ৳${currentOffer}`,
-            confirm: true,
-            close: false,
-            product: product
+            product: product,
+            user: currentUser
           });
 
           setShowModal(true);

@@ -13,7 +13,7 @@ export const authMiddleware = async (req, res, next) => {
     if (!result.valid) {
       return next(new CustomError(capitalizeWords(result.error + ", Please log in again"), 403, "USER_VERIFICATION_ERROR"));
     }
-    req.user = { name: result.name, id: result.id };
+    req.user = { name: result.name, email: result.email, id: result.id };
     next();
   } catch (error) {
     console.error("gRPC error:", error);

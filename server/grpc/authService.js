@@ -20,7 +20,8 @@ export const startAuthServer = () => {
           },
           select: {
             id: true,
-            name: true
+            name: true,
+            email: true
           }
         });
         if (!user) {
@@ -29,7 +30,8 @@ export const startAuthServer = () => {
         callback(null, {
           valid: true,
           id: user.id,
-          name: user.name
+          name: user.name,
+          email: user.email,
         });
 
       } catch (error) {
