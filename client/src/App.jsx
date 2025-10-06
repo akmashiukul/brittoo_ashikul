@@ -57,6 +57,8 @@ import IncomingChats from "./pages/private/dash-pages/IncomingChats";
 import OutgoingChats from "./pages/private/dash-pages/OutgoingChats";
 import AdminManageChats from "./pages/admin/admin-dash-pages/AdminManageChats";
 import NegotiationHistory from "./pages/admin/admin-dash-pages/NegotiationHistory";
+import ManageNotifications from "./pages/admin/admin-dash-pages/ManageNotifications";
+import { promptNotifications, promptPwaInstall } from "./lib/promptPwaOrNotificationEnable";
 
 const AppContent = () => {
   const location = useLocation();
@@ -66,6 +68,45 @@ const AppContent = () => {
   const { isShowRccModalOpen } = useShowRccModalStore();
   const [search, setSearch] = useState("");
   const [productType, setProductType] = useState("");
+  const [isPWA, setIsPWA] = useState(false);
+
+  useEffect(() => {
+    const hasPrompted = localStorage.getItem('hasPromptedNotifications');
+    if (!hasPrompted && Notification.permission !== 'granted') {
+      const timer = setTimeout(async () => {
+        try {
+          await promptNotifications();
+          localStorage.setItem('hasPromptedNotifications', 'true');
+        } catch (error) {
+          console.error('Failed to prompt notifications:', error);
+        }
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  useEffect(() => {
+    const checkIsPWA = () => {
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+      // iOS-specific (Safari)
+      const isIosStandalone = 'standalone' in window.navigator && window.navigator.standalone;
+      return isStandalone || isIosStandalone;
+    };
+    setIsPWA(checkIsPWA());
+    const hasPrompted = localStorage.getItem('hasPromptedPWA');
+    if (!checkIsPWA() && !hasPrompted) {
+      const timer = setTimeout(async () => {
+        try {
+          await promptPwaInstall();
+          localStorage.setItem('hasPromptedPWA', 'true');
+        } catch (error) {
+          console.error('Failed to prompt PWA install:', error);
+        }
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+  console.log('Running as PWA:', isPWA);
 
   // Terminate session if JWT expires
   const loginDtStr = localStorage.getItem("login-dt");
@@ -184,6 +225,10 @@ const AppContent = () => {
               <Route
                 path="negotiation-history"
                 element={<NegotiationHistory />}
+              />
+              <Route
+                path="manage-notifications"
+                element={<ManageNotifications />}
               />
             </Route>
           </Route>

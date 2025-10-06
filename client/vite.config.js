@@ -8,6 +8,9 @@ export default defineConfig({
   plugins: [react(), tailwindcss(), flowbiteReact()],
   server: {
     host: true,
-    allowedHosts: ["evolving-champion-bullfrog.ngrok-free.app"],
+    https: {
+      key: './key.pem',
+      cert: './cert.pem',
+    },
   }
 })

@@ -9,7 +9,7 @@ import useRegModalStore from "../../stores/authStores/useRegModalStore";
 import useLoginModalStore from "../../stores/authStores/useLoginModalStore";
 import useUserStore from "../../stores/authStores/useUserStore";
 import api from "../../lib/api";
-import { Coins, CreditCard } from "lucide-react";
+import { Bell, Coins, CreditCard } from "lucide-react";
 
 const Navbar = () => {
   const menuClassname =
@@ -20,7 +20,33 @@ const Navbar = () => {
   const { openLoginModal } = useLoginModalStore();
   const { currentUser, setCurrentUser } = useUserStore();
   const [totalCredits, setTotalCredits] = useState(null);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (currentUser) {
+      fetchNotifications();
+    }
+  }, [currentUser]);
+
+  const fetchNotifications = async () => {
+    const res = await api.get('/api/v1/notifications');
+    setNotifications(res.data.data);
+    setUnreadCount(res.data.data.filter(n => !n.isRead).length);
+  };
+
+  const handleClick = async () => {
+    setShowNotificationDropdown(!showNotificationDropdown);
+    if (!showNotificationDropdown) {
+      // Mark all as read
+      for (const n of notifications.filter(n => !n.isRead)) {
+        await api.put(`/api/v1/notifications/${n.id}/read`);
+      }
+      setUnreadCount(0);
+    }
+  };
 
   useEffect(() => {
     const fetchUserTotalCredits = async () => {
@@ -150,6 +176,31 @@ const Navbar = () => {
                       {totalCredits?.totalAvailableRcc || 0}
                     </span>
                   </div>
+                </div>
+                <div className="relative flex flex-col items-center">
+                  <button onClick={handleClick} className="relative">
+                    <Bell size={24} />
+                    {unreadCount > 0 && (
+                      <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1">
+                        {unreadCount}
+                      </span>
+                    )}
+                  </button>
+                  {showNotificationDropdown && (
+                    <div className="absolute right-0 mt-2 w-64 bg-white border shadow-lg">
+                      <ul>
+                        {notifications.length === 0 ? (
+                          <li className="p-2">No notifications</li>
+                        ) : (
+                          notifications.map(n => (
+                            <li key={n.id} className="p-2 border-b">
+                              <strong>{n.title}</strong>: {n.body}
+                            </li>
+                          ))
+                        )}
+                      </ul>
+                    </div>
+                  )}
                 </div>
                 <div className="relative">
                   <Avatar

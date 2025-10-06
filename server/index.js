@@ -21,6 +21,7 @@ import couponRoutes from "./routes/coupon.routes.js";
 import adminPurchaseRoutes from "./routes/admin-routes/purchaseRequestAdmin.routes.js";
 import userPurchaseRoutes from "./routes/user-routes/purchaseRequestUser.routes.js";
 import chatRoutes from "./routes/user-routes/purcaseChat.routes.js";
+import notificationRoutes from "./routes/notification.routes.js";
 
 import { createServer } from "http";
 import { initializeSocket } from "./socket/chatSocket.js";
@@ -68,6 +69,7 @@ app.use("/api/v1/coupons", couponRoutes);
 app.use("/api/v1/purchase", userPurchaseRoutes);
 app.use("/api/v1/admin/purchase", adminPurchaseRoutes);
 app.use("/api/v1/chat", chatRoutes);
+app.use("/api/v1/notifications", notificationRoutes);
 
 app.use(errorHandler);
 app.use(multerErrorHandler);
