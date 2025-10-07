@@ -1,7 +1,96 @@
+import { useEffect } from "react";
 import { IoSearchCircle } from "react-icons/io5";
 import { Link, useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+import { promptNotifications, promptPwaInstall } from "../../lib/promptPwaOrNotificationEnable";
+import useUserStore from "../../stores/authStores/useUserStore";
+import { Download } from "lucide-react";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
+import { useState } from "react";
 
 const Banner = ({ setProductType, setSearch }) => {
+  const [isPWA, setIsPWA] = useState(false);
+  const [canPromptPWA, setCanPromptPWA] = useState(false);
+  const { currentUser } = useUserStore();
+
+
+
+  useEffect(() => {
+    const checkIsPWA = () => {
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+      const isIosStandalone = 'standalone' in window.navigator && window.navigator.standalone;
+      return isStandalone || isIosStandalone;
+    };
+    setIsPWA(checkIsPWA());
+    console.log('Running as PWA:', checkIsPWA());
+    console.log('DeferredPrompt available:', !!window.deferredPrompt);
+
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault();
+       window.deferredPrompt = e;
+      setCanPromptPWA(true);
+      console.log('Ready to prompt PWA:', e);
+    };
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, []);
+
+  const handlePWAInstall = async () => {
+    console.log(canPromptPWA)
+    if (!canPromptPWA) return;
+    Swal.fire({
+      title: 'Install Brittoo?',
+      text: 'Add to your home screen for real-time updates!',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#28a745',
+      cancelButtonColor: '#dc3545',
+      confirmButtonText: 'Yes, Install!',
+      cancelButtonText: 'No, Thanks',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          console.log('Attempting PWA prompt...');
+          await promptPwaInstall();
+          setCanPromptPWA(false);
+        } catch (error) {
+          console.error('Failed to prompt PWA install:', error);
+          Swal.fire({
+            title: 'Error',
+            text: 'Failed to install. Please try again or use the browser menu.',
+            icon: 'error',
+          });
+        }
+      }
+    });
+  };
+
+
+
+  useEffect(() => {
+    const hasPrompted = localStorage.getItem('hasPromptedNotifications');
+    if (currentUser && !hasPrompted && Notification.permission !== 'granted') {
+      const timer = setTimeout(async () => {
+        try {
+          await promptNotifications();
+        } catch (error) {
+          console.error('Failed to prompt notifications:', error);
+          Swal.fire({
+            title: 'Error',
+            text: 'Failed to enable notifications. Please try again later.',
+            icon: 'error',
+          });
+        }
+        localStorage.setItem('hasPromptedNotifications', 'true');
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [currentUser]);
+
   const navigate = useNavigate();
   const tagClassNames = `border border-gray-300 rounded-3xl py-[6px] px-4 text-gray-800 font-semibold bg-white cursor-pointer hover:bg-green-200 md:text-sm text-xs`;
 
@@ -23,6 +112,34 @@ const Banner = ({ setProductType, setSearch }) => {
           <Link to={'/dashboard/list-items'} className="text-xs md:text-base border py-2 border-green-500 hover:text-gray-500 text-green-500 hover:bg-green-100 rounded-lg cursor-pointer bg-transparent px-6">
             List Your Items
           </Link>
+          {
+            !isPWA && (
+              <motion.button
+                onClick={handlePWAInstall}
+                initial={{ opacity: 0, scale: 0.9, y: 30 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+                className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 
+                 flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5
+                 bg-gradient-to-r from-emerald-500 via-green-500 to-lime-500
+                 text-white font-semibold rounded-md sm:rounded-lg shadow-lg
+                 hover:from-emerald-600 hover:to-lime-600
+                 focus:outline-none focus:ring-4 focus:ring-green-300
+                 transition-all duration-300 z-50 cursor-pointer"
+              >
+                <motion.span
+                  animate={{ rotate: [0, -10, 10, -10, 10, 0] }}
+                  transition={{ repeat: Infinity, duration: 3 }}
+                >
+                  <Download size={22} className="sm:w-5 sm:h-5 w-4 h-4" />
+                </motion.span>
+                <span className="text-sm hidden sm:block">Install Brittoo</span>
+                <span className="text-sm block sm:hidden">Install</span>
+              </motion.button>
+            )
+          }
         </div>
         <div className="relative mt-8">
           <input

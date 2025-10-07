@@ -9,12 +9,14 @@ import useLoginModalStore from "../../stores/authStores/useLoginModalStore";
 import useRegModalStore from "../../stores/authStores/useRegModalStore";
 import useUserStore from "../../stores/authStores/useUserStore";
 import useResetPasswordModalStore from "../../stores/authStores/useResetPasswordModalStore";
+import { Eye, EyeOff } from "lucide-react";
 
 const LoginModal = () => {
   const { isLoginModalOpen, closeLoginModal } = useLoginModalStore();
   const { openRegModal } = useRegModalStore();
   const { setCurrentUser, loading, setLoading } = useUserStore();
   const { openResetPasswordModal } = useResetPasswordModalStore();
+  const [showPassword, setShowPassword] = useState(false);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -141,16 +143,26 @@ const LoginModal = () => {
                 >
                   Your password
                 </label>
-                <input
-                  type="password"
-                  name="password"
-                  id="password"
-                  onChange={handleChange}
-                  value={formData.password}
-                  placeholder="••••••••"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-xs md:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2 md:p-2.5"
-                  required
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    name="password"
+                    id="password"
+                    onChange={handleChange}
+                    value={formData.password}
+                    placeholder="••••••••"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-xs md:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2 md:p-2.5"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    disabled={loading}
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
               </div>
               <p onClick={() => {
                 closeLoginModal();

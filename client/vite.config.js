@@ -8,9 +8,5 @@ export default defineConfig({
   plugins: [react(), tailwindcss(), flowbiteReact()],
   server: {
     host: true,
-    https: {
-      key: './key.pem',
-      cert: './cert.pem',
-    },
   }
 })

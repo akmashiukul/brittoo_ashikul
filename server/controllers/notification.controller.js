@@ -45,10 +45,6 @@ export const createNotification = async (userId, title, body, data = {}) => {
   await sendPush(userId, title, body, data);
 };
 
-
-
-
-// Example integration: In your rental request creation controller, after success:
 export const createRentalRequest = async (req, res, next) => {
   try {
     // Your existing code to create request...
