@@ -42,7 +42,7 @@ export const startAuthServer = () => {
     }
   });
   server.bindAsync(
-    "0.0.0.0:50051",
+    "127.0.0.1:50051",
     grpc.ServerCredentials.createInsecure(),
     () => {
       console.log("Auth gRPC server running on port 50051");
