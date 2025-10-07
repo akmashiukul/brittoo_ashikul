@@ -119,8 +119,7 @@ const FAQ = () => {
               We're here to help! Our support team is ready to assist you with
               any questions or concerns.
             </p>
-            <a href="mailto:aagalib2323@gmail.com?subject=I%20Have%20A%20Question" target="_blank"
-              rel="noopener noreferrer">
+            <a href="https://wa.me/8801772967677?text=I%20have%20a%20question" target="_blank" rel="noopener noreferrer">
               <button className="bg-green-500 hover:bg-green-600 text-white text-sm px-6 py-2 rounded-md font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
                 Contact Support
               </button>

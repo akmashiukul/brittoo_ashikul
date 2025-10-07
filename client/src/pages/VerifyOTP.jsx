@@ -138,24 +138,31 @@ export default function VerifyOTP() {
               </span>
             </p>
           ) : (
-            <p className="text-sm">
-              Didn't receive the code?{" "}
-              <button
-                onClick={handleResend}
-                disabled={resending}
-                className="text-green-600 font-semibold hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {resending ? "Resending..." : "Resend OTP"}
-              </button>
-            </p>
+            <div>
+              <p className="text-sm">
+                Didn't receive the code?{" "}
+                <button
+                  onClick={handleResend}
+                  disabled={resending}
+                  className="text-green-600 font-semibold hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {resending ? "Resending..." : "Resend OTP"}
+                </button>
+              </p>
+              <p className="text-xs mt-2 text-gray-700">
+                Please have patience. For some reason institutional mail servers are too slow 😩
+              </p>
+              <a className="text-green-600 mt-2 text-sm font-semibold underline" href="https://wa.me/8801772967677?text=I%20am%20having%20trouble%20recieving%20OTP" target="_blank" rel="noopener noreferrer">
+                Contact Support
+              </a>
+            </div>
           )}
         </div>
 
         {message && (
           <p
-            className={`mt-4 text-center text-sm ${
-              message.includes("✅") ? "text-green-600" : "text-green-500"
-            }`}
+            className={`mt-4 text-center text-sm ${message.includes("✅") ? "text-green-600" : "text-green-500"
+              }`}
           >
             {message}
           </p>

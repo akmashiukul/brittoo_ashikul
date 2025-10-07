@@ -138,6 +138,14 @@ const ResetPasswordModal = () => {
               >
                 Get Reset Link
               </button>
+              <div className="mt-2">
+                <p className="text-sm text-gray-700">
+                  Please have patience. For some reason institutional mail servers are too slow 😩. If you are still facing any issue please <a className="text-green-600 mt-2 text-sm font-semibold underline" href="https://wa.me/8801772967677?text=I%20am%20having%20trouble%20recieving%20password%20reset%20email" target="_blank" rel="noopener noreferrer">
+                    Contact Here.
+                  </a>
+                </p>
+
+              </div>
               <div className="text-xs md:text-sm font-medium text-gray-500">
                 Remembered Password?{" "}
                 <a
