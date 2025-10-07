@@ -2,6 +2,7 @@ import { Resend } from "resend";
 import prisma from "../config/prisma.js";
 import { CustomError } from "../lib/customError.js";
 import { isGiftCreditValid } from "../lib/creditValidators.js";
+import { createNotification } from "./notification.controller.js";
 const resend = new Resend(`${process.env.RESEND_API_KEY}`);
 
 export const createRentalRequest = async (req, res, next) => {
@@ -257,28 +258,42 @@ export const createRentalRequest = async (req, res, next) => {
       return rentalRequest;
     });
 
-    // TODO: emit notification to owner
-    await resend.emails.send({
-      from: "Brittoo <notifications@brittoo.xyz>",
-      to: result.owner.email,
-      subject: `Congratulations! You have received a request.`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f4f7f6;">
-          <div style="text-align: center; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
-            <h2 style="color: #2e7d32; font-size: 24px; margin-bottom: 20px;">Congratulations! You've Received a Request!</h2>
-            <p style="color: #374151; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
-              A new rental request is waiting for your review. Please take a moment to accept or respond to the request.
-            </p>
-            <a href="${process.env.CLIENT_BASE_URL}/dashboard/received-requests" style="display: inline-block; padding: 12px 24px; background-color: #4caf50; color: #ffffff; text-decoration: none; font-weight: bold; border-radius: 5px; margin: 20px 0;">
-              View Received Requests
-            </a>
-            <p style="color: #374151; font-size: 14px; line-height: 1.5;">
-              If you have any questions, feel free to contact our support team.
-            </p>
+    // emit notification to owner
+    try {
+      const title = 'New Rental Request 😍';
+      const body = `You have received a rental request for ${result.product.name}🥳`;
+      const data = { url: '/dashboard/received-requests' };
+      await createNotification(result.owner.id, title, body, data);
+      //await createNotification("admin-id", title, body, data);
+    } catch (error) {
+      console.error("error in notification in create request", error);
+    }
+
+    try {
+      await resend.emails.send({
+        from: "Brittoo <notifications@brittoo.xyz>",
+        to: result.owner.email,
+        subject: `Congratulations! You have received a request.`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f4f7f6;">
+            <div style="text-align: center; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+              <h2 style="color: #2e7d32; font-size: 24px; margin-bottom: 20px;">Congratulations! You've Received a Request!</h2>
+              <p style="color: #374151; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
+                A new rental request is waiting for your review. Please take a moment to accept or respond to the request.
+              </p>
+              <a href="${process.env.CLIENT_BASE_URL}/dashboard/received-requests" style="display: inline-block; padding: 12px 24px; background-color: #4caf50; color: #ffffff; text-decoration: none; font-weight: bold; border-radius: 5px; margin: 20px 0;">
+                View Received Requests
+              </a>
+              <p style="color: #374151; font-size: 14px; line-height: 1.5;">
+                If you have any questions, feel free to contact our support team.
+              </p>
+            </div>
           </div>
-        </div>
-      `,
-    });
+        `,
+      });
+    } catch (error) {
+      console.error("error in email in create request", error);
+    }
     res.status(201).json({
       success: true,
       message: "Rental request created successfully",
@@ -486,6 +501,7 @@ export const acceptRentalRequest = async (req, res, next) => {
           },
           requester: {
             select: {
+              id: true,
               name: true,
               email: true,
             },
@@ -509,6 +525,11 @@ export const acceptRentalRequest = async (req, res, next) => {
     });
 
     //Emit notification to renter
+    const title = 'Request Accepted';
+    const body = `Your rental request for product ${updatedRequest.product.name} has been accepted 😍`;
+    const data = { url: '/dashboard/placed-requests' };
+    await createNotification(updatedRequest.requester.id, title, body, data);
+
     await resend.emails.send({
       from: "Brittoo <notifications@brittoo.xyz>",
       to: updatedRequest.requester.email,
@@ -551,11 +572,17 @@ export const rejectRentalRequest = async (req, res, next) => {
     const userId = req.user.id;
     const { rejectReason } = req.body;
 
+    // Enhanced validation
     if (!rejectReason || rejectReason.trim() === "") {
       throw new CustomError("Reject reason is required", 400, "MISSING_FIELDS");
     }
 
+    if (rejectReason.trim().length > 500) {
+      throw new CustomError("Reject reason must not exceed 500 characters", 400, "INVALID_INPUT");
+    }
+
     const updatedRequest = await prisma.$transaction(async (tx) => {
+      // Fetch the rental request with all needed data
       const request = await tx.rentalRequest.findFirst({
         where: {
           id: requestId,
@@ -570,112 +597,139 @@ export const rejectRentalRequest = async (req, res, next) => {
             },
           },
           bccWallet: true,
+          product: {
+            select: {
+              name: true,
+              optimizedImages: true,
+            },
+          },
+          requester: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
         },
       });
 
       if (!request) {
         throw new CustomError(
           "Rental request not found or already processed",
-          400,
+          404,
+          "NOT_FOUND"
         );
       }
 
-      const updates = [];
+      // Validate amounts before processing
+      if (request.usedBccAmount && request.usedBccAmount < 0) {
+        throw new CustomError("Invalid BCC amount", 400, "INVALID_DATA");
+      }
 
-      // Handle BCC refund
+      // Handle BCC refund sequentially
       if (request.paidWithBcc && request.usedBccAmount && request.bccWalletId) {
-        updates.push(
-          tx.bccWallet.update({
-            where: { id: request.bccWalletId },
-            data: {
-              availableBalance: { increment: request.usedBccAmount },
-              lockedBalance: { decrement: request.usedBccAmount },
-            },
-          }),
-        );
-        updates.push(
-          tx.bccTransaction.create({
-            data: {
-              userId: request.requesterId,
-              walletId: request.bccWalletId,
-              rentalRequestId: request.id,
-              amount: request.usedBccAmount,
-              status: "ACCEPTED",
-              transactionType: "DEPOSIT_REFUND",
-            },
-          }),
-        );
+        await tx.bccWallet.update({
+          where: { id: request.bccWalletId },
+          data: {
+            availableBalance: { increment: request.usedBccAmount },
+            lockedBalance: { decrement: request.usedBccAmount },
+          },
+        });
+
+        await tx.bccTransaction.create({
+          data: {
+            userId: request.requesterId,
+            walletId: request.bccWalletId,
+            rentalRequestId: request.id,
+            amount: request.usedBccAmount,
+            status: "ACCEPTED",
+            transactionType: "DEPOSIT_REFUND",
+          },
+        });
       }
 
-      // Handle RCC refund
+      // Handle RCC refund sequentially
       if (request.paidWithRcc && request.rccUsageDetails.length > 0) {
         for (const usage of request.rccUsageDetails) {
-          updates.push(
-            tx.redCacheCredit.update({
-              where: { id: usage.redCacheCreditId, deletedAt: null },
-              data: {
-                inUse: { decrement: usage.usedAmount },
-              },
-            }),
-          );
+          // Validate amount
+          if (usage.usedAmount < 0) {
+            throw new CustomError("Invalid RCC usage amount", 400, "INVALID_DATA");
+          }
+
+          await tx.redCacheCredit.update({
+            where: { id: usage.redCacheCreditId, deletedAt: null },
+            data: {
+              inUse: { decrement: usage.usedAmount },
+            },
+          });
         }
       }
 
-      // Update rental request status
-      updates.push(
-        tx.rentalRequest.update({
-          where: { id: requestId },
-          data: {
-            status: "REJECTED_BY_OWNER",
-            rejectReason: rejectReason.trim(),
-          },
-          include: {
-            product: {
-              select: {
-                name: true,
-
-                optimizedImages: true,
-              },
-            },
-            requester: {
-              select: {
-                name: true,
-                email: true,
-              },
+      // Update rental request status last
+      const updatedRequest = await tx.rentalRequest.update({
+        where: { id: requestId },
+        data: {
+          status: "REJECTED_BY_OWNER",
+          rejectReason: rejectReason.trim(),
+        },
+        include: {
+          product: {
+            select: {
+              name: true,
+              optimizedImages: true,
             },
           },
-        }),
-      );
-
-      const results = await Promise.all(updates);
-      const updatedRequest = results[results.length - 1];
+          requester: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+        },
+      });
       return updatedRequest;
     });
 
-    await resend.emails.send({
-      from: "Brittoo <notifications@brittoo.xyz>",
-      to: updatedRequest.requester.email,
-      subject: `Your Rental Request Has Been Rejected`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f4f7f6;">
-          <div style="text-align: center; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
-            <h2 style="color: #d32f2f; font-size: 24px; margin-bottom: 20px;">Rental Request Rejected</h2>
-            <p style="color: #374151; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
-              We're sorry, but your rental request could not be accepted at this time. For more details, please review your request or contact our support team.
-            </p>
-            <p style="color: #374151; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
-              You can submit a new request or explore other available options.
-            </p>
-            <a href="${process.env.CLIENT_BASE_URL}/dashboard/placed-requests" style="display: inline-block; padding: 12px 24px; background-color: #4caf50; color: #ffffff; text-decoration: none; font-weight: bold; border-radius: 5px; margin: 20px 0;">
-              View Your Requests
-            </a>
-            <p style="color: #374151; font-size: 14px; line-height: 1.5;">
-              If you have any questions, feel free to reach out to our support team.
-            </p>
-          </div>
-        </div>
-      `,
-    });
+    try {
+      const title = 'Request Rejected 😓';
+      const body = `Your rental request for product ${updatedRequest.product.name} has been rejected 🤧`;
+      const data = { url: '/dashboard/placed-requests' };
+      await createNotification(updatedRequest.requester.id, title, body, data);
+    } catch (notificationError) {
+      console.error("Failed to create notification:", notificationError);
+    }
+    // try {
+    //   await resend.emails.send({
+    //     from: "Brittoo <notifications@brittoo.xyz>",
+    //     to: updatedRequest.requester.email,
+    //     subject: `Your Rental Request Has Been Rejected`,
+    //     html: `
+    //       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f4f7f6;">
+    //         <div style="text-align: center; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+    //           <h2 style="color: #d32f2f; font-size: 24px; margin-bottom: 20px;">Rental Request Rejected</h2>
+    //           <p style="color: #374151; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
+    //             We're sorry, but your rental request for <strong>${updatedRequest.product.name}</strong> could not be accepted.
+    //           </p>
+    //           <p style="color: #374151; font-size: 16px; line-height: 1.5; margin-bottom: 10px;">
+    //             <strong>Reason:</strong> ${rejectReason.trim()}
+    //           </p>
+    //           <p style="color: #374151; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
+    //             You can submit a new request or explore other available options.
+    //           </p>
+    //           <a href="${process.env.CLIENT_BASE_URL}/dashboard/placed-requests" style="display: inline-block; padding: 12px 24px; background-color: #4caf50; color: #ffffff; text-decoration: none; font-weight: bold; border-radius: 5px; margin: 20px 0;">
+    //             View Your Requests
+    //           </a>
+    //           <p style="color: #374151; font-size: 14px; line-height: 1.5;">
+    //             If you have any questions, feel free to reach out to our support team.
+    //           </p>
+    //         </div>
+    //       </div>
+    //     `,
+    //   });
+    // } catch (emailError) {
+    //   console.error("Failed to send rejection email:", emailError);
+    // }
 
     res.status(200).json({
       success: true,
@@ -688,16 +742,24 @@ export const rejectRentalRequest = async (req, res, next) => {
   }
 };
 
+
 export const cancelRentalRequest = async (req, res, next) => {
   try {
     const { requestId } = req.params;
     const userId = req.user.id;
     const { cancelReason } = req.body;
+
+    // Enhanced validation
     if (!cancelReason || cancelReason.trim() === "") {
       throw new CustomError("Cancel reason is required", 400, "MISSING_FIELDS");
     }
 
+    if (cancelReason.trim().length > 500) {
+      throw new CustomError("Cancel reason must not exceed 500 characters", 400, "INVALID_INPUT");
+    }
+
     const updatedRequest = await prisma.$transaction(async (tx) => {
+      // Fetch the rental request with all needed data
       const request = await tx.rentalRequest.findFirst({
         where: {
           id: requestId,
@@ -710,128 +772,155 @@ export const cancelRentalRequest = async (req, res, next) => {
         include: {
           rccUsageDetails: {
             include: {
-              redCacheCredit: true
+              redCacheCredit: true,
             },
           },
           bccWallet: true,
           owner: {
             select: {
-              email: true
-            }
-          }
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+          product: {
+            select: {
+              name: true,
+              optimizedImages: true,
+            },
+          },
+          requester: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
         },
       });
+
       if (!request) {
         throw new CustomError(
           "Rental request not found or already processed",
-          400,
+          404,
+          "NOT_FOUND"
         );
       }
-      const updates = [];
-      // Handle BCC refund
+
+      // Validate amounts before processing
+      if (request.usedBccAmount && request.usedBccAmount < 0) {
+        throw new CustomError("Invalid BCC amount", 400, "INVALID_DATA");
+      }
+
+      // Handle BCC refund sequentially
       if (request.paidWithBcc && request.usedBccAmount && request.bccWalletId) {
-        updates.push(
-          tx.bccWallet.update({
-            where: { id: request.bccWalletId },
-            data: {
-              availableBalance: { increment: request.usedBccAmount },
-              lockedBalance: { decrement: request.usedBccAmount },
-            },
-          }),
-        );
-        updates.push(
-          tx.bccTransaction.create({
-            data: {
-              userId: request.requesterId,
-              walletId: request.bccWalletId,
-              rentalRequestId: request.id,
-              amount: request.usedBccAmount,
-              status: "ACCEPTED",
-              transactionType: "DEPOSIT_REFUND",
-            },
-          }),
-        );
+        await tx.bccWallet.update({
+          where: { id: request.bccWalletId },
+          data: {
+            availableBalance: { increment: request.usedBccAmount },
+            lockedBalance: { decrement: request.usedBccAmount },
+          },
+        });
+
+        await tx.bccTransaction.create({
+          data: {
+            userId: request.requesterId,
+            walletId: request.bccWalletId,
+            rentalRequestId: request.id,
+            amount: request.usedBccAmount,
+            status: "ACCEPTED",
+            transactionType: "DEPOSIT_REFUND",
+          },
+        });
       }
-      // Handle RCC refund
+
+      // Handle RCC refund sequentially
       if (request.paidWithRcc && request.rccUsageDetails.length > 0) {
         for (const usage of request.rccUsageDetails) {
-          updates.push(
-            tx.redCacheCredit.update({
-              where: { id: usage.redCacheCreditId, deletedAt: null },
-              data: {
-                inUse: { decrement: usage.usedAmount },
-              },
-            }),
-          );
+          // Validate amount
+          if (usage.usedAmount < 0) {
+            throw new CustomError("Invalid RCC usage amount", 400, "INVALID_DATA");
+          }
+
+          await tx.redCacheCredit.update({
+            where: { id: usage.redCacheCreditId, deletedAt: null },
+            data: {
+              inUse: { decrement: usage.usedAmount },
+            },
+          });
         }
       }
-      // Update rental request status
-      updates.push(
-        tx.rentalRequest.update({
-          where: { id: requestId },
-          data: {
-            status: "CANCELLED_BY_RENTER",
-            cancelReason: cancelReason.trim(),
-          },
-          include: {
-            product: {
-              select: {
-                name: true,
 
-                optimizedImages: true,
-              },
+      const updatedRequest = await tx.rentalRequest.update({
+        where: { id: requestId },
+        data: {
+          status: "CANCELLED_BY_RENTER",
+          cancelReason: cancelReason.trim(),
+        },
+        include: {
+          product: {
+            select: {
+              name: true,
+              optimizedImages: true,
             },
-            requester: {
-              select: {
-                name: true,
-                email: true,
-              },
-            },
-            owner: {
-              select: {
-                name: true,
-                email: true
-              }
-            }
           },
-        }),
-      );
+          requester: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
+          owner: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+        },
+      });
 
-      const results = await Promise.all(updates);
-      const updatedRequest = results[results.length - 1];
       return updatedRequest;
     });
 
-    //console.log(updatedRequest.owner);
-
-    // Emit notification to owner
-    await resend.emails.send({
-      from: "Brittoo <notifications@brittoo.xyz>",
-      to: updatedRequest.owner.email,
-      subject: `Rental Request Cancelled`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f4f7f6;">
-          <div style="text-align: center; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
-            <h2 style="color: #d32f2f; font-size: 24px; margin-bottom: 20px;">Rental Request Cancelled</h2>
-            <p style="color: #374151; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
-              The rental request for your product has been cancelled by the renter.
-            </p>
-            <p style="color: #374151; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
-              <strong>Reason for cancellation:</strong> ${cancelReason.trim()}
-            </p>
-            <p style="color: #374151; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
-              No further action is required at this time. You can view other pending requests or manage your products in your dashboard.
-            </p>
-            <a href="${process.env.CLIENT_BASE_URL}/dashboard/received-requests" style="display: inline-block; padding: 12px 24px; background-color: #4caf50; color: #ffffff; text-decoration: none; font-weight: bold; border-radius: 5px; margin: 20px 0;">
-              View Received Requests
-            </a>
-            <p style="color: #374151; font-size: 14px; line-height: 1.5;">
-              If you have any questions, feel free to reach out to our support team.
-            </p>
-          </div>
-        </div>
-      `,
-    });
+    try {
+      const title = 'Rental Request Cancelled 😓';
+      const body = `The rental request for product ${updatedRequest.product.name} has been cancelled by the renter`;
+      const data = { url: '/dashboard/received-requests' };
+      await createNotification(updatedRequest.owner.id, title, body, data);
+    } catch (notificationError) {
+      console.error("Failed to create notification:", notificationError);
+    }
+    // try {
+    //   await resend.emails.send({
+    //     from: "Brittoo <notifications@brittoo.xyz>",
+    //     to: updatedRequest.owner.email,
+    //     subject: `Rental Request Cancelled`,
+    //     html: `
+    //       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f4f7f6;">
+    //         <div style="text-align: center; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+    //           <h2 style="color: #d32f2f; font-size: 24px; margin-bottom: 20px;">Rental Request Cancelled</h2>
+    //           <p style="color: #374151; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
+    //             The rental request for your product <strong>${updatedRequest.product.name}</strong> has been cancelled by the renter.
+    //           </p>
+    //           <p style="color: #374151; font-size: 16px; line-height: 1.5; margin-bottom: 10px;">
+    //             <strong>Reason for cancellation:</strong> ${cancelReason.trim()}
+    //           </p>
+    //           <p style="color: #374151; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
+    //             No further action is required at this time. You can view other pending requests or manage your products in your dashboard.
+    //           </p>
+    //           <a href="${process.env.CLIENT_BASE_URL}/dashboard/received-requests" style="display: inline-block; padding: 12px 24px; background-color: #4caf50; color: #ffffff; text-decoration: none; font-weight: bold; border-radius: 5px; margin: 20px 0;">
+    //             View Received Requests
+    //           </a>
+    //           <p style="color: #374151; font-size: 14px; line-height: 1.5;">
+    //             If you have any questions, feel free to reach out to our support team.
+    //           </p>
+    //         </div>
+    //       </div>
+    //     `,
+    //   });
+    // } catch (emailError) {
+    //   console.error("Failed to send cancellation email:", emailError);
+    // }
 
     res.status(200).json({
       success: true,
