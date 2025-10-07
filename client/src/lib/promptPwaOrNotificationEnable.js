@@ -1,19 +1,19 @@
-import { subscribeToPush } from "./subscribeToPush";
 import Swal from "sweetalert2";
+import { subscribeToPush } from "./subscribeToPush";
 
 let deferredPrompt;
 
-// --- PWA INSTALL EVENT LISTENER ---
+// --- BEFORE INSTALL PROMPT LISTENER ---
 if (!window._pwaListenerAttached) {
   window.addEventListener("beforeinstallprompt", (e) => {
     console.log("✅ beforeinstallprompt fired:", e);
-    e.preventDefault(); // prevent the mini-infobar
-    deferredPrompt = e; // save event for manual trigger
+    e.preventDefault(); // prevent auto banner
+    deferredPrompt = e;
   });
   window._pwaListenerAttached = true;
 }
 
-// --- PROMPT FOR PWA INSTALLATION ---
+// --- PROMPT PWA INSTALLATION ---
 export const promptPwaInstall = async () => {
   const ua = navigator.userAgent.toLowerCase();
   const isIos = /iphone|ipad|ipod/.test(ua);
@@ -22,7 +22,7 @@ export const promptPwaInstall = async () => {
   if (isIos) {
     Swal.fire({
       title: "📱 iOS Users",
-      text: 'To install Brittoo, tap the Share button and select "Add to Home Screen".',
+      text: 'Tap the Share button and select "Add to Home Screen".',
       icon: "info",
       confirmButtonColor: "#22c55e",
     });
@@ -40,79 +40,51 @@ export const promptPwaInstall = async () => {
   }
 
   if (deferredPrompt) {
-    console.log("🟢 Prompting PWA install...");
     deferredPrompt.prompt();
-
     const { outcome } = await deferredPrompt.userChoice;
-    console.log("User choice:", outcome);
+    deferredPrompt = null;
 
     if (outcome === "accepted") {
       Swal.fire({
         title: "🎉 Installed!",
-        text: "Brittoo has been added to your home screen!",
+        text: "Brittoo added to your home screen!",
         icon: "success",
         confirmButtonColor: "#22c55e",
       });
-    } else {
-      console.log("❌ User declined PWA install");
     }
-
-    deferredPrompt = null;
   } else {
     Swal.fire({
       title: "⚠️ Install Not Available",
-      text: "Please use your browser menu to install Brittoo.",
+      text: "Use browser menu to install Brittoo.",
       icon: "warning",
       confirmButtonColor: "#22c55e",
     });
   }
 };
 
-// --- PROMPT FOR PUSH NOTIFICATIONS ---
+// --- PROMPT AND ENABLE NOTIFICATIONS ---
 export const promptNotifications = async () => {
   try {
-    if (Notification.permission === "denied") {
-      Swal.fire({
-        title: "🔕 Notifications Blocked",
-        text: "You've blocked notifications for this site. Enable them in browser settings to receive alerts.",
-        icon: "info",
-        confirmButtonColor: "#22c55e",
-      });
-      return;
-    }
-
-    if (Notification.permission !== "granted") {
-      const permission = await Notification.requestPermission();
-
-      if (permission === "granted") {
-        await subscribeToPush();
-        Swal.fire({
-          title: "🔔 Notifications Enabled",
-          text: "You'll now receive important updates from Brittoo!",
-          icon: "success",
-          confirmButtonColor: "#22c55e",
-        });
-      } else {
-        Swal.fire({
-          title: "🚫 Notifications Denied",
-          text: "You can enable them later in browser settings.",
-          icon: "warning",
-          confirmButtonColor: "#22c55e",
-        });
-      }
-    } else {
-      // Already granted → just subscribe again safely
-      await subscribeToPush();
-    }
+    await subscribeToPush();
+    Swal.fire({
+      title: "🔔 Notifications Enabled",
+      text: "You'll now receive updates from Brittoo!",
+      icon: "success",
+      confirmButtonColor: "#22c55e",
+    });
   } catch (err) {
-    console.error("❌ Failed to subscribe to push notifications:", err);
-
     Swal.fire({
       title: "⚠️ Push Subscription Failed",
-      text:
-        "Could not enable notifications. This may be due to a missing VAPID key or invalid service worker configuration. Please refresh and try again.",
+      text: "Could not enable notifications. Make sure you are on HTTPS and service worker is registered.",
       icon: "error",
       confirmButtonColor: "#22c55e",
     });
+    console.error(err);
   }
+};
+
+// --- COMBINED PROMPT ---
+export const promptPwaOrNotificationEnable = async () => {
+  await promptPwaInstall();
+  await promptNotifications();
 };
