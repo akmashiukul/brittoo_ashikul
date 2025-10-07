@@ -2,14 +2,14 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import brittoLogo from "../../assets/brittoo-logo.png";
 import { IoLogOut } from "react-icons/io5";
 import { GiHamburgerMenu } from "react-icons/gi";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Avatar from "boring-avatars";
 import Swal from "sweetalert2";
 import useRegModalStore from "../../stores/authStores/useRegModalStore";
 import useLoginModalStore from "../../stores/authStores/useLoginModalStore";
 import useUserStore from "../../stores/authStores/useUserStore";
 import api from "../../lib/api";
-import { Bell, Coins, CreditCard } from "lucide-react";
+import { Bell, Coins, CreditCard, ExternalLink } from "lucide-react";
 
 const Navbar = () => {
   const menuClassname =
@@ -23,6 +23,7 @@ const Navbar = () => {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
+  const notificationRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,6 +31,22 @@ const Navbar = () => {
       fetchNotifications();
     }
   }, [currentUser]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (notificationRef.current && !notificationRef.current.contains(event.target)) {
+        setShowNotificationDropdown(false);
+      }
+    };
+
+    if (showNotificationDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showNotificationDropdown]);
 
   const fetchNotifications = async () => {
     const res = await api.get('/api/v1/notifications');
@@ -39,13 +56,28 @@ const Navbar = () => {
 
   const handleClick = async () => {
     setShowNotificationDropdown(!showNotificationDropdown);
-    if (!showNotificationDropdown) {
-      // Mark all as read
+    if (!showNotificationDropdown && unreadCount > 0) {
       for (const n of notifications.filter(n => !n.isRead)) {
         await api.put(`/api/v1/notifications/${n.id}/read`);
       }
       setUnreadCount(0);
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
     }
+  };
+
+  const getTimeAgo = (date) => {
+    const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+    let interval = seconds / 31536000;
+    if (interval > 1) return Math.floor(interval) + ' years ago';
+    interval = seconds / 2592000;
+    if (interval > 1) return Math.floor(interval) + ' months ago';
+    interval = seconds / 86400;
+    if (interval > 1) return Math.floor(interval) + ' days ago';
+    interval = seconds / 3600;
+    if (interval > 1) return Math.floor(interval) + ' hours ago';
+    interval = seconds / 60;
+    if (interval > 1) return Math.floor(interval) + ' minutes ago';
+    return 'just now';
   };
 
   useEffect(() => {
@@ -151,7 +183,6 @@ const Navbar = () => {
             {currentUser ? (
               <div className="flex items-center gap-3 sm:gap-6 mr-2.5 sm:mr-0">
                 <div className="flex items-center gap-2 md:gap-4 bg-gray-50 rounded-full px-3 py-2 border border-gray-200">
-                  {/* BCC */}
                   <div className="flex items-center gap-1">
                     <div className="sm:w-6 sm:h-6 w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center">
                       <Coins className="w-3 h-3 text-blue-600" />
@@ -164,7 +195,6 @@ const Navbar = () => {
                     </span>
                   </div>
 
-                  {/* RCC */}
                   <div className="flex items-center gap-1">
                     <div className="sm:w-6 sm:h-6 w-4 h-4 bg-red-100 rounded-full flex items-center justify-center">
                       <CreditCard className="w-3 h-3 text-red-600" />
@@ -177,31 +207,76 @@ const Navbar = () => {
                     </span>
                   </div>
                 </div>
-                <div className="relative flex flex-col items-center">
-                  <button onClick={handleClick} className="relative">
-                    <Bell size={24} />
+
+                <div className="relative" ref={notificationRef}>
+                  <button 
+                    onClick={handleClick}
+                    className="relative p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  >
+                    <Bell size={22} className="text-gray-600" />
                     {unreadCount > 0 && (
-                      <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1">
-                        {unreadCount}
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
+                        {unreadCount > 9 ? '9+' : unreadCount}
                       </span>
                     )}
                   </button>
+
                   {showNotificationDropdown && (
-                    <div className="absolute right-0 mt-2 w-64 bg-white border shadow-lg">
-                      <ul>
-                        {notifications.length === 0 ? (
-                          <li className="p-2">No notifications</li>
-                        ) : (
-                          notifications.map(n => (
-                            <li key={n.id} className="p-2 border-b">
-                              <strong>{n.title}</strong>: {n.body}
-                            </li>
-                          ))
+                    <div className="fixed md:absolute right-2 left-2 md:right-0 md:left-auto mt-2 md:w-96 bg-white border border-gray-200 rounded-lg shadow-xl z-50 overflow-hidden">
+                      <div className="bg-gradient-to-r from-green-500 to-green-600 px-4 py-3 flex items-center justify-between">
+                        <h3 className="text-white font-semibold text-sm md:text-base">Notifications</h3>
+                        {notifications.length > 0 && (
+                          <span className="text-white text-xs bg-white/20 px-2 py-1 rounded-full">
+                            {notifications.length}
+                          </span>
                         )}
-                      </ul>
+                      </div>
+
+                      <div className="max-h-[70vh] md:max-h-96 overflow-y-auto">
+                        {notifications.length === 0 ? (
+                          <div className="p-8 text-center">
+                            <Bell size={48} className="mx-auto text-gray-300 mb-3" />
+                            <p className="text-gray-500 text-sm">No notifications yet</p>
+                          </div>
+                        ) : (
+                          <div className="divide-y divide-gray-100">
+                            {notifications.map(n => {
+                              const content = (
+                                <div className={`p-4 hover:bg-gray-50 transition-colors cursor-pointer ${!n.isRead ? 'bg-green-50/50' : ''}`}>
+                                  <div className="flex items-start gap-3">
+                                    <div className={`flex-shrink-0 w-2 h-2 rounded-full mt-2 ${!n.isRead ? 'bg-green-500' : 'bg-gray-300'}`} />
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-start justify-between gap-2">
+                                        <h4 className="font-semibold text-sm text-gray-800 truncate">{n.title}</h4>
+                                        {n.data.url && <ExternalLink size={14} className="text-gray-400 flex-shrink-0" />}
+                                      </div>
+                                      <p className="text-xs text-gray-600 mt-1 line-clamp-2">{n.body}</p>
+                                      <p className="text-xs text-gray-400 mt-2">{getTimeAgo(n.createdAt)}</p>
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+
+                              if (n.data.url) {
+                                return n.data.url.startsWith('/') ? (
+                                  <Link key={n.id} to={n.data.url} onClick={() => setShowNotificationDropdown(false)}>
+                                    {content}
+                                  </Link>
+                                ) : (
+                                  <a key={n.id} href={n.data.url} target="_blank" rel="noopener noreferrer" onClick={() => setShowNotificationDropdown(false)}>
+                                    {content}
+                                  </a>
+                                );
+                              }
+                              return <div key={n.id}>{content}</div>;
+                            })}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
+
                 <div className="relative">
                   <Avatar
                     name={currentUser.email}
@@ -220,9 +295,7 @@ const Navbar = () => {
                     }
                   />
                   {isUserDropDownOpen && (
-                    <div
-                      className="absolute end-0 z-20 mt-0.5 w-48 divide-gray-100 rounded-md border border-gray-100 bg-white shadow-lg overflow-x-hidden top-10 lg:-left-3"
-                    >
+                    <div className="absolute end-0 z-20 mt-0.5 w-48 divide-gray-100 rounded-md border border-gray-100 bg-white shadow-lg overflow-x-hidden top-10 lg:-left-3">
                       <div className="p-2">
                         <Link to="/dashboard/overview" className={menuClassname}>
                           My Dashboard

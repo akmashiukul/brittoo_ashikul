@@ -106,16 +106,16 @@ const DashboardLayout = () => {
               <X className="w-6 h-6 transition-transform duration-300 hover:scale-110 text-red-600 group-hover:rotate-180" />
             </button>
           </div>
-          <hr className="w-full border-t border-gray-300 my-4 mx-auto" />
+          <hr className="w-full border-t border-gray-300 mt-2 mb-0 mx-auto" />
         </div>
 
         {/* Scrollable Navigation Links */}
-        <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 px-4">
+        <div className="flex-1 overflow-y-auto px-4 scrollbar-hide">
           <ul className="space-y-2 pb-4">
             <li>
               <Link
                 to="/dashboard/overview"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/overview")
+                className={`block rounded-lg px-4 py-2 text-xs  hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/overview")
                   ? "bg-green-600 text-white"
                   : "text-gray-700"
                   } flex items-center gap-2`}
@@ -131,7 +131,7 @@ const DashboardLayout = () => {
             <li>
               <Link
                 to="/dashboard/list-items"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/list-items")
+                className={`block rounded-lg px-4 py-2 text-xs  hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/list-items")
                   ? "bg-green-600 text-white"
                   : "text-gray-700"
                   } flex items-center gap-2`}
@@ -147,7 +147,7 @@ const DashboardLayout = () => {
             <li>
               <Link
                 to="/dashboard/manage-items"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/manage-items")
+                className={`block rounded-lg px-4 py-2 text-xs  hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/manage-items")
                   ? "bg-green-600 text-white"
                   : "text-gray-700"
                   } flex items-center gap-2`}
@@ -163,7 +163,7 @@ const DashboardLayout = () => {
             <li>
               <Link
                 to="/dashboard/placed-requests"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/placed-requests")
+                className={`block rounded-lg px-4 py-2 text-xs  hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/placed-requests")
                   ? "bg-green-600 text-white"
                   : "text-gray-700"
                   } flex items-center gap-2`}
@@ -179,7 +179,7 @@ const DashboardLayout = () => {
             <li>
               <Link
                 to="/dashboard/received-requests"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/received-requests")
+                className={`block rounded-lg px-4 py-2 text-xs  hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/received-requests")
                   ? "bg-green-600 text-white"
                   : "text-gray-700"
                   } flex items-center gap-2`}
@@ -195,7 +195,7 @@ const DashboardLayout = () => {
             <li>
               <Link
                 to="/dashboard/received-purchase-requests"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/received-purchase-requests")
+                className={`block rounded-lg px-4 py-2 text-xs  hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/received-purchase-requests")
                   ? "bg-green-600 text-white"
                   : "text-gray-700"
                   } flex items-center gap-2`}
@@ -211,7 +211,7 @@ const DashboardLayout = () => {
             <li>
               <Link
                 to="/dashboard/placed-purchase-requests"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/placed-purchase-requests")
+                className={`block rounded-lg px-4 py-2 text-xs  hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/placed-purchase-requests")
                   ? "bg-green-600 text-white"
                   : "text-gray-700"
                   } flex items-center gap-2`}
@@ -227,7 +227,7 @@ const DashboardLayout = () => {
             <li>
               <Link
                 to="/dashboard/my-credits"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/my-credits")
+                className={`block rounded-lg px-4 py-2 text-xs  hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/my-credits")
                   ? "bg-green-600 text-white"
                   : "text-gray-700"
                   } flex items-center gap-2`}
@@ -243,7 +243,7 @@ const DashboardLayout = () => {
             <li>
               <Link
                 to="/dashboard/incoming-chats"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/incoming-chats")
+                className={`block rounded-lg px-4 py-2 text-xs  hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/incoming-chats")
                   ? "bg-green-600 text-white"
                   : "text-gray-700"
                   } flex items-center gap-2`}
@@ -259,7 +259,7 @@ const DashboardLayout = () => {
             <li>
               <Link
                 to="/dashboard/outgoing-chats"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/outgoing-chats")
+                className={`block rounded-lg px-4 py-2 text-xs  hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/outgoing-chats")
                   ? "bg-green-600 text-white"
                   : "text-gray-700"
                   } flex items-center gap-2`}
@@ -275,7 +275,7 @@ const DashboardLayout = () => {
             <li>
               <Link
                 to="/dashboard/user-analytics"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/user-analytics")
+                className={`block rounded-lg px-4 py-2 text-xs  hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/user-analytics")
                   ? "bg-green-600 text-white"
                   : "text-gray-700"
                   } flex items-center gap-2`}
@@ -297,7 +297,7 @@ const DashboardLayout = () => {
             <li>
               <Link
                 to="/"
-                className={`rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 flex items-center gap-2 text-gray-700`}
+                className={`rounded-lg px-4 py-2 text-xs  hover:bg-green-500 hover:text-white transition-colors duration-200 flex items-center gap-2 text-gray-700`}
                 onClick={closeDrawer}
               >
                 <IoHomeSharp /> Home
@@ -305,7 +305,7 @@ const DashboardLayout = () => {
             </li>
             <li>
               <button
-                className={`w-full text-left rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-red-500 hover:text-white transition-colors duration-200 text-red-600 flex items-center gap-2`}
+                className={`w-full text-left rounded-lg px-4 py-2 text-xs  hover:bg-red-500 hover:text-white transition-colors duration-200 text-red-600 flex items-center gap-2`}
                 onClick={handleLogOut}
               >
                 <IoExit /> Logout

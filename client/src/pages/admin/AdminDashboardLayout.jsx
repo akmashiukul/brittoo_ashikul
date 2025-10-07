@@ -63,7 +63,7 @@ const AdminDashboardLayout = () => {
             <li>
               <Link
                 to="/dashboard/admin/admin-overview"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/admin-overview")
+                className={`block rounded-lg px-4 py-2 text-xs  hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/admin-overview")
                     ? "bg-green-600 text-white"
                     : "text-gray-700"
                   } flex items-center gap-2`}
@@ -79,7 +79,7 @@ const AdminDashboardLayout = () => {
             <li>
               <Link
                 to="/dashboard/admin/manage-rental-requests"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/manage-rental-requests")
+                className={`block rounded-lg px-4 py-2 text-xs  hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/manage-rental-requests")
                     ? "bg-green-600 text-white"
                     : "text-gray-700"
                   } flex items-center gap-2`}
@@ -95,7 +95,7 @@ const AdminDashboardLayout = () => {
             <li>
               <Link
                 to="/dashboard/admin/manage-purchase-requests"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/manage-purchase-requests")
+                className={`block rounded-lg px-4 py-2 text-xs  hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/manage-purchase-requests")
                     ? "bg-green-600 text-white"
                     : "text-gray-700"
                   } flex items-center gap-2`}
@@ -111,7 +111,7 @@ const AdminDashboardLayout = () => {
             <li>
               <Link
                 to="/dashboard/admin/blue-cc-requests"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/blue-cc-requests")
+                className={`block rounded-lg px-4 py-2 text-xs  hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/blue-cc-requests")
                     ? "bg-green-600 text-white"
                     : "text-gray-700"
                   } flex items-center gap-2`}
@@ -127,7 +127,7 @@ const AdminDashboardLayout = () => {
             <li>
               <Link
                 to="/dashboard/admin/withdrawal-requests"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/withdrawal-requests")
+                className={`block rounded-lg px-4 py-2 text-xs  hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/withdrawal-requests")
                     ? "bg-green-600 text-white"
                     : "text-gray-700"
                   } flex items-center gap-2`}
@@ -143,7 +143,7 @@ const AdminDashboardLayout = () => {
             <li>
               <Link
                 to="/dashboard/admin/manage-users"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/manage-users")
+                className={`block rounded-lg px-4 py-2 text-xs  hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/manage-users")
                     ? "bg-green-600 text-white"
                     : "text-gray-700"
                   } flex items-center gap-2`}
@@ -159,7 +159,7 @@ const AdminDashboardLayout = () => {
             <li>
               <Link
                 to="/dashboard/admin/manage-products"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/manage-products")
+                className={`block rounded-lg px-4 py-2 text-xs  hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/manage-products")
                     ? "bg-green-600 text-white"
                     : "text-gray-700"
                   } flex items-center gap-2`}
@@ -175,7 +175,7 @@ const AdminDashboardLayout = () => {
             <li>
               <Link
                 to="/dashboard/admin/manage-chats"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/manage-chats")
+                className={`block rounded-lg px-4 py-2 text-xs  hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/manage-chats")
                     ? "bg-green-600 text-white"
                     : "text-gray-700"
                   } flex items-center gap-2`}
@@ -191,7 +191,7 @@ const AdminDashboardLayout = () => {
             <li>
               <Link
                 to="/dashboard/admin/negotiation-history"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/negotiation-history")
+                className={`block rounded-lg px-4 py-2 text-xs  hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/negotiation-history")
                     ? "bg-green-600 text-white"
                     : "text-gray-700"
                   } flex items-center gap-2`}
@@ -207,7 +207,7 @@ const AdminDashboardLayout = () => {
             <li>
               <Link
                 to="/dashboard/admin/manage-coupons"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/manage-coupons")
+                className={`block rounded-lg px-4 py-2 text-xs  hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/manage-coupons")
                     ? "bg-green-600 text-white"
                     : "text-gray-700"
                   } flex items-center gap-2`}
@@ -223,7 +223,7 @@ const AdminDashboardLayout = () => {
             <li>
               <Link
                 to="/dashboard/admin/manage-notifications"
-                className={`block rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/manage-notifications")
+                className={`block rounded-lg px-4 py-2 text-xs  hover:bg-green-500 hover:text-white transition-colors duration-200 ${path.includes("/manage-notifications")
                     ? "bg-green-600 text-white"
                     : "text-gray-700"
                   } flex items-center gap-2`}
@@ -244,7 +244,7 @@ const AdminDashboardLayout = () => {
             <li>
               <Link
                 to="/"
-                className={`rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-green-500 hover:text-white transition-colors duration-200 flex items-center gap-2 text-gray-700`}
+                className={`rounded-lg px-4 py-2 text-xs  hover:bg-green-500 hover:text-white transition-colors duration-200 flex items-center gap-2 text-gray-700`}
                 onClick={closeDrawer}
               >
                 <IoHomeSharp /> Home
@@ -252,7 +252,7 @@ const AdminDashboardLayout = () => {
             </li>
             <li>
               <button
-                className={`w-full text-left rounded-lg px-4 py-2 text-xs sm:text-sm hover:bg-red-500 hover:text-white transition-colors duration-200 text-red-600 flex items-center gap-2`}
+                className={`w-full text-left rounded-lg px-4 py-2 text-xs  hover:bg-red-500 hover:text-white transition-colors duration-200 text-red-600 flex items-center gap-2`}
                 onClick={closeDrawer}
               >
                 <IoExit /> Logout
