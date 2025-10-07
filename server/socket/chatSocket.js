@@ -2,6 +2,7 @@ import { Server } from "socket.io";
 import jwt from "jsonwebtoken";
 import prisma from "../config/prisma.js";
 import { safeAuthUserSelect } from "../lib/prismaSelects.js";
+import { createNotification } from "../controllers/notification.controller.js";
 
 let io;
 const onlineUsers = new Map(); // userId: socketId
@@ -129,10 +130,17 @@ export const initializeSocket = (server) => {
         const recipientId = socket.userId === chatRoom.buyerId
           ? chatRoom.sellerId
           : chatRoom.buyerId;
+        let data = {};
+        const inComing = socket.userId === chatRoom.sellerId;
+        if(!inComing) {
+          data.url = '/dashboard/incoming-chats';
+        } else data.url = '/dashboard/outgoing-chats';
 
         if (!onlineUsers.has(recipientId)) {
           // TODO: Send push notification
-
+          const title = 'New Message';
+          const body = message.content;
+          await createNotification(recipientId, title, body, data);
         }
       } catch (error) {
         console.error("Send message error:", error);
