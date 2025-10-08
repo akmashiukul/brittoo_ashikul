@@ -8,7 +8,10 @@ import connectToDB from './configs/mongodb.js';
 dotenv.config();
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: ["https://brittoo.xyz", "https://www.brittoo.xyz"],
+  credentials: true
+}));
 app.use(express.json());
 const port = process.env.PORT || 5001;
 connectToDB();
