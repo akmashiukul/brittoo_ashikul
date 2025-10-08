@@ -9,7 +9,7 @@ dotenv.config();
 
 const app = express();
 app.use(cors({
-  origin: ["https://brittoo.xyz", "https://www.brittoo.xyz"],
+  origin: ["https://brittoo.xyz", "https://www.brittoo.xyz", "http://localhost:5173"],
   credentials: true
 }));
 app.set('trust proxy', 1);

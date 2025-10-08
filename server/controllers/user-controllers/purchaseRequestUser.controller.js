@@ -131,7 +131,7 @@ export const acceptPurchaseRequest = async (req, res, next) => {
     //Emit notification to buyer
     try {
       const title = 'Request Accepted';
-      const body = `Your purchase request for product ${updatedRequest.product.name} has been accepted 😍`;
+      const body = `Your purchase request for product ${updated.product.name} has been accepted 😍`;
       const data = { url: '/dashboard/placed-purchase-requests' };
       await createNotification(updated.buyer.id, title, body, data);
     } catch (error) {
