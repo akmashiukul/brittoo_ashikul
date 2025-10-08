@@ -17,7 +17,7 @@ self.addEventListener('push', (event) => {
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const url = event.notification.data.url || '/dashboard';
+  const url = event.notification.data.url || '/';
   event.waitUntil(self.clients.openWindow(url).catch(err => console.error('Failed to open window:', err)));
 });
 
