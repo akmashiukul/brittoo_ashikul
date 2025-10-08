@@ -525,35 +525,43 @@ export const acceptRentalRequest = async (req, res, next) => {
     });
 
     //Emit notification to renter
-    const title = 'Request Accepted';
-    const body = `Your rental request for product ${updatedRequest.product.name} has been accepted 😍`;
-    const data = { url: '/dashboard/placed-requests' };
-    await createNotification(updatedRequest.requester.id, title, body, data);
+    try {
+      const title = 'Request Accepted';
+      const body = `Your rental request for product ${updatedRequest.product.name} has been accepted 😍`;
+      const data = { url: '/dashboard/placed-requests' };
+      await createNotification(updatedRequest.requester.id, title, body, data);
+    } catch (error) {
+      console.error("error in accept rental notification", error);
+    }
 
-    await resend.emails.send({
-      from: "Brittoo <notifications@brittoo.xyz>",
-      to: updatedRequest.requester.email,
-      subject: `Your Rental Request Has been accepted.`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f4f7f6;">
-          <div style="text-align: center; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
-            <h2 style="color: #2e7d32; font-size: 24px; margin-bottom: 20px;">Rental Request Accepted!</h2>
-            <p style="color: #374151; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
-              Your rental request has been successfully accepted. A member of the Brittoo team will contact you soon with further details.
-            </p>
-            <p style="color: #374151; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
-              Please have patience as we process your request.
-            </p>
-            <a href="${process.env.CLIENT_BASE_URL}/dashboard/placed-requests" style="display: inline-block; padding: 12px 24px; background-color: #4caf50; color: #ffffff; text-decoration: none; font-weight: bold; border-radius: 5px; margin: 20px 0;">
-              View Your Requests
-            </a>
-            <p style="color: #374151; font-size: 14px; line-height: 1.5;">
-              If you have any questions, feel free to reach out to our support team.
-            </p>
+    try {
+      await resend.emails.send({
+        from: "Brittoo <notifications@brittoo.xyz>",
+        to: updatedRequest.requester.email,
+        subject: `Your Rental Request Has been accepted.`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f4f7f6;">
+            <div style="text-align: center; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+              <h2 style="color: #2e7d32; font-size: 24px; margin-bottom: 20px;">Rental Request Accepted!</h2>
+              <p style="color: #374151; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
+                Your rental request has been successfully accepted. A member of the Brittoo team will contact you soon with further details.
+              </p>
+              <p style="color: #374151; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
+                Please have patience as we process your request.
+              </p>
+              <a href="${process.env.CLIENT_BASE_URL}/dashboard/placed-requests" style="display: inline-block; padding: 12px 24px; background-color: #4caf50; color: #ffffff; text-decoration: none; font-weight: bold; border-radius: 5px; margin: 20px 0;">
+                View Your Requests
+              </a>
+              <p style="color: #374151; font-size: 14px; line-height: 1.5;">
+                If you have any questions, feel free to reach out to our support team.
+              </p>
+            </div>
           </div>
-        </div>
-      `,
-    });
+        `,
+      });
+    } catch (error) {
+      console.error("error in accept rental email", error);
+    }
 
     res.status(200).json({
       success: true,

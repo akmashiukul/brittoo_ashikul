@@ -1,6 +1,7 @@
 import prisma from "../../config/prisma.js";
 import { CustomError } from "../../lib/customError.js";
 import { safeAuthUserSelect } from "../../lib/prismaSelects.js";
+import { createNotification } from "../notification.controller.js";
 
 export const placePurchaseRequest = async (req, res, next) => {
   try {
@@ -61,6 +62,18 @@ export const placePurchaseRequest = async (req, res, next) => {
         buyer: { select: safeAuthUserSelect },
       },
     });
+
+    // emit notification to seller
+    try {
+      const title = 'New Purchase Request 😍';
+      const body = `You have received a purchase request for ${purchaseRequest.product.name}🥳`;
+      const data = { url: '/dashboard/received-purchase-requests' };
+      await createNotification(purchaseRequest.seller.id, title, body, data);
+      //await createNotification("admin-id", title, body, data);
+    } catch (error) {
+      console.error("error in notification in create purchase request", error);
+    }
+
     res.status(201).json({
       success: true,
       message: "Purchase request placed successfully",
@@ -115,6 +128,15 @@ export const acceptPurchaseRequest = async (req, res, next) => {
         buyer: { select: safeAuthUserSelect },
       },
     });
+    //Emit notification to buyer
+    try {
+      const title = 'Request Accepted';
+      const body = `Your purchase request for product ${updatedRequest.product.name} has been accepted 😍`;
+      const data = { url: '/dashboard/placed-purchase-requests' };
+      await createNotification(updated.buyer.id, title, body, data);
+    } catch (error) {
+      console.error("error in accept purchase notification", error);
+    }
     res.json({
       success: true,
       message: "Purchase request accepted",
@@ -158,6 +180,14 @@ export const rejectPurchaseRequest = async (req, res, next) => {
         buyer: { select: safeAuthUserSelect },
       },
     });
+    try {
+      const title = 'Request Rejected 😓';
+      const body = `Your purchase request for product ${updated.product.name} has been rejected 🤧`;
+      const data = { url: '/dashboard/placed-purchase-requests' };
+      await createNotification(updated.buyer.id, title, body, data);
+    } catch (notificationError) {
+      console.error("Failed to create notification:", notificationError);
+    }
     res.json({
       success: true,
       message: "Purchase request rejected",
@@ -201,6 +231,17 @@ export const cancelPurchaseRequest = async (req, res, next) => {
         buyer: { select: safeAuthUserSelect },
       },
     });
+
+    // to seller
+    try {
+      const title = 'Purchase Request Cancelled 😓';
+      const body = `The purchase request for product ${updated.product.name} has been cancelled by the renter`;
+      const data = { url: '/dashboard/received-purchase-requests' };
+      await createNotification(updated.seller.id, title, body, data);
+    } catch (error) {
+      console.error("Failed to create notification:", error);
+    }
+
     res.json({
       success: true,
       message: "Purchase request cancelled",

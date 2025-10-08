@@ -15,10 +15,10 @@ const RegisterModal = () => {
 
   const navigate = useNavigate();
 
-  // const isValidRuetEmail = (email) => {
-  //   const regex = /^[\w.-]+@([\w-]+\.)?ruet\.ac\.bd$/i;
-  //   return regex.test(email);
-  // };
+  const isValidRuetEmail = (email) => {
+    const regex = /^[\w.-]+@([\w-]+\.)?ruet\.ac\.bd$/i;
+    return regex.test(email);
+  };
 
 
   //const { getGeoLocation } = useGeoLocation();
@@ -179,11 +179,11 @@ const RegisterModal = () => {
                   placeholder="2010033@student.ruet.ac.bd"
                   required
                 />
-                {/* {
+                {
                   formData.email.length > 0 && !isValidRuetEmail(formData.email) && (
                     <p className="text-red-500 text-xs">This is not a valid RUET email. You may still register, and rental features for other universities and the general market are coming soon.</p>
                   )
-                } */}
+                }
               </div>
               <div>
                 <label
