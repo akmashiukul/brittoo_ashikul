@@ -2,7 +2,7 @@ import { Resend } from "resend";
 import prisma from "../config/prisma.js";
 import { CustomError } from "../lib/customError.js";
 import { isGiftCreditValid } from "../lib/creditValidators.js";
-import { createNotification } from "./notification.controller.js";
+import { createNotification, notifyAdmins } from "./notification.controller.js";
 const resend = new Resend(`${process.env.RESEND_API_KEY}`);
 
 export const createRentalRequest = async (req, res, next) => {
@@ -269,6 +269,14 @@ export const createRentalRequest = async (req, res, next) => {
       console.error("error in notification in create request", error);
     }
 
+    // emit notification to admins
+    await notifyAdmins(
+      '📢 New Rental Request Submitted',
+      `A new rental request has been created by user ${result.requester.name} for product ${result.product.name}.`,
+      { url: `/dashboard/admin/manage-rental-requests` }
+    );
+
+    // send fallback email - just in case :)
     try {
       await resend.emails.send({
         from: "Brittoo <notifications@brittoo.xyz>",

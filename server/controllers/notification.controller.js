@@ -138,3 +138,42 @@ export const markAsRead = async (req, res, next) => {
     next(error);
   }
 };
+
+export const notifyAdmins = async (title, body, data = { url: '/' }) => {
+  try {
+    const admins = await prisma.user.findMany({
+      where: { role: 'ADMIN' },
+      select: { id: true }
+    });
+
+    if (!admins.length) {
+      console.warn('No admins found to notify.');
+      return;
+    }
+
+    for (const admin of admins) {
+      await prisma.userNotification.create({
+        data: {
+          userId: admin.id,
+          title,
+          body,
+          data
+        }
+      });
+      await sendPush(admin.id, title, body, data);
+    }
+
+    // Optionally log in admin history table if you have one
+    await prisma.sentNotification.create({
+      data: {
+        title,
+        body,
+        targets: 'admins'
+      }
+    });
+
+    console.log(`✅ Notification sent to ${admins.length} admin(s).`);
+  } catch (error) {
+    console.error('Failed to send admin notification:', error);
+  }
+};

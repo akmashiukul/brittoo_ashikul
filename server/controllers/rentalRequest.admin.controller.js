@@ -1,6 +1,7 @@
 import prisma from "../config/prisma.js";
 import { CustomError } from "../lib/customError.js";
 import { safeAuthUserSelect } from "../lib/prismaSelects.js";
+import { createNotification } from "./notification.controller.js";
 
 export const getAllRentalRequests = async (req, res, next) => {
   try {
@@ -278,6 +279,15 @@ export const rejectRentalRequestAdmin = async (req, res, next) => {
       const updatedRequest = results[results.length - 1];
       return updatedRequest;
     });
+
+    try {
+          const title = 'Request Rejected 😓';
+          const body = `Your rental request for product ${updatedRequest.product.name} has been rejected by Brittoo`;
+          const data = { url: '/dashboard/placed-requests' };
+          await createNotification(updatedRequest.requester.id, title, body, data);
+        } catch (notificationError) {
+          console.error("Failed to create notification in reject by brittoo:", notificationError);
+        }
 
 
     res.status(200).json({

@@ -261,7 +261,7 @@ const Navbar = () => {
                                           <h4 className="font-semibold text-sm text-gray-800 truncate">{n.title}</h4>
                                           {n.data.url && <ExternalLink size={14} className="text-gray-400 flex-shrink-0" />}
                                         </div>
-                                        <p className="text-xs text-gray-600 mt-1 line-clamp-2">{n.body}</p>
+                                        <p className="text-xs text-gray-600 mt-1 line-clamp-4">{n.body}</p>
                                         <p className="text-xs text-gray-400 mt-2">{getTimeAgo(n.createdAt)}</p>
                                       </div>
                                     </div>

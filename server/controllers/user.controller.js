@@ -2,6 +2,7 @@ import { Resend } from "resend";
 import prisma from "../config/prisma.js";
 import { CustomError } from "../lib/customError.js";
 import { safeAuthUserSelect } from "../lib/prismaSelects.js";
+import { createNotification } from "./notification.controller.js";
 const resend = new Resend(`${process.env.RESEND_API_KEY}`);
 
 export const getAllUsers = async (req, res, next) => {
@@ -410,6 +411,15 @@ export const verifyUser = async (req, res, next) => {
       },
     });
 
+    try {
+      const title = '✅ You’re Verified on Brittoo!';
+      const body = `Congrats 🎉 Your documents have been successfully verified. You can now rent, lend, and explore all Brittoo features freely. Start your rental journey today!`;
+      const data = { url: '' };
+      await createNotification(updatedUser.id, title, body, data);
+    } catch (error) {
+      console.error("Failed to create notification in verify user:", error);
+    }
+
     //send email
     await resend.emails.send({
       from: "Brittoo <verify@brittoo.xyz>",
@@ -462,6 +472,9 @@ export const suspendUser = async (req, res, next) => {
     let updatedUser;
     if (user.isSuspended) {
       updatedUser = await prisma.user.update({
+        where: {
+          id: userId
+        },
         data: {
           suspensionCount: user.suspensionCount + 1,
         },
@@ -475,6 +488,24 @@ export const suspendUser = async (req, res, next) => {
         },
       });
     }
+
+    try {
+      let title, body;
+
+      if (updatedUser.suspensionCount > 4) {
+        title = '🚫 Account Suspended – Maximum Limit Reached';
+        body = `You’ve reached the maximum suspension limit ⚠️ and can no longer participate in any rental activities. For assistance, please contact Brittoo Support.`;
+      } else {
+        title = '⚠️ Suspension Notice from Brittoo';
+        body = `You’ve received a suspension 🚫 due to policy violations. Be alert and follow our guidelines to avoid further action. Repeated suspensions may lead to account restrictions.`;
+      }
+
+      const data = { url: '' };
+      await createNotification(updatedUser.id, title, body, data);
+    } catch (error) {
+      console.error("Failed to create notification in suspend user:", error);
+    }
+
 
     res.json({
       success: true,
@@ -513,7 +544,7 @@ export const getUserCreditHistory = async (req, res, next) => {
               id: true,
               name: true,
               productSL: true,
-             
+
               optimizedImages: true,
               pricePerDay: true,
             },
@@ -568,7 +599,7 @@ export const getUserCreditHistory = async (req, res, next) => {
               name: true,
               pricePerDay: true,
               productSL: true,
-             
+
               optimizedImages: true,
             },
           },
@@ -704,7 +735,7 @@ export const getUserPlacedRequestsAdmin = async (req, res, next) => {
           select: {
             id: true,
             name: true,
-           
+
             optimizedImages: true,
             pricePerDay: true,
             productType: true,
@@ -751,7 +782,7 @@ export const getUserReceivedRequestsAdmin = async (req, res, next) => {
           select: {
             id: true,
             name: true,
-           
+
             optimizedImages: true,
             pricePerDay: true,
             productType: true,
