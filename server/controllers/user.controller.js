@@ -492,7 +492,7 @@ export const suspendUser = async (req, res, next) => {
     try {
       let title, body;
 
-      if (updatedUser.suspensionCount > 4) {
+      if (updatedUser.suspensionCount >= 3) {
         title = '🚫 Account Suspended – Maximum Limit Reached';
         body = `You’ve reached the maximum suspension limit ⚠️ and can no longer participate in any rental activities. For assistance, please contact Brittoo Support.`;
       } else {

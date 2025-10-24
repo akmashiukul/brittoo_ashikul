@@ -13,7 +13,7 @@ export const verificationMiddleware = async (req, res, next) => {
     if (loggedInUser.isVerified !== "VERIFIED") {
       throw new CustomError("Access denied! Only verified users can perform this operation", 403, "VERIFICATION_ERROR");
     }
-    if (loggedInUser.suspensionCount > 4) {
+    if (loggedInUser.suspensionCount >= 3) {
       throw new CustomError("Access denied! You are suspended", 403, "VERIFICATION_ERROR");
     }
     next();
