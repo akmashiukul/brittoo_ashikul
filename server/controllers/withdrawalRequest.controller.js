@@ -1,6 +1,6 @@
 import prisma from "../config/prisma.js";
 import { CustomError } from "../lib/customError.js";
-import { safeAuthUserSelect } from "../lib/prismaSelects.js";
+import { notifyAdmins } from "./notification.controller.js";
 
 export const createWithdrawalRequest = async (req, res, next) => {
   try {
@@ -48,10 +48,28 @@ export const createWithdrawalRequest = async (req, res, next) => {
             requestedForWithdrawal: { increment: parseInt(withdrawalAmount) },
             availableBalance: { decrement: parseInt(withdrawalAmount) },
           },
+          include: {
+            user: {
+              select: {
+                name: true
+              }
+            }
+          }
         }),
       ]);
       return { withdrawalRequest, updatedWallet };
     });
+
+    // Notify Admins
+    try {
+      await notifyAdmins(
+        'New BCC withdrawal Request',
+        `A new bcc withdrawal request has been created by user ${result.updatedWallet.user.name}`,
+        { url: `/dashboard/admin/withdrawal-requests` }
+      );
+    } catch (error) {
+      console.log("error n notify admin for buybcc: ", error);
+    }
 
     res.status(201).json({
       success: true,

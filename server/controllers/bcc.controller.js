@@ -1,6 +1,7 @@
 import prisma from "../config/prisma.js";
 import { CustomError } from "../lib/customError.js";
 import { safeAuthUserSelect } from "../lib/prismaSelects.js";
+import { createNotification, notifyAdmins } from "./notification.controller.js";
 
 export const buyBcc = async (req, res, next) => {
   try {
@@ -24,6 +25,14 @@ export const buyBcc = async (req, res, next) => {
       where: {
         userId: user.id,
       },
+      include: {
+        user: {
+          select: {
+            name: true,
+            email: true
+          }
+        }
+      }
     });
 
     const bccTransaction = await prisma.$transaction(async (tx) => {
@@ -34,6 +43,14 @@ export const buyBcc = async (req, res, next) => {
             availableBalance: 0,
             lockedBalance: 0,
           },
+          include: {
+            user: {
+              select: {
+                name: true,
+                email: true,
+              }
+            }
+          }
         });
       }
       const bccX = await tx.bccTransaction.create({
@@ -51,6 +68,17 @@ export const buyBcc = async (req, res, next) => {
 
       return bccX;
     });
+
+    // emit notification to admins
+    try {
+      await notifyAdmins(
+        'New BCC Request',
+        `A new bcc request has been created by user ${wallet.user.name} with email ${wallet.user.email}.`,
+        { url: `/dashboard/admin/blue-cc-requests` }
+      );
+    } catch (error) {
+      console.log("error n notify admin for buybcc: ", error);
+    }
 
     res.status(201).json({
       success: true,
@@ -135,7 +163,17 @@ export const acceptBCCRequest = async (req, res, next) => {
       });
     });
 
-    // TODO: Send notification to user
+    // Send notification to user
+    try {
+      const title = 'Bcc Request Accepted 😍';
+      const body = `Your BCC request has been accepted. 🥳`;
+      const data = { url: '/dashboard/my-credits' };
+      await createNotification(existingCredit.wallet.userId, title, body, data);
+    } catch (error) {
+      console.error("error in notification in acc bcc req: ", error);
+    }
+
+
     res.status(200).json({
       success: true,
       message: "Credit request accepted successfully",
@@ -153,6 +191,7 @@ export const rejectBCCRequest = async (req, res, next) => {
 
     const existingCredit = await prisma.bccTransaction.findUnique({
       where: { id: creditId, deletedAt: null, transactionType: "PURCHASE_BCC" },
+
     });
     if (!existingCredit) {
       throw new CustomError("Credit request not found", 404);
@@ -176,7 +215,16 @@ export const rejectBCCRequest = async (req, res, next) => {
       },
     });
 
-    // TODO: Send notification to user about rejection
+    // Send notification to user about rejection
+    try {
+      const title = 'Bcc Request Rejected';
+      const body = `Your BCC request has been rejected`;
+      const data = { url: '/dashboard/my-credits' };
+      await createNotification(existingCredit.userId, title, body, data);
+    } catch (error) {
+      console.error("error in notification in reject bcc req: ", error);
+    }
+
     res.status(200).json({
       success: true,
       message: "Credit request rejected successfully",

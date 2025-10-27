@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import {
   Search,
-  User,
   Users,
   Eye,
   CheckCircle,
@@ -167,9 +166,9 @@ const ManageUsers = () => {
                 onChange={(e) => handleFilterChange("limit", e.target.value)}
                 className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
               >
-                <option value="10">10 per page</option>
                 <option value="25">25 per page</option>
                 <option value="50">50 per page</option>
+                <option value="50">100 per page</option>
               </select>
             </div>
           </div>
@@ -331,7 +330,7 @@ const ManageUsers = () => {
                       >
                         <ChevronLeft className="h-5 w-5" />
                       </button>
-                      {[...Array(pagination.totalPages)].map((_, i) => (
+                      {/* {[...Array(pagination.totalPages)].map((_, i) => (
                         <button
                           key={i + 1}
                           onClick={() => handleFilterChange("page", i + 1)}
@@ -342,7 +341,43 @@ const ManageUsers = () => {
                         >
                           {i + 1}
                         </button>
-                      ))}
+                      ))} */}
+                      <div className="flex gap-1">
+                        {[...Array(pagination.totalPages)].map((_, i) => {
+                          const page = i + 1;
+                          if (
+                            page === 1 ||
+                            page === pagination.totalPages ||
+                            (page >= pagination.currentPage - 1 && page <= pagination.currentPage + 1)
+                          ) {
+                            return (
+                              <button
+                                key={page}
+                                onClick={() => handleFilterChange("page", page)}
+                                className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${pagination.currentPage === page
+                                  ? "z-10 bg-green-50 border-green-500 text-green-600"
+                                  : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
+                                  }`}
+                              >
+                                {page}
+                              </button>
+                            );
+                          } else if (
+                            page === pagination.currentPage - 2 ||
+                            page === pagination.currentPage + 2
+                          ) {
+                            return (
+                              <span
+                                key={page}
+                                className="px-2 py-2 text-gray-400"
+                              >
+                                ...
+                              </span>
+                            );
+                          }
+                          return null;
+                        })}
+                      </div>
                       <button
                         onClick={() =>
                           handleFilterChange("page", pagination.currentPage + 1)

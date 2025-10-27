@@ -8,10 +8,30 @@ import connectToDB from './configs/mongodb.js';
 dotenv.config();
 
 const app = express();
+
+// CORS Policy
+const devOrigins = ["http://localhost:5173", "http://localhost:5000", "http://localhost:5001", "http://127.0.0.1:5001", "http://127.0.0.1:5173"];
+const prodOrigins = [
+  "https://brittoo.xyz",
+  "https://www.brittoo.xyz",
+  "https://api.brittoo.xyz",
+  "https://agentic.brittoo.xyz",
+];
+
+const allowedOrigins = process.env.NODE_ENV === "production" ? prodOrigins : [...prodOrigins, ...devOrigins];
+
 app.use(cors({
-  origin: ["https://brittoo.xyz", "https://www.brittoo.xyz", "http://localhost:5173"],
-  credentials: true
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error("Not allowed by CORS"));
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
 }));
+
 app.set('trust proxy', 1);
 app.use(express.json());
 const port = process.env.PORT || 5001;
