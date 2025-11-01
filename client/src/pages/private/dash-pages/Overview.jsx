@@ -193,7 +193,7 @@ const Overview = () => {
                   userData.user.emailVerified ? "VERIFIED" : "UNVERIFIED",
                 )}
                 <span className="text-sm font-medium">
-                  {userData.user.emailVerified ? "Verified" : "Unverified"}
+                  {userData.user.emailVerified ? <span>Verified</span> : <span className="">Unverified</span>}
                 </span>
               </div>
             </div>

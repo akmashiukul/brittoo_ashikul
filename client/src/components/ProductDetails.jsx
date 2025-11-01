@@ -503,7 +503,7 @@ const ProductDetails = () => {
                       {product.owner.email}
                     </p>
                     <p className="text-xs text-gray-600 mt-1 flex gap-2">
-                      <span className="font-medium">Email Validity</span>
+                      <span className="font-medium">Edu-mail Validity</span>
                       <span className={`text-xs`}>
                         {
                           !product.owner.isValidRuetMail ? (<span className="flex items-center gap-0.5 text-red-500">Not Valid <XCircle size={12} /> </span>) : (<span className="flex items-center gap-0.5 text-green-500">Valid <CheckCircle size={12} /></span>)

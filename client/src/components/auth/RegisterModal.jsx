@@ -16,8 +16,11 @@ const RegisterModal = () => {
   const navigate = useNavigate();
 
   const isValidRuetEmail = (email) => {
-    const regex = /^[\w.-]+@([\w-]+\.)?ruet\.ac\.bd$/i;
-    return regex.test(email);
+    const patterns = [
+      /^[0-9]+@student\.ruet\.ac\.bd$/i,   // RUET ->2010033@student.ruet.ac.bd
+      /^s[0-9]+@ru\.ac\.bd$/i,             // RU ->s2310876102@ru.ac.bd
+    ];
+    return patterns.some((regex) => regex.test(email));
   };
 
 
@@ -181,7 +184,7 @@ const RegisterModal = () => {
                 />
                 {
                   formData.email.length > 0 && !isValidRuetEmail(formData.email) && (
-                    <p className="text-red-500 text-xs">This is not a valid RUET email. You may still register, and rental features for other universities and the general market are coming soon.</p>
+                    <p className="text-red-500 text-xs">This is not a valid Institutional (RUET/RU) email. But you can still register, rental features for other institutions/general are coming soon.</p>
                   )
                 }
               </div>
