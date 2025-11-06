@@ -367,7 +367,7 @@ const ChatModal = ({ isOpen, onClose, productId, chatRoomId: initialChatRoomId, 
           ) : (
             <>
               {messages.map((msg) => {
-                const isOwn = msg.senderId === currentUser.id || currentUser?.role === "ADMIN";
+                const isOwn = msg.senderId === currentUser.id;
                 return (
                   <div
                     key={msg.id}
