@@ -1,4 +1,4 @@
-import { Calendar, Clock2, TagIcon } from "lucide-react";
+import { Calendar, Clock2, Tag, TagIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const ProductCard = ({ product }) => {
@@ -45,6 +45,25 @@ const ProductCard = ({ product }) => {
             alt={name}
             className="w-full h-full object-cover group-hover:scale-110 transition duration-400 group-hover:translate-x-2"
           />
+          {
+            product?.isForSaleOnly && (
+              <div className="absolute top-2 right-2">
+                <span
+                  className="
+          relative inline-flex items-center gap-1.5
+          bg-gradient-to-r from-fuchsia-600 via-purple-600 to-indigo-600
+          text-white text-[10px] font-semibold
+          px-3 py-1.5 rounded-full shadow-md transition-all
+        "
+                >
+                  <Tag className="w-3 h-3 text-white drop-shadow-sm" />
+                  <span>Exclusive Sale</span>
+                  <span className="absolute inset-0 rounded-full bg-white/10 blur-md opacity-40 animate-ping"></span>
+                </span>
+              </div>
+
+            )
+          }
           <div className="absolute top-2 left-2">
             <div
               className={`px-2 py-1 rounded text-xs font-medium ${conditionColor}`}
@@ -52,20 +71,31 @@ const ProductCard = ({ product }) => {
               {conditionLabel}
             </div>
           </div>
-          <div className="absolute bottom-2 right-2">
-            {productType === "GADGET" || productType === "VEHICLE" ? (
-              <div className="bg-teal-800 text-white px-2 py-1 rounded text-sm font-medium flex items-center gap-1">
-                <Clock2 size={14} strokeWidth={3} /> BDT{" "}
-                {parseFloat(product.pricePerHour).toFixed(2)}/hr
+          {
+            product?.isForSaleOnly ? (
+              <div className="absolute bottom-2 right-2">
+                <div className="bg-amber-600 text-white px-2 py-1 rounded text-sm font-medium flex items-center gap-1">
+                  <Calendar size={14} strokeWidth={3} /> BDT{" "}
+                  {parseFloat(product?.omv).toFixed(2)} Only
+                </div>
               </div>
             ) : (
-              <div className="bg-gray-800 text-white px-2 py-1 rounded text-sm font-medium flex items-center gap-1">
-                <Calendar size={14} strokeWidth={3} /> BDT{" "}
-                {parseFloat(pricePerDay).toFixed(2)}/day
+              <div className="absolute bottom-2 right-2">
+                {productType === "GADGET" || productType === "VEHICLE" ? (
+                  <div className="bg-teal-600 text-white px-2 py-1 rounded text-sm font-medium flex items-center gap-1">
+                    <Clock2 size={14} strokeWidth={3} /> BDT{" "}
+                    {parseFloat(product?.pricePerHour).toFixed(2)}/hr
+                  </div>
+                ) : (
+                  <div className="bg-gray-800 text-white px-2 py-1 rounded text-sm font-medium flex items-center gap-1">
+                    <Calendar size={14} strokeWidth={3} /> BDT{" "}
+                    {parseFloat(pricePerDay).toFixed(2)}/day
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-          {!product.isAvailable && (
+            )
+          }
+          {!product?.isAvailable && (
             <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 bg-black/60 py-3 text-center">
               <span className="text-white text-xl font-bold tracking-wide">
                 UNAVAILABLE

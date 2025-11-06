@@ -17,6 +17,7 @@ const ListItems = () => {
     omv: "",
     productDescription: "",
     isForSale: false,
+    isForSaleOnly: false,
     minPrice: 0,
     askingPrice: 0,
     isAiEnabled: false,
@@ -105,6 +106,7 @@ const ListItems = () => {
         omv: "",
         productDescription: "",
         isForSale: false,
+        isForSaleOnly: false,
         isAiEnabled: false,
         askingPrice: 0,
         minPrice: 0
@@ -327,7 +329,7 @@ const ListItems = () => {
             Is this item also available for sale?
           </label>
           <div className="flex gap-4">
-            <label className="flex items-center space-x-2">
+            <label className="flex items-center space-x-2 text-sm">
               <input
                 type="radio"
                 name="isForSale"
@@ -337,7 +339,7 @@ const ListItems = () => {
               />
               <span>Yes</span>
             </label>
-            <label className="flex items-center space-x-2">
+            <label className="flex items-center space-x-2 text-sm">
               <input
                 type="radio"
                 name="isForSale"
@@ -352,6 +354,33 @@ const ListItems = () => {
         {
           formData.isForSale && (
             <div className="flex flex-col gap-5">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Is this item <span className="font-bold text-gray-800 text-[15px]">only</span> for sale (not for rent)?
+                </label>
+                <div className="flex gap-4">
+                  <label className="flex items-center space-x-2 text-sm">
+                    <input
+                      type="radio"
+                      name="isForSaleOnly"
+                      value="true"
+                      checked={formData.isForSaleOnly}
+                      onChange={() => setFormData({ ...formData, isForSaleOnly: true })}
+                    />
+                    <span>Yes For Sale Only</span>
+                  </label>
+                  <label className="flex items-center space-x-2 text-sm">
+                    <input
+                      type="radio"
+                      name="isForSaleOnly"
+                      value="false"
+                      checked={!formData.isForSaleOnly}
+                      onChange={() => setFormData({ ...formData, isForSaleOnly: false })}
+                    />
+                    <span>No (For rent + For Sale)</span>
+                  </label>
+                </div>
+              </div>
               <div className="flex flex-col gap-5 items-center">
                 <label htmlFor="askingPrice" className="flex flex-col gap-1.5 w-full">
                   <span className="text-sm font-medium text-gray-700">
@@ -394,7 +423,7 @@ const ListItems = () => {
                   </span>
                 </label>
                 <div className="flex gap-4">
-                  <label className="flex items-center space-x-2">
+                  <label className="flex items-center space-x-2 text-sm">
                     <input
                       type="radio"
                       name="isAiEnabled"
@@ -404,7 +433,7 @@ const ListItems = () => {
                     />
                     <span>Yes</span>
                   </label>
-                  <label className="flex items-center space-x-2">
+                  <label className="flex items-center space-x-2 text-sm">
                     <input
                       type="radio"
                       name="isAiEnabled"

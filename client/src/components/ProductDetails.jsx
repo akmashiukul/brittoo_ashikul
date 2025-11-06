@@ -21,6 +21,8 @@ import { useHourlyPrice } from "../hooks/useHourlyPrice";
 import PriceNegotiateWithBot from "./modals/PriceNegotiateWithBot";
 import ChatModal from "./modals/ChatModal";
 import OfferPriceModal from "./modals/OfferPriceModal";
+import Lottie from "lottie-react";
+import shoppingGreen from "../assets/animations/shopping-green.json";
 
 const ProductDetails = () => {
   const [product, setProduct] = useState(null);
@@ -576,59 +578,72 @@ const ProductDetails = () => {
       </div>
 
       {/* 2 - A */}
-      <div className="w-full lg:w-1/3 lg:border-l border-gray-300 sm:my-7 px-4">
-        <DaysDisplay
-          numberOfDays={numberOfDays}
-          price={price}
-          range={range}
-          setRange={setRange}
-          initial={initial}
-          final={final}
-          isHourlyRental={isHourlyRental}
-          setIsHourlyRental={setIsHourlyRental}
-          type={product.productType}
-        />
-        {
-          (numberOfDays === 1 && isHourlyRental) && (<HourSelector pickerValue={pickerValue} setPickerValue={setPickerValue} numberOfHours={numberOfHours} setNumberOfHours={setNumberOfHours} hourlyPrice={hourlyPrice} />)
-        }
-        <div className="mt-8">
-          <div className="mb-2">
-            <h2 className="font-semibold text-gray-600">Credit Required: <span className={`text-green-800 font-bold ${coupon && "line-through"}`}>{product.secondHandPrice}  CC</span>{coupon && <span className={`text-purple-600 font-bold ml-1.5 text-xl`}>{product.secondHandPrice - discountedPrice.value}  CC <span className="text-xs font-light">{discountedPrice.ceil ? "ceiled" : "(floored)"}</span> </span>}</h2>
-            {
-              coupon && <span className="text-purple-500 text-sm">{coupon.discount}% discount applied🤩</span>
-            }
-          </div>
-          <div>
-            <div className="flex items-center justify-between">
-              <label htmlFor="coupon" className="text-lg font-bold text-gray-700">
-                Enter Coupon{" "}
-                <span className="text-sm font-medium">(If Applicable)</span>:
-              </label>
-              {
-                couponCode && <p onClick={handleApplyCoupon} className="text-green-500 font-bold text-base mb-1 mr-1 cursor-pointer">Apply</p>
-              }
+      {
+        product?.isForSaleOnly ? (
+          <div className="w-full lg:w-1/3 lg:border-l border-gray-300 sm:my-7 px-4">
+            <div className="flex flex-col items-center md:items-start mb-8">
+              <Lottie className="h-56 md:h-80" animationData={shoppingGreen} loop={true} />
+              <h2 className="text-gray-600 text-3xl md:text-4xl font-bold text-center md:text-left">Got something you don’t use? Sell it on Brittoo!</h2>
+              <p className="text-xs md:text-sm text-gray-600 mt-2 md:mt-4 text-center md:text-left mx-3 md:mx-0">Got items collecting dust? Turn them into instant cash!
+                With Brittoo, you can list products in seconds, connect directly with buyers, and sell faster than ever — all from your phone.</p>
             </div>
-            <input
-              type="text"
-              name="coupon"
-              id="coupon"
-              onChange={(e) => setCouponCode(e.target.value)}
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-xs md:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-1.5 md:p-2.5"
-              placeholder="AF4K3LK3"
-              required
-            />
           </div>
-        </div>
-        {
-          couponValidationError && <p className="text-sm text-red-500">{couponValidationError}</p>
-        }
-        <button
-          className="w-full text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-xs md:text-sm px-5 py-2.5 text-center cursor-pointer mt-8"
-          onClick={requestRental}
-        >
-          Request Rental
-        </button>
-      </div>
+        ) : (
+          <div className="w-full lg:w-1/3 lg:border-l border-gray-300 sm:my-7 px-4">
+            <DaysDisplay
+              numberOfDays={numberOfDays}
+              price={price}
+              range={range}
+              setRange={setRange}
+              initial={initial}
+              final={final}
+              isHourlyRental={isHourlyRental}
+              setIsHourlyRental={setIsHourlyRental}
+              type={product.productType}
+            />
+            {
+              (numberOfDays === 1 && isHourlyRental) && (<HourSelector pickerValue={pickerValue} setPickerValue={setPickerValue} numberOfHours={numberOfHours} setNumberOfHours={setNumberOfHours} hourlyPrice={hourlyPrice} />)
+            }
+            <div className="mt-8">
+              <div className="mb-2">
+                <h2 className="font-semibold text-gray-600">Credit Required: <span className={`text-green-800 font-bold ${coupon && "line-through"}`}>{product.secondHandPrice}  CC</span>{coupon && <span className={`text-purple-600 font-bold ml-1.5 text-xl`}>{product.secondHandPrice - discountedPrice.value}  CC <span className="text-xs font-light">{discountedPrice.ceil ? "ceiled" : "(floored)"}</span> </span>}</h2>
+                {
+                  coupon && <span className="text-purple-500 text-sm">{coupon.discount}% discount applied🤩</span>
+                }
+              </div>
+              <div>
+                <div className="flex items-center justify-between">
+                  <label htmlFor="coupon" className="text-lg font-bold text-gray-700">
+                    Enter Coupon{" "}
+                    <span className="text-sm font-medium">(If Applicable)</span>:
+                  </label>
+                  {
+                    couponCode && <p onClick={handleApplyCoupon} className="text-green-500 font-bold text-base mb-1 mr-1 cursor-pointer">Apply</p>
+                  }
+                </div>
+                <input
+                  type="text"
+                  name="coupon"
+                  id="coupon"
+                  onChange={(e) => setCouponCode(e.target.value)}
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-xs md:text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-1.5 md:p-2.5"
+                  placeholder="AF4K3LK3"
+                  required
+                />
+              </div>
+            </div>
+            {
+              couponValidationError && <p className="text-sm text-red-500">{couponValidationError}</p>
+            }
+            <button
+              className="w-full text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-xs md:text-sm px-5 py-2.5 text-center cursor-pointer mt-8"
+              onClick={requestRental}
+            >
+              Request Rental
+            </button>
+          </div>
+        )
+      }
       {showNegotiateModal && (
         <PriceNegotiateWithBot
           product={product}

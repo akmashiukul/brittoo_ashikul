@@ -22,6 +22,7 @@ export const createProduct = async (req, res, next) => {
       tags,
       productDescription,
       isForSale,
+      isForSaleOnly,
       isAiEnabled = false,
       askingPrice,
       minPrice,
@@ -92,6 +93,7 @@ export const createProduct = async (req, res, next) => {
           productType,
           productCondition,
           isForSale: isForSale === "false" ? false : true,
+          isForSaleOnly: isForSaleOnly === "false" ? false : true,
           isAiEnabled: isAiEnabled === "false" ? false : true,
           askingPrice: isForSale === "false" ? null : parseInt(askingPrice),
           minPrice: isForSale === "false" ? null : parseInt(minPrice),
@@ -369,6 +371,7 @@ export const updateProductUser = async (req, res, next) => {
     const { id } = req.params;
     const {
       isForSale,
+      isForSaleOnly,
       isAvailable,
       askingPrice,
       minPrice,
@@ -393,12 +396,14 @@ export const updateProductUser = async (req, res, next) => {
     };
 
     const isForSaleBool = normalizeBool(isForSale);
+    const isForSaleOnlyBool = normalizeBool(isForSaleOnly);
     const isAvailableBool = normalizeBool(isAvailable);
     const isAiEnabledBool = normalizeBool(isAiEnabled);
 
     // Prepare update data
     const updateData = {};
     if (isForSaleBool !== undefined) updateData.isForSale = isForSaleBool;
+    if (isForSaleOnlyBool !== undefined) updateData.isForSaleOnly = isForSaleOnlyBool;
     if (isAvailableBool !== undefined) updateData.isAvailable = isAvailableBool;
     if (isAiEnabledBool !== undefined) updateData.isAiEnabled = isAiEnabledBool;
     if (updateData.isForSale) {

@@ -240,16 +240,21 @@ export const getChatMessages = async (req, res, next) => {
   try {
     const { chatRoomId } = req.params;
     const userId = req.user.id;
+    const isAdmin = req.user.role === "ADMIN";
     const { page = 1, limit = 50 } = req.query;
 
     // Verify user has access and get room details
     const chatRoom = await prisma.chatRoom.findFirst({
       where: {
         id: chatRoomId,
-        OR: [
-          { buyerId: userId },
-          { sellerId: userId }
-        ]
+        ...(isAdmin
+          ? {} // if admin, no user restriction
+          : {
+            OR: [
+              { buyerId: userId },
+              { sellerId: userId }
+            ]
+          })
       },
       include: {
         product: {

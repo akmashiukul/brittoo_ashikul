@@ -186,8 +186,9 @@ model Product {
   holdStartDate      DateTime?        @map("hold_start_date")
   holdEndDate        DateTime?        @map("hold_end_date")
   isAvailable        Boolean          @default(true) @map("is_available")
+  isForSaleOnly      Boolean          @default(false) @map("is_for_sale_only")
 
-  askingPrice Int?    @map("asking_price") //new
+  askingPrice Int?    @map("asking_price")
   minPrice    Int?    @map("min_price")
   isForSale   Boolean @default(false) @map("is_for_sale")
   isAiEnabled Boolean @default(false) @map("is_ai_enabled")

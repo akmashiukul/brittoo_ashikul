@@ -21,6 +21,7 @@ const ManageItems = () => {
         askingPrice: updatingProduct.askingPrice ?? 0,
         minPrice: updatingProduct.minPrice ?? 0,
         isForSale: updatingProduct.isForSale,
+        isForSaleOnly: updatingProduct.isForSaleOnly,
         isAvailable: updatingProduct.isAvailable ?? true,
         isAiEnabled: updatingProduct.isAiEnabled
       });
@@ -227,6 +228,33 @@ const ManageItems = () => {
                           {
                             updatedData?.isForSale && (
                               <>
+                                <div className="space-y-2">
+                                  <label className="text-sm font-medium text-gray-700">
+                                    Is this item <span className="font-bold text-gray-800 text-[15px]">only</span> for sale (not for rent)?
+                                  </label>
+                                  <div className="flex gap-4">
+                                    <label className="flex items-center space-x-2 text-sm">
+                                      <input
+                                        type="radio"
+                                        name="isForSaleOnly"
+                                        value="true"
+                                        checked={updatedData.isForSaleOnly}
+                                        onChange={() => setUpdatedData({ ...updatedData, isForSaleOnly: true })}
+                                      />
+                                      <span>Yes For Sale Only</span>
+                                    </label>
+                                    <label className="flex items-center space-x-2 text-sm">
+                                      <input
+                                        type="radio"
+                                        name="isForSaleOnly"
+                                        value="false"
+                                        checked={!updatedData.isForSaleOnly}
+                                        onChange={() => setUpdatedData({ ...updatedData, isForSaleOnly: false })}
+                                      />
+                                      <span>No (For rent + For Sale)</span>
+                                    </label>
+                                  </div>
+                                </div>
                                 <label htmlFor="askingPrice" className="flex flex-col gap-1.5 w-full">
                                   <span className="text-sm font-medium text-gray-700">
                                     Asking Price

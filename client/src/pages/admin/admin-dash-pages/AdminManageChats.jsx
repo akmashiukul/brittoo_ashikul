@@ -25,7 +25,6 @@ const AdminManageChats = () => {
   const fetchAllChats = async () => {
     setIsLoading(true);
     try {
-      // You'll need to create this admin endpoint
       const res = await api.get('/api/v1/chat/admin/rooms');
       setChatRooms(res.data.data);
     } catch (err) {
