@@ -76,7 +76,7 @@ const ProductCard = ({ product }) => {
               <div className="absolute bottom-2 right-2">
                 <div className="bg-amber-600 text-white px-2 py-1 rounded text-sm font-medium flex items-center gap-1">
                   <Calendar size={14} strokeWidth={3} /> BDT{" "}
-                  {parseFloat(product?.omv).toFixed(2)} Only
+                  {parseFloat(product?.askingPrice).toFixed(2)} Only
                 </div>
               </div>
             ) : (
