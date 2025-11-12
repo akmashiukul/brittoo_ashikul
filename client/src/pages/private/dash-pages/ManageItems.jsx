@@ -136,7 +136,7 @@ const ManageItems = () => {
           </div>
         )}
 
-        {/*  ------------- HERE"S THE MODALLLLLL -------------- */}
+        {/*  ------------- HERES THE MODALLLLLL -------------- */}
       </div>
       {
         showUpdateModal && updatedData && (

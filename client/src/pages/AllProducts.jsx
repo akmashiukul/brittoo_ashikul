@@ -6,11 +6,14 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
+  Sparkles,
+  SearchIcon,
 } from "lucide-react";
 import api from "../lib/api";
 import ProductCard from "../components/ProductCard";
+import Swal from "sweetalert2";
 
-const AllProducts = ({productType, setProductType, search, setSearch}) => {
+const AllProducts = ({ productType, setProductType, search, setSearch }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -21,6 +24,10 @@ const AllProducts = ({productType, setProductType, search, setSearch}) => {
   const [productCondition, setProductCondition] = useState("");
   const [productAge, setProductAge] = useState("");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+  const [prompt, setPrompt] = useState("");
+  const [aiFindLoading, setAiFindLoading] = useState(false);
+  const [isBuildModalOpen, setIsBuildModalOpen] = useState(false);
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -44,6 +51,9 @@ const AllProducts = ({productType, setProductType, search, setSearch}) => {
 
   const fetchProducts = useCallback(async () => {
     try {
+      if(prompt) {
+        return;
+      }
       setError("");
       setLoading(true);
       const params = new URLSearchParams({
@@ -54,6 +64,37 @@ const AllProducts = ({productType, setProductType, search, setSearch}) => {
         ...(productCondition && { productCondition }),
         ...(productAge && { productAge }),
       });
+      const res = await api.get(`/api/v1/products?${params}`);
+      setProducts(res.data.products);
+      setTotalPages(res.data.totalPages);
+      setTotal(res.data.total);
+    } catch (err) {
+      setError("Failed to fetch products");
+      Swal.fire({
+        icon: "error",
+        title: "Oops!!",
+        text: "Something went wrong."
+      })
+      console.error("Error fetching products:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [prompt, currentPage, search, productType, productCondition, productAge]);
+
+
+  const buildWithAI = async () => {
+    try {
+      if(!prompt) {
+        alert("Enter a prompt first!")
+      }
+      setError("");
+      setLoading(true);
+      setAiFindLoading(true);
+      setIsBuildModalOpen(false);
+      const params = new URLSearchParams({
+        ...(prompt && { prompt }),
+      });
+      console.log("Prompt being sent:", prompt);
 
       const res = await api.get(`/api/v1/products?${params}`);
       setProducts(res.data.products);
@@ -61,11 +102,18 @@ const AllProducts = ({productType, setProductType, search, setSearch}) => {
       setTotal(res.data.total);
     } catch (err) {
       setError("Failed to fetch products");
+      Swal.fire({
+        icon: "error",
+        title: "Oops!!",
+        text: "Something went wrong."
+      })
       console.error("Error fetching products:", err);
     } finally {
       setLoading(false);
+      setAiFindLoading(false);
     }
-  }, [currentPage, search, productType, productCondition, productAge]);
+  }
+
 
   useEffect(() => {
     fetchProducts();
@@ -78,6 +126,7 @@ const AllProducts = ({productType, setProductType, search, setSearch}) => {
     setProductAge("");
     setCurrentPage(1);
     setIsFilterOpen(false);
+    setPrompt("");
   };
 
   if (error) {
@@ -108,11 +157,25 @@ const AllProducts = ({productType, setProductType, search, setSearch}) => {
       <div className="bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">All Products</h1>
-              <p className="text-gray-500 mt-1 text-sm">
-                Curated selections from our community
-              </p>
+            <div className="flex flex-col md:flex-row items-center gap-3 md:gap-7">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">All Products</h1>
+                <p className="text-gray-500 mt-1 text-sm">
+                  Curated selections from our community
+                </p>
+              </div>
+              <div className="relative inline-block">
+                <button
+                  onClick={() => setIsBuildModalOpen(true)}
+                  className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 px-5 py-2 text-white font-semibold shadow-lg hover:opacity-90 active:scale-95 transition-all duration-200"
+                >
+                  <Sparkles className="w-5 h-5" />
+                  Build
+                </button>
+                <span className="absolute -top-2 -right-2 text-[10px] bg-yellow-300 text-black font-semibold px-1.5 py-[1px] rounded-sm">
+                  Beta
+                </span>
+              </div>
             </div>
             {/* Filters on the Right */}
             <div className="flex flex-col lg:flex-row items-center gap-4">
@@ -138,11 +201,10 @@ const AllProducts = ({productType, setProductType, search, setSearch}) => {
                 </button>
               </div>
               <div
-                className={`${
-                  isFilterOpen ? "block" : "hidden"
-                } sm:flex sm:items-center sm:gap-2 sm:static bg-white sm:bg-transparent p-4 sm:p-0 sm:w-auto`}
+                className={`${isFilterOpen ? "block" : "hidden"
+                  } sm:flex sm:items-center sm:gap-2 sm:static bg-white sm:bg-transparent p-4 sm:p-0 sm:w-auto`}
               >
-                {(search || productType || productCondition || productAge) && (
+                {(search || productType || productCondition || productAge || prompt) && (
                   <button
                     onClick={clearFilters}
                     className="flex items-center gap-1 text-sm text-gray-600 hover:text-green-500 transition-colors mb-2 sm:mb-0"
@@ -267,11 +329,10 @@ const AllProducts = ({productType, setProductType, search, setSearch}) => {
                             <button
                               key={page}
                               onClick={() => setCurrentPage(page)}
-                              className={`px-3 py-2 text-sm rounded-md ${
-                                currentPage === page
-                                  ? "bg-green-500 text-white"
-                                  : "text-gray-600 hover:bg-gray-100"
-                              }`}
+                              className={`px-3 py-2 text-sm rounded-md ${currentPage === page
+                                ? "bg-green-500 text-white"
+                                : "text-gray-600 hover:bg-gray-100"
+                                }`}
                             >
                               {page}
                             </button>
@@ -309,6 +370,76 @@ const AllProducts = ({productType, setProductType, search, setSearch}) => {
           </>
         )}
       </div>
+      {
+        isBuildModalOpen && !aiFindLoading ? (
+          <div
+            id="authentication-modal"
+            className="fixed overflow-y-scroll inset-0 z-50 flex justify-center items-center bg-black/70"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setIsBuildModalOpen(false);
+            }}
+          >
+            <div className="relative p-4 w-full max-w-md max-h-full">
+              <div className="relative bg-white rounded-lg shadow-sm">
+                <div className="flex items-center justify-between p-4 md:p-5 rounded-t border-b border-gray-300">
+                  <div className="flex flex-col items-center text-center w-full">
+                    <h3 className="text-base md:text-lg font-semibold text-gray-700 mt-1 md:mt-3">
+                      Tell us what do you wanna build
+                    </h3>
+                  </div>
+                  <button
+                    type="button"
+                    className="absolute top-1 cursor-pointer right-1  text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-xs md:text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
+                    data-modal-hide="authentication-modal"
+                    onClick={() => setIsBuildModalOpen(false)}
+                  >
+                    <X />
+                    <span className="sr-only">Close modal</span>
+                  </button>
+                </div>
+                <div className="p-4 md:p-5">
+                  <div className="space-y-4">
+
+                    <label htmlFor="prompt" className="flex flex-col gap-1.5 w-full">
+                      <span className="text-sm font-medium text-gray-700">
+                        Enter prompt
+                      </span>
+                      <textarea
+                        type="text"
+                        required
+                        id="prompt"
+                        placeholder="I want to build an LFR..."
+                        className="border bg-white border-gray-300 rounded-md w-full px-2 py-2 md:py-3 p md:px-4 focus:border-gray-400 focus:outline-none text-xs md:text-sm h-24"
+                        value={prompt}
+                        onChange={(e) => setPrompt(e.target.value)}
+                      />
+                    </label>
+                    <button
+                      onClick={() => buildWithAI()}
+                      type="submit"
+                      className="w-full text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-xs md:text-sm px-5 py-2.5 text-center cursor-pointer"
+                    >
+                      Let's Go
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : aiFindLoading && (
+          <div
+            id="authentication-modal"
+            className="fixed inset-0 z-50 flex justify-center items-center bg-black/20"
+          >
+            <div className="relative z-[60] flex items-center gap-2 text-indigo-500 font-semibold text-3xl md:text-4xl">
+              <SearchIcon className="w-8 md:h-9 h-8 md:w-9 animate-pulse" />
+              <span className="animate-pulse text-white drop-shadow-lg">
+                Finding the Best Products for you...
+              </span>
+            </div>
+          </div>
+        )
+      }
     </div>
   );
 };

@@ -10,6 +10,7 @@ import { productUploadsPath, productOptimizedPath } from "../middlewares/product
 import { calculateGadgetPricePerDay } from "../helpers/price-calculations/gadgetPricePerDay.js";
 import { calculateVehiclePricePerDay } from "../helpers/price-calculations/vehiclePricePerDay.js";
 import { calculateHourlyPrice } from "../helpers/price-calculations/calculateHourlyPrice.js";
+import { accumulateProducts, findCategory } from "../lib/aiProductAcumulator.js";
 
 export const createProduct = async (req, res, next) => {
   try {
@@ -159,42 +160,81 @@ export const getProducts = async (req, res, next) => {
       limit = 20,
       productId,
       productSL,
+      prompt = "",
     } = req.query;
 
     const cacheKey = `products:${JSON.stringify(req.query)}`;
-    const cached = await redisClient.get(cacheKey);
-    if (cached) {
-      console.log("Cache hit");
-      return res.status(200).json(JSON.parse(cached));
+
+    if (!prompt) {
+      const cached = await redisClient.get(cacheKey);
+      if (cached) {
+        console.log("Cache hit");
+        return res.status(200).json(JSON.parse(cached));
+      }
     }
 
     console.log("Cache Miss");
 
     const filters = {};
+    let aiFilteredIds = null;
 
-    if (productId) {
-      filters.id = productId;
-    }
-    if (productSL) {
-      filters.productSL = productSL;
-    }
-    if (productType) {
-      filters.productType = productType;
+    if (prompt) {
+      console.log("Running AI-based product recommendation...");
+
+      // STEP 1 — Determine category using Gemini
+      const detectedCategory = await findCategory(prompt);
+      console.log("Detected category:", detectedCategory);
+
+      // STEP 2 — Fetch products in that category
+      const categoryProducts = await prisma.product.findMany({
+        where: {
+          deletedAt: null,
+          isVirtual: false,
+          productType: detectedCategory,
+        },
+        select: { productSL: true, name: true },
+      });
+      console.log("categoryProducts count:", categoryProducts.length);
+
+      if (categoryProducts.length === 0) {
+        return res.status(200).json({
+          success: true,
+          message: "Data fetched successfully",
+          products: [],
+          page: 1,
+          limit: 10,
+          total: 0,
+          totalPages: 1,
+        });
+      }
+
+      // STEP 3 — Use AI to pick relevant products
+      const relevantIds = await accumulateProducts(prompt, categoryProducts);
+
+      if (!relevantIds || relevantIds.length === 0) {
+        return res.status(200).json({
+          success: true,
+          message: "Data fetched successfully",
+          products: [],
+          page: 1,
+          limit: 10,
+          total: 0,
+          totalPages: 1,
+        });
+      }
+
+      aiFilteredIds = relevantIds;
+      filters.productSL = { in: aiFilteredIds };
+      console.log("AI filters applied:", filters);
     }
 
-    if (productCondition) {
-      filters.productCondition = productCondition;
-    }
-
-    if (ownerId) {
-      filters.ownerId = ownerId;
-    }
-
-    if (productAge) {
-      filters.productAge = {
-        lte: parseInt(productAge),
-      };
-    }
+    // Apply normal filters if no AI filtering
+    if (productId) filters.id = productId;
+    if (productSL && !aiFilteredIds) filters.productSL = productSL;
+    if (productType) filters.productType = productType;
+    if (productCondition) filters.productCondition = productCondition;
+    if (ownerId) filters.ownerId = ownerId;
+    if (productAge) filters.productAge = { lte: parseInt(productAge) };
 
     const searchClause = search
       ? {
@@ -234,9 +274,7 @@ export const getProducts = async (req, res, next) => {
           },
         },
       },
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy: { createdAt: "desc" },
       skip: (parseInt(page) - 1) * parseInt(limit),
       take: parseInt(limit),
     });
@@ -260,14 +298,17 @@ export const getProducts = async (req, res, next) => {
       totalPages: Math.ceil(total / limit),
     };
 
+    // Cache the response
     await redisClient.setEx(cacheKey, 300, JSON.stringify(response));
 
-    res.status(200).json(response);
+    return res.status(200).json(response);
   } catch (error) {
     console.error("Error getting products:", error);
     next(error);
   }
 };
+
+
 
 export const deleteProduct = async (req, res, next) => {
   try {
