@@ -2,7 +2,7 @@ import { GoogleGenAI } from "@google/genai";
 import "dotenv/config";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-const MODEL_NAME = "gemini-2.5-flash-lite";
+const MODEL_NAME = "gemini-2.5-flash";
 const TEMPERATURE = 0.2;
 
 const VALID_ENUMS = [

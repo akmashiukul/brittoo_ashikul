@@ -79,7 +79,7 @@ const PriceNegotiateWithBot = ({ product, isOpen, onClose }) => {
       const errorMessage = {
         id: Date.now() + 1,
         type: 'bot',
-        content: 'Sorry, I encountered an error. Please try again.',
+        content: error?.respopnse?.data?.message || 'Sorry, I encountered an error. Please Log In if you are not logged in or try again',
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorMessage]);
