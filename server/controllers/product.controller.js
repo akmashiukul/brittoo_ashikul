@@ -423,6 +423,8 @@ export const updateProductUser = async (req, res, next) => {
       askingPrice,
       minPrice,
       isAiEnabled,
+      latitude,
+      longitude
     } = req.body;
     if (!req.user) {
       throw new CustomError("Unauthorized", 403);
@@ -457,6 +459,8 @@ export const updateProductUser = async (req, res, next) => {
       updateData.askingPrice = parseInt(askingPrice);
       updateData.minPrice = parseInt(minPrice);
     }
+    if (latitude) updateData.latitude = Number(latitude);
+    if (longitude) updateData.longitude = Number(longitude);
 
     // Update product + credits in transaction
     const updatedProduct = await prisma.$transaction(async (tx) => {

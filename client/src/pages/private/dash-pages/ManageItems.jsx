@@ -5,6 +5,7 @@ import api from "../../../lib/api";
 import Loader from "../../../components/shared/Loader";
 import useUserStore from "../../../stores/authStores/useUserStore";
 import { Sparkle, X } from "lucide-react";
+import LocationPicker from "../../../components/LocationPicker";
 
 const ManageItems = () => {
   const [products, setProducts] = useState([]);
@@ -23,7 +24,9 @@ const ManageItems = () => {
         isForSale: updatingProduct.isForSale,
         isForSaleOnly: updatingProduct.isForSaleOnly,
         isAvailable: updatingProduct.isAvailable ?? true,
-        isAiEnabled: updatingProduct.isAiEnabled
+        isAiEnabled: updatingProduct.isAiEnabled,
+        latitude: updatingProduct.latitude ?? 24.3635683,
+        longitude: updatingProduct.longitude ?? 88.6258024,
       });
     }
   }, [updatingProduct]);
@@ -320,6 +323,27 @@ const ManageItems = () => {
                               </>
                             )
                           }
+                          <div className="space-y-4">
+                            <label className="text-sm font-medium text-gray-700">
+                              Product Location
+                            </label>
+                            <LocationPicker
+                              formData={{
+                                latitude: updatedData.latitude ?? updatingProduct.latitude ?? 24.3635683,
+                                longitude: updatedData.longitude ?? updatingProduct.longitude ?? 88.6258024,
+                              }}
+                              setFormData={(locData) =>
+                                setUpdatedData({
+                                  ...updatedData,
+                                  latitude: Number(locData.latitude),
+                                  longitude: Number(locData.longitude),
+                                })
+                              }
+                            />
+                            <p className="text-xs text-gray-500">
+                              Click on the map to select the product's location.
+                            </p>
+                          </div>
                         </>
                       )
                     }
