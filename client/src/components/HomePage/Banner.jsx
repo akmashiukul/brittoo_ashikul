@@ -4,16 +4,17 @@ import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { promptNotifications, promptPwaInstall } from "../../lib/promptPwaOrNotificationEnable";
 import useUserStore from "../../stores/authStores/useUserStore";
-import { Download } from "lucide-react";
+import { Download, MapPin } from "lucide-react";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import { useState } from "react";
+import NearbyProductsModal from "../modals/NearbyProductsModal";
 
 const Banner = ({ setProductType, setSearch }) => {
   const [isPWA, setIsPWA] = useState(false);
   const [canPromptPWA, setCanPromptPWA] = useState(false);
   const { currentUser } = useUserStore();
-
+  const [showNearbyModal, setShowNearbyModal] = useState(false);
 
 
   useEffect(() => {
@@ -23,12 +24,12 @@ const Banner = ({ setProductType, setSearch }) => {
       return isStandalone || isIosStandalone;
     };
     setIsPWA(checkIsPWA());
-    console.log('Running as PWA:', checkIsPWA());
-    console.log('DeferredPrompt available:', !!window.deferredPrompt);
+    //console.log('Running as PWA:', checkIsPWA());
+    //console.log('DeferredPrompt available:', !!window.deferredPrompt);
 
     const handleBeforeInstallPrompt = (e) => {
       e.preventDefault();
-       window.deferredPrompt = e;
+      window.deferredPrompt = e;
       setCanPromptPWA(true);
       console.log('Ready to prompt PWA:', e);
     };
@@ -109,9 +110,29 @@ const Banner = ({ setProductType, setSearch }) => {
           <Link to={'/browse'} className="py-2 border border-green-600 bg-green-600 rounded-lg text-white cursor-pointer hover:bg-green-700 hover:border-green-700 px-6">
             Find Items to Rent
           </Link>
+
           <Link to={'/dashboard/list-items'} className="text-xs md:text-base border py-2 border-green-500 hover:text-gray-500 text-green-500 hover:bg-green-100 rounded-lg cursor-pointer bg-transparent px-6">
             List Your Items
           </Link>
+          <button
+            onClick={() => setShowNearbyModal(true)}
+            className="
+    text-xs md:text-base
+    border border-gray-400
+    text-gray-700
+    hover:text-gray-500 hover:bg-gray-100
+    rounded-lg
+    cursor-pointer
+    bg-transparent
+    px-6 py-2
+    flex items-center gap-2
+    transition-colors duration-150
+  "
+          >
+            <MapPin className="w-5 h-5 text-gray-700" />
+            Nearby Products
+          </button>
+
           {
             !isPWA && (
               <motion.button
@@ -383,9 +404,8 @@ const Banner = ({ setProductType, setSearch }) => {
             </li>
           </ul>
         </div>
-
-
       </div>
+      <NearbyProductsModal isOpen={showNearbyModal} onClose={() => setShowNearbyModal(false)} />
     </div>
   );
 };

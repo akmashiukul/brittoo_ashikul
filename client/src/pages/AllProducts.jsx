@@ -8,10 +8,12 @@ import {
   X,
   Sparkles,
   SearchIcon,
+  MapPin,
 } from "lucide-react";
 import api from "../lib/api";
 import ProductCard from "../components/ProductCard";
 import Swal from "sweetalert2";
+import NearbyProductsModal from "../components/modals/NearbyProductsModal";
 
 const AllProducts = ({ productType, setProductType, search, setSearch }) => {
   const [products, setProducts] = useState([]);
@@ -35,6 +37,8 @@ const AllProducts = ({ productType, setProductType, search, setSearch }) => {
   const [total, setTotal] = useState(0);
   const limit = 12;
 
+  const [showNearbyModal, setShowNearbyModal] = useState(false);
+
   const productTypes = [
     "GADGET",
     "FURNITURE",
@@ -51,7 +55,7 @@ const AllProducts = ({ productType, setProductType, search, setSearch }) => {
 
   const fetchProducts = useCallback(async () => {
     try {
-      if(prompt) {
+      if (prompt) {
         return;
       }
       setError("");
@@ -84,7 +88,7 @@ const AllProducts = ({ productType, setProductType, search, setSearch }) => {
 
   const buildWithAI = async () => {
     try {
-      if(!prompt) {
+      if (!prompt) {
         alert("Enter a prompt first!")
       }
       setError("");
@@ -131,7 +135,7 @@ const AllProducts = ({ productType, setProductType, search, setSearch }) => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center px-4">
+      <div className="min-h-screen bg-white flex items-center justify-center px-4 relative">
         <div className="bg-white p-8 rounded-lg border border-gray-200 text-center">
           <div className="text-red-500 mb-4">
             <Package className="w-16 h-16 mx-auto" />
@@ -440,6 +444,33 @@ const AllProducts = ({ productType, setProductType, search, setSearch }) => {
           </div>
         )
       }
+      <div className="fixed bottom-8 left-8">
+        <button
+        onClick={() => setShowNearbyModal(true)}
+        className="
+        group relative inline-flex items-center gap-2
+        px-5 py-2.5 
+        bg-gradient-to-r from-blue-600 to-indigo-600
+        text-white font-medium
+        rounded-xl shadow-md
+        hover:shadow-lg hover:scale-[1.02]
+        transition-all duration-200
+        focus:outline-none focus:ring-2 focus:ring-blue-400
+      "
+      >
+        <div
+          className="
+          absolute inset-0 bg-white/10 opacity-0 
+          group-hover:opacity-100 rounded-xl transition
+        "
+        ></div>
+        <MapPin
+          className="w-5 h-5 text-white group-hover:rotate-6 transition-transform duration-200"
+        />
+        <span className="relative z-10">Nearby Products</span>
+      </button>
+      </div>
+      <NearbyProductsModal isOpen={showNearbyModal} onClose={() => setShowNearbyModal(false)} />
     </div>
   );
 };

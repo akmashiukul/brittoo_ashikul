@@ -4,6 +4,7 @@ import Swal from "sweetalert2";
 import Loader from "../../../components/shared/Loader";
 import api from "../../../lib/api";
 import useShowRccModalStore from "../../../stores/creditModalStores/useShowRccModalStore";
+import LocationPicker from "../../../components/LocationPicker";
 
 const ListItems = () => {
   const [selectedImages, setSelectedImages] = useState([]);
@@ -21,6 +22,8 @@ const ListItems = () => {
     minPrice: 0,
     askingPrice: 0,
     isAiEnabled: false,
+    latitude: 24.3635683,
+    longitude: 88.6258024,
   });
 
   const { openShowRccModal, setRcc } = useShowRccModalStore();
@@ -109,7 +112,9 @@ const ListItems = () => {
         isForSaleOnly: false,
         isAiEnabled: false,
         askingPrice: 0,
-        minPrice: 0
+        minPrice: 0,
+        latitude: 24.3635683,
+        longitude: 88.6258024,
       });
       // Show cache credit
       await setRcc(res.data.rcc);
@@ -464,6 +469,8 @@ const ListItems = () => {
             onChange={handleInputChange}
           />
         </label>
+        <h2 className="text-sm font-medium text-gray-700">Enter Product Location:</h2>
+        <LocationPicker formData={formData} setFormData={setFormData} />
         <button
           type="submit"
           className="py-2 px-4 bg-green-600 text-white rounded-md border border-green-600 hover:bg-green-500 hover:text-white/90 cursor-pointer shadow-md text-center"

@@ -27,6 +27,8 @@ export const createProduct = async (req, res, next) => {
       isAiEnabled = false,
       askingPrice,
       minPrice,
+      latitude,
+      longitude
     } = req.body;
     if (!req.user || !req.user.id) {
       throw new CustomError("Unauthorized: No user authenticated", 401);
@@ -93,6 +95,8 @@ export const createProduct = async (req, res, next) => {
           productSL: "TEMP",
           productType,
           productCondition,
+          latitude: Number(latitude),
+          longitude: Number(longitude),
           isForSale: isForSale === "false" ? false : true,
           isForSaleOnly: isForSaleOnly === "false" ? false : true,
           isAiEnabled: isAiEnabled === "false" ? false : true,
@@ -160,6 +164,8 @@ export const getProducts = async (req, res, next) => {
       limit = 20,
       productId,
       productSL,
+      latitude,
+      longitude,
       prompt = "",
     } = req.query;
 
