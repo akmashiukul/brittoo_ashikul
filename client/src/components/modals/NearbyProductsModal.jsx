@@ -36,10 +36,10 @@ const NearbyProductsModal = ({ isOpen, onClose }) => {
 
           try {
             const res = await api.get("/api/v1/products");
-            const filtered = res.data.products.filter(
+            console.log(res.data)
+            const filtered = res?.data?.products?.filter(
               (p) => p.latitude !== null && p.longitude !== null
             );
-            console.log("Filtered: ", filtered)
             setProducts(filtered);
           } catch (err) {
             console.error("Error fetching products:", err);
