@@ -121,7 +121,7 @@ const NearbyProductsModal = ({ isOpen, onClose }) => {
                 {products.map((p) => (
                   <Marker
                     key={p.id}
-                    position={[p.latitude, p.longitude]}
+                    position={[Number(p.latitude), Number(p.longitude)]}
                     icon={createProductIcon(
                       `${import.meta.env.VITE_BASE_URL}${p.optimizedImages[0]}`,
                       p.name
@@ -133,6 +133,7 @@ const NearbyProductsModal = ({ isOpen, onClose }) => {
                       },
                     }}
                   />
+
                 ))}
               </MapContainer>
             )
