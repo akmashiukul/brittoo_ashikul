@@ -22,6 +22,7 @@ import adminPurchaseRoutes from "./routes/admin-routes/purchaseRequestAdmin.rout
 import userPurchaseRoutes from "./routes/user-routes/purchaseRequestUser.routes.js";
 import chatRoutes from "./routes/user-routes/purcaseChat.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
+import publicRoutes from "./routes/open-apis/userProfile.routes.js"
 
 import { createServer } from "http";
 import { initializeSocket } from "./socket/chatSocket.js";
@@ -32,8 +33,17 @@ dotenv.config();
 const app = express();
 
 const server = createServer(app);
-// Initialize Socket.IO
+//Socket.IO init
 initializeSocket(server);
+
+// for open source
+const publicCors = cors({
+  origin: "*", // allorigins
+  methods: ["GET", "OPTIONS"],
+  allowedHeaders: ["Content-Type"],
+  credentials: false,
+  maxAge: 86400
+});
 
 // CORS Policy
 const devOrigins = ["http://localhost:5173", "http://localhost:5000", "http://localhost:5001", "http://127.0.0.1:5001", "http://127.0.0.1:5173"];
@@ -74,6 +84,11 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.get("/", (req, res) => {
   res.send("Britto Server is Running....");
 });
+
+// public
+app.use("/api/v1/public", publicCors, publicRoutes);
+
+// conf
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/products", productRoutes);
 app.use("/api/v1/credit/bcc", bccRoutes);
