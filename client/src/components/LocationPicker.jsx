@@ -1,4 +1,5 @@
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import { markerIcon } from './MarkerIcon';
 
 
 const LocationPicker = ({ formData, setFormData }) => {
@@ -22,7 +23,7 @@ const LocationPicker = ({ formData, setFormData }) => {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; OpenStreetMap contributors'
       />
-      <Marker position={[formData.latitude, formData.longitude]} />
+      <Marker position={[formData.latitude, formData.longitude]} icon={markerIcon} />
       <MapClickHandler />
     </MapContainer>
   );
