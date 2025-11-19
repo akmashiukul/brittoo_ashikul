@@ -35,8 +35,7 @@ const NearbyProductsModal = ({ isOpen, onClose }) => {
           setUserPos([lat, lng]);
 
           try {
-            const res = await api.get("/api/v1/products");
-            console.log(res.data)
+            const res = await api.get(`/api/v1/products?page=${1}&limit=${400}`);
             const filtered = res?.data?.products?.filter(
               (p) => p.latitude !== null && p.longitude !== null
             );
