@@ -28,7 +28,8 @@ Rules:
 
 Examples:
 "I want to build a robot" → ELECTRONICS  
-"I want to go on a ride with friends" → VEHICLE  
+"I want to go on a ride with friends" → VEHICLE
+"I want to go on a travel" → CLOTHING (as travel bags, neck pillows falls under clothing in this system)
 "I need a guitar" → MUSICAL_INSTRUMENT  
 "I need a new sofa" → FURNITURE  
 "I want a nice outfit" → CLOTHING  
