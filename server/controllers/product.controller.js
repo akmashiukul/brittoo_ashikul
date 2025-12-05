@@ -188,19 +188,18 @@ export const getProducts = async (req, res, next) => {
       console.log("Running AI-based product recommendation...");
 
       // STEP 1 — Determine category using Gemini
-      const detectedCategory = await findCategory(prompt);
-      console.log("Detected category:", detectedCategory);
+      // const detectedCategory = await findCategory(prompt);
+      // console.log("Detected category:", detectedCategory);
 
       // STEP 2 — Fetch products in that category
       const categoryProducts = await prisma.product.findMany({
         where: {
           deletedAt: null,
           isVirtual: false,
-          productType: detectedCategory,
         },
         select: { productSL: true, name: true },
       });
-      console.log("categoryProducts count:", categoryProducts.length);
+      //console.log("categoryProducts count:", categoryProducts.length);
 
       if (categoryProducts.length === 0) {
         return res.status(200).json({

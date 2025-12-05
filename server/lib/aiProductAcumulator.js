@@ -79,12 +79,21 @@ Your task:
 - If none match, output "NONE".
 
 Examples:
-User: "build a line following robot"
+User: "build a LFR or line following robot"
 Products:
-ID: A1, Name: Arduino Uno
-ID: B2, Name: Guitar
-ID: C3, Name: Ultrasonic Sensor
-Expected: A1,C3
+ID: E1, Name: Arduino Uno
+ID: G2, Name: Guitar
+ID: E3, Name: Ultrasonic Sensor
+ID: E4, Name: Wheels
+Expected: A1,C3,E4
+
+User: "Want to go on a travel"
+Products:
+ID: E1, Name: Arduino Uno
+ID: C2, Name: Trolley Luggage
+ID: E3, Name: Neck Pillow
+ID: E4, Name: Camera
+Expected: C2,E3,E4
 
 User: "decorate my living room"
 Products:
