@@ -18,9 +18,7 @@ jobs:
         script: |
           set -e  # Exit on error
           
-          echo "======================================="
           echo "Starting deployment..."
-          echo "======================================="
           
           # Load NVM environment
           echo "Loading NVM..."
@@ -43,26 +41,20 @@ jobs:
           git pull origin main
           
           # Build frontend
-          echo "======================================="
           echo "Building frontend..."
-          echo "======================================="
           cd client
           npm ci
           npm run build
           echo "Frontend build completed!"
           
           # Install backend dependencies
-          echo "======================================="
           echo "Installing backend dependencies..."
-          echo "======================================="
           cd ../server
           npm ci
           echo "Backend dependencies installed!"
           
           # Restart services
-          echo "======================================="
           echo "Restarting services..."
-          echo "======================================="
           
           echo "Reloading nginx..."
           sudo systemctl reload nginx
@@ -72,12 +64,8 @@ jobs:
           pm2 restart brittoo-backend || pm2 start server/index.js --name brittoo-backend
           
           # Verify deployment
-          echo "======================================="
           echo "Verifying deployment..."
-          echo "======================================="
           sleep 3
           pm2 status brittoo-backend
           
-          echo "======================================="
           echo "Deployment completed successfully!"
-          echo "======================================="
