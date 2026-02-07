@@ -16,47 +16,68 @@ jobs:
         username: ${{ secrets.VPS_USERNAME }}
         password: ${{ secrets.VPS_PASSWORD }}
         script: |
+          set -e  # Exit on error
+          
+          echo "======================================="
           echo "Starting deployment..."
+          echo "======================================="
           
           # Load NVM environment
-          export NVM_DIR="/root/.nvm"
+          echo "Loading NVM..."
+          export NVM_DIR="$HOME/.nvm"
           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-          [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-          
-          # THIS LINE WAS MISSING - Activate Node.js
           nvm use node
           
           echo "Node version: $(node --version)"
           echo "NPM version: $(npm --version)"
           
+          # Navigate to project directory
+          echo "Navigating to project directory..."
           cd /var/www/brittoo
           
-          echo "Pulling latest code..."
+          # Update code from repository
+          echo "Stashing local changes (if any)..."
+          git stash
+          
+          echo "Pulling latest code from main branch..."
           git pull origin main
           
+          # Build frontend
+          echo "======================================="
           echo "Building frontend..."
+          echo "======================================="
           cd client
-          npm install --silent
+          npm ci
           npm run build
-          cd ..
+          echo "Frontend build completed!"
           
+          # Install backend dependencies
+          echo "======================================="
           echo "Installing backend dependencies..."
-          cd server
-          npm install --silent
-          cd ..
+          echo "======================================="
+          cd ../server
+          npm ci
+          echo "Backend dependencies installed!"
           
-          echo "Restarting nginx..."
+          # Restart services
+          echo "======================================="
+          echo "Restarting services..."
+          echo "======================================="
+          
+          echo "Reloading nginx..."
           sudo systemctl reload nginx
+          echo "Nginx reloaded successfully!"
           
-          # Find and use PM2
-          echo "Restarting backend..."
-          npm list -g pm2 > /dev/null 2>&1 && PM2_AVAILABLE=true || PM2_AVAILABLE=false
+          echo "Restarting backend with PM2..."
+          pm2 restart brittoo-backend || pm2 start server/index.js --name brittoo-backend
           
-          if [ "$PM2_AVAILABLE" = true ]; then
-            pm2 restart brittoo-backend || pm2 start server/index.js --name brittoo-backend
-          else
-            echo "PM2 not found globally, trying npx..."
-            npx pm2 restart brittoo-backend || npx pm2 start server/index.js --name brittoo-backend
-          fi
+          # Verify deployment
+          echo "======================================="
+          echo "Verifying deployment..."
+          echo "======================================="
+          sleep 3
+          pm2 status brittoo-backend
           
-          echo "Deployment completed!"
+          echo "======================================="
+          echo "Deployment completed successfully!"
+          echo "======================================="
