@@ -89,7 +89,7 @@ const extractSuggestedPrice = (text, minPrice) => {
   if (!match) return null;
   const price = Number(match[1]);
   if (minPrice && price < minPrice) {
-    console.warn(`⚠️ AI suggested price ${price} below threshold ${minPrice}`);
+    console.warn(`AI suggested price ${price} below threshold ${minPrice}`);
     return null;
   }
   return price;

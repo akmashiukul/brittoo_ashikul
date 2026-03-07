@@ -121,7 +121,7 @@ const VerifyUser = () => {
         setCameraStream(null);
       }
 
-      let errorMessage = "❌ Camera access failed. ";
+      let errorMessage = " Camera access failed. ";
       if (err.name === "NotAllowedError") {
         errorMessage += "Please allow camera permissions.";
       } else if (err.name === "NotFoundError") {
@@ -155,7 +155,7 @@ const VerifyUser = () => {
 
   const capturePhoto = () => {
     if (!videoRef.current || !canvasRef.current || !cameraReady) {
-      setMessage("❌ Camera not ready. Please try again.");
+      setMessage(" Camera not ready. Please try again.");
       return;
     }
 
@@ -163,7 +163,7 @@ const VerifyUser = () => {
     const video = videoRef.current;
 
     if (video.videoWidth === 0 || video.videoHeight === 0) {
-      setMessage("❌ Camera not ready. Please wait and try again.");
+      setMessage(" Camera not ready. Please wait and try again.");
       return;
     }
 
@@ -182,7 +182,7 @@ const VerifyUser = () => {
     canvas.toBlob(
       (blob) => {
         if (!blob) {
-          setMessage("❌ Failed to capture photo. Please try again.");
+          setMessage(" Failed to capture photo. Please try again.");
           return;
         }
 
@@ -194,7 +194,7 @@ const VerifyUser = () => {
           setIdCardPreview(URL.createObjectURL(blob));
         }
         stopCamera();
-        setMessage("✅ Photo captured successfully!");
+        setMessage(" Photo captured successfully!");
       },
       "image/jpeg",
       0.8,
@@ -205,11 +205,11 @@ const VerifyUser = () => {
     const file = event.target.files[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
-        setMessage("❌ File size should be less than 5MB");
+        setMessage(" File size should be less than 5MB");
         return;
       }
       if (!file.type.startsWith("image/")) {
-        setMessage("❌ Please select a valid image file");
+        setMessage(" Please select a valid image file");
         return;
       }
       setIdCardImage(file);
@@ -232,7 +232,7 @@ const VerifyUser = () => {
 
   const handleSubmit = async () => {
     if (!idCardImage || !selfieImage) {
-      setMessage("❌ Please provide both ID card and selfie images");
+      setMessage(" Please provide both ID card and selfie images");
       return;
     }
 
@@ -256,7 +256,7 @@ const VerifyUser = () => {
       if (response.data.success) {
         Swal.fire({
           icon: "success",
-          title: "✅ Documents submitted successfully",
+          title: " Documents submitted successfully",
           text: 'Awaiting review within 2-3 hours.',
         })
         await setCurrentUser({
@@ -266,7 +266,7 @@ const VerifyUser = () => {
         setTimeout(() => navigate("/"), 500);
       } else {
         setMessage(
-          `❌ ${response.data.message || "Submission failed. Please try again."
+          ` ${response.data.message || "Submission failed. Please try again."
           }`,
         );
       }
@@ -276,7 +276,7 @@ const VerifyUser = () => {
         error.response?.data?.message ||
         error.message ||
         "Something went wrong. Please try again.";
-      setMessage(`❌ ${errorMessage}`);
+      setMessage(` ${errorMessage}`);
       if (error.response?.status === 401) {
         navigate("/login");
       }

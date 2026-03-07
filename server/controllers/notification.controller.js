@@ -172,7 +172,7 @@ export const notifyAdmins = async (title, body, data = { url: '/' }) => {
       }
     });
 
-    console.log(`✅ Notification sent to ${admins.length} admin(s).`);
+    console.log(` Notification sent to ${admins.length} admin(s).`);
   } catch (error) {
     console.error('Failed to send admin notification:', error);
   }

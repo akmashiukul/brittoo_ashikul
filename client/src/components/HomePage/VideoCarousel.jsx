@@ -44,10 +44,10 @@ const slides = [
 export default function VideoCarousel() {
   const swiperRef = useRef(null);
   const videoRefs = useRef([]);
-  const [currentIndex, setCurrentIndex] = useState(0); // ✅ added state
+  const [currentIndex, setCurrentIndex] = useState(0); //  added state
 
   const handleSlideChange = (swiper) => {
-    setCurrentIndex(swiper.activeIndex); // ✅ track active index for overlay
+    setCurrentIndex(swiper.activeIndex); //  track active index for overlay
 
     // pause and reset all videos
     videoRefs.current.forEach((video) => {

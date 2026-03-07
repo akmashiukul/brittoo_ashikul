@@ -1,4 +1,4 @@
-Config ✅:
+Config :
   9. add Redis config
 
 Prod: 

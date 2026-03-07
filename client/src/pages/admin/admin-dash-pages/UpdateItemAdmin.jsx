@@ -88,7 +88,7 @@ const UpdateItemAdmin = () => {
     const totalImages =
       existingImages.length +
       selectedImages.length +
-      validFiles.length - // ✅ use validFiles, not all files
+      validFiles.length - //  use validFiles, not all files
       imagesToDelete.length;
 
     if (totalImages <= 4) {

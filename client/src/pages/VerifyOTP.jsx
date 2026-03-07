@@ -30,7 +30,7 @@ export default function VerifyOTP() {
 
   const handleVerify = async () => {
     if (!otp.trim()) {
-      setMessage("❌ Please enter the OTP.");
+      setMessage(" Please enter the OTP.");
       return;
     }
 
@@ -44,17 +44,17 @@ export default function VerifyOTP() {
       });
 
       if (!res.data.success) {
-        setMessage("❌ Invalid OTP. Please try again.");
+        setMessage(" Invalid OTP. Please try again.");
         return;
       }
 
-      setMessage("✅ OTP verified successfully!");
+      setMessage(" OTP verified successfully!");
       await setCurrentUser(res.data.user);
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("login-dt", new Date().toISOString());
       setTempUser(null);
     } catch (err) {
-      setMessage("❌ Invalid OTP. Please try again.");
+      setMessage(" Invalid OTP. Please try again.");
       console.error("OTP verification error:", err);
     } finally {
       setVerifying(false);
@@ -75,7 +75,7 @@ export default function VerifyOTP() {
       setMessage("📩 OTP resent successfully! Check your email.");
       setTimer(60);
     } catch (err) {
-      setMessage("❌ Failed to resend OTP. Try again later.");
+      setMessage(" Failed to resend OTP. Try again later.");
       console.error("Resend OTP error:", err);
     } finally {
       setResending(false);
@@ -161,7 +161,7 @@ export default function VerifyOTP() {
 
         {message && (
           <p
-            className={`mt-4 text-center text-sm ${message.includes("✅") ? "text-green-600" : "text-green-500"
+            className={`mt-4 text-center text-sm ${message.includes("") ? "text-green-600" : "text-green-500"
               }`}
           >
             {message}

@@ -56,9 +56,9 @@ async function main() {
         });
       });
 
-      console.log(`✅ Gifted RCC to ${user.roll ?? user.id}`);
+      console.log(` Gifted RCC to ${user.roll ?? user.id}`);
     } catch (err) {
-      console.error(`❌ Failed for user ${user.roll ?? user.id}:`, err.message);
+      console.error(` Failed for user ${user.roll ?? user.id}:`, err.message);
     }
   }
 

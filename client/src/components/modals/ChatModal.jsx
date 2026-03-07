@@ -87,7 +87,7 @@ const ChatModal = ({ isOpen, onClose, productId, chatRoomId: initialChatRoomId, 
     });
 
     newSocket.on('connect', () => {
-      console.log('✅ Socket connected');
+      console.log(' Socket connected');
       setIsConnected(true);
       newSocket.emit('join_room', { chatRoomId: chatRoomIdRef.current });
     });
@@ -98,7 +98,7 @@ const ChatModal = ({ isOpen, onClose, productId, chatRoomId: initialChatRoomId, 
     });
 
     newSocket.on('disconnect', () => {
-      console.log('❌ Socket disconnected');
+      console.log(' Socket disconnected');
       setIsConnected(false);
     });
 

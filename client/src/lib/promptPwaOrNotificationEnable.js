@@ -6,7 +6,7 @@ let deferredPrompt;
 // --- BEFORE INSTALL PROMPT LISTENER ---
 if (!window._pwaListenerAttached) {
   window.addEventListener("beforeinstallprompt", (e) => {
-    console.log("✅ beforeinstallprompt fired:", e);
+    console.log(" beforeinstallprompt fired:", e);
     e.preventDefault(); // prevent auto banner
     deferredPrompt = e;
   });

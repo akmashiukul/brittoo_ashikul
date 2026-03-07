@@ -693,7 +693,7 @@ export const updateProductAdmin = async (req, res, next) => {
       return productUpdate;
     });
 
-    // 🚀 Invalidate cache
+    // Invalidate cache
     const keys = await redisClient.keys("products:*");
     if (keys.length > 0) {
       await redisClient.del(keys);

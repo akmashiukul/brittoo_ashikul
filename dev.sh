@@ -11,7 +11,7 @@ run_all() {
 
 run_client() {
   if [ -n "$(docker ps -aq -f name=$CLIENT_CONTAINER)" ]; then
-    echo "⚠️  Client container '$CLIENT_CONTAINER' already exists. Stop it first."
+    echo "Client container '$CLIENT_CONTAINER' already exists. Stop it first."
   else
     echo "Running client container..."
     docker run \
@@ -20,14 +20,14 @@ run_client() {
       -p 5173:5173 \
       -d --name $CLIENT_CONTAINER brittoo-client
 
-    echo "📦 Installing client dependencies..."
+    echo "Installing client dependencies..."
     docker exec $CLIENT_CONTAINER npm install
   fi
 }
 
 run_server() {
   if [ -n "$(docker ps -aq -f name=$SERVER_CONTAINER)" ]; then
-    echo "⚠️  Server container '$SERVER_CONTAINER' already exists. Stop it first."
+    echo "Server container '$SERVER_CONTAINER' already exists. Stop it first."
   else
     echo "Running server container..."
     docker run \
@@ -37,7 +37,7 @@ run_server() {
       -d --name $SERVER_CONTAINER \
       brittoo-server
 
-    echo "📦 Installing server dependencies..."
+    echo "Installing server dependencies..."
     docker exec $SERVER_CONTAINER npm install
   fi
 }

@@ -49,11 +49,11 @@ const processImage = async (filePath, outputPath) => {
 export const productImageUpload = (req, res, next) => {
   upload(req, res, async function (err) {
     if (err) {
-      console.error("💥 Multer Error:", err);
+      console.error("Multer Error:", err);
       return res.status(400).json({ message: err.message });
     }
 
-    // ✅ Check if files exist before processing
+    //  Check if files exist before processing
     if (req.files && req.files.length > 0) {
       try {
         for (const file of req.files) {
@@ -64,14 +64,14 @@ export const productImageUpload = (req, res, next) => {
           await processImage(file.path, outputPath);
           file.optimizedPath = outputPath;
         }
-        console.log(`✅ Files uploaded and optimized: ${req.files.length} files`);
+        console.log(` Files uploaded and optimized: ${req.files.length} files`);
       } catch (e) {
-        console.error("💥 Image Processing Error:", e);
+        console.error("Image Processing Error:", e);
         return res.status(500).json({ message: "Image processing failed" });
       }
     } else {
-      // ✅ No files uploaded - this is fine for updates without images
-      console.log("ℹ️ No files uploaded - proceeding with other updates");
+      //  No files uploaded - this is fine for updates without images
+      console.log("No files uploaded - proceeding with other updates");
     }
 
     next();

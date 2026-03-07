@@ -12,7 +12,7 @@ const isValidRuetEmail = (email) => {
 };
 
 async function main() {
-  console.log('🔍 Checking user emails for RUET validity...');
+  console.log(' Checking user emails for RUET validity...');
 
   const users = await prisma.user.findMany({
     select: { id: true, email: true },
@@ -30,16 +30,16 @@ async function main() {
 
     updatedCount++;
     console.log(
-      `→ Updated: ${user.email} => ${valid ? '✅ valid' : '❌ invalid'}`
+      `→ Updated: ${user.email} => ${valid ? ' valid' : ' invalid'}`
     );
   }
 
-  console.log(`\n✅ Done! Updated ${updatedCount} users.`);
+  console.log(`\n Done! Updated ${updatedCount} users.`);
 }
 
 main()
   .catch((e) => {
-    console.error('❌ Error updating RUET emails:', e);
+    console.error(' Error updating RUET emails:', e);
   })
   .finally(async () => {
     await prisma.$disconnect();

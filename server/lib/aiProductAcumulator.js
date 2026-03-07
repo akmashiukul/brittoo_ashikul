@@ -11,7 +11,7 @@ const VALID_ENUMS = [
   "ELECTRONICS", "APARTMENTS", "OTHERS",
 ];
 
-// 🔹 STEP 1 — Detect the category
+// STEP 1 — Detect the category
 export const findCategory = async (prompt) => {
   const systemInstruction = `
 You are a product classification AI for a rental platform called Brittoo.
@@ -62,7 +62,7 @@ Examples:
   }
 };
 
-// 🔹 STEP 2 — Pick matching product IDs
+// STEP 2 — Pick matching product IDs
 export const accumulateProducts = async (userPrompt, products) => {
   if (!products || products.length === 0) return [];
 

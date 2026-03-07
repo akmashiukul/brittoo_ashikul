@@ -39,11 +39,11 @@ export const subscribeToPush = async () => {
       subscription: subscription.toJSON(),
     });
 
-    console.log("✅ Push subscription successful");
+    console.log(" Push subscription successful");
     return subscription;
 
   } catch (err) {
-    console.error("❌ Failed to subscribe to push notifications:", err);
+    console.error(" Failed to subscribe to push notifications:", err);
     throw err; // propagate to caller
   }
 };

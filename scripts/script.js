@@ -31,9 +31,9 @@ const processImage = async (inputPath, outputPath) => {
 
     try {
       await processImage(inputPath, outputPath);
-      console.log(`✅ Optimized: ${file} → ${path.basename(outputPath)}`);
+      console.log(` Optimized: ${file} → ${path.basename(outputPath)}`);
     } catch (err) {
-      console.error(`💥 Failed: ${file}`, err);
+      console.error(`Failed: ${file}`, err);
     }
   }
 
