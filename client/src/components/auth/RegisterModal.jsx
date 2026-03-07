@@ -21,6 +21,7 @@ const RegisterModal = () => {
       /^s[0-9]+@ru\.ac\.bd$/i,                 // RU: s2310876102@ru.ac.bd
       /^[0-9]{7}@[a-z]+\.buet\.ac\.bd$/i,      // BUET: 2212011@cse.buet.ac.bd
       /^[0-9]{10}@student\.sust\.edu$/i,       // SUST: 2024134111@student.sust.edu
+      /^[a-z0-9._]+@iut-dhaka\.edu$/i,         // IUT: rafsanasif@iut-dhaka.edu
     ];
     return patterns.some((regex) => regex.test(email));
   };
@@ -186,7 +187,7 @@ const RegisterModal = () => {
                 />
                 {
                   formData.email.length > 0 && !isValidRuetEmail(formData.email) && (
-                    <p className="text-red-500 text-xs">This is not a valid Edu (BUET/RUET/RU/SUST) mail. But you can still register, rental features for other institutions are coming soon.</p>
+                    <p className="text-red-500 text-xs">This is not a valid Edu (BUET/RUET/RU/SUST/IUT) mail. But you can still register, rental features for other institutions are coming soon.</p>
                   )
                 }
               </div>
