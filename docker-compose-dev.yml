@@ -1,62 +1,100 @@
-name: "brittoo"
-
 services:
-  client:
-    build:
-      context: ./client
-      dockerfile: Dockerfile.dev
-    ports:
-      - "5173:5173"
-    volumes:
-      - ./client/src:/app/src
-      - /app/node_modules
-
   server:
     build:
-      context: ./server
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: server/Dockerfile.dev
+    container_name: brittoo-server-dev
+    restart: unless-stopped
     ports:
       - "5000:5000"
-      - "5555:5555"
-    volumes:
-      - ./server:/app
-      - /app/node_modules
     env_file:
       - ./server/.env
-    command: npm run dev
-
-  db:
-    image: postgres
     environment:
-      - POSTGRES_USER=galib
-      - POSTGRES_PASSWORD=galib2723
-      - POSTGRES_DB=brittoodb
+      - PORT=5000
+      - NODE_ENV=development
+      - GRPC_PORT=50051
+      - CLIENT_BASE_URL=http://localhost:5173
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=postgresql://brittoo:brittoo_dev_pass@postgres:5432/brittoodb_dev
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - ./server:/app/server
+      - /app/server/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - brittoo-dev
+
+  agentic:
+    build:
+      context: .
+      dockerfile: agentic-service/Dockerfile.dev
+    container_name: brittoo-agentic-dev
+    restart: unless-stopped
     ports:
-      - "5432:5432"
+      - "5001:5001"
+    env_file:
+      - ./agentic-service/.env
+    environment:
+      - PORT=5001
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://galib:Brittoo%401234@mongo:27017/negotiations_dev?authSource=admin
+      - GRPC_SERVER_URL=server:50051
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - ./agentic-service:/app/agentic-service
+      - /app/agentic-service/node_modules
+      - ./server/lib:/app/server/lib
+    depends_on:
+      - server
+      - mongo
+      - redis
+    networks:
+      - brittoo-dev
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: brittoo-postgres-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: brittoodb_dev
+      POSTGRES_USER: brittoo
+      POSTGRES_PASSWORD: brittoo_dev_pass
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U brittoo -d brittoodb_dev"] 
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - brittoo-dev
+
+  mongo:
+    image: mongo:7-jammy
+    container_name: brittoo-mongo-dev
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: galib
+      MONGO_INITDB_ROOT_PASSWORD: "Brittoo@1234"
+    volumes:
+      - mongo_dev_data:/data/db
+    networks:
+      - brittoo-dev
+
+  redis:
+    image: redis:7-alpine
+    container_name: brittoo-redis-dev
+    restart: unless-stopped
+    networks:
+      - brittoo-dev
 
 volumes:
-  pgdata:
+  postgres_dev_data:
+  mongo_dev_data:
 
-
-## VISIT DB Locally: psql -h localhost -p 5433 -U galib -d brittoodb
-
-# ===========================================
-# DEV COMMANDS (using docker-compose-dev.yml)
-# ===========================================
-
-#   --Up (start in detached mode):
-#       $ docker compose -f docker-compose-dev.yml up -d
-
-#   --List images (confirm image is built):
-#       $ docker image ls
-
-#   --Down & Delete anonymous volumes:
-#       $ docker compose -f docker-compose-dev.yml down -v
-
-#   --Force rebuild from scratch (no cache):
-#       $ docker compose -f docker-compose-dev.yml up -d --build
-
-
-
+networks:
+  brittoo-dev:
+    driver: bridge

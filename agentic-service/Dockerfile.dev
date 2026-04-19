@@ -1,0 +1,18 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+COPY agentic-service/package*.json ./agentic-service/
+COPY server/package*.json ./server/
+
+RUN cd agentic-service && npm install
+RUN cd server && npm install
+
+COPY agentic-service ./agentic-service
+COPY server/lib ./server/lib
+
+WORKDIR /app/agentic-service
+
+EXPOSE 5001
+
+CMD ["node", "--watch", "index.js"]

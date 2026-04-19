@@ -106,6 +106,35 @@ export const giftRcc = async (req, res, next) => {
       console.error("Failed to create notification in gift rcc:", error);
     }
 
+    try {
+      await resend.emails.send({
+        from: "Brittoo <notifications@brittoo.xyz>",
+        to: targetUser.email,
+        subject: `Congratulations! You have received RCC From Brittoo.`,
+        html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #fdecea;">
+        <div style="text-align: center; padding: 20px; background-color: #fff5f5; border-radius: 8px; box-shadow: 0 2px 4px rgba(220, 38, 38, 0.1);">
+          <h2 style="color: #b91c1c; font-size: 24px; margin-bottom: 20px;">
+            Congratulations! You've Received ${amount} Red Cache Credits From Brittoo 🟥
+          </h2>
+          <p style="color: #991b1b; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
+            Start your rental journey with Brittoo now. Use this credit and rent anything you want.
+          </p>
+          <a href="${process.env.CLIENT_BASE_URL}/dashboard/my-credits" 
+             style="display: inline-block; padding: 12px 24px; background-color: #dc2626; color: #ffffff; text-decoration: none; font-weight: bold; border-radius: 5px; margin: 20px 0;">
+            View Credits
+          </a>
+          <p style="color: #7f1d1d; font-size: 14px; line-height: 1.5;">
+            If you have any questions, feel free to contact our support team.
+          </p>
+        </div>
+      </div>
+    `,
+      });
+    } catch (error) {
+      console.log("Error in email send in gift rcc", error);
+    }
+
 
     res.status(201).json({
       success: true,

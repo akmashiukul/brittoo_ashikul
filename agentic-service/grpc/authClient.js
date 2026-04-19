@@ -5,7 +5,7 @@ const packageDef = protoLoader.loadSync("protos/auth.proto");
 const authProto = grpc.loadPackageDefinition(packageDef).auth;
 
 const client = new authProto.AuthService(
-  "localhost:50051",
+  process.env.GRPC_SERVER_URL || "localhost:50051",
   grpc.credentials.createInsecure()
 );
 

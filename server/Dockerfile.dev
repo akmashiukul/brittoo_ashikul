@@ -1,15 +1,22 @@
 FROM node:22-alpine
+
 WORKDIR /app
 
-COPY package*.json ./
+# context is project root, so prefix with server/
+COPY server/package*.json ./
+
 RUN npm install
 
-COPY . .
+# Generate prisma client at build time
+COPY server/prisma ./prisma
+RUN npx prisma generate
+
+# Copy server source
+COPY server .
 
 EXPOSE 5000
 
-CMD ["sh", "-c", "npx prisma generate && npm run dev"]
-
+CMD ["sh", "-c", "npx prisma migrate deploy && npm run dev"]
 
 
 # Commands:
