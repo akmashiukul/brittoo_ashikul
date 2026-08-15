@@ -3,7 +3,7 @@ import { mockProducts, mockNotifications } from './mockData';
 
 const baseURL = import.meta.env.VITE_BASE_URL || '';
 
-// Mock response resolver for seamless local frontend development
+// Mock response resolver for seamless local frontend development & Vercel demo
 const handleMockResponse = (config) => {
   const url = config.url || '';
   const params = config.params || {};
@@ -17,7 +17,63 @@ const handleMockResponse = (config) => {
     }
   }
 
-  // 1. Products endpoint
+  // Parse body if present
+  let bodyData = {};
+  if (config.data) {
+    try {
+      bodyData = typeof config.data === 'string' ? JSON.parse(config.data) : config.data;
+    } catch {
+      bodyData = {};
+    }
+  }
+
+  // 1. Auth Login Endpoint
+  if (url.includes('/api/v1/auth/login')) {
+    const email = bodyData.email || 'user@ruet.ac.bd';
+    const isAdmin = email.toLowerCase().includes('admin');
+
+    const mockUser = {
+      id: isAdmin ? 'admin-1' : 'user-1',
+      name: isAdmin ? 'Admin Brittoo' : 'Ashikul Islam',
+      email: email,
+      roll: isAdmin ? 'ADMIN' : '1903001',
+      role: isAdmin ? 'ADMIN' : 'USER',
+      phoneNumber: '+8801712345678',
+      isVerified: 'VERIFIED',
+      brittooVerified: true,
+      emailVerified: true,
+      securityScore: 'VERY_HIGH',
+    };
+
+    return {
+      data: {
+        success: true,
+        message: 'Login successful',
+        token: isAdmin ? 'mock-jwt-admin-token-xyz' : 'mock-jwt-user-token-xyz',
+        user: mockUser,
+      },
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config,
+    };
+  }
+
+  // 2. Auth Register Endpoint
+  if (url.includes('/api/v1/auth/register')) {
+    return {
+      data: {
+        success: true,
+        message: 'Account created successfully! You can now log in.',
+      },
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config,
+    };
+  }
+
+  // 3. Products endpoint
   if (url.includes('/api/v1/products')) {
     const productId = queryParams.productId || queryParams.id;
     if (productId) {
@@ -93,7 +149,7 @@ const handleMockResponse = (config) => {
     };
   }
 
-  // 2. User Total Credits endpoint
+  // 4. User Total Credits endpoint
   if (url.includes('/api/v1/users/total-credits')) {
     return {
       data: {
@@ -112,7 +168,78 @@ const handleMockResponse = (config) => {
     };
   }
 
-  // 3. Notifications endpoint
+  // 5. User Dashboard Overview
+  if (url.includes('/api/v1/user-dashboard/overview') || url.includes('/api/v1/user-dash/')) {
+    return {
+      data: {
+        success: true,
+        data: {
+          user: {
+            id: 'user-1',
+            name: 'Ashikul Islam',
+            email: 'user@ruet.ac.bd',
+            roll: '1903001',
+            isVerified: 'VERIFIED',
+            brittooVerified: true,
+            securityScore: 'VERY_HIGH',
+            createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
+          },
+          stats: {
+            totalListings: 4,
+            activeRentals: 2,
+            totalEarningsBcc: 3450,
+            totalWithdrawnRcc: 1200,
+          },
+          recentActivity: [
+            { id: 'act-1', type: 'RENTAL_REQUEST', text: 'Rental request received for Sony A7 IV', date: '2 hours ago' },
+            { id: 'act-2', type: 'CREDIT_EARNED', text: 'Earned 450 BCC from item rental', date: 'Yesterday' },
+          ],
+        },
+      },
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config,
+    };
+  }
+
+  // 6. Admin Analytics / Overview
+  if (url.includes('/api/v1/admin-dash/analytics') || url.includes('/api/v1/admin-dash/')) {
+    return {
+      data: {
+        success: true,
+        data: {
+          totalUsers: 1420,
+          verifiedUsers: 1280,
+          totalProducts: 385,
+          activeRentals: 84,
+          totalTransactionsBDT: 850000,
+          monthlyGrowth: 28.5,
+          monthlyStats: [
+            { month: 'Jan', rentals: 45, volume: 42000 },
+            { month: 'Feb', rentals: 68, volume: 61000 },
+            { month: 'Mar', rentals: 95, volume: 88000 },
+            { month: 'Apr', rentals: 120, volume: 115000 },
+            { month: 'May', rentals: 160, volume: 154000 },
+            { month: 'Jun', rentals: 210, volume: 198000 },
+          ],
+          categoryBreakdown: [
+            { name: 'Gadgets', value: 38 },
+            { name: 'Vehicles', value: 24 },
+            { name: 'Electronics', value: 18 },
+            { name: 'Books', value: 12 },
+            { name: 'Furniture', value: 8 },
+          ],
+        },
+      },
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config,
+    };
+  }
+
+  // 7. Notifications endpoint
   if (url.includes('/api/v1/notifications')) {
     return {
       data: {
@@ -126,7 +253,7 @@ const handleMockResponse = (config) => {
     };
   }
 
-  // 4. Coupons validation endpoint
+  // 8. Coupons validation endpoint
   if (url.includes('/api/v1/coupons')) {
     return {
       data: {
