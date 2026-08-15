@@ -192,7 +192,7 @@ const Navbar = () => {
         }`}
       >
         <header
-          className={`mx-auto max-w-screen-xl transition-all duration-300 pointer-events-auto relative overflow-hidden ${
+          className={`mx-auto max-w-screen-xl transition-all duration-300 pointer-events-auto relative ${
             isScrolled
               ? "bg-white/85 backdrop-blur-xl border border-white/60 shadow-xl shadow-black/[0.04] rounded-2xl md:rounded-full px-4 sm:px-6 py-1 ring-1 ring-black/[0.03]"
               : "bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 sm:px-6 lg:px-8 py-1.5 shadow-xs"
@@ -200,10 +200,12 @@ const Navbar = () => {
         >
           {/* Scroll Progress Indicator */}
           {isScrolled && (
-            <div
-              className="absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-emerald-400 via-green-500 to-teal-400 rounded-full transition-all duration-150 ease-out"
-              style={{ width: `${scrollProgress}%` }}
-            />
+            <div className="absolute bottom-0 left-0 right-0 h-[2px] overflow-hidden rounded-full pointer-events-none">
+              <div
+                className="h-full bg-gradient-to-r from-emerald-400 via-green-500 to-teal-400 rounded-full transition-all duration-150 ease-out"
+                style={{ width: `${scrollProgress}%` }}
+              />
+            </div>
           )}
 
           <div className="flex h-12 md:h-14 items-center justify-between">
@@ -285,18 +287,25 @@ const Navbar = () => {
                       )}
                     </button>
 
-                    {showNotificationDropdown && (
-                      <div className="fixed md:absolute right-2 left-2 md:right-0 md:left-auto mt-2 md:w-96 bg-white border border-gray-200/80 rounded-2xl shadow-2xl z-50 overflow-hidden">
-                        <div className="bg-gradient-to-r from-emerald-600 to-green-600 px-4 py-3 flex items-center justify-between">
-                          <h3 className="text-white font-semibold text-sm md:text-base flex items-center gap-2">
-                            <Bell size={16} /> Notifications
-                          </h3>
-                          {notifications.length > 0 && (
-                            <span className="text-white text-xs bg-white/20 px-2 py-0.5 rounded-full font-medium">
-                              {notifications.length}
-                            </span>
-                          )}
-                        </div>
+                    <AnimatePresence>
+                      {showNotificationDropdown && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                          transition={{ duration: 0.15 }}
+                          className="fixed md:absolute right-2 left-2 md:right-0 md:left-auto mt-3 md:w-96 bg-white border border-gray-200/80 rounded-2xl shadow-2xl z-50 overflow-hidden"
+                        >
+                          <div className="bg-gradient-to-r from-emerald-600 to-green-600 px-4 py-3 flex items-center justify-between">
+                            <h3 className="text-white font-semibold text-sm md:text-base flex items-center gap-2">
+                              <Bell size={16} /> Notifications
+                            </h3>
+                            {notifications.length > 0 && (
+                              <span className="text-white text-xs bg-white/20 px-2 py-0.5 rounded-full font-medium">
+                                {notifications.length}
+                              </span>
+                            )}
+                          </div>
 
                         <div className="max-h-[70vh] md:max-h-96 overflow-y-auto divide-y divide-gray-100">
                           {notifications.length === 0 ? (
@@ -366,9 +375,10 @@ const Navbar = () => {
                               );
                             })
                           )}
-                        </div>
-                      </div>
-                    )}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
 
                   {/* User Profile Avatar & Dropdown */}
@@ -385,45 +395,53 @@ const Navbar = () => {
                       />
                     </button>
 
-                    {isUserDropDownOpen && (
-                      <div className="absolute right-0 z-50 mt-2 w-52 rounded-2xl border border-gray-200/80 bg-white/95 backdrop-blur-md shadow-2xl p-1.5 divide-y divide-gray-100">
-                        <div className="px-3 py-2">
-                          <p className="text-xs font-semibold text-gray-900 truncate">
-                            {currentUser.name || "User"}
-                          </p>
-                          <p className="text-[11px] text-gray-500 truncate">{currentUser.email}</p>
-                        </div>
+                    <AnimatePresence>
+                      {isUserDropDownOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                          transition={{ duration: 0.15 }}
+                          className="absolute right-0 z-50 mt-3 w-52 rounded-2xl border border-gray-200/80 bg-white/95 backdrop-blur-md shadow-2xl p-1.5 divide-y divide-gray-100"
+                        >
+                          <div className="px-3 py-2">
+                            <p className="text-xs font-semibold text-gray-900 truncate">
+                              {currentUser.name || "User"}
+                            </p>
+                            <p className="text-[11px] text-gray-500 truncate">{currentUser.email}</p>
+                          </div>
 
-                        <div className="py-1">
-                          <Link
-                            to="/dashboard/overview"
-                            className={menuClassname}
-                            onClick={() => setIsUserDropDownOpen(false)}
-                          >
-                            My Dashboard
-                          </Link>
-                          {currentUser.role === "ADMIN" && (
+                          <div className="py-1">
                             <Link
-                              to="/dashboard/admin/manage-users"
+                              to="/dashboard/overview"
                               className={menuClassname}
                               onClick={() => setIsUserDropDownOpen(false)}
                             >
-                              Admin Dashboard
+                              My Dashboard
                             </Link>
-                          )}
-                        </div>
+                            {currentUser.role === "ADMIN" && (
+                              <Link
+                                to="/dashboard/admin/manage-users"
+                                className={menuClassname}
+                                onClick={() => setIsUserDropDownOpen(false)}
+                              >
+                                Admin Dashboard
+                              </Link>
+                            )}
+                          </div>
 
-                        <div className="pt-1">
-                          <button
-                            className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 transition cursor-pointer"
-                            onClick={handleLogOut}
-                          >
-                            <IoLogOut size={16} />
-                            Log Out
-                          </button>
-                        </div>
-                      </div>
-                    )}
+                          <div className="pt-1">
+                            <button
+                              className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 transition cursor-pointer"
+                              onClick={handleLogOut}
+                            >
+                              <IoLogOut size={16} />
+                              Log Out
+                            </button>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 </div>
               ) : (
