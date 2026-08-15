@@ -34,6 +34,8 @@ const Navbar = () => {
 
   // Scroll listener for floating glassmorphism effect & scroll progress bar
   useEffect(() => {
+    let lastScrollY = window.scrollY;
+
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       setIsScrolled(currentScrollY > 25);
@@ -41,6 +43,14 @@ const Navbar = () => {
       const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
       if (totalScroll > 0) {
         setScrollProgress((currentScrollY / totalScroll) * 100);
+      }
+
+      // If user scrolls the page significantly, dismiss dropdowns so they don't block content
+      if (Math.abs(currentScrollY - lastScrollY) > 8) {
+        setShowNotificationDropdown(false);
+        setIsUserDropDownOpen(false);
+        setIsHamMenuOpen(false);
+        lastScrollY = currentScrollY;
       }
     };
 
