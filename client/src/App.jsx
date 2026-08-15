@@ -58,6 +58,7 @@ import OutgoingChats from "./pages/private/dash-pages/OutgoingChats";
 import AdminManageChats from "./pages/admin/admin-dash-pages/AdminManageChats";
 import NegotiationHistory from "./pages/admin/admin-dash-pages/NegotiationHistory";
 import ManageNotifications from "./pages/admin/admin-dash-pages/ManageNotifications";
+import BrandIntroSplash from "./components/shared/BrandIntroSplash";
 
 const AppContent = () => {
   const location = useLocation();
@@ -111,6 +112,7 @@ const AppContent = () => {
 
   return (
     <>
+      <BrandIntroSplash />
       {!loading && !hideNavbar && <Navbar />}
 
       {/* Auth Modals */}

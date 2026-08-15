@@ -154,6 +154,7 @@ const Navbar = () => {
             <div className="flex-1 md:flex md:items-center md:gap-12">
               <Link to={"/"}>
                 <img
+                  id="navbar-brand-logo"
                   src={brittoLogo}
                   className="h-8 md:h-10 object-contain"
                   alt="Britto"
