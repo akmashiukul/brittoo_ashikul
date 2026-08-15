@@ -194,16 +194,6 @@ const Navbar = () => {
 
   return (
     <>
-      {/* Viewport Top Scroll Progress Indicator */}
-      {isScrolled && (
-        <div className="fixed top-0 left-0 right-0 h-[2.5px] z-50 pointer-events-none bg-transparent">
-          <div
-            className="h-full bg-gradient-to-r from-emerald-400 via-green-500 to-teal-400 shadow-sm shadow-emerald-500/50 transition-all duration-150 ease-out"
-            style={{ width: `${scrollProgress}%` }}
-          />
-        </div>
-      )}
-
       <div
         className={`sticky top-0 z-40 w-full transition-all duration-300 ${
           isScrolled
@@ -218,6 +208,19 @@ const Navbar = () => {
               : "bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 sm:px-6 lg:px-8 py-1.5 shadow-xs"
           }`}
         >
+          {/* Integrated Scroll Progress Indicator merged into the Navbar shape */}
+          <div
+            className={`absolute pointer-events-none transition-all duration-300 overflow-hidden ${
+              isScrolled
+                ? "bottom-1 inset-x-8 sm:inset-x-12 h-[2.5px] bg-emerald-100/40 rounded-full"
+                : "bottom-0 inset-x-0 h-[2px] bg-transparent"
+            }`}
+          >
+            <div
+              className="h-full bg-gradient-to-r from-emerald-400 via-green-500 to-teal-400 rounded-full transition-all duration-150 ease-out shadow-xs shadow-emerald-500/50"
+              style={{ width: `${scrollProgress}%` }}
+            />
+          </div>
 
           <div className="flex h-12 md:h-14 items-center justify-between">
             {/* Logo */}
