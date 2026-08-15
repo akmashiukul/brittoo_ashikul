@@ -9,11 +9,15 @@ import useRegModalStore from "../../stores/authStores/useRegModalStore";
 import useLoginModalStore from "../../stores/authStores/useLoginModalStore";
 import useUserStore from "../../stores/authStores/useUserStore";
 import api from "../../lib/api";
-import { Bell, Coins, CreditCard, ExternalLink, X } from "lucide-react";
+import { Bell, Coins, CreditCard, ExternalLink, X, Sparkles } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Navbar = () => {
   const menuClassname =
-    "block rounded-lg px-4 py-2 text-xs md:text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700";
+    "block rounded-lg px-4 py-2 text-xs md:text-sm text-gray-600 hover:bg-emerald-50 hover:text-emerald-700 font-medium transition-colors";
+  
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
   const [isUserDropDownOpen, setIsUserDropDownOpen] = useState(false);
   const [isHamMenuOpen, setIsHamMenuOpen] = useState(false);
   const { openRegModal } = useRegModalStore();
@@ -25,7 +29,24 @@ const Navbar = () => {
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState(null);
   const notificationRef = useRef(null);
+  const userDropdownRef = useRef(null);
   const navigate = useNavigate();
+
+  // Scroll listener for floating glassmorphism effect & scroll progress bar
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      setIsScrolled(currentScrollY > 25);
+
+      const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
+      if (totalScroll > 0) {
+        setScrollProgress((currentScrollY / totalScroll) * 100);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
     if (currentUser) {
@@ -38,31 +59,39 @@ const Navbar = () => {
       if (notificationRef.current && !notificationRef.current.contains(event.target)) {
         setShowNotificationDropdown(false);
       }
+      if (userDropdownRef.current && !userDropdownRef.current.contains(event.target)) {
+        setIsUserDropDownOpen(false);
+      }
     };
 
-    if (showNotificationDropdown) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [showNotificationDropdown]);
+  }, []);
 
   const fetchNotifications = async () => {
-    const res = await api.get('/api/v1/notifications');
-    setNotifications(res.data.data);
-    setUnreadCount(res.data.data.filter(n => !n.isRead).length);
+    try {
+      const res = await api.get("/api/v1/notifications");
+      setNotifications(res.data.data || []);
+      setUnreadCount((res.data.data || []).filter((n) => !n.isRead).length);
+    } catch (err) {
+      console.error("Failed to fetch notifications:", err);
+    }
   };
 
   const handleClick = async () => {
     setShowNotificationDropdown(!showNotificationDropdown);
     if (!showNotificationDropdown && unreadCount > 0) {
-      for (const n of notifications.filter(n => !n.isRead)) {
-        await api.put(`/api/v1/notifications/${n.id}/read`);
+      for (const n of notifications.filter((n) => !n.isRead)) {
+        try {
+          await api.put(`/api/v1/notifications/${n.id}/read`);
+        } catch (e) {
+          console.error(e);
+        }
       }
       setUnreadCount(0);
-      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+      setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
     }
   };
 
@@ -78,16 +107,16 @@ const Navbar = () => {
   const getTimeAgo = (date) => {
     const seconds = Math.floor((new Date() - new Date(date)) / 1000);
     let interval = seconds / 31536000;
-    if (interval > 1) return Math.floor(interval) + ' years ago';
+    if (interval > 1) return Math.floor(interval) + " years ago";
     interval = seconds / 2592000;
-    if (interval > 1) return Math.floor(interval) + ' months ago';
+    if (interval > 1) return Math.floor(interval) + " months ago";
     interval = seconds / 86400;
-    if (interval > 1) return Math.floor(interval) + ' days ago';
+    if (interval > 1) return Math.floor(interval) + " days ago";
     interval = seconds / 3600;
-    if (interval > 1) return Math.floor(interval) + ' hours ago';
+    if (interval > 1) return Math.floor(interval) + " hours ago";
     interval = seconds / 60;
-    if (interval > 1) return Math.floor(interval) + ' minutes ago';
-    return 'just now';
+    if (interval > 1) return Math.floor(interval) + " minutes ago";
+    return "just now";
   };
 
   useEffect(() => {
@@ -118,13 +147,13 @@ const Navbar = () => {
   const handleLogOut = () => {
     Swal.fire({
       title: "Logging Out?",
-      text: "Your first year study group lasted longer than this session",
+      text: "Are you sure you want to end your current session?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#dc2626",
       cancelButtonColor: "#6b7280",
-      confirmButtonText: "Yes! Take me outta this shit",
-      cancelButtonText: "Let me rot a little longer",
+      confirmButtonText: "Yes, Log Out",
+      cancelButtonText: "Stay Logged In",
     }).then((result) => {
       if (result.isConfirmed) {
         setCurrentUser(null);
@@ -134,7 +163,7 @@ const Navbar = () => {
         setIsUserDropDownOpen(false);
         Swal.fire({
           title: "Session Terminated",
-          text: "Unlike your CG, this completed successfully.",
+          text: "You have been safely logged out.",
           icon: "success",
         });
         setTimeout(() => {
@@ -146,281 +175,369 @@ const Navbar = () => {
     });
   };
 
+  const navLinkClasses = ({ isActive }) =>
+    `relative px-3.5 py-1.5 rounded-full text-[15px] font-medium transition-all duration-200 ${
+      isActive
+        ? "text-emerald-700 bg-emerald-50/90 font-semibold shadow-xs"
+        : "text-gray-600 hover:text-emerald-600 hover:bg-gray-50/80"
+    }`;
+
   return (
     <>
-      <header className="bg-white shadow-md z-10 relative">
-        <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-14 md:h-16 items-center justify-between">
-            <div className="flex-1 md:flex md:items-center md:gap-12">
-              <Link to={"/"}>
+      <div
+        className={`sticky top-0 z-40 w-full transition-all duration-300 ${
+          isScrolled
+            ? "pt-3 px-3 sm:px-6 pointer-events-none"
+            : "pt-0 px-0 pointer-events-auto"
+        }`}
+      >
+        <header
+          className={`mx-auto max-w-screen-xl transition-all duration-300 pointer-events-auto relative overflow-hidden ${
+            isScrolled
+              ? "bg-white/85 backdrop-blur-xl border border-white/60 shadow-xl shadow-black/[0.04] rounded-2xl md:rounded-full px-4 sm:px-6 py-1 ring-1 ring-black/[0.03]"
+              : "bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 sm:px-6 lg:px-8 py-1.5 shadow-xs"
+          }`}
+        >
+          {/* Scroll Progress Indicator */}
+          {isScrolled && (
+            <div
+              className="absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-emerald-400 via-green-500 to-teal-400 rounded-full transition-all duration-150 ease-out"
+              style={{ width: `${scrollProgress}%` }}
+            />
+          )}
+
+          <div className="flex h-12 md:h-14 items-center justify-between">
+            {/* Logo */}
+            <div className="flex items-center gap-8">
+              <Link to={"/"} className="flex items-center group transition-transform duration-200 hover:scale-[1.03]">
                 <img
                   id="navbar-brand-logo"
                   src={brittoLogo}
-                  className="h-8 md:h-10 object-contain"
+                  className="h-8 md:h-9 object-contain"
                   alt="Britto"
                 />
               </Link>
             </div>
 
-            <div className="md:flex md:items-center md:gap-6">
-              <nav className="hidden md:block">
-                <div className="flex items-center gap-6 text-sm">
-                  <NavLink
-                    to="/"
-                    className="text-gray-600 text-[16px] cursor-pointer hover:text-green-500"
-                  >
-                    Home
-                  </NavLink>
-                  <NavLink
-                    to="/browse"
-                    className="text-gray-600 text-[16px] cursor-pointer hover:text-green-500"
-                  >
-                    Browse Items
-                  </NavLink>
-                  <NavLink
-                    to="/buy-credits"
-                    className="text-gray-600 text-[16px] cursor-pointer hover:text-green-500"
-                  >
-                    Buy Credits
-                  </NavLink>
-                  <NavLink
-                    to="/dashboard/overview"
-                    className="text-gray-600 text-[16px] cursor-pointer hover:text-green-500"
-                  >
-                    Dashboard
-                  </NavLink>
-                </div>
-              </nav>
+            {/* Desktop Navigation Links */}
+            <nav className="hidden md:block">
+              <div className="flex items-center gap-2 text-sm bg-gray-100/50 p-1 rounded-full border border-gray-200/50">
+                <NavLink to="/" className={navLinkClasses}>
+                  Home
+                </NavLink>
+                <NavLink to="/browse" className={navLinkClasses}>
+                  Browse Items
+                </NavLink>
+                <NavLink to="/buy-credits" className={navLinkClasses}>
+                  Buy Credits
+                </NavLink>
+                <NavLink to="/dashboard/overview" className={navLinkClasses}>
+                  Dashboard
+                </NavLink>
+              </div>
+            </nav>
 
+            {/* Right Action Icons & User Status */}
+            <div className="flex items-center gap-3 md:gap-4">
               {currentUser ? (
-                <div className="flex items-center gap-3 sm:gap-6 mr-2.5 sm:mr-0">
-                  <div className="flex items-center gap-2 md:gap-4 bg-gray-50 rounded-full px-3 py-2 border border-gray-200">
-                    <div className="flex items-center gap-1">
-                      <div className="sm:w-6 sm:h-6 w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center">
-                        <Coins className="w-3 h-3 text-blue-600" />
+                <div className="flex items-center gap-3 sm:gap-4">
+                  {/* Credit Cards (BCC & RCC) */}
+                  <div className="flex items-center gap-2 bg-gray-50/90 backdrop-blur-sm rounded-full p-1 sm:px-2.5 sm:py-1 border border-gray-200/70 shadow-xs">
+                    {/* BCC */}
+                    <Link
+                      to="/buy-credits"
+                      className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-blue-50/90 hover:bg-blue-100 text-blue-700 font-medium text-xs sm:text-sm transition-all hover:scale-105"
+                      title="Blue Cash Credits (BCC)"
+                    >
+                      <div className="w-4 h-4 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-xs">
+                        <Coins className="w-2.5 h-2.5" />
                       </div>
-                      <span className="text-sm font-medium text-blue-600 hidden sm:inline">
-                        {totalCredits?.totalAvailableBcc || 0}
-                      </span>
-                      <span className="text-xs font-medium text-blue-600 sm:hidden">
-                        {totalCredits?.totalAvailableBcc || 0}
-                      </span>
-                    </div>
+                      <span>{totalCredits?.totalAvailableBcc || 0}</span>
+                      <span className="text-[10px] text-blue-500 font-bold hidden lg:inline">BCC</span>
+                    </Link>
 
-                    <div className="flex items-center gap-1">
-                      <div className="sm:w-6 sm:h-6 w-4 h-4 bg-red-100 rounded-full flex items-center justify-center">
-                        <CreditCard className="w-3 h-3 text-red-600" />
+                    {/* RCC */}
+                    <Link
+                      to="/dashboard/my-credits"
+                      className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-rose-50/90 hover:bg-rose-100 text-rose-700 font-medium text-xs sm:text-sm transition-all hover:scale-105"
+                      title="Red Cash Credits (RCC - Withdrawable)"
+                    >
+                      <div className="w-4 h-4 rounded-full bg-rose-500 text-white flex items-center justify-center shadow-xs">
+                        <CreditCard className="w-2.5 h-2.5" />
                       </div>
-                      <span className="text-sm font-medium text-red-600 hidden sm:inline">
-                        {totalCredits?.totalAvailableRcc || 0}
-                      </span>
-                      <span className="text-xs font-medium text-red-600 sm:hidden">
-                        {totalCredits?.totalAvailableRcc || 0}
-                      </span>
-                    </div>
+                      <span>{totalCredits?.totalAvailableRcc || 0}</span>
+                      <span className="text-[10px] text-rose-500 font-bold hidden lg:inline">RCC</span>
+                    </Link>
                   </div>
 
+                  {/* Notification Bell */}
                   <div className="relative" ref={notificationRef}>
-                    <button 
+                    <button
                       onClick={handleClick}
-                      className="relative p-2 hover:bg-gray-100 rounded-full transition-colors"
+                      className="relative p-2 hover:bg-gray-100 text-gray-600 hover:text-gray-900 rounded-full transition-colors"
+                      title="Notifications"
                     >
-                      <Bell size={22} className="text-gray-600" />
+                      <Bell size={20} />
                       {unreadCount > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
-                          {unreadCount > 9 ? '9+' : unreadCount}
+                        <span className="absolute -top-0.5 -right-0.5 bg-emerald-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center ring-2 ring-white animate-pulse">
+                          {unreadCount > 9 ? "9+" : unreadCount}
                         </span>
                       )}
                     </button>
 
                     {showNotificationDropdown && (
-                      <div className="fixed md:absolute right-2 left-2 md:right-0 md:left-auto mt-2 md:w-96 bg-white border border-gray-200 rounded-lg shadow-xl z-50 overflow-hidden">
-                        <div className="bg-gradient-to-r from-green-500 to-green-600 px-4 py-3 flex items-center justify-between">
-                          <h3 className="text-white font-semibold text-sm md:text-base">Notifications</h3>
+                      <div className="fixed md:absolute right-2 left-2 md:right-0 md:left-auto mt-2 md:w-96 bg-white border border-gray-200/80 rounded-2xl shadow-2xl z-50 overflow-hidden">
+                        <div className="bg-gradient-to-r from-emerald-600 to-green-600 px-4 py-3 flex items-center justify-between">
+                          <h3 className="text-white font-semibold text-sm md:text-base flex items-center gap-2">
+                            <Bell size={16} /> Notifications
+                          </h3>
                           {notifications.length > 0 && (
-                            <span className="text-white text-xs bg-white/20 px-2 py-1 rounded-full">
+                            <span className="text-white text-xs bg-white/20 px-2 py-0.5 rounded-full font-medium">
                               {notifications.length}
                             </span>
                           )}
                         </div>
 
-                        <div className="max-h-[70vh] md:max-h-96 overflow-y-auto">
+                        <div className="max-h-[70vh] md:max-h-96 overflow-y-auto divide-y divide-gray-100">
                           {notifications.length === 0 ? (
                             <div className="p-8 text-center">
-                              <Bell size={48} className="mx-auto text-gray-300 mb-3" />
+                              <Bell size={36} className="mx-auto text-gray-300 mb-2" />
                               <p className="text-gray-500 text-sm">No notifications yet</p>
                             </div>
                           ) : (
-                            <div className="divide-y divide-gray-100">
-                              {notifications.map(n => {
-                                const content = (
-                                  <div className={`p-4 hover:bg-gray-50 transition-colors cursor-pointer ${!n.isRead ? 'bg-green-50/50' : ''}`}>
-                                    <div className="flex items-start gap-3">
-                                      <div className={`flex-shrink-0 w-2 h-2 rounded-full mt-2 ${!n.isRead ? 'bg-green-500' : 'bg-gray-300'}`} />
-                                      <div className="flex-1 min-w-0">
-                                        <div className="flex items-start justify-between gap-2">
-                                          <h4 className="font-semibold text-sm text-gray-800 truncate">{n.title}</h4>
-                                          {n.data.url && <ExternalLink size={14} className="text-gray-400 flex-shrink-0" />}
-                                        </div>
-                                        <p className="text-xs text-gray-600 mt-1 line-clamp-4">{n.body}</p>
-                                        <p className="text-xs text-gray-400 mt-2">{getTimeAgo(n.createdAt)}</p>
+                            notifications.map((n) => {
+                              const content = (
+                                <div
+                                  className={`p-3.5 hover:bg-gray-50 transition-colors cursor-pointer ${
+                                    !n.isRead ? "bg-emerald-50/40" : ""
+                                  }`}
+                                >
+                                  <div className="flex items-start gap-3">
+                                    <div
+                                      className={`flex-shrink-0 w-2 h-2 rounded-full mt-2 ${
+                                        !n.isRead ? "bg-emerald-500 ring-2 ring-emerald-200" : "bg-gray-300"
+                                      }`}
+                                    />
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-start justify-between gap-2">
+                                        <h4 className="font-semibold text-xs sm:text-sm text-gray-800 truncate">
+                                          {n.title}
+                                        </h4>
+                                        {n.data?.url && (
+                                          <ExternalLink size={13} className="text-gray-400 flex-shrink-0" />
+                                        )}
                                       </div>
+                                      <p className="text-xs text-gray-600 mt-1 line-clamp-3 leading-relaxed">
+                                        {n.body || n.message}
+                                      </p>
+                                      <p className="text-[11px] text-gray-400 mt-1.5">
+                                        {getTimeAgo(n.createdAt)}
+                                      </p>
                                     </div>
                                   </div>
-                                );
+                                </div>
+                              );
 
-                                if (n.data.url) {
-                                  return n.data.url.startsWith('/') ? (
-                                    <Link key={n.id} to={n.data.url} onClick={() => setShowNotificationDropdown(false)}>
-                                      {content}
-                                    </Link>
-                                  ) : (
-                                    <a key={n.id} href={n.data.url} target="_blank" rel="noopener noreferrer" onClick={() => setShowNotificationDropdown(false)}>
-                                      {content}
-                                    </a>
-                                  );
-                                }
-                                return <div key={n.id} onClick={() => handleNotificationClick(n)}>{content}</div>;
-                              })}
-                            </div>
+                              if (n.data?.url) {
+                                return n.data.url.startsWith("/") ? (
+                                  <Link
+                                    key={n.id}
+                                    to={n.data.url}
+                                    onClick={() => setShowNotificationDropdown(false)}
+                                  >
+                                    {content}
+                                  </Link>
+                                ) : (
+                                  <a
+                                    key={n.id}
+                                    href={n.data.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    onClick={() => setShowNotificationDropdown(false)}
+                                  >
+                                    {content}
+                                  </a>
+                                );
+                              }
+                              return (
+                                <div key={n.id} onClick={() => handleNotificationClick(n)}>
+                                  {content}
+                                </div>
+                              );
+                            })
                           )}
                         </div>
                       </div>
                     )}
                   </div>
 
-                  <div className="relative">
-                    <Avatar
-                      name={currentUser.email}
-                      colors={[
-                        "#482344",
-                        "#2b5166",
-                        "#429867",
-                        "#fab243",
-                        "#e02130",
-                      ]}
-                      variant="beam"
-                      size={35}
-                      className="cursor-pointer"
-                      onClick={() =>
-                        setIsUserDropDownOpen((prevState) => !prevState)
-                      }
-                    />
+                  {/* User Profile Avatar & Dropdown */}
+                  <div className="relative" ref={userDropdownRef}>
+                    <button
+                      onClick={() => setIsUserDropDownOpen((prev) => !prev)}
+                      className="rounded-full ring-2 ring-emerald-500/20 hover:ring-emerald-500/60 transition p-0.5"
+                    >
+                      <Avatar
+                        name={currentUser.email}
+                        colors={["#059669", "#10b981", "#34d399", "#6ee7b7", "#a7f3d0"]}
+                        variant="beam"
+                        size={32}
+                      />
+                    </button>
+
                     {isUserDropDownOpen && (
-                      <div className="absolute end-0 z-20 mt-0.5 w-48 divide-gray-100 rounded-md border border-gray-100 bg-white shadow-lg overflow-x-hidden top-10 lg:-left-3">
-                        <div className="p-2">
-                          <Link to="/dashboard/overview" className={menuClassname}>
+                      <div className="absolute right-0 z-50 mt-2 w-52 rounded-2xl border border-gray-200/80 bg-white/95 backdrop-blur-md shadow-2xl p-1.5 divide-y divide-gray-100">
+                        <div className="px-3 py-2">
+                          <p className="text-xs font-semibold text-gray-900 truncate">
+                            {currentUser.name || "User"}
+                          </p>
+                          <p className="text-[11px] text-gray-500 truncate">{currentUser.email}</p>
+                        </div>
+
+                        <div className="py-1">
+                          <Link
+                            to="/dashboard/overview"
+                            className={menuClassname}
+                            onClick={() => setIsUserDropDownOpen(false)}
+                          >
                             My Dashboard
                           </Link>
                           {currentUser.role === "ADMIN" && (
                             <Link
                               to="/dashboard/admin/manage-users"
                               className={menuClassname}
+                              onClick={() => setIsUserDropDownOpen(false)}
                             >
                               Admin Dashboard
                             </Link>
                           )}
                         </div>
-                        {currentUser && (
+
+                        <div className="pt-1">
                           <button
-                            className="flex w-full items-center gap-2 rounded-lg px-4 py-2 text-sm text-red-700 hover:bg-red-50 cursor-pointer mb-2 mx-2"
+                            className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 transition cursor-pointer"
                             onClick={handleLogOut}
                           >
-                            <IoLogOut size={20} />
-                            Logout
+                            <IoLogOut size={16} />
+                            Log Out
                           </button>
-                        )}
+                        </div>
                       </div>
                     )}
                   </div>
                 </div>
               ) : (
-                <div className="flex gap-4">
+                <div className="flex items-center gap-2">
                   <button
                     onClick={openLoginModal}
-                    className="text-xs md:text-base mr-3 lg:mr-0 px-3 py-2 border border-gray-300 text-gray-700 hover:border-green-600 hover:bg-green-600 rounded-lg hover:text-white cursor-pointer bg-transparent"
+                    className="px-3.5 py-1.5 text-xs sm:text-sm font-medium text-gray-700 hover:text-emerald-600 hover:bg-gray-100/70 rounded-full transition-all"
                   >
                     Log In
                   </button>
                   <button
                     onClick={openRegModal}
-                    className="px-3 py-2 border border-green-600 bg-green-600 rounded-lg text-white cursor-pointer hover:bg-green-700 hover:border-green-700 hidden md:block"
+                    className="px-4 py-1.5 text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 rounded-full shadow-md shadow-green-600/20 hover:shadow-lg hover:shadow-green-600/30 hover:scale-[1.02] active:scale-[0.98] transition-all"
                   >
                     Sign Up
                   </button>
                 </div>
               )}
-              {isHamMenuOpen && (
-                <div className="absolute end-0 z-10 mt-0.5 w-40 divide-gray-100 rounded-md border border-gray-100 bg-white shadow-lg top-12 overflow-x-hidden right-2">
-                  <div className="p-2">
-                    <NavLink onClick={() => setIsHamMenuOpen(false)} to="/" className={menuClassname}>
-                      Home
-                    </NavLink>
-                    <NavLink onClick={() => setIsHamMenuOpen(false)} to="/browse" className={menuClassname}>
-                      Browse Items
-                    </NavLink>
-                    <NavLink onClick={() => setIsHamMenuOpen(false)} to="/buy-credits" className={menuClassname}>
-                      Buy Credits
-                    </NavLink>
-                    <NavLink onClick={() => setIsHamMenuOpen(false)}
-                      to="/dashboard/overview"
-                      className={menuClassname}
-                    >
-                      Dashboard
-                    </NavLink>
-                  </div>
-                </div>
-              )}
-            </div>
-            <GiHamburgerMenu
-              onClick={() => setIsHamMenuOpen((prevState) => !prevState)}
-              className="block md:hidden"
-              size={24}
-            />
-          </div>
-        </div>
-      </header>
 
-      {/* Notification Modal */}
+              {/* Hamburger Button for Mobile */}
+              <button
+                onClick={() => setIsHamMenuOpen((prev) => !prev)}
+                className="p-1.5 text-gray-600 hover:text-gray-900 rounded-lg md:hidden"
+                aria-label="Toggle mobile menu"
+              >
+                <GiHamburgerMenu size={20} />
+              </button>
+            </div>
+          </div>
+        </header>
+
+        {/* Mobile Slide-down Menu */}
+        <AnimatePresence>
+          {isHamMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="md:hidden mx-auto max-w-screen-xl mt-2 bg-white/95 backdrop-blur-xl border border-gray-200/80 rounded-2xl shadow-2xl p-3 space-y-1 pointer-events-auto"
+            >
+              <NavLink
+                onClick={() => setIsHamMenuOpen(false)}
+                to="/"
+                className={menuClassname}
+              >
+                Home
+              </NavLink>
+              <NavLink
+                onClick={() => setIsHamMenuOpen(false)}
+                to="/browse"
+                className={menuClassname}
+              >
+                Browse Items
+              </NavLink>
+              <NavLink
+                onClick={() => setIsHamMenuOpen(false)}
+                to="/buy-credits"
+                className={menuClassname}
+              >
+                Buy Credits
+              </NavLink>
+              <NavLink
+                onClick={() => setIsHamMenuOpen(false)}
+                to="/dashboard/overview"
+                className={menuClassname}
+              >
+                Dashboard
+              </NavLink>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Notification Full Modal Details */}
       {selectedNotification && (
-        <div className="fixed inset-0 bg-black/60 bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
-            <div className="bg-gradient-to-r from-green-500 to-green-600 px-6 py-4 flex items-center justify-between">
-              <h3 className="text-white font-semibold text-lg">Notification Details</h3>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-gray-100"
+          >
+            <div className="bg-gradient-to-r from-emerald-600 to-green-600 px-6 py-4 flex items-center justify-between text-white">
+              <h3 className="font-semibold text-base flex items-center gap-2">
+                <Bell size={18} /> Notification
+              </h3>
               <button
                 onClick={closeModal}
-                className="text-white hover:bg-white/20 rounded-full p-1 transition-colors"
+                className="hover:bg-white/20 rounded-full p-1 transition-colors"
               >
-                <X size={24} />
+                <X size={20} />
               </button>
-            </div>
-            
-            <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
-              <div className="mb-4">
-                <h4 className="text-xl font-bold text-gray-800 mb-2">
-                  {selectedNotification.title}
-                </h4>
-                <p className="text-sm text-gray-500">
-                  {getTimeAgo(selectedNotification.createdAt)}
-                </p>
-              </div>
-              
-              <div className="prose max-w-none">
-                <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
-                  {selectedNotification.body}
-                </p>
-              </div>
             </div>
 
-            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end">
+            <div className="p-6">
+              <h4 className="text-lg font-bold text-gray-900 mb-1">
+                {selectedNotification.title}
+              </h4>
+              <p className="text-xs text-gray-400 mb-4">
+                {getTimeAgo(selectedNotification.createdAt)}
+              </p>
+              <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                {selectedNotification.body || selectedNotification.message}
+              </p>
+            </div>
+
+            <div className="px-6 py-3.5 bg-gray-50/80 border-t border-gray-100 flex justify-end">
               <button
                 onClick={closeModal}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+                className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-medium text-xs transition"
               >
-                Close
+                Dismiss
               </button>
             </div>
-          </div>
+          </motion.div>
         </div>
       )}
     </>
